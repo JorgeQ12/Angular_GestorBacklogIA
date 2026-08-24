@@ -1,3 +1,3 @@
 interface:
-  display_name: "Migracion Angular Interia"
-  short_description: "Help with Migracion Angular Interia tasks"
+  display_name: 'Migración Angular InterIA'
+  short_description: 'Migra el frontend siguiendo sus convenciones'
