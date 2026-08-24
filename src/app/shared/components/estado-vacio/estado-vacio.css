@@ -1,0 +1,40 @@
+/* Mantiene una presentación coherente para experiencias sin contenido disponible. */
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.ui-empty-state {
+  display: grid;
+  min-height: var(--ui-empty-state-min-height, 10rem);
+  place-items: center;
+  gap: var(--space-2);
+  padding: var(--space-6);
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.ui-empty-state__icon {
+  display: grid;
+  width: var(--control-height-lg);
+  height: var(--control-height-lg);
+  place-items: center;
+  border-radius: var(--radius-md);
+  background: var(--ui-card-accent-surface, var(--surface-muted));
+  color: var(--ui-card-accent, var(--text-secondary));
+}
+
+.ui-empty-state__icon app-icono {
+  width: var(--space-5);
+  height: var(--space-5);
+}
+
+.ui-empty-state__title {
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+}
+
+.ui-empty-state__description {
+  max-width: 28rem;
+  font-size: var(--font-size-xs);
+}

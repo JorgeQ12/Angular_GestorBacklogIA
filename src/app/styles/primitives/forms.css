@@ -1,0 +1,162 @@
+/* Primitivas compartidas para campos, controles y mensajes de validación. */
+.ui-field {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.ui-label {
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-snug);
+}
+
+.ui-label--compact {
+  color: var(--field-label-color);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+}
+
+.ui-control-wrap {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  align-items: center;
+}
+
+.ui-control {
+  width: 100%;
+  min-height: var(--control-height-lg);
+  padding: 0 var(--space-4);
+  border: var(--border-width) solid var(--field-border);
+  border-radius: var(--radius-md);
+  background: var(--field-surface);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-tight);
+  transition:
+    border-color var(--transition-base) var(--ease-standard),
+    background-color var(--transition-base) var(--ease-standard),
+    box-shadow var(--transition-base) var(--ease-standard);
+}
+
+.ui-control--xl {
+  min-height: var(--control-height-xl);
+}
+
+.ui-control--with-leading-icon {
+  padding-left: 3rem;
+}
+
+.ui-control--with-trailing-action {
+  padding-right: 3.25rem;
+}
+
+.ui-control::placeholder {
+  color: var(--text-disabled);
+  opacity: 1;
+}
+
+.ui-control:hover:not(:disabled) {
+  border-color: var(--field-border-hover);
+  background: var(--field-surface-hover);
+}
+
+.ui-control-wrap:focus-within .ui-control {
+  border-color: var(--field-border-focus);
+  background: var(--field-surface-focus);
+  box-shadow: var(--shadow-focus);
+  outline: 0;
+}
+
+.ui-control:disabled {
+  border-color: var(--field-border);
+  background: var(--field-surface-disabled);
+  color: var(--text-disabled);
+  opacity: 0.75;
+}
+
+.ui-control-icon {
+  position: absolute;
+  left: var(--space-4);
+  z-index: var(--z-raised);
+  display: grid;
+  width: 1rem;
+  height: 1rem;
+  place-items: center;
+  color: var(--field-icon-color);
+  pointer-events: none;
+}
+
+.ui-control-icon app-icono,
+.ui-control-action app-icono {
+  width: 1rem;
+  height: 1rem;
+  color: inherit;
+}
+
+.ui-control-action {
+  position: absolute;
+  right: 0.55rem;
+  z-index: var(--z-raised);
+  display: inline-flex;
+  width: 2.2rem;
+  height: 2.2rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: var(--border-width) solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--field-icon-color);
+}
+
+.ui-control-action:hover:not(:disabled) {
+  border-color: var(--field-border);
+  background: var(--surface-muted);
+  color: var(--text-primary);
+}
+
+.ui-control-action:focus-visible {
+  outline: 0;
+  box-shadow: var(--shadow-focus);
+}
+
+.ui-control-action:disabled {
+  color: var(--text-disabled);
+  opacity: 0.7;
+}
+
+/* Estados coordinados por el contenedor para foco y validación accesible. */
+.ui-control-wrap:focus-within .ui-control-icon,
+.ui-control-wrap:focus-within .ui-control-action {
+  color: var(--field-border-focus);
+}
+
+.ui-field.has-error .ui-control {
+  border-color: var(--field-error-color);
+  background: var(--field-error-surface);
+}
+
+.ui-field.has-error .ui-control-icon,
+.ui-field.has-error .ui-control-action {
+  color: var(--field-error-color);
+}
+
+.ui-field-error {
+  padding-left: var(--space-1);
+  color: var(--field-error-color);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-snug);
+}
+
+/* Respeta la preferencia del usuario sin alterar los estados del control. */
+@media (prefers-reduced-motion: reduce) {
+  .ui-control {
+    transition: none;
+  }
+}

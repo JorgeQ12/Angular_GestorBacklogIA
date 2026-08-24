@@ -1,0 +1,12 @@
+<section class="layout-panel" [class.layout-panel--colapsado]="barraLateralColapsada()">
+  <app-barra-lateral-panel
+    [items]="itemsNavegacion()"
+    [rutaInicio]="rutaInicio"
+    [colapsada]="barraLateralColapsada()"
+    (alternarColapso)="alternarBarraLateral()"
+    (cerrarSesion)="cerrarSesion()"
+  />
+  <main class="contenido-panel">
+    <router-outlet />
+  </main>
+</section>

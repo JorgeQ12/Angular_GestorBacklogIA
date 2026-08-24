@@ -1,0 +1,50 @@
+<article class="ui-card ui-card--accented" aria-labelledby="titulo-proyectos-recientes">
+  <header class="ui-card__header">
+    <div class="ui-card__heading">
+      <span class="ui-card__icon" aria-hidden="true"><app-icono nombre="proyectos" /></span>
+      <div>
+        <span class="ui-card__eyebrow">Actividad de proyectos</span>
+        <h2 id="titulo-proyectos-recientes" class="ui-card__title">Proyectos recientes</h2>
+      </div>
+    </div>
+    <button type="button" class="ui-button ui-button--text ui-button--md" (click)="verTodos.emit()">
+      Ver todos
+      <app-icono class="ui-button__icon ui-button__icon--trailing" nombre="continuar" />
+    </button>
+  </header>
+
+  @if (proyectos().length === 0) {
+    <app-estado-vacio
+      icono="proyectos"
+      titulo="Aún no hay proyectos"
+      descripcion="Los proyectos disponibles para el usuario aparecerán aquí."
+    />
+  } @else {
+    <div class="ui-card__body lista-proyectos-recientes" aria-label="Proyectos recientes">
+      @for (proyecto of proyectos(); track proyecto.id) {
+        <button
+          type="button"
+          class="proyecto-reciente"
+          (click)="seleccionarProyecto.emit(proyecto)"
+        >
+          <span class="proyecto-reciente__identidad">
+            <i aria-hidden="true"><app-icono nombre="proyectos" /></i>
+            <span>
+              <strong>{{ proyecto.nombre }}</strong>
+              <small>{{ proyecto.responsable || 'Sin responsable' }}</small>
+            </span>
+          </span>
+          <span class="proyecto-reciente__estado">{{ proyecto.estado || 'Sin estado' }}</span>
+          <span class="proyecto-reciente__fecha">{{ proyecto.fechaObjetivo | fecha }}</span>
+          <span
+            class="proyecto-reciente__backlog"
+            [class.proyecto-reciente__backlog--disponible]="proyecto.tieneBacklog"
+          >
+            {{ proyecto.tieneBacklog ? 'Disponible' : 'Pendiente' }}
+          </span>
+          <app-icono class="proyecto-reciente__flecha" nombre="continuar" />
+        </button>
+      }
+    </div>
+  }
+</article>

@@ -2,6 +2,14 @@
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.1.0.
 
+## Convenciones del proyecto
+
+- [Convenciones generales del frontend](docs/CONVENCIONES_FRONTEND.md)
+- [Autenticación mediante Kong y Microsoft](docs/AUTENTICACION_KONG.md)
+- [Carga global](docs/CARGA_GLOBAL.md)
+- [Estándar de formularios reactivos](docs/FORMULARIOS_REACTIVOS.md)
+- [Estándar de estilos del frontend](docs/ESTILOS_FRONTEND.md)
+
 ## Development server
 
 To start a local development server, run:

@@ -1,0 +1,21 @@
+<div class="acceso-microsoft" [attr.aria-busy]="autenticando()">
+  <button
+    type="button"
+    class="ui-button ui-button--primary ui-button--block ui-button--xl acceso-microsoft__boton"
+    [disabled]="autenticando()"
+    (click)="solicitarInicioSesion()"
+  >
+    <img
+      class="acceso-microsoft__icono"
+      src="/brand/microsoft.svg"
+      width="21"
+      height="21"
+      alt=""
+      aria-hidden="true"
+    />
+    <span class="ui-button__label">
+      {{ autenticando() ? 'Esperando a Microsoft…' : 'Iniciar sesión con Microsoft' }}
+    </span>
+    <app-icono class="ui-button__icon ui-button__icon--trailing" nombre="continuar" />
+  </button>
+</div>

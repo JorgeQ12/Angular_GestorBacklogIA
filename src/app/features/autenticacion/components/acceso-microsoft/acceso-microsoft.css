@@ -1,0 +1,17 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.acceso-microsoft {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.acceso-microsoft__icono {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex: 0 0 auto;
+}

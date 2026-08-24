@@ -1,0 +1,92 @@
+:host {
+  display: block;
+}
+
+.indicadores-proyectos {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.indicador-proyecto {
+  display: grid;
+  grid-template-columns: var(--control-height-lg) minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-xs);
+}
+
+.indicador-proyecto__icono {
+  display: grid;
+  width: var(--control-height-lg);
+  height: var(--control-height-lg);
+  place-items: center;
+  border-radius: var(--radius-md);
+  background: var(--surface-muted);
+  color: var(--text-secondary);
+}
+
+.indicador-proyecto--exito .indicador-proyecto__icono {
+  background: var(--color-success-surface);
+  color: var(--color-success);
+}
+
+.indicador-proyecto--advertencia .indicador-proyecto__icono {
+  background: var(--color-warning-surface);
+  color: var(--color-warning);
+}
+
+.indicador-proyecto__icono app-icono {
+  width: var(--space-5);
+  height: var(--space-5);
+}
+
+.indicador-proyecto__contenido {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'titulo valor'
+    'detalle valor';
+  align-items: center;
+  column-gap: var(--space-3);
+  row-gap: var(--space-1);
+}
+
+.indicador-proyecto__contenido > span {
+  grid-area: titulo;
+  color: var(--text-muted);
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-wide);
+  line-height: var(--line-height-none);
+  text-transform: uppercase;
+}
+
+.indicador-proyecto__contenido > strong {
+  grid-area: valor;
+  font-size: var(--font-size-2xl);
+  line-height: var(--line-height-none);
+}
+
+.indicador-proyecto__contenido > small {
+  grid-area: detalle;
+  overflow: hidden;
+  color: var(--text-secondary);
+  font-size: var(--font-size-3xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 1280px) {
+  .indicadores-proyectos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .indicadores-proyectos {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

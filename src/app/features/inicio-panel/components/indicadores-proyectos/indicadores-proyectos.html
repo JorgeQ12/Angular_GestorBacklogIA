@@ -1,0 +1,48 @@
+<section class="indicadores-proyectos" aria-label="Indicadores principales de proyectos">
+  <article class="ui-card indicador-proyecto">
+    <span class="indicador-proyecto__icono" aria-hidden="true">
+      <app-icono nombre="proyectos" />
+    </span>
+    <div class="indicador-proyecto__contenido">
+      <span>Proyectos</span>
+      <strong>{{ indicadores().totalProyectos }}</strong>
+      <small>{{ indicadores().nuevos }} nuevos · {{ indicadores().activos }} activos</small>
+    </div>
+  </article>
+
+  <article class="ui-card indicador-proyecto indicador-proyecto--exito">
+    <span class="indicador-proyecto__icono" aria-hidden="true">
+      <app-icono nombre="seguimiento" />
+    </span>
+    <div class="indicador-proyecto__contenido">
+      <span>En seguimiento</span>
+      <strong>{{ indicadores().nuevos + indicadores().activos }}</strong>
+      <small>{{ indicadores().proximosAVencer }} con fecha próxima</small>
+    </div>
+  </article>
+
+  <article class="ui-card indicador-proyecto">
+    <span class="indicador-proyecto__icono" aria-hidden="true">
+      <app-icono nombre="backlog" />
+    </span>
+    <div class="indicador-proyecto__contenido">
+      <span>Backlog disponible</span>
+      <strong>{{ indicadores().conBacklog }}</strong>
+      <small>{{ indicadores().pendientesBacklog }} pendientes por iniciar</small>
+    </div>
+  </article>
+
+  <article
+    class="ui-card indicador-proyecto"
+    [class.indicador-proyecto--advertencia]="indicadores().requierenAtencion > 0"
+  >
+    <span class="indicador-proyecto__icono" aria-hidden="true">
+      <app-icono nombre="alerta" />
+    </span>
+    <div class="indicador-proyecto__contenido">
+      <span>Requieren atención</span>
+      <strong>{{ indicadores().requierenAtencion }}</strong>
+      <small>{{ indicadores().vencidos }} con fecha vencida</small>
+    </div>
+  </article>
+</section>

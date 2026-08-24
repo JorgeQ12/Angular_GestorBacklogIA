@@ -1,0 +1,51 @@
+:host {
+  display: block;
+}
+
+.inicio-panel {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.inicio-panel__columnas {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(20rem, 0.85fr);
+  align-items: start;
+  gap: var(--space-4);
+}
+
+.inicio-panel__columna {
+  display: grid;
+  min-width: 0;
+  gap: var(--space-4);
+}
+
+.inicio-panel__error {
+  --ui-error-state-min-height: calc(100dvh - var(--space-6) - var(--space-12));
+}
+
+@media (max-width: 1280px) {
+  .inicio-panel__columnas {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .inicio-panel__columna {
+    display: contents;
+  }
+
+  app-estado-proyectos {
+    order: 1;
+  }
+
+  app-proyectos-atencion {
+    order: 2;
+  }
+
+  app-proyectos-recientes {
+    order: 3;
+  }
+
+  app-borradores-recientes {
+    order: 4;
+  }
+}

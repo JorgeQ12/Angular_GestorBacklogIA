@@ -1,0 +1,19 @@
+<article class="ui-card ui-error-state" role="alert" aria-live="polite">
+  <div class="ui-error-state__content">
+    <span class="ui-error-state__icon" aria-hidden="true">
+      <app-icono nombre="alerta" />
+    </span>
+    <strong class="ui-error-state__title">{{ titulo() }}</strong>
+    <p class="ui-error-state__description">{{ descripcion() }}</p>
+    @if (reintentable()) {
+      <button
+        type="button"
+        class="ui-button ui-button--secondary ui-button--md ui-error-state__retry"
+        (click)="reintentar.emit()"
+      >
+        <app-icono class="ui-button__icon" nombre="reintentar" />
+        Reintentar
+      </button>
+    }
+  </div>
+</article>

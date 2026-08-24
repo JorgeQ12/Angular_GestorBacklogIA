@@ -1,0 +1,51 @@
+<article class="ui-card ui-card--accented ui-card--warning" aria-labelledby="titulo-atencion">
+  <header class="ui-card__header">
+    <div class="ui-card__heading">
+      <span class="ui-card__icon" aria-hidden="true"><app-icono nombre="alerta" /></span>
+      <div>
+        <span class="ui-card__eyebrow">Prioridad operativa</span>
+        <h2 id="titulo-atencion" class="ui-card__title">Requieren atención</h2>
+      </div>
+    </div>
+    <span class="ui-card__count">{{ proyectos().length }}</span>
+  </header>
+
+  @if (proyectos().length === 0) {
+    <app-estado-vacio
+      icono="completado"
+      titulo="Sin alertas pendientes"
+      descripcion="Los proyectos disponibles no presentan condiciones críticas."
+    />
+  } @else {
+    <div class="ui-card__body lista-atencion">
+      @for (proyecto of proyectos(); track proyecto.id) {
+        <button
+          type="button"
+          class="proyecto-atencion"
+          (click)="seleccionarProyecto.emit(proyecto)"
+        >
+          <span class="proyecto-atencion__marca" aria-hidden="true"></span>
+          <span class="proyecto-atencion__datos">
+            <span>{{ proyecto.motivoAtencion ?? 'Revisión pendiente' }}</span>
+            <strong>{{ proyecto.nombre }}</strong>
+            <small>
+              {{ proyecto.responsable || 'Sin responsable' }} ·
+              {{ proyecto.fechaObjetivo | fecha }}
+            </small>
+          </span>
+          <span class="proyecto-atencion__accion">Revisar proyecto</span>
+          <app-icono nombre="continuar" />
+        </button>
+      }
+    </div>
+  }
+
+  <footer class="ui-card__footer resumen-atencion">
+    <span
+      ><strong>{{ vencidos() }}</strong> fechas vencidas</span
+    >
+    <span
+      ><strong>{{ proximosAVencer() }}</strong> próximas a vencer</span
+    >
+  </footer>
+</article>

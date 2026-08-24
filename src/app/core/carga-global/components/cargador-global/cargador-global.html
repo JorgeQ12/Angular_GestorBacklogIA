@@ -1,0 +1,22 @@
+@if (visible()) {
+  <div class="cargador-global" role="status" aria-live="polite" aria-atomic="true" aria-busy="true">
+    <div class="cargador-global__contenido">
+      <div class="cargador-global__recorrido" aria-hidden="true">
+        <div class="cargador-global__vehiculo">
+          <span class="cargador-global__humo cargador-global__humo--uno"></span>
+          <span class="cargador-global__humo cargador-global__humo--dos"></span>
+          <span class="cargador-global__humo cargador-global__humo--tres"></span>
+          <span class="cargador-global__humo cargador-global__humo--cuatro"></span>
+          <img
+            class="cargador-global__camion"
+            src="/brand/camion_carga.webp"
+            width="480"
+            height="302"
+            alt=""
+          />
+        </div>
+      </div>
+      <p class="cargador-global__estado">Procesando información…</p>
+    </div>
+  </div>
+}

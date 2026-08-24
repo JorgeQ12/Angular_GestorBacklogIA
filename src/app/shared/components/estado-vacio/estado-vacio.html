@@ -1,0 +1,10 @@
+<div class="ui-empty-state">
+  <span class="ui-empty-state__icon" aria-hidden="true">
+    <app-icono [nombre]="icono()" />
+  </span>
+  <strong class="ui-empty-state__title">{{ titulo() }}</strong>
+  @if (descripcion()) {
+    <p class="ui-empty-state__description">{{ descripcion() }}</p>
+  }
+  <ng-content select="[estadoVacioAcciones]" />
+</div>

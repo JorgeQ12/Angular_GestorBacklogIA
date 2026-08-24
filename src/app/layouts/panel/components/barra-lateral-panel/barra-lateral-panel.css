@@ -1,0 +1,268 @@
+/* Presenta la navegación completa o compacta sin decidir qué opciones son visibles. */
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.barra-lateral-panel {
+  position: sticky;
+  top: 0;
+  display: flex;
+  height: 100dvh;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  overflow: hidden;
+  border-right: var(--border-width) solid var(--border-subtle);
+  background: var(--surface-subtle);
+}
+
+.barra-lateral-panel__cabecera {
+  display: flex;
+  min-height: var(--control-height-xl);
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-1);
+  border: var(--border-width) solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--surface-default);
+  box-shadow: var(--shadow-sm);
+}
+
+.marca-panel {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.marca-panel__simbolo {
+  display: grid;
+  width: var(--control-height-md);
+  height: var(--control-height-md);
+  flex: 0 0 var(--control-height-md);
+  place-items: center;
+  border: var(--border-width) solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--surface-subtle);
+}
+
+.marca-panel__simbolo img {
+  width: var(--space-3);
+  height: var(--space-5);
+}
+
+.marca-panel__texto {
+  display: grid;
+  min-width: 0;
+  font-size: var(--font-size-md);
+}
+
+.barra-lateral-panel__alternador {
+  display: grid;
+  width: var(--control-height-sm);
+  height: var(--control-height-sm);
+  flex: 0 0 var(--control-height-sm);
+  place-items: center;
+  padding: 0;
+  border: var(--border-width) solid transparent;
+  border-radius: var(--radius-sm);
+  background: var(--surface-muted);
+  color: var(--text-secondary);
+  font-size: var(--font-size-lg);
+}
+
+.barra-lateral-panel__alternador:hover {
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+
+.barra-lateral-panel__alternador:focus-visible,
+.marca-panel:focus-visible,
+.navegacion-panel__enlace:focus-visible,
+.barra-lateral-panel__cerrar-sesion:focus-visible {
+  outline: 0;
+  box-shadow: var(--shadow-focus);
+}
+
+.navegacion-panel {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-1) 0;
+  overflow-y: auto;
+}
+
+.navegacion-panel__enlace {
+  display: grid;
+  min-height: var(--control-height-lg);
+  grid-template-columns: var(--control-height-sm) minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-width) solid transparent;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+
+.navegacion-panel__enlace:hover {
+  background: var(--surface-muted);
+  color: var(--text-primary);
+}
+
+.navegacion-panel__enlace.es-activo {
+  border-color: var(--surface-inverse);
+  background: var(--surface-inverse);
+  color: var(--text-inverse);
+  box-shadow: var(--shadow-sm);
+}
+
+.navegacion-panel__icono {
+  display: flex;
+  width: var(--control-height-sm);
+  height: var(--control-height-sm);
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-base);
+}
+
+.navegacion-panel__texto {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+}
+
+.barra-lateral-panel__pie {
+  flex: 0 0 auto;
+  padding-top: var(--space-3);
+  border-top: var(--border-width) solid var(--border-subtle);
+}
+
+.barra-lateral-panel__cerrar-sesion {
+  justify-content: center;
+  border-color: transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-danger);
+  font-weight: var(--font-weight-semibold);
+  text-align: left;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+.barra-lateral-panel__cerrar-sesion:hover:not(:disabled) {
+  border-color: transparent;
+  background: var(--color-danger-surface);
+  color: var(--color-danger);
+  box-shadow: none;
+  transform: none;
+}
+
+.barra-lateral-panel__cerrar-sesion:active:not(:disabled) {
+  border-color: transparent;
+  background: var(--color-danger-border);
+  color: var(--color-danger-strong);
+  transform: none;
+}
+
+/* La versión compacta oculta visualmente los textos sin retirarlos del árbol accesible. */
+.barra-lateral-panel--colapsada {
+  align-items: center;
+  padding-inline: var(--space-2);
+}
+
+.barra-lateral-panel--colapsada .barra-lateral-panel__cabecera {
+  width: 100%;
+  flex-direction: column;
+}
+
+.barra-lateral-panel--colapsada .marca-panel__texto,
+.barra-lateral-panel--colapsada .navegacion-panel__texto {
+  display: none;
+}
+
+.barra-lateral-panel--colapsada .navegacion-panel {
+  width: 100%;
+  align-items: center;
+}
+
+.barra-lateral-panel--colapsada .navegacion-panel__enlace {
+  display: flex;
+  width: var(--control-height-lg);
+  justify-content: center;
+  padding: var(--space-1);
+}
+
+.barra-lateral-panel--colapsada .barra-lateral-panel__pie {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
+
+.barra-lateral-panel--colapsada .barra-lateral-panel__cerrar-sesion {
+  width: var(--control-height-lg);
+  padding: 0;
+  justify-content: center;
+}
+
+.barra-lateral-panel--colapsada .barra-lateral-panel__cerrar-sesion-texto {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .barra-lateral-panel,
+  .barra-lateral-panel--colapsada {
+    position: relative;
+    width: auto;
+    height: auto;
+    align-items: stretch;
+    padding: var(--space-4);
+    overflow: visible;
+    border-right: 0;
+    border-bottom: var(--border-width) solid var(--border-subtle);
+  }
+
+  .barra-lateral-panel__cabecera,
+  .barra-lateral-panel--colapsada .barra-lateral-panel__cabecera {
+    width: auto;
+    flex-direction: row;
+  }
+
+  .barra-lateral-panel--colapsada .marca-panel__texto,
+  .barra-lateral-panel--colapsada .navegacion-panel__texto {
+    display: grid;
+  }
+
+  .barra-lateral-panel__alternador {
+    display: none;
+  }
+
+  .barra-lateral-panel--colapsada .navegacion-panel__enlace {
+    display: grid;
+    width: auto;
+    align-self: stretch;
+    justify-content: normal;
+  }
+
+  .barra-lateral-panel--colapsada .barra-lateral-panel__pie {
+    display: block;
+    width: auto;
+  }
+
+  .barra-lateral-panel--colapsada .barra-lateral-panel__cerrar-sesion {
+    width: 100%;
+    padding-inline: var(--space-3);
+    justify-content: center;
+  }
+
+  .barra-lateral-panel--colapsada .barra-lateral-panel__cerrar-sesion-texto {
+    display: inline-flex;
+  }
+}

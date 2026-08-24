@@ -1,0 +1,47 @@
+<article class="ui-card ui-card--accented ui-card--brand" aria-labelledby="titulo-borradores">
+  <header class="ui-card__header">
+    <div class="ui-card__heading">
+      <span class="ui-card__icon" aria-hidden="true"><app-icono nombre="borrador" /></span>
+      <div>
+        <span class="ui-card__eyebrow">Borradores en curso</span>
+        <h2 id="titulo-borradores" class="ui-card__title">Continuar trabajando</h2>
+      </div>
+    </div>
+    <span class="ui-card__count">{{ total() }}</span>
+  </header>
+
+  @if (borradores().length === 0) {
+    <app-estado-vacio
+      icono="tareaCompletada"
+      titulo="No hay borradores pendientes"
+      descripcion="Los proyectos que inicies y aún no finalices aparecerán aquí."
+    />
+  } @else {
+    <div class="ui-card__body lista-borradores" aria-label="Proyectos en borrador">
+      @for (borrador of borradores(); track borrador.id) {
+        <button type="button" class="borrador-reciente" (click)="continuarBorrador.emit(borrador)">
+          <span class="borrador-reciente__icono" aria-hidden="true">
+            <app-icono nombre="borrador" />
+          </span>
+          <span class="borrador-reciente__datos">
+            <span class="borrador-reciente__meta">
+              <strong>Paso {{ paso(borrador) }} de 10</strong>
+              <small>{{ borrador.fechaUltimoGuardado | tiempoRelativo }}</small>
+            </span>
+            <strong class="borrador-reciente__nombre">
+              {{ borrador.nombre || 'Proyecto en borrador' }}
+            </strong>
+            <small>{{ borrador.responsable || 'Equipo por completar' }}</small>
+            <span class="borrador-reciente__progreso" aria-hidden="true">
+              <i [style.width.%]="progreso(borrador)"></i>
+            </span>
+          </span>
+          <span class="borrador-reciente__accion">
+            Continuar definición
+            <app-icono nombre="continuar" />
+          </span>
+        </button>
+      }
+    </div>
+  }
+</article>

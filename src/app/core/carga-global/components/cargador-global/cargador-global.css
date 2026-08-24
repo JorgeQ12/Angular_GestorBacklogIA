@@ -1,0 +1,180 @@
+:host {
+  display: contents;
+}
+
+.cargador-global {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-loader);
+  display: grid;
+  place-items: center;
+  padding: var(--space-6);
+  background: var(--overlay-scrim);
+}
+
+.cargador-global__contenido {
+  display: flex;
+  width: min(100%, 30rem);
+  min-height: 16rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  overflow: hidden;
+  padding: var(--space-8);
+  border: var(--border-width) solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  background: var(--surface-default);
+  box-shadow: var(--shadow-xl);
+  text-align: center;
+}
+
+.cargador-global__recorrido {
+  --cargador-ancho-camion: 10rem;
+  position: relative;
+  width: 100%;
+  height: 7rem;
+  overflow: hidden;
+  container-type: inline-size;
+  contain: layout paint;
+}
+
+.cargador-global__vehiculo {
+  position: absolute;
+  bottom: 0;
+  left: calc(-1 * var(--cargador-ancho-camion));
+  width: var(--cargador-ancho-camion);
+  height: 6.3rem;
+  animation: recorrer-cargador 4.4s linear infinite;
+  will-change: transform;
+}
+
+.cargador-global__camion {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  z-index: var(--z-raised);
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(var(--shadow-sm));
+  transform-origin: center bottom;
+  animation: vibrar-camion 540ms var(--ease-standard) infinite;
+  will-change: transform;
+}
+
+.cargador-global__humo {
+  position: absolute;
+  bottom: 1.45rem;
+  left: var(--space-1);
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: var(--radius-circle);
+  background: var(--neutral-400);
+  opacity: 0;
+  animation: expulsar-humo 1.25s var(--ease-out) infinite;
+  animation-delay: -1s;
+  will-change: transform, opacity;
+}
+
+.cargador-global__humo--dos {
+  width: 0.5rem;
+  height: 0.5rem;
+  animation-delay: -700ms;
+}
+
+.cargador-global__humo--tres {
+  width: 0.75rem;
+  height: 0.75rem;
+  animation-delay: -400ms;
+}
+
+.cargador-global__humo--cuatro {
+  width: 0.45rem;
+  height: 0.45rem;
+  animation-delay: -100ms;
+}
+
+.cargador-global__estado {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-normal);
+}
+
+@keyframes recorrer-cargador {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(calc(100cqw + var(--cargador-ancho-camion)), 0, 0);
+  }
+}
+
+@keyframes vibrar-camion {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+
+  50% {
+    transform: translate3d(0, -0.08rem, 0) rotate(-0.12deg);
+  }
+}
+
+@keyframes expulsar-humo {
+  0% {
+    opacity: 0;
+    transform: translate3d(var(--space-1), var(--space-1), 0) scale(0.35);
+  }
+
+  18% {
+    opacity: 0.75;
+  }
+
+  68% {
+    opacity: 0.35;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate3d(
+        calc(-1 * var(--space-8)),
+        calc(-1 * var(--space-3)),
+        0
+      )
+      scale(1.55);
+  }
+}
+
+@media (max-width: 640px) {
+  .cargador-global {
+    padding: var(--space-4);
+  }
+
+  .cargador-global__contenido {
+    padding: var(--space-6) var(--space-4);
+  }
+
+  .cargador-global__recorrido {
+    --cargador-ancho-camion: 9rem;
+    height: 6.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cargador-global__vehiculo {
+    left: 50%;
+    transform: translate3d(-50%, 0, 0);
+    animation: none;
+  }
+
+  .cargador-global__humo {
+    display: none;
+  }
+
+  .cargador-global__camion {
+    animation: none;
+  }
+}

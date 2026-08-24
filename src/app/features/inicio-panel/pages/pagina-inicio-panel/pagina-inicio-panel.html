@@ -1,0 +1,72 @@
+<section
+  class="inicio-panel"
+  [attr.aria-labelledby]="errorResumen() ? null : 'titulo-inicio-panel'"
+  [attr.aria-label]="errorResumen() ? 'Estado de carga del panel' : null"
+>
+  @if (errorResumen()) {
+    <app-estado-error
+      class="inicio-panel__error"
+      [reintentable]="true"
+      (reintentar)="cargarResumen()"
+    />
+  } @else {
+    <app-encabezado-pagina
+      idTitulo="titulo-inicio-panel"
+      titulo="Visión general"
+      etiqueta="Panel de trabajo"
+      [descripcion]="descripcionBienvenida()"
+      [contexto]="fechaContexto() | fecha: 'extendida'"
+      icono="panel"
+    >
+      <button
+        encabezadoPaginaAcciones
+        type="button"
+        class="ui-button ui-button--secondary ui-button--on-inverse ui-button--md"
+        (click)="verProyectos()"
+      >
+        <app-icono class="ui-button__icon" nombre="proyectos" />
+        Ver proyectos
+      </button>
+      <button
+        encabezadoPaginaAcciones
+        type="button"
+        class="ui-button ui-button--primary ui-button--on-inverse ui-button--md"
+        (click)="crearProyecto()"
+      >
+        <app-icono class="ui-button__icon" nombre="agregar" />
+        Nuevo proyecto
+      </button>
+    </app-encabezado-pagina>
+
+    <app-indicadores-proyectos [indicadores]="resumen().indicadores" />
+
+    <div class="inicio-panel__columnas">
+      <div class="inicio-panel__columna inicio-panel__columna--principal">
+        <app-estado-proyectos
+          [indicadores]="resumen().indicadores"
+          (verProyectos)="verProyectos()"
+          (seleccionarEstado)="verProyectos($event)"
+        />
+        <app-proyectos-recientes
+          [proyectos]="resumen().proyectosRecientes"
+          (verTodos)="verProyectos()"
+          (seleccionarProyecto)="abrirProyecto($event)"
+        />
+      </div>
+
+      <div class="inicio-panel__columna inicio-panel__columna--lateral">
+        <app-proyectos-atencion
+          [proyectos]="resumen().proyectosAtencion"
+          [vencidos]="resumen().indicadores.vencidos"
+          [proximosAVencer]="resumen().indicadores.proximosAVencer"
+          (seleccionarProyecto)="abrirProyecto($event)"
+        />
+        <app-borradores-recientes
+          [borradores]="resumen().borradoresRecientes"
+          [total]="resumen().totalBorradores"
+          (continuarBorrador)="continuarBorrador($event)"
+        />
+      </div>
+    </div>
+  }
+</section>

@@ -1,0 +1,50 @@
+import {
+  LucideChartColumn,
+  LucideChevronRight,
+  LucideCircleCheck,
+  LucideClipboardCheck,
+  LucideEye,
+  LucideEyeOff,
+  LucideFilePenLine,
+  LucideFolderKanban,
+  LucideHouse,
+  LucideLayoutDashboard,
+  LucideListTodo,
+  LucideLockKeyhole,
+  LucideLogOut,
+  LucidePanelLeftClose,
+  LucidePanelLeftOpen,
+  LucidePlus,
+  LucideRefreshCw,
+  LucideTrendingUp,
+  LucideTriangleAlert,
+  LucideUserRound,
+  type LucideIconData,
+} from '@lucide/angular';
+
+/** Catálogo semántico inicial de iconos compartidos por la aplicación. */
+export const ICONOS_APLICACION = {
+  agregar: LucidePlus.icon,
+  alerta: LucideTriangleAlert.icon,
+  backlog: LucideListTodo.icon,
+  bloqueado: LucideLockKeyhole.icon,
+  borrador: LucideFilePenLine.icon,
+  cerrarSesion: LucideLogOut.icon,
+  colapsarPanel: LucidePanelLeftClose.icon,
+  completado: LucideCircleCheck.icon,
+  continuar: LucideChevronRight.icon,
+  expandirPanel: LucidePanelLeftOpen.icon,
+  inicio: LucideHouse.icon,
+  mostrar: LucideEye.icon,
+  ocultar: LucideEyeOff.icon,
+  panel: LucideLayoutDashboard.icon,
+  proyectos: LucideFolderKanban.icon,
+  reintentar: LucideRefreshCw.icon,
+  resumen: LucideChartColumn.icon,
+  seguimiento: LucideTrendingUp.icon,
+  tareaCompletada: LucideClipboardCheck.icon,
+  usuario: LucideUserRound.icon,
+} as const satisfies Record<string, LucideIconData>;
+
+/** Limita los nombres permitidos a los iconos registrados. */
+export type NombreIconoAplicacion = keyof typeof ICONOS_APLICACION;

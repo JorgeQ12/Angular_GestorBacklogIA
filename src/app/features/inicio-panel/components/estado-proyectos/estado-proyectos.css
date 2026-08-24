@@ -1,0 +1,197 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.estado-proyectos {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.estado-proyectos__resumen {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.estado-proyectos__resumen span {
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.estado-proyectos__resumen strong {
+  font-size: var(--font-size-2xl);
+}
+
+.estado-proyectos__distribucion {
+  display: flex;
+  height: var(--space-3);
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--surface-muted);
+}
+
+.estado-proyectos__distribucion span {
+  min-width: var(--space-1);
+}
+
+.estado-proyectos__lista {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.estado-proyectos__item {
+  --color-estado: var(--text-muted);
+
+  display: grid;
+  min-height: var(--control-height-lg);
+  grid-template-columns: var(--space-3) minmax(6rem, 0.8fr) minmax(5rem, 1fr) 2rem 2.5rem var(
+      --space-5
+    );
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-2);
+  border: var(--border-width) solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-primary);
+  text-align: left;
+  transition:
+    background var(--transition-fast) var(--ease-standard),
+    border-color var(--transition-fast) var(--ease-standard),
+    transform var(--transition-fast) var(--ease-standard);
+}
+
+.estado-proyectos__item:hover {
+  border-color: var(--border-divider);
+  background: var(--surface-subtle);
+  transform: translateX(var(--space-1));
+}
+
+.estado-proyectos__item:focus-visible {
+  outline: 0;
+  box-shadow: var(--shadow-focus);
+}
+
+.estado-proyectos__punto {
+  width: var(--space-2);
+  height: var(--space-2);
+  border-radius: var(--radius-circle);
+  background: var(--color-estado);
+}
+
+.estado-proyectos__nombre {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.estado-proyectos__barra,
+.cobertura-backlog__barra {
+  display: block;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--surface-muted);
+}
+
+.estado-proyectos__barra {
+  height: var(--space-1);
+}
+
+.estado-proyectos__barra i,
+.cobertura-backlog__barra i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+}
+
+.estado-proyectos__barra i {
+  background: var(--color-estado);
+}
+
+.estado-proyectos__item strong,
+.estado-proyectos__item small {
+  font-size: var(--font-size-xs);
+  text-align: right;
+}
+
+.estado-proyectos__item small {
+  color: var(--text-muted);
+}
+
+.estado-proyectos__item > app-icono {
+  width: var(--font-size-base);
+  height: var(--font-size-base);
+  color: var(--text-disabled);
+}
+
+.es-nuevo {
+  --color-estado: var(--color-info);
+  background: var(--color-info);
+}
+
+.es-activo {
+  --color-estado: var(--color-success);
+  background: var(--color-success);
+}
+
+.es-finalizado {
+  --color-estado: var(--color-brand);
+  background: var(--color-brand);
+}
+
+.es-cerrado {
+  --color-estado: var(--text-muted);
+  background: var(--text-muted);
+}
+
+.estado-proyectos__item.es-nuevo,
+.estado-proyectos__item.es-activo,
+.estado-proyectos__item.es-finalizado,
+.estado-proyectos__item.es-cerrado {
+  background: transparent;
+}
+
+.cobertura-backlog {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.cobertura-backlog > div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.cobertura-backlog__barra {
+  height: var(--space-2);
+}
+
+.cobertura-backlog__barra i {
+  background: var(--color-success);
+}
+
+.cobertura-backlog p {
+  color: var(--text-muted);
+  font-size: var(--font-size-2xs);
+}
+
+@media (max-width: 640px) {
+  .estado-proyectos__item {
+    grid-template-columns: var(--space-3) minmax(0, 1fr) 2rem var(--space-5);
+  }
+
+  .estado-proyectos__barra,
+  .estado-proyectos__item small {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .estado-proyectos__item {
+    transition: none;
+  }
+}

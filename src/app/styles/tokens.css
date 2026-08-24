@@ -1,0 +1,278 @@
+/* ============================================================================
+   InterIA · Design Tokens
+   ============================================================================ */
+
+:root {
+  color-scheme: light;
+
+  /* --------------------------------------------------------------------------
+     1. TIPOGRAFÍA
+     -------------------------------------------------------------------------- */
+  --font-sans: 'Prospero', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'Consolas', 'SFMono-Regular', ui-monospace, monospace;
+
+  /* Escala tipográfica (consolida ~40 tamaños reales → 11 pasos) */
+  --font-size-3xs: 0.625rem; /* 10px · micro-kickers */
+  --font-size-2xs: 0.6875rem; /* 11px · kickers, badges */
+  --font-size-xs: 0.75rem; /* 12px · labels menores, metadatos */
+  --font-size-sm: 0.8125rem; /* 13px · texto de apoyo, errores */
+  --font-size-md: 0.875rem; /* 14px · CUERPO por defecto de la UI */
+  --font-size-base: 1rem; /* 16px · cuerpo cómodo */
+  --font-size-lg: 1.125rem; /* 18px */
+  --font-size-xl: 1.375rem; /* 22px · títulos de tarjeta/panel */
+  --font-size-2xl: 1.5rem; /* 24px · títulos de sección */
+  --font-size-3xl: 2rem; /* 32px · títulos de página */
+  --font-size-4xl: 3rem; /* 48px */
+  --font-size-display: clamp(2rem, 4vw, 3rem); /* héroes responsivos */
+
+  /* Pesos disponibles en los archivos Prospero migrados; no sintetizar intermedios. */
+  --font-weight-regular: 400;
+  --font-weight-medium: 400;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-heavy: 700;
+  --font-weight-black: 700;
+
+  /* Interlineado */
+  --line-height-none: 1;
+  --line-height-tight: 1.2; /* títulos */
+  --line-height-snug: 1.35;
+  --line-height-normal: 1.5; /* cuerpo UI */
+  --line-height-relaxed: 1.6; /* párrafos largos */
+
+  /* Tracking (espaciado entre letras) */
+  --tracking-tighter: -0.03em; /* títulos muy grandes */
+  --tracking-tight: -0.02em; /* títulos */
+  --tracking-normal: 0;
+  --tracking-wide: 0.05em;
+  --tracking-wider: 0.075em; /* kickers en MAYÚSCULAS */
+
+  /* --------------------------------------------------------------------------
+     2. ESCALA NEUTRA (fría / blue-gray) — la base de toda la UI
+        Del casi-negro al blanco. Cambia SOLO este bloque para re-tematizar.
+     -------------------------------------------------------------------------- */
+  --neutral-0: #ffffff;
+  --neutral-25: #f7f8fa; /* superficie sutil */
+  --neutral-50: #f1f3f5; /* lienzo / canvas */
+  --neutral-100: #eceef1; /* divisores, superficie mute */
+  --neutral-150: #e2e5e9; /* borde sutil */
+  --neutral-200: #d9dde3; /* borde por defecto */
+  --neutral-300: #c2c8cf; /* borde fuerte / hover de borde */
+  --neutral-400: #98a0aa; /* placeholder / texto deshabilitado */
+  --neutral-500: #747c87; /* texto secundario (blue-gray) */
+  --neutral-600: #5b636e; /* texto secundario fuerte */
+  --neutral-700: #3a3f47; /* hover sobre superficies oscuras */
+  --neutral-800: #292c32; /* UI oscura / botón primario */
+  --neutral-900: #23272e; /* texto primario / superficie más oscura */
+  --neutral-950: #1b1e22;
+
+  /* --------------------------------------------------------------------------
+     3. COLOR DE MARCA Y SEMÁNTICOS
+     -------------------------------------------------------------------------- */
+  --color-brand: #555b8f; /* índigo sobrio para acentos de identidad */
+  --color-brand-surface: #f2f2f8;
+
+  --color-success: #1f7a54;
+  --color-success-strong: #15603f;
+  --color-success-surface: #eef7f1;
+  --color-success-border: #cde8da;
+
+  --color-danger: #b42318;
+  --color-danger-strong: #8f1d10;
+  --color-danger-surface: #fff1f1;
+  --color-danger-border: #f3d3d3;
+
+  --color-warning: #9a6b18;
+  --color-warning-strong: #7a5312;
+  --color-warning-surface: #fff7e7;
+  --color-warning-border: #efe0bf;
+
+  --color-info: #45658c;
+  --color-info-strong: #365a82;
+  --color-info-surface: #edf3f9;
+  --color-info-border: #d3e0ef;
+
+  /* --------------------------------------------------------------------------
+     4. TOKENS SEMÁNTICOS (usar ESTOS en los componentes, no la escala cruda)
+     -------------------------------------------------------------------------- */
+  /* Superficies */
+  --surface-canvas: var(--neutral-50); /* fondo general de la app */
+  --surface-default: var(--neutral-0); /* tarjetas, paneles, formularios */
+  --surface-subtle: var(--neutral-25); /* encabezados/grupos suaves */
+  --surface-muted: var(--neutral-100); /* iconos, inputs deshabilitados */
+  --surface-inverse: var(--neutral-800); /* barras/botones oscuros */
+
+  /* Texto */
+  --text-primary: var(--neutral-900);
+  --text-secondary: var(--neutral-600);
+  --text-muted: var(--neutral-500);
+  --text-disabled: var(--neutral-400);
+  --text-inverse: var(--neutral-0);
+  --text-link: var(--neutral-800);
+
+  /* Bordes */
+  --border-default: var(--neutral-200);
+  --border-subtle: var(--neutral-150);
+  --border-divider: var(--neutral-100);
+  --border-strong: var(--neutral-300);
+
+  /* Acción primaria (botón oscuro) */
+  --action-primary-bg: var(--neutral-800);
+  --action-primary-bg-hover: var(--neutral-700);
+  --action-primary-bg-active: var(--neutral-900);
+  --action-primary-text: var(--neutral-0);
+
+  /* Acción secundaria sobre superficies claras */
+  --action-secondary-bg: var(--surface-default);
+  --action-secondary-bg-hover: var(--surface-subtle);
+  --action-secondary-bg-active: var(--surface-muted);
+  --action-secondary-border: var(--border-default);
+  --action-secondary-border-hover: var(--border-strong);
+  --action-secondary-text: var(--text-primary);
+
+  /* Acciones presentadas sobre superficies oscuras */
+  --action-inverse-primary-bg: var(--surface-default);
+  --action-inverse-primary-bg-hover: var(--surface-muted);
+  --action-inverse-primary-border: var(--surface-default);
+  --action-inverse-primary-text: var(--text-primary);
+  --action-inverse-secondary-bg: color-mix(in srgb, var(--surface-default) 10%, transparent);
+  --action-inverse-secondary-bg-hover: color-mix(in srgb, var(--surface-default) 18%, transparent);
+  --action-inverse-secondary-border: color-mix(in srgb, var(--surface-default) 24%, transparent);
+  --action-inverse-secondary-text: var(--text-inverse);
+
+  /* Acción textual sin contenedor visible */
+  --action-text: var(--text-link);
+
+  --action-disabled-bg: var(--neutral-500);
+  --action-disabled-border: var(--neutral-500);
+  --action-disabled-text: var(--neutral-0);
+
+  /* --------------------------------------------------------------------------
+     5. ESPACIADO (escala de 4px — obligatoria, sin valores intermedios)
+     -------------------------------------------------------------------------- */
+  --space-0: 0;
+  --space-1: 0.25rem; /* 4  */
+  --space-2: 0.5rem; /* 8  */
+  --space-3: 0.75rem; /* 12 */
+  --space-4: 1rem; /* 16 */
+  --space-5: 1.25rem; /* 20 */
+  --space-6: 1.5rem; /* 24 */
+  --space-8: 2rem; /* 32 */
+  --space-10: 2.5rem; /* 40 */
+  --space-12: 3rem; /* 48 */
+  --space-16: 4rem; /* 64 */
+
+  /* --------------------------------------------------------------------------
+     6. RADIOS (consolida ~30 valores → 6)
+     -------------------------------------------------------------------------- */
+  --radius-xs: 0.375rem; /* 6px  · chips pequeños */
+  --radius-sm: 0.5rem; /* 8px  · badges, acciones compactas */
+  --radius-md: 0.75rem; /* 12px · CONTROLES, botones, inputs */
+  --radius-lg: 1rem; /* 16px · tarjetas y paneles */
+  --radius-xl: 1.25rem; /* 20px · modales */
+  --radius-pill: 9999px; /* pastillas */
+  --radius-circle: 50%;
+
+  /* --------------------------------------------------------------------------
+     7. BORDES / ANCHOS
+     -------------------------------------------------------------------------- */
+  --border-width: 1px;
+
+  /* --------------------------------------------------------------------------
+     8. SOMBRAS (consolida ~60 → 5 niveles + foco). Base tinte casi-negro.
+     -------------------------------------------------------------------------- */
+  --shadow-xs: 0 1px 2px rgba(24, 28, 34, 0.05);
+  --shadow-sm: 0 2px 8px rgba(24, 28, 34, 0.06);
+  --shadow-md: 0 8px 24px rgba(24, 28, 34, 0.08); /* tarjetas elevadas */
+  --shadow-lg: 0 18px 44px rgba(18, 23, 30, 0.12); /* dropdowns, popovers */
+  --shadow-xl: 0 28px 80px rgba(9, 12, 17, 0.28); /* modales */
+  --shadow-focus: 0 0 0 3px rgba(41, 44, 50, 0.12); /* anillo de foco único */
+  --shadow-focus-inverse: 0 0 0 3px rgba(255, 255, 255, 0.3);
+
+  /* --------------------------------------------------------------------------
+     9. Z-INDEX (escala ordenada; popovers por encima de modales a propósito)
+     -------------------------------------------------------------------------- */
+  --z-base: 0;
+  --z-raised: 1;
+  --z-canvas: 10; /* nodos/conexiones del flow builder */
+  --z-sticky: 100; /* encabezados sticky, barras internas */
+  --z-dropdown: 1000; /* menús contextuales en página */
+  --z-modal: 1100; /* modales y su overlay */
+  --z-popover: 1200; /* shared-select / date-picker (deben tapar modales) */
+  --z-loader: 1300; /* overlay de carga global */
+  --z-toast: 1400; /* notificaciones */
+  --z-tooltip: 1500; /* tooltips */
+
+  /* --------------------------------------------------------------------------
+     10. MOVIMIENTO (consolida 6 formas de escribir 4 duraciones)
+     -------------------------------------------------------------------------- */
+  --transition-fast: 150ms;
+  --transition-base: 180ms;
+  --transition-slow: 240ms;
+  --ease-standard: ease;
+  --ease-out: ease-out;
+  --ease-emphasized: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* --------------------------------------------------------------------------
+     11. OVERLAYS (scrims de modal, glass, tintados)
+     -------------------------------------------------------------------------- */
+  --overlay-scrim: rgba(17, 20, 25, 0.6); /* fondo oscurecido de modales */
+  --overlay-blur: 6px;
+
+  /* --------------------------------------------------------------------------
+     12. DIMENSIONES DE CONTROL
+     -------------------------------------------------------------------------- */
+  --control-height-sm: 2.25rem;
+  --control-height-md: 2.5rem;
+  --control-height-lg: 2.75rem; /* estándar de inputs/botones */
+  --control-height-xl: 3.25rem; /* CTA/inputs destacados (login) */
+
+  /* --------------------------------------------------------------------------
+     13. LAYOUT
+     -------------------------------------------------------------------------- */
+  --page-max-width: 80rem;
+  --page-padding-inline: clamp(1rem, 2.5vw, 2rem);
+
+  /* --------------------------------------------------------------------------
+     14. PRIMITIVAS DE FORMULARIO
+     -------------------------------------------------------------------------- */
+  --field-label-color: var(--neutral-700);
+  --field-surface: var(--surface-subtle);
+  --field-surface-hover: var(--surface-default);
+  --field-surface-focus: var(--surface-default);
+  --field-surface-disabled: var(--surface-muted);
+  --field-border: var(--border-default);
+  --field-border-hover: var(--border-strong);
+  --field-border-focus: var(--neutral-700);
+  --field-icon-color: var(--text-muted);
+  --field-error-color: var(--color-danger);
+  --field-error-surface: var(--color-danger-surface);
+
+  /* --------------------------------------------------------------------------
+     15. PRIMITIVAS DE TARJETA
+     -------------------------------------------------------------------------- */
+  --card-surface: var(--surface-default);
+  --card-header-surface: var(--surface-subtle);
+  --card-footer-surface: var(--surface-subtle);
+  --card-border: var(--border-subtle);
+  --card-divider: var(--border-divider);
+  --card-shadow: var(--shadow-sm);
+
+  /* --------------------------------------------------------------------------
+     16. PRIMITIVAS DE ENCABEZADO DE PÁGINA
+     -------------------------------------------------------------------------- */
+  --page-header-surface-start: var(--neutral-700);
+  --page-header-surface-end: var(--surface-inverse);
+  --page-header-text: var(--text-inverse);
+  --page-header-text-muted: color-mix(in srgb, var(--text-inverse) 76%, transparent);
+  --page-header-border: color-mix(in srgb, var(--surface-default) 10%, transparent);
+  --page-header-control-surface: color-mix(in srgb, var(--surface-default) 9%, transparent);
+  --page-header-control-border: color-mix(in srgb, var(--surface-default) 14%, transparent);
+}
+
+/* ============================================================================
+   BREAKPOINTS (documentales — @media no admite var(); usar estos valores)
+     --bp-xs: 480px · --bp-sm: 640px · --bp-md: 768px
+     --bp-lg: 1024px · --bp-xl: 1280px
+   Regla: usar SIEMPRE estos 5. El de facto del proyecto es 640px.
+   ============================================================================ */

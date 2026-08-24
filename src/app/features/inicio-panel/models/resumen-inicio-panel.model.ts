@@ -1,0 +1,75 @@
+/** Identifica los estados de proyecto representados en el inicio del panel. */
+export const ESTADOS_PROYECTO = {
+  nuevo: 'Nuevo',
+  activo: 'Activo',
+  finalizado: 'Finalizado',
+  cerrado: 'Cerrado',
+} as const;
+
+/** Limita los estados que pueden utilizarse para filtrar los proyectos. */
+export type EstadoProyecto = (typeof ESTADOS_PROYECTO)[keyof typeof ESTADOS_PROYECTO];
+
+/** Reúne los indicadores agregados proporcionados para el usuario vigente. */
+export interface IndicadoresInicioPanel {
+  totalProyectos: number;
+  nuevos: number;
+  activos: number;
+  finalizados: number;
+  cerrados: number;
+  conBacklog: number;
+  pendientesBacklog: number;
+  vencidos: number;
+  proximosAVencer: number;
+  requierenAtencion: number;
+}
+
+/** Describe un proyecto resumido dentro de las tarjetas del inicio. */
+export interface ProyectoInicioPanel {
+  id: number | string;
+  nombre: string;
+  responsable: string;
+  estado: string;
+  fechaObjetivo: string | null;
+  tieneBacklog: boolean;
+  motivoAtencion: string | null;
+}
+
+/** Describe un proyecto cuya definición puede continuar posteriormente. */
+export interface BorradorInicioPanel {
+  id: number | string;
+  nombre: string;
+  responsable: string;
+  pasoActual: number;
+  fechaUltimoGuardado: string | null;
+}
+
+/** Representa el contenido completo del inicio para el usuario vigente. */
+export interface ResumenInicioPanel {
+  fechaCorte: string | null;
+  totalBorradores: number;
+  indicadores: IndicadoresInicioPanel;
+  proyectosAtencion: readonly ProyectoInicioPanel[];
+  proyectosRecientes: readonly ProyectoInicioPanel[];
+  borradoresRecientes: readonly BorradorInicioPanel[];
+}
+
+/** Proporciona un estado seguro mientras se integra el resumen real del backend. */
+export const RESUMEN_INICIO_PANEL_VACIO: ResumenInicioPanel = {
+  fechaCorte: null,
+  totalBorradores: 0,
+  indicadores: {
+    totalProyectos: 0,
+    nuevos: 0,
+    activos: 0,
+    finalizados: 0,
+    cerrados: 0,
+    conBacklog: 0,
+    pendientesBacklog: 0,
+    vencidos: 0,
+    proximosAVencer: 0,
+    requierenAtencion: 0,
+  },
+  proyectosAtencion: [],
+  proyectosRecientes: [],
+  borradoresRecientes: [],
+};

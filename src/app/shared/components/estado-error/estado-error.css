@@ -1,0 +1,75 @@
+/* Mantiene una presentación coherente para fallas que impiden mostrar el contenido. */
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.ui-error-state {
+  display: grid;
+  min-height: var(--ui-error-state-min-height, 20rem);
+  place-items: center;
+  padding: var(--space-8);
+  border: var(--border-width) dashed var(--border-strong);
+  background:
+    radial-gradient(
+      circle at center,
+      color-mix(in srgb, var(--color-danger-surface) 72%, transparent) 0,
+      transparent 19rem
+    ),
+    var(--surface-default);
+  box-shadow: var(--shadow-xs);
+  text-align: center;
+}
+
+.ui-error-state__content {
+  display: grid;
+  max-width: 32rem;
+  justify-items: center;
+  gap: var(--space-3);
+}
+
+.ui-error-state__icon {
+  display: grid;
+  width: var(--control-height-xl);
+  height: var(--control-height-xl);
+  place-items: center;
+  border: var(--border-width) solid var(--color-danger-border);
+  border-radius: var(--radius-md);
+  background: var(--color-danger-surface);
+  color: var(--color-danger);
+  box-shadow: var(--shadow-xs);
+}
+
+.ui-error-state__icon app-icono {
+  width: var(--space-5);
+  height: var(--space-5);
+}
+
+.ui-error-state__title {
+  color: var(--text-primary);
+  font-size: var(--font-size-lg);
+}
+
+.ui-error-state__description {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.ui-error-state__retry {
+  margin-top: var(--space-2);
+}
+
+.ui-error-state__retry app-icono {
+  transition: transform var(--transition-base) var(--ease-standard);
+}
+
+.ui-error-state__retry:hover app-icono {
+  transform: rotate(-45deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-error-state__retry app-icono {
+    transition: none;
+  }
+}

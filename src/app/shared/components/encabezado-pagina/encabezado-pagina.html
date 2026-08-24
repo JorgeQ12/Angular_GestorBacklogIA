@@ -1,0 +1,29 @@
+<header class="ui-page-header" [attr.aria-labelledby]="idTitulo()">
+  <div class="ui-page-header__main">
+    @if (icono(); as nombreIcono) {
+      <span class="ui-page-header__icon" aria-hidden="true">
+        <app-icono [nombre]="nombreIcono" />
+      </span>
+    }
+    <div class="ui-page-header__content">
+      @if (etiqueta(); as textoEtiqueta) {
+        <span class="ui-page-header__eyebrow">{{ textoEtiqueta }}</span>
+      }
+      <h1 class="ui-page-header__title" [id]="idTitulo()">{{ titulo() }}</h1>
+      <div class="ui-page-header__meta">
+        <ng-content select="[encabezadoPaginaMetadatos]" />
+      </div>
+      @if (descripcion(); as textoDescripcion) {
+        <p class="ui-page-header__description">{{ textoDescripcion }}</p>
+      }
+    </div>
+  </div>
+  <div class="ui-page-header__aside">
+    @if (contexto(); as textoContexto) {
+      <span class="ui-page-header__context">{{ textoContexto }}</span>
+    }
+    <div class="ui-page-header__actions">
+      <ng-content select="[encabezadoPaginaAcciones]" />
+    </div>
+  </div>
+</header>

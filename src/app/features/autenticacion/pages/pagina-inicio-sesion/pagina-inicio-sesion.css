@@ -1,0 +1,85 @@
+/* Compone la experiencia de acceso sin redefinir las primitivas compartidas. */
+:host {
+  display: block;
+  min-height: 100dvh;
+}
+
+.inicio-sesion {
+  display: grid;
+  min-height: 100dvh;
+  place-items: center;
+  padding: clamp(var(--space-5), 4vw, var(--space-12));
+  background: var(--surface-canvas);
+}
+
+.inicio-sesion__tarjeta {
+  display: flex;
+  width: min(100%, 31rem);
+  flex-direction: column;
+  padding: clamp(var(--space-8), 5vw, var(--space-12));
+  border: var(--border-width) solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  background: var(--surface-default);
+  box-shadow: var(--shadow-md);
+}
+
+.inicio-sesion__encabezado {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: var(--space-8);
+  text-align: center;
+}
+
+.inicio-sesion__marca {
+  display: grid;
+  width: 3.25rem;
+  height: 3.25rem;
+  place-items: center;
+  margin-bottom: var(--space-5);
+  border: var(--border-width) solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--surface-subtle);
+  box-shadow: var(--shadow-sm);
+}
+
+.inicio-sesion__marca img {
+  width: 1.1rem;
+  height: 1.65rem;
+  object-fit: contain;
+}
+
+.inicio-sesion__titulo {
+  color: var(--text-primary);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-heavy);
+  letter-spacing: var(--tracking-tight);
+  line-height: var(--line-height-tight);
+}
+
+.inicio-sesion__subtitulo {
+  max-width: 22rem;
+  margin-top: var(--space-2);
+  color: var(--text-muted);
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-normal);
+}
+
+.inicio-sesion__tarjeta > app-acceso-microsoft {
+  display: block;
+}
+
+@media (max-width: 640px) {
+  .inicio-sesion {
+    align-items: start;
+    padding: var(--space-8) var(--space-4);
+  }
+
+  .inicio-sesion__tarjeta {
+    padding: var(--space-6) var(--space-5);
+  }
+
+  .inicio-sesion__titulo {
+    font-size: var(--font-size-xl);
+  }
+}

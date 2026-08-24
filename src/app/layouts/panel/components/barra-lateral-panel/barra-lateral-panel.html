@@ -1,0 +1,59 @@
+<aside
+  class="barra-lateral-panel"
+  [class.barra-lateral-panel--colapsada]="colapsada()"
+  aria-label="Navegación principal"
+>
+  <header class="barra-lateral-panel__cabecera">
+    <a class="marca-panel" [routerLink]="rutaInicio()" aria-label="Ir al inicio de InterIA">
+      <span class="marca-panel__simbolo" aria-hidden="true">
+        <img src="/brand/logo.svg" width="109" height="158" alt="" />
+      </span>
+      <span class="marca-panel__texto">
+        <strong>InterIA</strong>
+      </span>
+    </a>
+
+    <button
+      type="button"
+      class="barra-lateral-panel__alternador"
+      aria-controls="navegacion-panel"
+      [attr.aria-label]="colapsada() ? 'Expandir navegación' : 'Contraer navegación'"
+      [attr.aria-pressed]="colapsada()"
+      (click)="solicitarAlternancia()"
+    >
+      <app-icono [nombre]="colapsada() ? 'expandirPanel' : 'colapsarPanel'" />
+    </button>
+  </header>
+
+  <nav id="navegacion-panel" class="navegacion-panel" aria-label="Secciones del aplicativo">
+    @for (item of items(); track item.id) {
+      <a
+        class="navegacion-panel__enlace"
+        [routerLink]="item.ruta"
+        routerLinkActive="es-activo"
+        [routerLinkActiveOptions]="{ exact: item.coincidenciaExacta ?? false }"
+        ariaCurrentWhenActive="page"
+        [attr.aria-label]="item.descripcion"
+        [attr.title]="colapsada() ? item.etiqueta : null"
+      >
+        <span class="navegacion-panel__icono" aria-hidden="true">
+          <app-icono [nombre]="item.icono" />
+        </span>
+        <span class="navegacion-panel__texto">{{ item.etiqueta }}</span>
+      </a>
+    }
+  </nav>
+
+  <footer class="barra-lateral-panel__pie">
+    <button
+      type="button"
+      class="ui-button ui-button--block ui-button--md barra-lateral-panel__cerrar-sesion"
+      aria-label="Cerrar sesión"
+      [attr.title]="colapsada() ? 'Cerrar sesión' : null"
+      (click)="solicitarCierreSesion()"
+    >
+      <app-icono class="ui-button__icon" nombre="cerrarSesion" />
+      <span class="ui-button__label barra-lateral-panel__cerrar-sesion-texto">Cerrar sesión</span>
+    </button>
+  </footer>
+</aside>
