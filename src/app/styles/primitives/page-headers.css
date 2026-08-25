@@ -82,7 +82,7 @@
 
 .ui-page-header__title {
   overflow-wrap: anywhere;
-  font-size: clamp(var(--font-size-2xl), 2vw, var(--font-size-3xl));
+  font-size: clamp(var(--font-size-xl), 2vw, var(--font-size-2xl));
   font-weight: var(--font-weight-bold);
   letter-spacing: var(--tracking-tight);
   line-height: var(--line-height-tight);
@@ -193,7 +193,7 @@
   }
 
   .ui-page-header__title {
-    font-size: var(--font-size-2xl);
+    font-size: var(--font-size-xl);
   }
 
   .ui-page-header__actions .ui-button {

@@ -1,0 +1,194 @@
+:host {
+  display: block;
+}
+
+.vinculacion-azure {
+  display: flex;
+  flex-direction: column;
+}
+
+.vinculacion-azure__aviso p,
+.vinculacion-azure__guardado p {
+  margin: 0;
+}
+
+.vinculacion-azure__ayuda,
+.vinculacion-azure__guardado,
+.vinculacion-azure__resultado-item small {
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-snug);
+}
+
+.vinculacion-azure__resultado-item .vinculacion-azure__resultado-icono {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: var(--border-width) solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  background: var(--surface-default);
+  color: var(--text-secondary);
+}
+
+.vinculacion-azure__contenido {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding: var(--space-6);
+}
+
+.vinculacion-azure__campos-principales {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(13rem, 0.7fr);
+  gap: var(--space-5);
+}
+
+.vinculacion-azure__equipo {
+  max-width: 52rem;
+}
+
+.vinculacion-azure__opcional {
+  margin-left: var(--space-2);
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-regular);
+}
+
+.vinculacion-azure__aviso {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-snug);
+}
+
+.vinculacion-azure__aviso app-icono,
+.vinculacion-azure__guardado app-icono {
+  width: var(--font-size-base);
+  height: var(--font-size-base);
+  flex: 0 0 auto;
+}
+
+.vinculacion-azure__acciones {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-6);
+  border-top: var(--border-width) solid var(--card-divider);
+  background: var(--card-footer-surface);
+}
+
+.vinculacion-azure__acciones--confirmacion {
+  justify-content: space-between;
+  padding-inline: var(--space-5);
+}
+
+.vinculacion-azure__guardado {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.vinculacion-azure__grupo-acciones {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.vinculacion-azure__resultado {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: var(--space-5);
+  overflow: hidden;
+  border: var(--border-width) solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--surface-subtle);
+}
+
+.vinculacion-azure__resultado-item {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+}
+
+.vinculacion-azure__resultado-item + .vinculacion-azure__resultado-item {
+  border-left: var(--border-width) solid var(--border-divider);
+}
+
+.vinculacion-azure__resultado-icono {
+  width: var(--control-height-sm);
+  height: var(--control-height-sm);
+}
+
+.vinculacion-azure__resultado-item > div {
+  min-width: 0;
+}
+
+.vinculacion-azure__resultado-item span,
+.vinculacion-azure__resultado-item strong,
+.vinculacion-azure__resultado-item small {
+  display: block;
+}
+
+.vinculacion-azure__resultado-item div > span {
+  color: var(--text-muted);
+  font-size: var(--font-size-2xs);
+  text-transform: uppercase;
+}
+
+.vinculacion-azure__resultado-item strong {
+  margin-block: var(--space-1);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-snug);
+  overflow-wrap: anywhere;
+}
+
+.ui-field.has-error .vinculacion-azure__ayuda {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .vinculacion-azure__campos-principales {
+    grid-template-columns: 1fr;
+  }
+
+  .vinculacion-azure__resultado {
+    grid-template-columns: 1fr;
+  }
+
+  .vinculacion-azure__resultado-item + .vinculacion-azure__resultado-item {
+    border-top: var(--border-width) solid var(--border-divider);
+    border-left: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .vinculacion-azure__contenido {
+    padding: var(--space-4);
+  }
+
+  .vinculacion-azure__resultado {
+    margin: var(--space-4);
+  }
+
+  .vinculacion-azure__acciones {
+    align-items: stretch;
+    flex-direction: column;
+    padding: var(--space-4);
+  }
+
+  .vinculacion-azure__grupo-acciones {
+    flex-direction: column-reverse;
+  }
+
+  .vinculacion-azure__acciones .ui-button {
+    width: 100%;
+  }
+}

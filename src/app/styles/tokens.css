@@ -69,8 +69,8 @@
   /* --------------------------------------------------------------------------
      3. COLOR DE MARCA Y SEMÁNTICOS
      -------------------------------------------------------------------------- */
-  --color-brand: #555b8f; /* índigo sobrio para acentos de identidad */
-  --color-brand-surface: #f2f2f8;
+  --color-brand: var(--neutral-800); /* identidad neutra alineada con la interfaz */
+  --color-brand-surface: var(--neutral-100);
 
   --color-success: #1f7a54;
   --color-success-strong: #15603f;
@@ -101,6 +101,7 @@
   --surface-subtle: var(--neutral-25); /* encabezados/grupos suaves */
   --surface-muted: var(--neutral-100); /* iconos, inputs deshabilitados */
   --surface-inverse: var(--neutral-800); /* barras/botones oscuros */
+  --surface-inverse-muted: color-mix(in srgb, var(--surface-default) 10%, transparent);
 
   /* Texto */
   --text-primary: var(--neutral-900);
@@ -108,6 +109,7 @@
   --text-muted: var(--neutral-500);
   --text-disabled: var(--neutral-400);
   --text-inverse: var(--neutral-0);
+  --text-inverse-muted: color-mix(in srgb, var(--text-inverse) 76%, transparent);
   --text-link: var(--neutral-800);
 
   /* Bordes */
@@ -115,6 +117,7 @@
   --border-subtle: var(--neutral-150);
   --border-divider: var(--neutral-100);
   --border-strong: var(--neutral-300);
+  --border-inverse: color-mix(in srgb, var(--surface-default) 18%, transparent);
 
   /* Acción primaria (botón oscuro) */
   --action-primary-bg: var(--neutral-800);
@@ -129,6 +132,12 @@
   --action-secondary-border: var(--border-default);
   --action-secondary-border-hover: var(--border-strong);
   --action-secondary-text: var(--text-primary);
+
+  /* Acción destructiva */
+  --action-danger-bg: var(--color-danger);
+  --action-danger-bg-hover: var(--color-danger-strong);
+  --action-danger-bg-active: var(--color-danger-strong);
+  --action-danger-text: var(--neutral-0);
 
   /* Acciones presentadas sobre superficies oscuras */
   --action-inverse-primary-bg: var(--surface-default);
@@ -243,7 +252,7 @@
   --field-surface-disabled: var(--surface-muted);
   --field-border: var(--border-default);
   --field-border-hover: var(--border-strong);
-  --field-border-focus: var(--neutral-700);
+  --field-border-focus: var(--border-strong);
   --field-icon-color: var(--text-muted);
   --field-error-color: var(--color-danger);
   --field-error-surface: var(--color-danger-surface);

@@ -9,6 +9,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { AutenticacionService } from '../../../../core/autenticacion/services/autenticacion.service';
+import { URL_NUEVO_PROYECTO, crearUrlContextoProyecto } from '../../../../core/navegacion/rutas';
 import { EncabezadoPagina } from '../../../../shared/components/encabezado-pagina/encabezado-pagina';
 import { EstadoError } from '../../../../shared/components/estado-error/estado-error';
 import { IconoComponent } from '../../../../shared/components/icono/icono.component';
@@ -79,9 +80,9 @@ export class PaginaInicioPanel {
       });
   }
 
-  /** Conserva el punto de entrada hacia la creación de proyectos. */
+  /** Abre el punto de partida para crear un proyecto. */
   protected crearProyecto(): void {
-    // TODO: Navegar al flujo de creación cuando su ruta sea migrada.
+    void this.router.navigateByUrl(URL_NUEVO_PROYECTO);
   }
 
   /** Conserva el punto de entrada hacia los proyectos disponibles. */
@@ -94,9 +95,9 @@ export class PaginaInicioPanel {
     void this.router.navigate(['/panel/proyectos', proyecto.id]);
   }
 
-  /** Conserva el punto de entrada hacia la definición pendiente. */
-  protected continuarBorrador(_borrador: BorradorInicioPanel): void {
-    // TODO: Navegar al flujo de definición cuando su ruta sea migrada.
+  /** Reanuda el borrador desde el recorrido de especificación disponible. */
+  protected continuarBorrador(borrador: BorradorInicioPanel): void {
+    void this.router.navigateByUrl(crearUrlContextoProyecto(borrador.id));
   }
 
   private obtenerPrimerNombre(nombre: string | null | undefined): string | null {

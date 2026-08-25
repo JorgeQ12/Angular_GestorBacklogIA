@@ -1,0 +1,207 @@
+:host {
+  display: block;
+}
+
+/* Mantiene el diálogo por encima del contenido y debajo del loader global. */
+.ui-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: grid;
+  place-items: center;
+  padding: var(--space-6);
+  background: var(--overlay-scrim);
+  backdrop-filter: blur(var(--overlay-blur));
+}
+
+.ui-modal {
+  --ui-modal-width: 34rem;
+
+  display: flex;
+  width: min(100%, var(--ui-modal-width));
+  max-height: min(90dvh, 50rem);
+  flex-direction: column;
+  overflow: hidden;
+  border: var(--border-width) solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  background: var(--surface-default);
+  box-shadow: var(--shadow-xl);
+  color: var(--text-primary);
+}
+
+.ui-modal:focus-visible {
+  outline: 0;
+}
+
+.ui-modal--sm {
+  --ui-modal-width: 28rem;
+}
+
+.ui-modal--lg {
+  --ui-modal-width: 44rem;
+}
+
+.ui-modal--xl {
+  --ui-modal-width: 65rem;
+}
+
+.ui-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border-bottom: var(--border-width) solid var(--border-divider);
+  background: var(--ui-modal-header-surface, var(--surface-subtle));
+}
+
+.ui-modal__heading {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.ui-modal__icon {
+  display: grid;
+  width: var(--control-height-lg);
+  height: var(--control-height-lg);
+  flex: 0 0 var(--control-height-lg);
+  place-items: center;
+  border: var(--border-width) solid var(--ui-modal-icon-border, transparent);
+  border-radius: var(--radius-md);
+  background: var(--ui-modal-icon-surface, var(--surface-inverse));
+  color: var(--ui-modal-icon-color, var(--text-inverse));
+  box-shadow: var(--shadow-sm);
+}
+
+.ui-modal__icon app-icono {
+  width: var(--space-5);
+  height: var(--space-5);
+}
+
+.ui-modal__heading-copy {
+  min-width: 0;
+}
+
+.ui-modal__eyebrow {
+  display: block;
+  margin-bottom: var(--space-1);
+  color: var(--text-muted);
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-wide);
+  line-height: var(--line-height-tight);
+  text-transform: uppercase;
+}
+
+.ui-modal__title {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-snug);
+}
+
+.ui-modal__description {
+  margin: var(--space-1) 0 0;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+}
+
+.ui-modal__close {
+  display: inline-grid;
+  width: var(--control-height-sm);
+  height: var(--control-height-sm);
+  flex: 0 0 var(--control-height-sm);
+  place-items: center;
+  padding: 0;
+  border: var(--border-width) solid var(--action-secondary-border);
+  border-radius: var(--radius-sm);
+  background: var(--action-secondary-bg);
+  color: var(--text-secondary);
+  box-shadow: var(--shadow-xs);
+  transition:
+    background-color var(--transition-base) var(--ease-standard),
+    border-color var(--transition-base) var(--ease-standard),
+    color var(--transition-base) var(--ease-standard);
+}
+
+.ui-modal__close:hover {
+  border-color: var(--action-secondary-border-hover);
+  background: var(--action-secondary-bg-hover);
+  color: var(--text-primary);
+}
+
+.ui-modal__close:focus-visible {
+  outline: 0;
+  box-shadow: var(--shadow-focus);
+}
+
+.ui-modal__close app-icono {
+  width: var(--space-4);
+  height: var(--space-4);
+}
+
+.ui-modal__body {
+  min-height: 0;
+  overflow: auto;
+  padding: var(--space-5);
+  scrollbar-color: var(--border-strong) transparent;
+  scrollbar-width: thin;
+}
+
+.ui-modal__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border-top: var(--border-width) solid var(--border-divider);
+  background: var(--surface-subtle);
+}
+
+.ui-modal__actions .ui-button {
+  min-width: 9rem;
+}
+
+/* En pantallas pequeñas funciona como una hoja inferior para aprovechar el alto disponible. */
+@media (max-width: 640px) {
+  .ui-modal-overlay {
+    place-items: end center;
+    padding: var(--space-3);
+  }
+
+  .ui-modal,
+  .ui-modal--sm,
+  .ui-modal--lg,
+  .ui-modal--xl {
+    --ui-modal-width: 100%;
+
+    max-height: 92dvh;
+  }
+
+  .ui-modal__header,
+  .ui-modal__body,
+  .ui-modal__actions {
+    padding: var(--space-4);
+  }
+
+  .ui-modal__header {
+    align-items: flex-start;
+  }
+
+  .ui-modal__actions {
+    flex-direction: column-reverse;
+  }
+
+  .ui-modal__actions .ui-button {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-modal__close {
+    transition: none;
+  }
+}

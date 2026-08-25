@@ -2,5 +2,5 @@
 export const environment = {
   production: false,
   kongUrl: 'https://konge-dev.interrapidisimo.co',
-  apiBaseUrl: 'http://172.21.232.114:8081/api',
+  apiBaseUrl: 'https://localhost:44329/api',
 } as const;

@@ -83,9 +83,9 @@ Un valor debe convertirse en token cuando representa una decisión visual reutil
 varios componentes necesitan cambiar conjuntamente. Una medida exclusiva de un layout local no
 requiere un token nuevo.
 
-El acento de identidad utiliza la familia índigo definida por `--color-brand`. El naranja no forma
-parte de la paleta del aplicativo y no debe reintroducirse mediante valores locales. Los estados de
-advertencia conservan sus tokens semánticos `--color-warning-*` y no se usan como color de marca.
+El acento de identidad utiliza la escala neutral gris y negra mediante `--color-brand`. No se
+introducen colores decorativos mediante valores locales. Los colores de información, éxito,
+advertencia y error se reservan para estados que necesiten comunicar esas condiciones.
 
 ## Tipografía oficial
 
@@ -157,6 +157,11 @@ profundos como `.mi-feature .ui-control` si el cambio representa una variante re
 - `.ui-field-error`.
 - Adaptación a `prefers-reduced-motion`.
 
+El foco de `.ui-control` es único para toda la aplicación, tanto si el control está directamente
+dentro de `.ui-field` como si utiliza `.ui-control-wrap`. La primitiva elimina el contorno nativo
+del navegador y mantiene la accesibilidad mediante `--field-border-focus` y `--shadow-focus`.
+Las features no agregan bordes negros, outlines ni sombras locales para representar el foco.
+
 ### Botones
 
 `primitives/buttons.css` es responsable de:
@@ -171,11 +176,18 @@ profundos como `.mi-feature .ui-control` si el cambio representa una variante re
 Los modificadores se combinan por responsabilidad:
 
 ```html
-<button class="ui-button ui-button--primary ui-button--md">Crear</button>
+<button class="ui-button ui-button--primary ui-button--md">
+  <app-icono class="ui-button__icon" nombre="agregar" />
+  Crear
+</button>
 <button class="ui-button ui-button--secondary ui-button--on-inverse ui-button--md">
+  <app-icono class="ui-button__icon" nombre="resumen" />
   Consultar
 </button>
-<button class="ui-button ui-button--text ui-button--md">Ver todos</button>
+<button class="ui-button ui-button--text ui-button--md">
+  Ver todos
+  <app-icono class="ui-button__icon ui-button__icon--trailing" nombre="continuar" />
+</button>
 ```
 
 - `primary`, `secondary` y `text` expresan la jerarquía de la acción.
@@ -183,6 +195,25 @@ Los modificadores se combinan por responsabilidad:
 - `on-inverse` adapta la acción a una superficie oscura sin crear clases de una feature.
 - Las acciones `text` conservan su color durante hover y comunican la interacción únicamente con
   movimiento; el foco visible permanece independiente para navegación con teclado.
+
+### Iconografía
+
+`ICONOS_APLICACION` es el único catálogo de iconos permitido. Las plantillas los representan
+mediante `app-icono` y utilizan nombres semánticos como `editar`, `volver` o `eliminar`.
+
+- Solo `shared/components/icono/iconos-aplicacion.ts` importa definiciones desde
+  `@lucide/angular`.
+- Si una acción requiere una semántica nueva, se registra una vez en el catálogo; las features no
+  importan ni almacenan SVG independientes.
+- Las marcas externas también se registran como datos compatibles con el renderizador compartido;
+  las features las consumen por su nombre semántico y no insertan SVG directamente.
+- Los botones de operación incluyen normalmente un icono reconocible. Se exceptúan acciones de
+  texto donde el contexto ya comunica suficientemente su finalidad.
+- El icono inicial identifica acciones como editar, cancelar, guardar o eliminar. El icono final
+  indica dirección o continuidad.
+- Los iconos de botones usan `ui-button__icon`; los direccionales agregan
+  `ui-button__icon--trailing`.
+- Un botón compuesto únicamente por un icono conserva un `aria-label` que nombre la acción.
 
 ### Tarjetas
 
@@ -220,6 +251,7 @@ Los modificadores se combinan por responsabilidad:
   descripcion="Los proyectos disponibles aparecerán aquí."
 >
   <button estadoVacioAcciones class="ui-button ui-button--primary ui-button--md">
+    <app-icono class="ui-button__icon" nombre="agregar" />
     Crear proyecto
   </button>
 </app-estado-vacio>
@@ -272,6 +304,7 @@ estructura y la presentación del encabezado principal:
     encabezadoPaginaAcciones
     class="ui-button ui-button--primary ui-button--on-inverse ui-button--md"
   >
+    <app-icono class="ui-button__icon" nombre="agregar" />
     Crear proyecto
   </button>
 </app-encabezado-pagina>
@@ -282,6 +315,60 @@ estructura y la presentación del encabezado principal:
 - `encabezadoPaginaMetadatos` y `encabezadoPaginaAcciones` identifican el contenido proyectado.
 - Los botones conservan sus primitivas y se adaptan mediante `ui-button--on-inverse`.
 - Encabezados internos de tarjetas, modales o secciones no usan `ui-page-header`.
+
+### Modales
+
+`Modal` proporciona el contenedor compartido para formularios, confirmaciones y contenido de
+dominio sin conocer las reglas de cada feature:
+
+```html
+<app-modal
+  titulo="Confirmar vinculación"
+  descripcion="Revisa la información antes de continuar."
+  icono="proyectos"
+  [idFormulario]="formId"
+  textoConfirmar="Continuar"
+  (cerrar)="cancelar()"
+>
+  <form [id]="formId"></form>
+</app-modal>
+```
+
+- La feature controla si el componente existe y atiende sus salidas; el modal no mantiene estado
+  de negocio ni consume servicios.
+- `descartable` controla únicamente Escape, backdrop y el botón superior. La acción de cancelar
+  permanece disponible cuando `mostrarCancelar` está habilitado.
+- `idFormulario` permite que el botón del pie envíe un formulario proyectado sin duplicar las
+  acciones dentro del contenido.
+- El componente administra `role`, relaciones ARIA, foco inicial, confinamiento del foco,
+  restauración del foco y bloqueo del desplazamiento del documento.
+- Los tamaños usan `sm`, `md`, `lg` y `xl`; las features no deben replicar overlay, superficie,
+  encabezado o pie para obtener otro ancho.
+- Los mensajes globales y los formularios de dominio se componen sobre este contenedor; no
+  duplican su estructura ni sus estilos.
+
+`ModalMensaje` se monta una sola vez en la raíz y consume el estado de `MensajesService`. Las
+features solicitan información o decisiones desde TypeScript sin implementar otro modal:
+
+```ts
+await this.mensajes.error(
+  'No fue posible validar Azure',
+  'Verifica la información e intenta nuevamente.',
+);
+
+const confirmado = await this.mensajes.confirmar(
+  'Crear proyecto',
+  'Se creará un borrador con la información validada.',
+);
+```
+
+- `informar`, `exito`, `advertir` y `error` comunican un resultado con una acción de reconocimiento.
+- `confirmar` y `confirmarDestructiva` devuelven la decisión mediante `Promise<boolean>` y no se
+  descartan mediante Escape o backdrop.
+- Una acción destructiva utiliza `ui-button--danger`; el color de peligro no se usa para errores
+  informativos ni como acento general de la aplicación.
+- Abrir un mensaje nuevo resuelve como cancelada cualquier decisión anterior pendiente para evitar
+  promesas sin completar.
 
 ## Estilos de componentes y features
 

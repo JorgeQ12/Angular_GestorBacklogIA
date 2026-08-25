@@ -1,0 +1,28 @@
+@if (mensaje(); as mensajeActual) {
+  <app-modal
+    class="modal-mensaje"
+    [attr.data-variante]="mensajeActual.variante"
+    [titulo]="mensajeActual.titulo"
+    [etiqueta]="mensajeActual.contexto"
+    [descripcion]="mensajeActual.descripcion"
+    [icono]="iconoPorVariante[mensajeActual.variante]"
+    [rol]="obtenerRol(mensajeActual.variante)"
+    [descartable]="mensajeActual.descartable"
+    [mostrarCuerpo]="mensajeActual.detalles.length > 0"
+    [mostrarCancelar]="mensajeActual.mostrarCancelar"
+    [textoCancelar]="mensajeActual.textoCancelar"
+    [textoConfirmar]="mensajeActual.textoConfirmar"
+    [varianteConfirmacion]="mensajeActual.variante === 'destructiva' ? 'danger' : 'primary'"
+    tamano="sm"
+    (cerrar)="gestionarCierre()"
+    (confirmar)="mensajes.aceptar()"
+  >
+    @if (mensajeActual.detalles.length) {
+      <ul class="modal-mensaje__detalles" aria-label="Información relacionada">
+        @for (detalle of mensajeActual.detalles; track $index) {
+          <li>{{ detalle }}</li>
+        }
+      </ul>
+    }
+  </app-modal>
+}

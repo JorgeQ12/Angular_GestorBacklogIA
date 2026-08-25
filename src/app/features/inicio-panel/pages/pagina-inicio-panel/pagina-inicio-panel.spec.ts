@@ -1,8 +1,9 @@
 import { LOCALE_ID, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { AutenticacionService } from '../../../../core/autenticacion/services/autenticacion.service';
+import { URL_NUEVO_PROYECTO } from '../../../../core/navegacion/rutas';
 import { ResumenInicioPanel } from '../../models/resumen-inicio-panel.model';
 import { ResumenInicioPanelService } from '../../services/resumen-inicio-panel.service';
 import { PaginaInicioPanel } from './pagina-inicio-panel';
@@ -105,5 +106,16 @@ describe('PaginaInicioPanel', () => {
 
     expect(elemento.querySelector('app-borradores-recientes button')).toBeNull();
     expect(elemento.textContent).toContain('Nuevo proyecto');
+  });
+
+  it('abre el punto de partida al seleccionar un nuevo proyecto', () => {
+    const navegar = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
+    const boton = [...(fixture.nativeElement as HTMLElement).querySelectorAll('button')].find(
+      (elemento) => elemento.textContent?.includes('Nuevo proyecto'),
+    );
+
+    (boton as HTMLButtonElement).click();
+
+    expect(navegar).toHaveBeenCalledWith(URL_NUEVO_PROYECTO);
   });
 });

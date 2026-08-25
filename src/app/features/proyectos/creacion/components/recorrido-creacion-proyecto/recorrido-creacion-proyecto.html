@@ -1,0 +1,59 @@
+<nav class="recorrido-creacion" aria-labelledby="titulo-recorrido-creacion">
+  <header class="recorrido-creacion__encabezado">
+    <strong id="titulo-recorrido-creacion" class="recorrido-creacion__titulo">
+      Definición del proyecto
+    </strong>
+    <span class="recorrido-creacion__posicion" aria-hidden="true">
+      Paso {{ posicionActual() }} de {{ etapas.length }}
+    </span>
+  </header>
+
+  <div
+    class="recorrido-creacion__progreso"
+    role="progressbar"
+    aria-label="Progreso de la definición del proyecto"
+    aria-valuemin="1"
+    [attr.aria-valuemax]="etapas.length"
+    [attr.aria-valuenow]="posicionActual()"
+    [attr.aria-valuetext]="textoProgreso()"
+  >
+    <span [style.width.%]="porcentajeRecorrido()"></span>
+  </div>
+
+  <ol class="recorrido-creacion__lista">
+    @for (etapa of etapas; track etapa.clave) {
+      <li
+        class="recorrido-creacion__item"
+        [class.recorrido-creacion__item--actual]="esActual(etapa.clave)"
+        [class.recorrido-creacion__item--completado]="estaCompletada(etapa.clave)"
+      >
+        <button
+          type="button"
+          class="recorrido-creacion__boton"
+          [disabled]="!puedeSeleccionar(etapa.clave)"
+          [attr.aria-current]="esActual(etapa.clave) ? 'step' : null"
+          (click)="seleccionarEtapa(etapa.clave)"
+        >
+          <span class="recorrido-creacion__icono" aria-hidden="true">
+            <app-icono [nombre]="etapa.icono" />
+            @if (estaCompletada(etapa.clave)) {
+              <span class="recorrido-creacion__confirmacion">
+                <app-icono nombre="confirmar" />
+              </span>
+            }
+          </span>
+          <span class="recorrido-creacion__contenido">
+            <strong>{{ etapa.titulo }}</strong>
+            <small>{{ etapa.descripcion }}</small>
+          </span>
+          @if (estaCompletada(etapa.clave)) {
+            <span class="recorrido-creacion__estado-accesible">Etapa completada</span>
+          }
+          @if (puedeSeleccionar(etapa.clave)) {
+            <app-icono class="recorrido-creacion__direccion" nombre="continuar" />
+          }
+        </button>
+      </li>
+    }
+  </ol>
+</nav>

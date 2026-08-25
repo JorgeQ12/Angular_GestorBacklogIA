@@ -5,14 +5,13 @@
 
 .estado-proyectos {
   display: grid;
-  gap: var(--space-4);
+  gap: var(--space-3);
 }
 
 .estado-proyectos__resumen {
   display: flex;
   align-items: baseline;
-  justify-content: space-between;
-  gap: var(--space-4);
+  gap: var(--space-2);
 }
 
 .estado-proyectos__resumen span {
@@ -22,11 +21,12 @@
 
 .estado-proyectos__resumen strong {
   font-size: var(--font-size-2xl);
+  line-height: 1;
 }
 
 .estado-proyectos__distribucion {
   display: flex;
-  height: var(--space-3);
+  height: var(--space-2);
   overflow: hidden;
   border-radius: var(--radius-pill);
   background: var(--surface-muted);
@@ -34,29 +34,30 @@
 
 .estado-proyectos__distribucion span {
   min-width: var(--space-1);
+  background: var(--color-estado);
 }
 
 .estado-proyectos__lista {
   display: grid;
-  gap: var(--space-1);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-2);
 }
 
 .estado-proyectos__item {
   --color-estado: var(--text-muted);
 
   display: grid;
-  min-height: var(--control-height-lg);
-  grid-template-columns: var(--space-3) minmax(6rem, 0.8fr) minmax(5rem, 1fr) 2rem 2.5rem var(
-      --space-5
-    );
+  min-height: var(--control-height-md);
+  grid-template-columns: var(--space-2) minmax(0, 1fr) auto auto;
   align-items: center;
   gap: var(--space-2);
   width: 100%;
-  padding: var(--space-2);
+  padding: var(--space-2) var(--space-3);
   border: var(--border-width) solid transparent;
-  border-radius: var(--radius-sm);
-  background: transparent;
+  border-radius: var(--radius-md);
+  background: var(--surface-subtle);
   color: var(--text-primary);
+  cursor: pointer;
   text-align: left;
   transition:
     background var(--transition-fast) var(--ease-standard),
@@ -66,8 +67,8 @@
 
 .estado-proyectos__item:hover {
   border-color: var(--border-divider);
-  background: var(--surface-subtle);
-  transform: translateX(var(--space-1));
+  background: var(--surface-muted);
+  transform: translateY(calc(-1 * var(--border-width)));
 }
 
 .estado-proyectos__item:focus-visible {
@@ -83,110 +84,89 @@
 }
 
 .estado-proyectos__nombre {
+  overflow: hidden;
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.estado-proyectos__barra,
-.cobertura-backlog__barra {
-  display: block;
-  overflow: hidden;
-  border-radius: var(--radius-pill);
-  background: var(--surface-muted);
-}
-
-.estado-proyectos__barra {
-  height: var(--space-1);
-}
-
-.estado-proyectos__barra i,
-.cobertura-backlog__barra i {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-}
-
-.estado-proyectos__barra i {
-  background: var(--color-estado);
-}
-
-.estado-proyectos__item strong,
-.estado-proyectos__item small {
+.estado-proyectos__item strong {
   font-size: var(--font-size-xs);
   text-align: right;
 }
 
-.estado-proyectos__item small {
+.estado-proyectos__flecha {
+  width: var(--font-size-sm);
+  height: var(--font-size-sm);
   color: var(--text-muted);
 }
 
-.estado-proyectos__item > app-icono {
-  width: var(--font-size-base);
-  height: var(--font-size-base);
-  color: var(--text-disabled);
+.estado-proyectos__item--vacio {
+  background: transparent;
+  color: var(--text-muted);
 }
 
 .es-nuevo {
   --color-estado: var(--color-info);
-  background: var(--color-info);
 }
 
 .es-activo {
   --color-estado: var(--color-success);
-  background: var(--color-success);
 }
 
 .es-finalizado {
   --color-estado: var(--color-brand);
-  background: var(--color-brand);
 }
 
 .es-cerrado {
   --color-estado: var(--text-muted);
-  background: var(--text-muted);
-}
-
-.estado-proyectos__item.es-nuevo,
-.estado-proyectos__item.es-activo,
-.estado-proyectos__item.es-finalizado,
-.estado-proyectos__item.es-cerrado {
-  background: transparent;
 }
 
 .cobertura-backlog {
   display: grid;
-  gap: var(--space-2);
+  grid-template-columns: var(--space-6) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
 }
 
-.cobertura-backlog > div {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--space-4);
+.cobertura-backlog > app-icono {
+  width: var(--space-6);
+  height: var(--space-6);
+  color: var(--color-brand);
+}
+
+.cobertura-backlog--completa > app-icono {
+  color: var(--color-success);
+}
+
+.cobertura-backlog__detalle {
+  min-width: 0;
+}
+
+.cobertura-backlog__detalle span,
+.cobertura-backlog__detalle small {
+  display: block;
+}
+
+.cobertura-backlog__detalle span {
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
 }
 
-.cobertura-backlog__barra {
-  height: var(--space-2);
-}
-
-.cobertura-backlog__barra i {
-  background: var(--color-success);
-}
-
-.cobertura-backlog p {
+.cobertura-backlog__detalle small {
+  margin-top: var(--space-1);
   color: var(--text-muted);
   font-size: var(--font-size-2xs);
 }
 
-@media (max-width: 640px) {
-  .estado-proyectos__item {
-    grid-template-columns: var(--space-3) minmax(0, 1fr) 2rem var(--space-5);
-  }
+.cobertura-backlog__porcentaje {
+  font-size: var(--font-size-sm);
+}
 
-  .estado-proyectos__barra,
-  .estado-proyectos__item small {
-    display: none;
+@media (max-width: 760px) {
+  .estado-proyectos__lista {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 

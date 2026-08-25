@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Diseño InterIA'
+  short_description: 'Diseña interfaces coherentes con InterIA'
+  default_prompt: 'Usa $diseno-interia para revisar y mejorar esta interfaz Angular.'

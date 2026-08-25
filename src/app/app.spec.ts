@@ -23,5 +23,6 @@ describe('App', () => {
 
     expect(compiled.querySelector('router-outlet')).toBeTruthy();
     expect(compiled.querySelector('app-cargador-global')).toBeTruthy();
+    expect(compiled.querySelector('app-modal-mensaje')).toBeTruthy();
   });
 });

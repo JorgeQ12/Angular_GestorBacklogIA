@@ -8,6 +8,8 @@ específicas se mantienen en documentos separados para evitar un archivo único 
 - [Autenticación mediante Kong y Microsoft](AUTENTICACION_KONG.md): popup, sesión, endpoints y
   responsabilidades.
 - [Carga global](CARGA_GLOBAL.md): estado concurrente, interceptor HTTP y presentación única.
+- [Creación de proyectos](CREACION_PROYECTOS.md): vinculación con Azure, borrador y recorrido de
+  especificación.
 - [Formularios reactivos](FORMULARIOS_REACTIVOS.md): tipado, validación, mensajes y accesibilidad.
 - [Estilos del frontend](ESTILOS_FRONTEND.md): tokens, tipografía, primitivas y CSS encapsulado.
 - [Inicio único del panel](INICIO_PANEL.md): composición del resumen y evolución mediante permisos.
@@ -34,6 +36,10 @@ src/app/
 - Las páginas se cargan de forma diferida desde `app.routes.ts`.
 - Las rutas reutilizables se centralizan en `core/navegacion/rutas.ts`.
 - Los estados globales de carga se centralizan en `core/carga-global` y se montan una sola vez.
+- Los mensajes y confirmaciones globales se coordinan desde `core/mensajes` y se presentan mediante
+  una única instancia montada en la raíz.
+- `shared/components/modal` conserva únicamente el contenedor visual reutilizable; no administra
+  estado global ni decisiones de una feature.
 
 No se crean carpetas genéricas como `utils`, `helpers` o `models` para un único archivo sin una
 necesidad real de crecimiento.

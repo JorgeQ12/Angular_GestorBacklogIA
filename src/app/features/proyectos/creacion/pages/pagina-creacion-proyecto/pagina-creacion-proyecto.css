@@ -1,0 +1,44 @@
+:host {
+  display: block;
+}
+
+.pagina-creacion {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.pagina-creacion__recorrido {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(16rem, 18rem) minmax(0, 1fr);
+  align-items: start;
+  gap: var(--space-5);
+}
+
+.pagina-creacion__etapa,
+.pagina-creacion__contenido {
+  min-width: 0;
+}
+
+.pagina-creacion__encabezado-etapa {
+  background: var(--card-footer-surface);
+}
+
+.pagina-creacion__descripcion-etapa {
+  margin: var(--space-1) 0 0;
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-snug);
+}
+
+.pagina-creacion__contenido {
+  background: var(--card-surface);
+}
+
+@media (max-width: 1024px) {
+  .pagina-creacion__recorrido {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

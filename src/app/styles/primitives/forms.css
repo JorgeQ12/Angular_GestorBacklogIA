@@ -66,6 +66,7 @@
   background: var(--field-surface-hover);
 }
 
+.ui-control:focus,
 .ui-control-wrap:focus-within .ui-control {
   border-color: var(--field-border-focus);
   background: var(--field-surface-focus);

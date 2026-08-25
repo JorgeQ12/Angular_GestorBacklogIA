@@ -1,0 +1,65 @@
+:host {
+  display: contents;
+}
+
+.modal-mensaje[data-variante='informacion'] {
+  --ui-modal-icon-surface: var(--color-info-surface);
+  --ui-modal-icon-border: var(--color-info-border);
+  --ui-modal-icon-color: var(--color-info);
+}
+
+.modal-mensaje[data-variante='exito'] {
+  --ui-modal-icon-surface: var(--color-success-surface);
+  --ui-modal-icon-border: var(--color-success-border);
+  --ui-modal-icon-color: var(--color-success);
+}
+
+.modal-mensaje[data-variante='advertencia'] {
+  --ui-modal-icon-surface: var(--color-warning-surface);
+  --ui-modal-icon-border: var(--color-warning-border);
+  --ui-modal-icon-color: var(--color-warning);
+}
+
+.modal-mensaje[data-variante='error'],
+.modal-mensaje[data-variante='destructiva'] {
+  --ui-modal-icon-surface: var(--color-danger-surface);
+  --ui-modal-icon-border: var(--color-danger-border);
+  --ui-modal-icon-color: var(--color-danger);
+}
+
+.modal-mensaje[data-variante='confirmacion'] {
+  --ui-modal-icon-surface: var(--color-brand-surface);
+  --ui-modal-icon-border: var(--border-subtle);
+  --ui-modal-icon-color: var(--color-brand);
+}
+
+.modal-mensaje__detalles {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  gap: var(--space-2);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+  list-style: none;
+}
+
+.modal-mensaje__detalles li {
+  position: relative;
+  padding: var(--space-3) var(--space-3) var(--space-3) var(--space-8);
+  border: var(--border-width) solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--surface-subtle);
+}
+
+.modal-mensaje__detalles li::before {
+  position: absolute;
+  top: 1.15rem;
+  left: var(--space-3);
+  width: var(--space-2);
+  height: var(--space-2);
+  border-radius: var(--radius-circle);
+  background: currentColor;
+  content: '';
+  opacity: 0.7;
+}

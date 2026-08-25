@@ -1,0 +1,76 @@
+<div #overlay class="ui-modal-overlay" data-app-modal (click)="gestionarBackdrop($event)">
+  <section
+    #dialogo
+    class="ui-modal"
+    [class.ui-modal--sm]="tamano() === 'sm'"
+    [class.ui-modal--lg]="tamano() === 'lg'"
+    [class.ui-modal--xl]="tamano() === 'xl'"
+    [attr.role]="rol()"
+    aria-modal="true"
+    [attr.aria-labelledby]="idTitulo"
+    [attr.aria-describedby]="descripcion() ? idDescripcion : null"
+    tabindex="-1"
+  >
+    <header class="ui-modal__header">
+      <div class="ui-modal__heading">
+        @if (icono(); as nombreIcono) {
+          <span class="ui-modal__icon" aria-hidden="true">
+            <app-icono [nombre]="nombreIcono" />
+          </span>
+        }
+        <div class="ui-modal__heading-copy">
+          @if (etiqueta(); as textoEtiqueta) {
+            <span class="ui-modal__eyebrow">{{ textoEtiqueta }}</span>
+          }
+          <h2 [id]="idTitulo" class="ui-modal__title">{{ titulo() }}</h2>
+          @if (descripcion(); as textoDescripcion) {
+            <p [id]="idDescripcion" class="ui-modal__description">{{ textoDescripcion }}</p>
+          }
+        </div>
+      </div>
+      @if (descartable()) {
+        <button
+          type="button"
+          class="ui-modal__close"
+          aria-label="Cerrar diálogo"
+          (click)="cerrar.emit()"
+        >
+          <app-icono nombre="cerrar" />
+        </button>
+      }
+    </header>
+
+    @if (mostrarCuerpo()) {
+      <div class="ui-modal__body">
+        <ng-content />
+      </div>
+    }
+
+    @if (mostrarCancelar() || mostrarConfirmar()) {
+      <footer class="ui-modal__actions">
+        @if (mostrarCancelar()) {
+          <button type="button" class="ui-button ui-button--secondary" (click)="cerrar.emit()">
+            <app-icono class="ui-button__icon" nombre="cerrar" />
+            <span class="ui-button__label">{{ textoCancelar() }}</span>
+          </button>
+        }
+        @if (mostrarConfirmar()) {
+          <button
+            class="ui-button"
+            [class.ui-button--primary]="varianteConfirmacion() === 'primary'"
+            [class.ui-button--danger]="varianteConfirmacion() === 'danger'"
+            [attr.type]="idFormulario() ? 'submit' : 'button'"
+            [attr.form]="idFormulario()"
+            [disabled]="confirmacionDeshabilitada()"
+            (click)="gestionarConfirmacion()"
+          >
+            @if (iconoConfirmar(); as nombreIconoConfirmar) {
+              <app-icono class="ui-button__icon" [nombre]="nombreIconoConfirmar" />
+            }
+            <span class="ui-button__label">{{ textoConfirmar() }}</span>
+          </button>
+        }
+      </footer>
+    }
+  </section>
+</div>

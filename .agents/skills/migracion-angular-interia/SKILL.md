@@ -24,6 +24,8 @@ del proyecto sin extender el alcance autorizado.
      [inicio único del panel](../../../docs/INICIO_PANEL.md).
 3. Inspecciona el código origen y el destino antes de proponer la estructura. Si el usuario excluye
    servicios, integración u otra parte, conserva el punto de extensión sin implementarla.
+4. Si el cambio incluye decisiones de composición o presentación, aplica también la skill
+   `diseno-interia` disponible en este proyecto.
 
 ## Asignar cada responsabilidad
 

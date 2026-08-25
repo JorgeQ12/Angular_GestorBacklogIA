@@ -5,10 +5,7 @@
   <header class="ui-card__header">
     <div class="ui-card__heading">
       <span class="ui-card__icon" aria-hidden="true"><app-icono nombre="resumen" /></span>
-      <div>
-        <span class="ui-card__eyebrow">Estado de los proyectos</span>
-        <h2 id="titulo-distribucion-proyectos" class="ui-card__title">Distribución de proyectos</h2>
-      </div>
+      <h2 id="titulo-distribucion-proyectos" class="ui-card__title">Estado de los proyectos</h2>
     </div>
     <button
       type="button"
@@ -22,8 +19,10 @@
 
   <div class="ui-card__body ui-card__body--padded estado-proyectos">
     <div class="estado-proyectos__resumen">
-      <span>Proyectos registrados</span>
       <strong>{{ indicadores().totalProyectos }}</strong>
+      <span>
+        {{ indicadores().totalProyectos === 1 ? 'proyecto registrado' : 'proyectos registrados' }}
+      </span>
     </div>
 
     <div class="estado-proyectos__distribucion" aria-label="Distribución porcentual por estado">
@@ -38,38 +37,37 @@
       }
     </div>
 
-    <div class="estado-proyectos__lista">
+    <div class="estado-proyectos__lista" aria-label="Proyectos por estado">
       @for (item of estados(); track item.estado) {
         <button
           type="button"
           class="estado-proyectos__item"
           [class]="'estado-proyectos__item ' + item.clase"
+          [class.estado-proyectos__item--vacio]="item.cantidad === 0"
+          [attr.aria-label]="item.etiqueta + ': ' + item.cantidad + ' (' + item.porcentaje + '%)'"
           (click)="seleccionarEstado.emit(item.estado)"
         >
           <span class="estado-proyectos__punto" aria-hidden="true"></span>
           <span class="estado-proyectos__nombre">{{ item.etiqueta }}</span>
-          <span class="estado-proyectos__barra" aria-hidden="true">
-            <i [style.width.%]="item.porcentaje"></i>
-          </span>
           <strong>{{ item.cantidad }}</strong>
-          <small>{{ item.porcentaje }}%</small>
-          <app-icono nombre="continuar" />
+          <app-icono class="estado-proyectos__flecha" nombre="continuar" aria-hidden="true" />
         </button>
       }
     </div>
   </div>
 
-  <footer class="ui-card__footer cobertura-backlog">
-    <div>
+  <footer
+    class="ui-card__footer cobertura-backlog"
+    [class.cobertura-backlog--completa]="coberturaBacklog() === 100"
+  >
+    <app-icono nombre="backlog" aria-hidden="true" />
+    <div class="cobertura-backlog__detalle">
       <span>Preparación del backlog</span>
-      <strong>{{ coberturaBacklog() }}%</strong>
+      <small>
+        {{ indicadores().conBacklog }} de {{ indicadores().totalProyectos }}
+        {{ indicadores().totalProyectos === 1 ? 'proyecto listo' : 'proyectos listos' }}
+      </small>
     </div>
-    <span class="cobertura-backlog__barra" aria-hidden="true">
-      <i [style.width.%]="coberturaBacklog()"></i>
-    </span>
-    <p>
-      {{ indicadores().conBacklog }} proyectos disponibles ·
-      {{ indicadores().pendientesBacklog }} pendientes
-    </p>
+    <strong class="cobertura-backlog__porcentaje">{{ coberturaBacklog() }}%</strong>
   </footer>
 </article>
