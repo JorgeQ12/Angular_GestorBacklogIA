@@ -4,6 +4,7 @@ import { By } from '@angular/platform-browser';
 import { provideRouter, Routes } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { firstValueFrom, of } from 'rxjs';
+import { SEGMENTOS_RUTA } from '../../../../../core/navegacion/rutas';
 import { IconoComponent } from '../../../../../shared/components/icono/icono.component';
 import { DATOS_RUTA_PASOS_CREACION } from '../../config/pasos-creacion-proyecto.config';
 import { BorradorProyecto } from '../../models/borrador-proyecto.model';
@@ -16,7 +17,7 @@ class PasoPrueba {}
 
 const RUTAS: Routes = [
   {
-    path: 'proyectos/nuevo',
+    path: `${SEGMENTOS_RUTA.proyectos}/${SEGMENTOS_RUTA.nuevo}`,
     component: PaginaCreacionProyecto,
     providers: [EstadoCreacionProyectoService],
     children: [
@@ -28,37 +29,37 @@ const RUTAS: Routes = [
     ],
   },
   {
-    path: 'proyectos/:proyectoId/creacion',
+    path: `${SEGMENTOS_RUTA.proyectos}/:proyectoId/${SEGMENTOS_RUTA.creacion}`,
     component: PaginaCreacionProyecto,
     providers: [EstadoCreacionProyectoService],
     children: [
       {
-        path: 'contexto',
+        path: SEGMENTOS_RUTA.contexto,
         component: PasoPrueba,
         data: DATOS_RUTA_PASOS_CREACION.contexto,
       },
       {
-        path: 'tipo-solucion',
+        path: SEGMENTOS_RUTA.tipoSolucion,
         component: PasoPrueba,
         data: DATOS_RUTA_PASOS_CREACION.tipoSolucion,
       },
       {
-        path: 'necesidad',
+        path: SEGMENTOS_RUTA.necesidad,
         component: PasoPrueba,
         data: DATOS_RUTA_PASOS_CREACION.necesidad,
       },
       {
-        path: 'objetivos',
+        path: SEGMENTOS_RUTA.objetivos,
         component: PasoPrueba,
         data: DATOS_RUTA_PASOS_CREACION.objetivos,
       },
       {
-        path: 'alcance',
+        path: SEGMENTOS_RUTA.alcance,
         component: PasoPrueba,
         data: DATOS_RUTA_PASOS_CREACION.alcance,
       },
       {
-        path: 'roles',
+        path: SEGMENTOS_RUTA.roles,
         component: PasoPrueba,
         data: DATOS_RUTA_PASOS_CREACION.roles,
       },

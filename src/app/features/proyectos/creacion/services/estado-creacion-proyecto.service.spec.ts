@@ -1,5 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { firstValueFrom, of } from 'rxjs';
+import { ClaveSeccionProyecto } from '../../config/secciones-proyecto.config';
+import { ActualizacionSeccionBorrador } from '../models/actualizacion-seccion-borrador.model';
 import { BorradorProyecto } from '../models/borrador-proyecto.model';
 import { CreacionProyectoService } from './creacion-proyecto.service';
 import { EstadoCreacionProyectoService } from './estado-creacion-proyecto.service';
@@ -7,53 +9,28 @@ import { EstadoCreacionProyectoService } from './estado-creacion-proyecto.servic
 describe('EstadoCreacionProyectoService', () => {
   const creacionProyecto = {
     obtenerBorrador: vi.fn(),
-    actualizarContexto: vi.fn(),
-    actualizarAlcance: vi.fn(),
-    actualizarNecesidad: vi.fn(),
-    actualizarObjetivos: vi.fn(),
-    actualizarTipoSolucion: vi.fn(),
+    actualizarBorrador: vi.fn(),
   };
   let servicio: EstadoCreacionProyectoService;
 
   beforeEach(() => {
     vi.clearAllMocks();
     creacionProyecto.obtenerBorrador.mockReturnValue(of(BORRADOR));
-    creacionProyecto.actualizarContexto.mockReturnValue(
-      of({ ...BORRADOR, revision: 4, pasoActual: 2 }),
-    );
-    creacionProyecto.actualizarTipoSolucion.mockReturnValue(
-      of({
-        ...BORRADOR,
-        revision: 5,
-        pasoActual: 3,
-        tipoSolucionJson: '{"tieneInterfaz":true,"plataforma":"Web"}',
-      }),
-    );
-    creacionProyecto.actualizarNecesidad.mockReturnValue(
-      of({
-        ...BORRADOR,
-        revision: 6,
-        pasoActual: 4,
-        necesidadJson:
-          '{"situacionActual":"Registro manual","problemas":"Reprocesos","impacto":"Costos"}',
-      }),
-    );
-    creacionProyecto.actualizarObjetivos.mockReturnValue(
-      of({
-        ...BORRADOR,
-        revision: 7,
-        pasoActual: 5,
-        objetivosJson:
-          '{"objetivoGeneral":"Reducir tiempos","objetivosEspecificos":["Automatizar"]}',
-      }),
-    );
-    creacionProyecto.actualizarAlcance.mockReturnValue(
-      of({
-        ...BORRADOR,
-        revision: 8,
-        pasoActual: 6,
-        alcanceJson: '{"incluido":"Seguimiento","excluido":"Pagos"}',
-      }),
+    creacionProyecto.actualizarBorrador.mockImplementation(
+      (
+        borrador: BorradorProyecto,
+        actualizacion: ActualizacionSeccionBorrador,
+        pasoActual: number,
+      ) =>
+        of({
+          ...borrador,
+          revision: pasoActual + 2,
+          pasoActual,
+          contexto:
+            actualizacion.seccion === ClaveSeccionProyecto.Contexto
+              ? actualizacion.datos
+              : borrador.contexto,
+        }),
     );
     TestBed.configureTestingModule({
       providers: [
@@ -82,18 +59,24 @@ describe('EstadoCreacionProyectoService', () => {
   it('conserva la revisión devuelta al guardar Contexto', async () => {
     await firstValueFrom(servicio.cargar(42));
     await firstValueFrom(
-      servicio.guardarContexto({
-        nombre: 'InterIA',
-        responsable: 'María',
-        descripcion: 'Contexto actualizado.',
-        prioridadCatalogoId: 13,
-        fechaObjetivo: '2026-09-30',
+      servicio.guardarSeccion({
+        seccion: ClaveSeccionProyecto.Contexto,
+        datos: {
+          nombre: 'InterIA',
+          responsable: 'María',
+          descripcion: 'Contexto actualizado.',
+          prioridadCatalogoId: 13,
+          fechaObjetivo: '2026-09-30',
+        },
       }),
     );
 
-    expect(creacionProyecto.actualizarContexto).toHaveBeenCalledWith(
+    expect(creacionProyecto.actualizarBorrador).toHaveBeenCalledWith(
       BORRADOR,
-      expect.objectContaining({ responsable: 'María' }),
+      {
+        seccion: ClaveSeccionProyecto.Contexto,
+        datos: expect.objectContaining({ responsable: 'María' }),
+      },
       2,
     );
     expect(servicio.borrador()?.revision).toBe(4);
@@ -102,22 +85,35 @@ describe('EstadoCreacionProyectoService', () => {
   it('no hace retroceder el avance al editar Contexto desde un paso posterior', async () => {
     creacionProyecto.obtenerBorrador.mockReturnValue(of({ ...BORRADOR, pasoActual: 5 }));
     await firstValueFrom(servicio.cargar(42));
-    await firstValueFrom(servicio.guardarContexto(BORRADOR.contexto));
+    await firstValueFrom(
+      servicio.guardarSeccion({
+        seccion: ClaveSeccionProyecto.Contexto,
+        datos: BORRADOR.contexto,
+      }),
+    );
 
-    expect(creacionProyecto.actualizarContexto).toHaveBeenCalledWith(
+    expect(creacionProyecto.actualizarBorrador).toHaveBeenCalledWith(
       expect.objectContaining({ pasoActual: 5 }),
-      BORRADOR.contexto,
+      { seccion: ClaveSeccionProyecto.Contexto, datos: BORRADOR.contexto },
       5,
     );
   });
 
   it('conserva la revisión devuelta al guardar Tipo de solución', async () => {
     await firstValueFrom(servicio.cargar(42));
-    await firstValueFrom(servicio.guardarTipoSolucion({ tieneInterfaz: true, plataforma: 'Web' }));
+    await firstValueFrom(
+      servicio.guardarSeccion({
+        seccion: ClaveSeccionProyecto.TipoSolucion,
+        datos: { tieneInterfaz: true, plataforma: 'Web' },
+      }),
+    );
 
-    expect(creacionProyecto.actualizarTipoSolucion).toHaveBeenCalledWith(
+    expect(creacionProyecto.actualizarBorrador).toHaveBeenCalledWith(
       BORRADOR,
-      { tieneInterfaz: true, plataforma: 'Web' },
+      {
+        seccion: ClaveSeccionProyecto.TipoSolucion,
+        datos: { tieneInterfaz: true, plataforma: 'Web' },
+      },
       3,
     );
     expect(servicio.borrador()?.revision).toBe(5);
@@ -130,9 +126,15 @@ describe('EstadoCreacionProyectoService', () => {
       impacto: 'Costos',
     };
     await firstValueFrom(servicio.cargar(42));
-    await firstValueFrom(servicio.guardarNecesidad(necesidad));
+    await firstValueFrom(
+      servicio.guardarSeccion({ seccion: ClaveSeccionProyecto.Necesidad, datos: necesidad }),
+    );
 
-    expect(creacionProyecto.actualizarNecesidad).toHaveBeenCalledWith(BORRADOR, necesidad, 4);
+    expect(creacionProyecto.actualizarBorrador).toHaveBeenCalledWith(
+      BORRADOR,
+      { seccion: ClaveSeccionProyecto.Necesidad, datos: necesidad },
+      4,
+    );
     expect(servicio.borrador()?.revision).toBe(6);
   });
 
@@ -140,16 +142,19 @@ describe('EstadoCreacionProyectoService', () => {
     creacionProyecto.obtenerBorrador.mockReturnValue(of({ ...BORRADOR, pasoActual: 7 }));
     await firstValueFrom(servicio.cargar(42));
     await firstValueFrom(
-      servicio.guardarNecesidad({
-        situacionActual: 'Registro manual',
-        problemas: 'Reprocesos',
-        impacto: 'Costos',
+      servicio.guardarSeccion({
+        seccion: ClaveSeccionProyecto.Necesidad,
+        datos: {
+          situacionActual: 'Registro manual',
+          problemas: 'Reprocesos',
+          impacto: 'Costos',
+        },
       }),
     );
 
-    expect(creacionProyecto.actualizarNecesidad).toHaveBeenCalledWith(
+    expect(creacionProyecto.actualizarBorrador).toHaveBeenCalledWith(
       expect.objectContaining({ pasoActual: 7 }),
-      expect.any(Object),
+      expect.objectContaining({ seccion: ClaveSeccionProyecto.Necesidad }),
       7,
     );
   });
@@ -160,9 +165,15 @@ describe('EstadoCreacionProyectoService', () => {
       objetivosEspecificos: ['Automatizar'],
     };
     await firstValueFrom(servicio.cargar(42));
-    await firstValueFrom(servicio.guardarObjetivos(objetivos));
+    await firstValueFrom(
+      servicio.guardarSeccion({ seccion: ClaveSeccionProyecto.Objetivos, datos: objetivos }),
+    );
 
-    expect(creacionProyecto.actualizarObjetivos).toHaveBeenCalledWith(BORRADOR, objetivos, 5);
+    expect(creacionProyecto.actualizarBorrador).toHaveBeenCalledWith(
+      BORRADOR,
+      { seccion: ClaveSeccionProyecto.Objetivos, datos: objetivos },
+      5,
+    );
     expect(servicio.borrador()?.revision).toBe(7);
   });
 
@@ -170,15 +181,18 @@ describe('EstadoCreacionProyectoService', () => {
     creacionProyecto.obtenerBorrador.mockReturnValue(of({ ...BORRADOR, pasoActual: 8 }));
     await firstValueFrom(servicio.cargar(42));
     await firstValueFrom(
-      servicio.guardarObjetivos({
-        objetivoGeneral: 'Reducir tiempos',
-        objetivosEspecificos: ['Automatizar'],
+      servicio.guardarSeccion({
+        seccion: ClaveSeccionProyecto.Objetivos,
+        datos: {
+          objetivoGeneral: 'Reducir tiempos',
+          objetivosEspecificos: ['Automatizar'],
+        },
       }),
     );
 
-    expect(creacionProyecto.actualizarObjetivos).toHaveBeenCalledWith(
+    expect(creacionProyecto.actualizarBorrador).toHaveBeenCalledWith(
       expect.objectContaining({ pasoActual: 8 }),
-      expect.any(Object),
+      expect.objectContaining({ seccion: ClaveSeccionProyecto.Objetivos }),
       8,
     );
   });
@@ -189,20 +203,31 @@ describe('EstadoCreacionProyectoService', () => {
       excluido: 'Pagos',
     };
     await firstValueFrom(servicio.cargar(42));
-    await firstValueFrom(servicio.guardarAlcance(alcance));
+    await firstValueFrom(
+      servicio.guardarSeccion({ seccion: ClaveSeccionProyecto.Alcance, datos: alcance }),
+    );
 
-    expect(creacionProyecto.actualizarAlcance).toHaveBeenCalledWith(BORRADOR, alcance, 6);
+    expect(creacionProyecto.actualizarBorrador).toHaveBeenCalledWith(
+      BORRADOR,
+      { seccion: ClaveSeccionProyecto.Alcance, datos: alcance },
+      6,
+    );
     expect(servicio.borrador()?.revision).toBe(8);
   });
 
   it('no hace retroceder el avance al editar Alcance desde un paso posterior', async () => {
     creacionProyecto.obtenerBorrador.mockReturnValue(of({ ...BORRADOR, pasoActual: 8 }));
     await firstValueFrom(servicio.cargar(42));
-    await firstValueFrom(servicio.guardarAlcance({ incluido: 'Seguimiento', excluido: 'Pagos' }));
+    await firstValueFrom(
+      servicio.guardarSeccion({
+        seccion: ClaveSeccionProyecto.Alcance,
+        datos: { incluido: 'Seguimiento', excluido: 'Pagos' },
+      }),
+    );
 
-    expect(creacionProyecto.actualizarAlcance).toHaveBeenCalledWith(
+    expect(creacionProyecto.actualizarBorrador).toHaveBeenCalledWith(
       expect.objectContaining({ pasoActual: 8 }),
-      expect.any(Object),
+      expect.objectContaining({ seccion: ClaveSeccionProyecto.Alcance }),
       8,
     );
   });

@@ -5,6 +5,7 @@ import { finalize } from 'rxjs';
 import { PARAMETROS_RUTA, crearUrlRolesProyecto } from '../../../../../../core/navegacion/rutas';
 import { EstadoError } from '../../../../../../shared/components/estado-error/estado-error';
 import { IconoComponent } from '../../../../../../shared/components/icono/icono.component';
+import { ClaveSeccionProyecto } from '../../../../config/secciones-proyecto.config';
 import { FormularioAlcanceProyecto } from '../../../../secciones/alcance/components/formulario-alcance-proyecto/formulario-alcance-proyecto';
 import { deserializarAlcanceProyecto } from '../../../../secciones/alcance/mappers/alcance-proyecto.mapper';
 import { AlcanceProyecto } from '../../../../secciones/alcance/models/alcance-proyecto.model';
@@ -65,14 +66,15 @@ export class PaginaAlcanceProyecto {
 
     this.procesando.set(true);
     this.estadoCreacion
-      .guardarAlcance(alcance)
+      .guardarSeccion({ seccion: ClaveSeccionProyecto.Alcance, datos: alcance })
       .pipe(
         finalize(() => this.procesando.set(false)),
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({
         next: () => void this.router.navigateByUrl(crearUrlRolesProyecto(this.proyectoId)),
-        error: (error: unknown) => this.notificadorErrores.comunicar(error, 'alcance'),
+        error: (error: unknown) =>
+          this.notificadorErrores.comunicar(error, ClaveSeccionProyecto.Alcance),
       });
   }
 }

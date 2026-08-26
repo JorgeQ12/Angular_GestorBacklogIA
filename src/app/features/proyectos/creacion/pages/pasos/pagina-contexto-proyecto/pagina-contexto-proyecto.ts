@@ -10,6 +10,7 @@ import {
 } from '../../../../../../core/navegacion/rutas';
 import { EstadoError } from '../../../../../../shared/components/estado-error/estado-error';
 import { IconoComponent } from '../../../../../../shared/components/icono/icono.component';
+import { ClaveSeccionProyecto } from '../../../../config/secciones-proyecto.config';
 import { FormularioContextoProyecto } from '../../../../secciones/contexto/components/formulario-contexto-proyecto/formulario-contexto-proyecto';
 import { CATALOGO_PRIORIDADES_PROYECTO } from '../../../../secciones/contexto/config/contexto-proyecto.config';
 import { ContextoProyecto } from '../../../../secciones/contexto/models/contexto-proyecto.model';
@@ -77,7 +78,7 @@ export class PaginaContextoProyecto {
 
     this.procesando.set(true);
     this.estadoCreacion
-      .guardarContexto(contexto)
+      .guardarSeccion({ seccion: ClaveSeccionProyecto.Contexto, datos: contexto })
       .pipe(
         finalize(() => this.procesando.set(false)),
         takeUntilDestroyed(this.destroyRef),
@@ -86,7 +87,8 @@ export class PaginaContextoProyecto {
         next: () => {
           void this.router.navigateByUrl(crearUrlTipoSolucionProyecto(this.proyectoId));
         },
-        error: (error: unknown) => this.notificadorErrores.comunicar(error, 'contexto'),
+        error: (error: unknown) =>
+          this.notificadorErrores.comunicar(error, ClaveSeccionProyecto.Contexto),
       });
   }
 

@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { IconoComponent } from '../../../../../shared/components/icono/icono.component';
+import { ClaveSeccionProyecto } from '../../../config/secciones-proyecto.config';
+import { CLAVE_PASO_VINCULACION_AZURE } from '../../config/pasos-creacion-proyecto.config';
 import { RecorridoCreacionProyecto } from './recorrido-creacion-proyecto';
 
 describe('RecorridoCreacionProyecto', () => {
@@ -11,13 +13,16 @@ describe('RecorridoCreacionProyecto', () => {
       imports: [RecorridoCreacionProyecto],
     }).compileComponents();
     fixture = TestBed.createComponent(RecorridoCreacionProyecto);
-    fixture.componentRef.setInput('pasoActual', 'necesidad');
+    fixture.componentRef.setInput('pasoActual', ClaveSeccionProyecto.Necesidad);
     fixture.componentRef.setInput('pasosCompletados', [
-      'vinculacion-azure',
-      'contexto',
-      'tipo-solucion',
+      CLAVE_PASO_VINCULACION_AZURE,
+      ClaveSeccionProyecto.Contexto,
+      ClaveSeccionProyecto.TipoSolucion,
     ]);
-    fixture.componentRef.setInput('pasosNavegables', ['contexto', 'tipo-solucion']);
+    fixture.componentRef.setInput('pasosNavegables', [
+      ClaveSeccionProyecto.Contexto,
+      ClaveSeccionProyecto.TipoSolucion,
+    ]);
     fixture.detectChanges();
   });
 
@@ -68,7 +73,7 @@ describe('RecorridoCreacionProyecto', () => {
     botones[1].click();
 
     expect(seleccionar).toHaveBeenCalledOnce();
-    expect(seleccionar).toHaveBeenCalledWith('contexto');
+    expect(seleccionar).toHaveBeenCalledWith(ClaveSeccionProyecto.Contexto);
   });
 
   it('presenta estado y dirección únicamente cuando aportan información', () => {

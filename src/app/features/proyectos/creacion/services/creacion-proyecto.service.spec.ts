@@ -3,6 +3,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TestBed } from '@angular/core/testing';
 import { firstValueFrom } from 'rxjs';
 import { ResultadoApi } from '../../../../core/http/models/resultado-api.model';
+import { ClaveSeccionProyecto } from '../../config/secciones-proyecto.config';
 import { ENDPOINTS_CREACION_PROYECTO } from '../config/endpoints-creacion-proyecto.config';
 import { CrearBorradorProyectoRespuestaDto } from '../models/borrador-proyecto.dto';
 import { ValidarVinculacionAzureRespuestaDto } from '../models/vinculacion-azure.dto';
@@ -121,7 +122,13 @@ describe('CreacionProyectoService', () => {
       fechaObjetivo: '2026-09-30',
     };
 
-    const respuesta = firstValueFrom(servicio.actualizarContexto(borrador, contexto, 2));
+    const respuesta = firstValueFrom(
+      servicio.actualizarBorrador(
+        borrador,
+        { seccion: ClaveSeccionProyecto.Contexto, datos: contexto },
+        2,
+      ),
+    );
     const solicitud = httpTesting.expectOne(ENDPOINTS_CREACION_PROYECTO.actualizarBorrador);
 
     expect(solicitud.request.method).toBe('PUT');
@@ -176,7 +183,14 @@ describe('CreacionProyectoService', () => {
     const borrador = await cargaBorrador;
 
     const respuesta = firstValueFrom(
-      servicio.actualizarTipoSolucion(borrador, { tieneInterfaz: true, plataforma: 'Web' }, 3),
+      servicio.actualizarBorrador(
+        borrador,
+        {
+          seccion: ClaveSeccionProyecto.TipoSolucion,
+          datos: { tieneInterfaz: true, plataforma: 'Web' },
+        },
+        3,
+      ),
     );
     const solicitud = httpTesting.expectOne(ENDPOINTS_CREACION_PROYECTO.actualizarBorrador);
 
@@ -213,12 +227,15 @@ describe('CreacionProyectoService', () => {
     const borrador = await cargaBorrador;
 
     const respuesta = firstValueFrom(
-      servicio.actualizarNecesidad(
+      servicio.actualizarBorrador(
         borrador,
         {
-          situacionActual: 'Registro manual',
-          problemas: 'Reprocesos',
-          impacto: 'Costos altos',
+          seccion: ClaveSeccionProyecto.Necesidad,
+          datos: {
+            situacionActual: 'Registro manual',
+            problemas: 'Reprocesos',
+            impacto: 'Costos altos',
+          },
         },
         4,
       ),
@@ -259,11 +276,14 @@ describe('CreacionProyectoService', () => {
     const borrador = await cargaBorrador;
 
     const respuesta = firstValueFrom(
-      servicio.actualizarObjetivos(
+      servicio.actualizarBorrador(
         borrador,
         {
-          objetivoGeneral: 'Reducir tiempos',
-          objetivosEspecificos: ['Automatizar tareas', 'Medir resultados'],
+          seccion: ClaveSeccionProyecto.Objetivos,
+          datos: {
+            objetivoGeneral: 'Reducir tiempos',
+            objetivosEspecificos: ['Automatizar tareas', 'Medir resultados'],
+          },
         },
         5,
       ),
@@ -304,11 +324,14 @@ describe('CreacionProyectoService', () => {
     const borrador = await cargaBorrador;
 
     const respuesta = firstValueFrom(
-      servicio.actualizarAlcance(
+      servicio.actualizarBorrador(
         borrador,
         {
-          incluido: 'Seguimiento de envíos',
-          excluido: 'Pagos en línea',
+          seccion: ClaveSeccionProyecto.Alcance,
+          datos: {
+            incluido: 'Seguimiento de envíos',
+            excluido: 'Pagos en línea',
+          },
         },
         6,
       ),

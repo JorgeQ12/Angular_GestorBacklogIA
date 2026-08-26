@@ -3,6 +3,7 @@ import { convertToParamMap } from '@angular/router';
 import { of } from 'rxjs';
 import { CatalogosService } from '../../../../../../core/catalogos/services/catalogos.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ClaveSeccionProyecto } from '../../../../config/secciones-proyecto.config';
 import { BorradorProyecto } from '../../../models/borrador-proyecto.model';
 import { EstadoCreacionProyectoService } from '../../../services/estado-creacion-proyecto.service';
 import { NotificadorErroresBorradorProyectoService } from '../../../services/notificador-errores-borrador-proyecto.service';
@@ -12,7 +13,7 @@ describe('PaginaContextoProyecto', () => {
   let fixture: ComponentFixture<PaginaContextoProyecto>;
   const estadoCreacion = {
     cargar: vi.fn(),
-    guardarContexto: vi.fn(),
+    guardarSeccion: vi.fn(),
     actualizarNombreProyecto: vi.fn(),
   };
   const router = { navigateByUrl: vi.fn() };
@@ -20,7 +21,7 @@ describe('PaginaContextoProyecto', () => {
   beforeEach(async () => {
     vi.clearAllMocks();
     estadoCreacion.cargar.mockReturnValue(of(BORRADOR));
-    estadoCreacion.guardarContexto.mockReturnValue(of({ ...BORRADOR, revision: 4, pasoActual: 2 }));
+    estadoCreacion.guardarSeccion.mockReturnValue(of({ ...BORRADOR, revision: 4, pasoActual: 2 }));
 
     await TestBed.configureTestingModule({
       imports: [PaginaContextoProyecto],
@@ -73,6 +74,16 @@ describe('PaginaContextoProyecto', () => {
     control.dispatchEvent(new Event('input'));
 
     expect(estadoCreacion.actualizarNombreProyecto).toHaveBeenCalledWith('Portal de clientes');
+  });
+
+  it('guarda Contexto mediante la actualización centralizada', () => {
+    const elemento = fixture.nativeElement as HTMLElement;
+    elemento.querySelector('form')?.dispatchEvent(new Event('submit'));
+
+    expect(estadoCreacion.guardarSeccion).toHaveBeenCalledWith({
+      seccion: ClaveSeccionProyecto.Contexto,
+      datos: expect.objectContaining({ nombre: 'InterIA' }),
+    });
   });
 });
 

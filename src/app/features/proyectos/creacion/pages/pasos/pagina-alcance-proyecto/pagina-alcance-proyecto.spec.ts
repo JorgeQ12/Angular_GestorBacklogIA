@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router, convertToParamMap } from '@angular/router';
 import { of } from 'rxjs';
+import { ClaveSeccionProyecto } from '../../../../config/secciones-proyecto.config';
 import { BorradorProyecto } from '../../../models/borrador-proyecto.model';
 import { EstadoCreacionProyectoService } from '../../../services/estado-creacion-proyecto.service';
 import { NotificadorErroresBorradorProyectoService } from '../../../services/notificador-errores-borrador-proyecto.service';
@@ -10,14 +11,14 @@ describe('PaginaAlcanceProyecto', () => {
   let fixture: ComponentFixture<PaginaAlcanceProyecto>;
   const estadoCreacion = {
     cargar: vi.fn(),
-    guardarAlcance: vi.fn(),
+    guardarSeccion: vi.fn(),
   };
   const router = { navigateByUrl: vi.fn() };
 
   beforeEach(async () => {
     vi.clearAllMocks();
     estadoCreacion.cargar.mockReturnValue(of(BORRADOR));
-    estadoCreacion.guardarAlcance.mockReturnValue(of({ ...BORRADOR, revision: 7, pasoActual: 6 }));
+    estadoCreacion.guardarSeccion.mockReturnValue(of({ ...BORRADOR, revision: 7, pasoActual: 6 }));
 
     await TestBed.configureTestingModule({
       imports: [PaginaAlcanceProyecto],
@@ -54,9 +55,12 @@ describe('PaginaAlcanceProyecto', () => {
     escribir(elemento, '#alcance-excluido', 'Facturación electrónica');
     elemento.querySelector('form')?.dispatchEvent(new Event('submit'));
 
-    expect(estadoCreacion.guardarAlcance).toHaveBeenCalledWith({
-      incluido: 'Consulta de estados',
-      excluido: 'Facturación electrónica',
+    expect(estadoCreacion.guardarSeccion).toHaveBeenCalledWith({
+      seccion: ClaveSeccionProyecto.Alcance,
+      datos: {
+        incluido: 'Consulta de estados',
+        excluido: 'Facturación electrónica',
+      },
     });
     expect(router.navigateByUrl).toHaveBeenCalledWith('/panel/proyectos/42/creacion/roles');
   });

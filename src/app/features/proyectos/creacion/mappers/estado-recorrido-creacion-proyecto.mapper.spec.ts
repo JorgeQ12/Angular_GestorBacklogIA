@@ -1,3 +1,5 @@
+import { ClaveSeccionProyecto } from '../../config/secciones-proyecto.config';
+import { CLAVE_PASO_VINCULACION_AZURE } from '../config/pasos-creacion-proyecto.config';
 import {
   construirEstadoRecorridoCreacion,
   obtenerPosicionVisualCreacion,
@@ -6,32 +8,50 @@ import {
 
 describe('estado del recorrido de creación', () => {
   it('mantiene el recorrido inicial sin pasos persistidos', () => {
-    expect(construirEstadoRecorridoCreacion('vinculacion-azure', null)).toEqual({
-      pasoActual: 'vinculacion-azure',
+    expect(construirEstadoRecorridoCreacion(CLAVE_PASO_VINCULACION_AZURE, null)).toEqual({
+      pasoActual: CLAVE_PASO_VINCULACION_AZURE,
       pasosCompletados: [],
       pasosNavegables: [],
     });
   });
 
   it('conserva el máximo avance al regresar a un paso anterior', () => {
-    expect(construirEstadoRecorridoCreacion('contexto', 4)).toEqual({
-      pasoActual: 'contexto',
-      pasosCompletados: ['vinculacion-azure', 'contexto', 'tipo-solucion', 'necesidad'],
-      pasosNavegables: ['tipo-solucion', 'necesidad', 'objetivos'],
+    expect(construirEstadoRecorridoCreacion(ClaveSeccionProyecto.Contexto, 4)).toEqual({
+      pasoActual: ClaveSeccionProyecto.Contexto,
+      pasosCompletados: [
+        CLAVE_PASO_VINCULACION_AZURE,
+        ClaveSeccionProyecto.Contexto,
+        ClaveSeccionProyecto.TipoSolucion,
+        ClaveSeccionProyecto.Necesidad,
+      ],
+      pasosNavegables: [
+        ClaveSeccionProyecto.TipoSolucion,
+        ClaveSeccionProyecto.Necesidad,
+        ClaveSeccionProyecto.Objetivos,
+      ],
     });
   });
 
   it('separa los pasos completados del siguiente paso alcanzado', () => {
-    expect(construirEstadoRecorridoCreacion('objetivos', 4)).toEqual({
-      pasoActual: 'objetivos',
-      pasosCompletados: ['vinculacion-azure', 'contexto', 'tipo-solucion', 'necesidad'],
-      pasosNavegables: ['contexto', 'tipo-solucion', 'necesidad'],
+    expect(construirEstadoRecorridoCreacion(ClaveSeccionProyecto.Objetivos, 4)).toEqual({
+      pasoActual: ClaveSeccionProyecto.Objetivos,
+      pasosCompletados: [
+        CLAVE_PASO_VINCULACION_AZURE,
+        ClaveSeccionProyecto.Contexto,
+        ClaveSeccionProyecto.TipoSolucion,
+        ClaveSeccionProyecto.Necesidad,
+      ],
+      pasosNavegables: [
+        ClaveSeccionProyecto.Contexto,
+        ClaveSeccionProyecto.TipoSolucion,
+        ClaveSeccionProyecto.Necesidad,
+      ],
     });
   });
 
   it('impide abrir pasos posteriores al avance persistido', () => {
-    expect(puedeAbrirPasoCreacion('necesidad', 2)).toBe(false);
-    expect(puedeAbrirPasoCreacion('tipo-solucion', 2)).toBe(true);
+    expect(puedeAbrirPasoCreacion(ClaveSeccionProyecto.Necesidad, 2)).toBe(false);
+    expect(puedeAbrirPasoCreacion(ClaveSeccionProyecto.TipoSolucion, 2)).toBe(true);
   });
 
   it('incluye Azure al presentar la posición visual del avance', () => {

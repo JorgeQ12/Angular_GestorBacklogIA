@@ -8,6 +8,7 @@ import {
 } from '../../../../../../core/navegacion/rutas';
 import { EstadoError } from '../../../../../../shared/components/estado-error/estado-error';
 import { IconoComponent } from '../../../../../../shared/components/icono/icono.component';
+import { ClaveSeccionProyecto } from '../../../../config/secciones-proyecto.config';
 import { FormularioNecesidadProyecto } from '../../../../secciones/necesidad/components/formulario-necesidad-proyecto/formulario-necesidad-proyecto';
 import { deserializarNecesidadProyecto } from '../../../../secciones/necesidad/mappers/necesidad-proyecto.mapper';
 import { NecesidadProyecto } from '../../../../secciones/necesidad/models/necesidad-proyecto.model';
@@ -68,14 +69,15 @@ export class PaginaNecesidadProyecto {
 
     this.procesando.set(true);
     this.estadoCreacion
-      .guardarNecesidad(necesidad)
+      .guardarSeccion({ seccion: ClaveSeccionProyecto.Necesidad, datos: necesidad })
       .pipe(
         finalize(() => this.procesando.set(false)),
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({
         next: () => void this.router.navigateByUrl(crearUrlObjetivosProyecto(this.proyectoId)),
-        error: (error: unknown) => this.notificadorErrores.comunicar(error, 'necesidad'),
+        error: (error: unknown) =>
+          this.notificadorErrores.comunicar(error, ClaveSeccionProyecto.Necesidad),
       });
   }
 }

@@ -1,5 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
+import { ClaveSeccionProyecto } from '../../config/secciones-proyecto.config';
 import { MensajesService } from '../../../../core/mensajes/services/mensajes.service';
 import { NotificadorErroresBorradorProyectoService } from './notificador-errores-borrador-proyecto.service';
 
@@ -19,7 +20,7 @@ describe('NotificadorErroresBorradorProyectoService', () => {
   });
 
   it('presenta el conflicto de revisión de forma uniforme', () => {
-    servicio.comunicar(new HttpErrorResponse({ status: 409 }), 'necesidad');
+    servicio.comunicar(new HttpErrorResponse({ status: 409 }), ClaveSeccionProyecto.Necesidad);
 
     expect(mensajes.error).toHaveBeenCalledWith(
       'El borrador cambió',
@@ -28,7 +29,7 @@ describe('NotificadorErroresBorradorProyectoService', () => {
   });
 
   it('presenta el mensaje particular cuando no existe conflicto', () => {
-    servicio.comunicar(new HttpErrorResponse({ status: 500 }), 'tipoSolucion');
+    servicio.comunicar(new HttpErrorResponse({ status: 500 }), ClaveSeccionProyecto.TipoSolucion);
 
     expect(mensajes.error).toHaveBeenCalledWith(
       'No fue posible guardar el tipo de solución',

@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router, convertToParamMap } from '@angular/router';
 import { of } from 'rxjs';
+import { ClaveSeccionProyecto } from '../../../../config/secciones-proyecto.config';
 import { BorradorProyecto } from '../../../models/borrador-proyecto.model';
 import { EstadoCreacionProyectoService } from '../../../services/estado-creacion-proyecto.service';
 import { NotificadorErroresBorradorProyectoService } from '../../../services/notificador-errores-borrador-proyecto.service';
@@ -10,16 +11,14 @@ describe('PaginaTipoSolucionProyecto', () => {
   let fixture: ComponentFixture<PaginaTipoSolucionProyecto>;
   const estadoCreacion = {
     cargar: vi.fn(),
-    guardarTipoSolucion: vi.fn(),
+    guardarSeccion: vi.fn(),
   };
   const router = { navigateByUrl: vi.fn() };
 
   beforeEach(async () => {
     vi.clearAllMocks();
     estadoCreacion.cargar.mockReturnValue(of(BORRADOR));
-    estadoCreacion.guardarTipoSolucion.mockReturnValue(
-      of({ ...BORRADOR, revision: 4, pasoActual: 3 }),
-    );
+    estadoCreacion.guardarSeccion.mockReturnValue(of({ ...BORRADOR, revision: 4, pasoActual: 3 }));
 
     await TestBed.configureTestingModule({
       imports: [PaginaTipoSolucionProyecto],
@@ -61,9 +60,9 @@ describe('PaginaTipoSolucionProyecto', () => {
       .querySelector('form')
       ?.dispatchEvent(new Event('submit'));
 
-    expect(estadoCreacion.guardarTipoSolucion).toHaveBeenCalledWith({
-      tieneInterfaz: true,
-      plataforma: 'Web',
+    expect(estadoCreacion.guardarSeccion).toHaveBeenCalledWith({
+      seccion: ClaveSeccionProyecto.TipoSolucion,
+      datos: { tieneInterfaz: true, plataforma: 'Web' },
     });
     expect(router.navigateByUrl).toHaveBeenCalledWith('/panel/proyectos/42/creacion/necesidad');
   });

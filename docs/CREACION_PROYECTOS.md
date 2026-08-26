@@ -226,6 +226,12 @@ La construcción de `ActualizarBorrador` acepta reemplazos parciales internos y 
 fotografía completa exigida por el backend. Así cada sección reemplaza únicamente su contenido sin
 crear copias diferentes del comando ni perder datos de secciones posteriores.
 
+`ClaveSeccionProyecto` es un enum de cadenas y constituye la identidad única de las secciones. Las
+páginas envían una actualización discriminada con `seccion` y `datos`; el tipado relaciona cada
+miembro del enum con su modelo y evita combinaciones inválidas. Un único método guarda la sección,
+selecciona su mapper, ejecuta `ActualizarBorrador`, conserva la revisión y calcula el avance. No se
+detecta una sección inspeccionando propiedades del objeto ni se repiten métodos HTTP por paso.
+
 ## Implementación de Necesidad de negocio
 
 Necesidad conserva la sección narrativa reutilizable fuera del recorrido de creación:

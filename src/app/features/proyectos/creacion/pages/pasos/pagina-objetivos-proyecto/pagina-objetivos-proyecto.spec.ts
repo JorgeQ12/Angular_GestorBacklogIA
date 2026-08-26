@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router, convertToParamMap } from '@angular/router';
 import { of } from 'rxjs';
+import { ClaveSeccionProyecto } from '../../../../config/secciones-proyecto.config';
 import { BorradorProyecto } from '../../../models/borrador-proyecto.model';
 import { EstadoCreacionProyectoService } from '../../../services/estado-creacion-proyecto.service';
 import { NotificadorErroresBorradorProyectoService } from '../../../services/notificador-errores-borrador-proyecto.service';
@@ -10,16 +11,14 @@ describe('PaginaObjetivosProyecto', () => {
   let fixture: ComponentFixture<PaginaObjetivosProyecto>;
   const estadoCreacion = {
     cargar: vi.fn(),
-    guardarObjetivos: vi.fn(),
+    guardarSeccion: vi.fn(),
   };
   const router = { navigateByUrl: vi.fn() };
 
   beforeEach(async () => {
     vi.clearAllMocks();
     estadoCreacion.cargar.mockReturnValue(of(BORRADOR));
-    estadoCreacion.guardarObjetivos.mockReturnValue(
-      of({ ...BORRADOR, revision: 6, pasoActual: 5 }),
-    );
+    estadoCreacion.guardarSeccion.mockReturnValue(of({ ...BORRADOR, revision: 6, pasoActual: 5 }));
 
     await TestBed.configureTestingModule({
       imports: [PaginaObjetivosProyecto],
@@ -58,9 +57,12 @@ describe('PaginaObjetivosProyecto', () => {
     escribir(elemento, '#objetivos-especifico-1', 'Medir resultados');
     elemento.querySelector('form')?.dispatchEvent(new Event('submit'));
 
-    expect(estadoCreacion.guardarObjetivos).toHaveBeenCalledWith({
-      objetivoGeneral: 'Mejorar la operación',
-      objetivosEspecificos: ['Reducir reprocesos', 'Medir resultados'],
+    expect(estadoCreacion.guardarSeccion).toHaveBeenCalledWith({
+      seccion: ClaveSeccionProyecto.Objetivos,
+      datos: {
+        objetivoGeneral: 'Mejorar la operación',
+        objetivosEspecificos: ['Reducir reprocesos', 'Medir resultados'],
+      },
     });
     expect(router.navigateByUrl).toHaveBeenCalledWith('/panel/proyectos/42/creacion/alcance');
   });

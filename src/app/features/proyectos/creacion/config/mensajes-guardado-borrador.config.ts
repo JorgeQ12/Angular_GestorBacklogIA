@@ -1,26 +1,34 @@
+import { ClaveSeccionProyecto } from '../../config/secciones-proyecto.config';
+import { SeccionActualizableBorrador } from '../models/actualizacion-seccion-borrador.model';
+
 /** Centraliza los mensajes particulares de cada sección guardable. */
 export const MENSAJES_GUARDADO_BORRADOR = {
-  contexto: {
+  [ClaveSeccionProyecto.Contexto]: {
     titulo: 'No fue posible guardar el contexto',
     descripcion: 'Conservamos los datos del formulario para que puedas intentarlo nuevamente.',
   },
-  tipoSolucion: {
+  [ClaveSeccionProyecto.TipoSolucion]: {
     titulo: 'No fue posible guardar el tipo de solución',
     descripcion: 'Conservamos la selección para que puedas intentarlo nuevamente.',
   },
-  necesidad: {
+  [ClaveSeccionProyecto.Necesidad]: {
     titulo: 'No fue posible guardar la necesidad',
     descripcion: 'Conservamos la información para que puedas intentarlo nuevamente.',
   },
-  objetivos: {
+  [ClaveSeccionProyecto.Objetivos]: {
     titulo: 'No fue posible guardar los objetivos',
     descripcion: 'Conservamos la información para que puedas intentarlo nuevamente.',
   },
-  alcance: {
+  [ClaveSeccionProyecto.Alcance]: {
     titulo: 'No fue posible guardar el alcance',
     descripcion: 'Conservamos los límites definidos para que puedas intentarlo nuevamente.',
   },
-} as const;
+} as const satisfies Record<SeccionActualizableBorrador, MensajeGuardadoBorrador>;
+
+interface MensajeGuardadoBorrador {
+  readonly titulo: string;
+  readonly descripcion: string;
+}
 
 /** Limita las secciones admitidas por la notificación de guardado. */
-export type SeccionGuardadoBorrador = keyof typeof MENSAJES_GUARDADO_BORRADOR;
+export type SeccionGuardadoBorrador = SeccionActualizableBorrador;

@@ -8,6 +8,7 @@ import {
 } from '../../../../../../core/navegacion/rutas';
 import { EstadoError } from '../../../../../../shared/components/estado-error/estado-error';
 import { IconoComponent } from '../../../../../../shared/components/icono/icono.component';
+import { ClaveSeccionProyecto } from '../../../../config/secciones-proyecto.config';
 import { FormularioTipoSolucionProyecto } from '../../../../secciones/tipo-solucion/components/formulario-tipo-solucion-proyecto/formulario-tipo-solucion-proyecto';
 import { deserializarTipoSolucionProyecto } from '../../../../secciones/tipo-solucion/mappers/tipo-solucion-proyecto.mapper';
 import { TipoSolucionProyecto } from '../../../../secciones/tipo-solucion/models/tipo-solucion-proyecto.model';
@@ -68,14 +69,15 @@ export class PaginaTipoSolucionProyecto {
 
     this.procesando.set(true);
     this.estadoCreacion
-      .guardarTipoSolucion(tipoSolucion)
+      .guardarSeccion({ seccion: ClaveSeccionProyecto.TipoSolucion, datos: tipoSolucion })
       .pipe(
         finalize(() => this.procesando.set(false)),
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({
         next: () => void this.router.navigateByUrl(crearUrlNecesidadProyecto(this.proyectoId)),
-        error: (error: unknown) => this.notificadorErrores.comunicar(error, 'tipoSolucion'),
+        error: (error: unknown) =>
+          this.notificadorErrores.comunicar(error, ClaveSeccionProyecto.TipoSolucion),
       });
   }
 }

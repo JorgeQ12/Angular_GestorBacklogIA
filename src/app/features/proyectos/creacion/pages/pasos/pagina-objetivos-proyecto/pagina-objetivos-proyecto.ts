@@ -2,12 +2,10 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { finalize } from 'rxjs';
-import {
-  PARAMETROS_RUTA,
-  crearUrlAlcanceProyecto,
-} from '../../../../../../core/navegacion/rutas';
+import { PARAMETROS_RUTA, crearUrlAlcanceProyecto } from '../../../../../../core/navegacion/rutas';
 import { EstadoError } from '../../../../../../shared/components/estado-error/estado-error';
 import { IconoComponent } from '../../../../../../shared/components/icono/icono.component';
+import { ClaveSeccionProyecto } from '../../../../config/secciones-proyecto.config';
 import { FormularioObjetivosProyecto } from '../../../../secciones/objetivos/components/formulario-objetivos-proyecto/formulario-objetivos-proyecto';
 import { deserializarObjetivosProyecto } from '../../../../secciones/objetivos/mappers/objetivos-proyecto.mapper';
 import { ObjetivosProyecto } from '../../../../secciones/objetivos/models/objetivos-proyecto.model';
@@ -68,14 +66,15 @@ export class PaginaObjetivosProyecto {
 
     this.procesando.set(true);
     this.estadoCreacion
-      .guardarObjetivos(objetivos)
+      .guardarSeccion({ seccion: ClaveSeccionProyecto.Objetivos, datos: objetivos })
       .pipe(
         finalize(() => this.procesando.set(false)),
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({
         next: () => void this.router.navigateByUrl(crearUrlAlcanceProyecto(this.proyectoId)),
-        error: (error: unknown) => this.notificadorErrores.comunicar(error, 'objetivos'),
+        error: (error: unknown) =>
+          this.notificadorErrores.comunicar(error, ClaveSeccionProyecto.Objetivos),
       });
   }
 }

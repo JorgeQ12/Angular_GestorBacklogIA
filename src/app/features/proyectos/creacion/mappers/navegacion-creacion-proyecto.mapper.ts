@@ -6,6 +6,7 @@ import {
   crearUrlRolesProyecto,
   crearUrlTipoSolucionProyecto,
 } from '../../../../core/navegacion/rutas';
+import { ClaveSeccionProyecto } from '../../config/secciones-proyecto.config';
 import {
   AVANCE_BORRADOR_POR_PASO,
   ClavePasoCreacionProyecto,
@@ -16,12 +17,12 @@ import { normalizarAvanceCreacionProyecto } from './estado-recorrido-creacion-pr
 type ConstructorUrlPaso = (proyectoId: number | string) => string;
 
 const CONSTRUCTORES_URL_PASO: Partial<Record<ClavePasoCreacionProyecto, ConstructorUrlPaso>> = {
-  contexto: crearUrlContextoProyecto,
-  'tipo-solucion': crearUrlTipoSolucionProyecto,
-  necesidad: crearUrlNecesidadProyecto,
-  objetivos: crearUrlObjetivosProyecto,
-  alcance: crearUrlAlcanceProyecto,
-  roles: crearUrlRolesProyecto,
+  [ClaveSeccionProyecto.Contexto]: crearUrlContextoProyecto,
+  [ClaveSeccionProyecto.TipoSolucion]: crearUrlTipoSolucionProyecto,
+  [ClaveSeccionProyecto.Necesidad]: crearUrlNecesidadProyecto,
+  [ClaveSeccionProyecto.Objetivos]: crearUrlObjetivosProyecto,
+  [ClaveSeccionProyecto.Alcance]: crearUrlAlcanceProyecto,
+  [ClaveSeccionProyecto.Roles]: crearUrlRolesProyecto,
 };
 
 /** Construye la URL de un paso disponible dentro del recorrido migrado. */

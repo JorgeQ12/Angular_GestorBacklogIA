@@ -11,21 +11,14 @@ import {
   mapearResultadoVinculacionAzure,
   mapearSolicitudVinculacionAzure,
 } from '../mappers/creacion-proyecto.mapper';
+import { mapearCambioSeccionBorrador } from '../mappers/actualizacion-seccion-borrador.mapper';
 import {
   CrearBorradorProyectoRespuestaDto,
   CrearBorradorProyectoSolicitudDto,
   BorradorProyectoDto,
 } from '../models/borrador-proyecto.dto';
 import { BorradorProyecto, BorradorProyectoCreado } from '../models/borrador-proyecto.model';
-import { ContextoProyecto } from '../../secciones/contexto/models/contexto-proyecto.model';
-import { serializarAlcanceProyecto } from '../../secciones/alcance/mappers/alcance-proyecto.mapper';
-import { AlcanceProyecto } from '../../secciones/alcance/models/alcance-proyecto.model';
-import { serializarNecesidadProyecto } from '../../secciones/necesidad/mappers/necesidad-proyecto.mapper';
-import { NecesidadProyecto } from '../../secciones/necesidad/models/necesidad-proyecto.model';
-import { serializarObjetivosProyecto } from '../../secciones/objetivos/mappers/objetivos-proyecto.mapper';
-import { ObjetivosProyecto } from '../../secciones/objetivos/models/objetivos-proyecto.model';
-import { serializarTipoSolucionProyecto } from '../../secciones/tipo-solucion/mappers/tipo-solucion-proyecto.mapper';
-import { TipoSolucionProyecto } from '../../secciones/tipo-solucion/models/tipo-solucion-proyecto.model';
+import { ActualizacionSeccionBorrador } from '../models/actualizacion-seccion-borrador.model';
 import { ValidarVinculacionAzureRespuestaDto } from '../models/vinculacion-azure.dto';
 import {
   DatosVinculacionAzure,
@@ -83,27 +76,10 @@ export class CreacionProyectoService {
       );
   }
 
-  /** Persiste Contexto sin perder la información de las demás secciones. */
-  public actualizarContexto(
+  /** Persiste una sección sin perder la información de las demás secciones. */
+  public actualizarBorrador(
     borrador: BorradorProyecto,
-    contexto: ContextoProyecto,
-    pasoActual: number,
-  ): Observable<BorradorProyecto> {
-    return this.http
-      .put<ResultadoApi<BorradorProyectoDto>>(
-        ENDPOINTS_CREACION_PROYECTO.actualizarBorrador,
-        mapearActualizacionBorrador(borrador, { contexto }, pasoActual),
-      )
-      .pipe(
-        map((resultado) => exigirDatosResultadoApi(resultado, 'el borrador actualizado')),
-        map(mapearBorradorProyecto),
-      );
-  }
-
-  /** Persiste Tipo de solución sin perder la información de las demás secciones. */
-  public actualizarTipoSolucion(
-    borrador: BorradorProyecto,
-    tipoSolucion: TipoSolucionProyecto,
+    actualizacion: ActualizacionSeccionBorrador,
     pasoActual: number,
   ): Observable<BorradorProyecto> {
     return this.http
@@ -111,70 +87,7 @@ export class CreacionProyectoService {
         ENDPOINTS_CREACION_PROYECTO.actualizarBorrador,
         mapearActualizacionBorrador(
           borrador,
-          { tipoSolucionJson: serializarTipoSolucionProyecto(tipoSolucion) },
-          pasoActual,
-        ),
-      )
-      .pipe(
-        map((resultado) => exigirDatosResultadoApi(resultado, 'el borrador actualizado')),
-        map(mapearBorradorProyecto),
-      );
-  }
-
-  /** Persiste Necesidad sin perder la información de las demás secciones. */
-  public actualizarNecesidad(
-    borrador: BorradorProyecto,
-    necesidad: NecesidadProyecto,
-    pasoActual: number,
-  ): Observable<BorradorProyecto> {
-    return this.http
-      .put<ResultadoApi<BorradorProyectoDto>>(
-        ENDPOINTS_CREACION_PROYECTO.actualizarBorrador,
-        mapearActualizacionBorrador(
-          borrador,
-          { necesidadJson: serializarNecesidadProyecto(necesidad) },
-          pasoActual,
-        ),
-      )
-      .pipe(
-        map((resultado) => exigirDatosResultadoApi(resultado, 'el borrador actualizado')),
-        map(mapearBorradorProyecto),
-      );
-  }
-
-  /** Persiste Objetivos sin perder la información de las demás secciones. */
-  public actualizarObjetivos(
-    borrador: BorradorProyecto,
-    objetivos: ObjetivosProyecto,
-    pasoActual: number,
-  ): Observable<BorradorProyecto> {
-    return this.http
-      .put<ResultadoApi<BorradorProyectoDto>>(
-        ENDPOINTS_CREACION_PROYECTO.actualizarBorrador,
-        mapearActualizacionBorrador(
-          borrador,
-          { objetivosJson: serializarObjetivosProyecto(objetivos) },
-          pasoActual,
-        ),
-      )
-      .pipe(
-        map((resultado) => exigirDatosResultadoApi(resultado, 'el borrador actualizado')),
-        map(mapearBorradorProyecto),
-      );
-  }
-
-  /** Persiste Alcance sin perder la información de las demás secciones. */
-  public actualizarAlcance(
-    borrador: BorradorProyecto,
-    alcance: AlcanceProyecto,
-    pasoActual: number,
-  ): Observable<BorradorProyecto> {
-    return this.http
-      .put<ResultadoApi<BorradorProyectoDto>>(
-        ENDPOINTS_CREACION_PROYECTO.actualizarBorrador,
-        mapearActualizacionBorrador(
-          borrador,
-          { alcanceJson: serializarAlcanceProyecto(alcance) },
+          mapearCambioSeccionBorrador(actualizacion),
           pasoActual,
         ),
       )

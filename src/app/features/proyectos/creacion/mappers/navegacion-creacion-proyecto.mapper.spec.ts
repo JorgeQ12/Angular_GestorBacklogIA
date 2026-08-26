@@ -1,3 +1,4 @@
+import { ClaveSeccionProyecto } from '../../config/secciones-proyecto.config';
 import {
   crearUrlPasoCreacionProyecto,
   crearUrlReanudacionProyecto,
@@ -20,6 +21,6 @@ describe('navegación de creación de proyectos', () => {
   });
 
   it('no inventa rutas para pasos todavía no migrados', () => {
-    expect(crearUrlPasoCreacionProyecto(42, 'equipo')).toBeNull();
+    expect(crearUrlPasoCreacionProyecto(42, ClaveSeccionProyecto.Equipo)).toBeNull();
   });
 });
