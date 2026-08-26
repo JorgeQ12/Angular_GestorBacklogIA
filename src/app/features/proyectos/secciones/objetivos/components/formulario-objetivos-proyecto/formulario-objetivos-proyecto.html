@@ -1,0 +1,80 @@
+<form
+  class="formulario-objetivos"
+  [formGroup]="formulario"
+  [appMensajesFormulario]="mensajesFormulario"
+  (ngSubmit)="enviar()"
+>
+  <div class="formulario-objetivos__contenido">
+    <div class="ui-field">
+      <div class="formulario-objetivos__label">
+        <label class="ui-label" for="objetivos-general">Objetivo general</label>
+        <span>
+          {{ formulario.controls.objetivoGeneral.value.length }}/{{ limites.objetivoGeneral }}
+        </span>
+      </div>
+      <textarea
+        id="objetivos-general"
+        class="ui-control formulario-objetivos__general"
+        formControlName="objetivoGeneral"
+        [maxlength]="limites.objetivoGeneral"
+        placeholder="Describe el resultado principal que debe alcanzar el proyecto."
+        rows="5"
+        required
+        appErrorCampo
+      ></textarea>
+    </div>
+
+    <section class="formulario-objetivos__especificos" aria-labelledby="titulo-objetivos-especificos">
+      <header class="formulario-objetivos__encabezado-lista">
+        <div>
+          <h3 id="titulo-objetivos-especificos">Objetivos específicos</h3>
+          <p>Define resultados concretos que permitan alcanzar el objetivo general.</p>
+        </div>
+        <div class="formulario-objetivos__acciones-lista">
+          <span>{{ controlesObjetivosEspecificos.length }}/{{ limites.objetivosEspecificos }}</span>
+          <button
+            type="button"
+            class="ui-button ui-button--secondary ui-button--md"
+            [disabled]="procesando() || controlesObjetivosEspecificos.length >= limites.objetivosEspecificos"
+            (click)="agregarObjetivoEspecifico()"
+          >
+            <app-icono class="ui-button__icon" nombre="agregar" />
+            Agregar objetivo
+          </button>
+        </div>
+      </header>
+
+      <div class="formulario-objetivos__lista" formArrayName="objetivosEspecificos">
+        @for (objetivo of controlesObjetivosEspecificos; track objetivo; let indice = $index) {
+          <div class="formulario-objetivos__item">
+            <span class="formulario-objetivos__numero" aria-hidden="true">{{ indice + 1 }}</span>
+            <div class="ui-field formulario-objetivos__campo-especifico">
+              <input
+                [id]="'objetivos-especifico-' + indice"
+                class="ui-control"
+                type="text"
+                [formControlName]="indice"
+                [appMensajesError]="mensajesObjetivoEspecifico"
+                [attr.aria-label]="'Objetivo específico ' + (indice + 1)"
+                placeholder="Ej. Automatizar la validación de solicitudes."
+                required
+                appErrorCampo
+              />
+            </div>
+            <button
+              type="button"
+              class="formulario-objetivos__eliminar"
+              [disabled]="procesando() || controlesObjetivosEspecificos.length <= 1"
+              [attr.aria-label]="'Eliminar objetivo específico ' + (indice + 1)"
+              (click)="eliminarObjetivoEspecifico(indice)"
+            >
+              <app-icono nombre="eliminar" aria-hidden="true" />
+            </button>
+          </div>
+        }
+      </div>
+    </section>
+  </div>
+
+  <ng-content select="[accionesFormularioObjetivos]" />
+</form>

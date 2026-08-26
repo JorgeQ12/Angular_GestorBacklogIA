@@ -17,16 +17,16 @@
   gap: var(--space-5);
 }
 
-.pagina-creacion__etapa,
+.pagina-creacion__paso,
 .pagina-creacion__contenido {
   min-width: 0;
 }
 
-.pagina-creacion__encabezado-etapa {
+.pagina-creacion__encabezado-paso {
   background: var(--card-footer-surface);
 }
 
-.pagina-creacion__descripcion-etapa {
+.pagina-creacion__descripcion-paso {
   margin: var(--space-1) 0 0;
   color: var(--text-muted);
   font-size: var(--font-size-xs);

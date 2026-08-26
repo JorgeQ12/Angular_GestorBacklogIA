@@ -64,6 +64,21 @@ describe('VinculacionAzure', () => {
     });
   });
 
+  it('presenta el enlace como obligatorio cuando solo contiene espacios', () => {
+    const validar = vi.fn();
+    fixture.componentInstance.validar.subscribe(validar);
+    cambiarValor('vinculacion-url-board', '   ');
+    cambiarValor('vinculacion-id-epica', '321');
+
+    obtenerFormulario().requestSubmit();
+    fixture.detectChanges();
+
+    expect(validar).not.toHaveBeenCalled();
+    expect(obtenerElemento().textContent).toContain(
+      'El enlace del proyecto o board es obligatorio.',
+    );
+  });
+
   it('emite el identificador cuando se indica un Team específico', () => {
     let emitido: DatosVinculacionAzure | undefined;
     fixture.componentInstance.validar.subscribe((datos) => (emitido = datos));

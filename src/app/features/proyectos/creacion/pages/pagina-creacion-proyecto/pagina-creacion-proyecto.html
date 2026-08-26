@@ -1,7 +1,7 @@
 <section class="pagina-creacion" aria-labelledby="titulo-creacion-proyecto">
   <app-encabezado-pagina
     idTitulo="titulo-creacion-proyecto"
-    titulo="Nuevo proyecto"
+    [titulo]="tituloEncabezado()"
     [etiqueta]="etiquetaEncabezado"
     [descripcion]="descripcionEncabezado"
     icono="proyectos"
@@ -19,23 +19,24 @@
 
   <div class="pagina-creacion__recorrido">
     <app-recorrido-creacion-proyecto
-      [etapaActual]="estadoRecorrido().etapaActual"
-      [etapasCompletadas]="estadoRecorrido().etapasCompletadas"
-      [etapasNavegables]="estadoRecorrido().etapasNavegables"
+      [pasoActual]="estadoRecorrido().pasoActual"
+      [pasosCompletados]="estadoRecorrido().pasosCompletados"
+      [pasosNavegables]="estadoRecorrido().pasosNavegables"
+      (pasoSeleccionado)="abrirPaso($event)"
     />
 
-    <article class="ui-card pagina-creacion__etapa" aria-labelledby="titulo-etapa-creacion">
-      <header class="ui-card__header pagina-creacion__encabezado-etapa">
+    <article class="ui-card pagina-creacion__paso" aria-labelledby="titulo-paso-creacion">
+      <header class="ui-card__header pagina-creacion__encabezado-paso">
         <div class="ui-card__heading">
           <span class="ui-card__icon" aria-hidden="true">
-            <app-icono [nombre]="etapaActiva().icono" />
+            <app-icono [nombre]="pasoActivo().icono" />
           </span>
           <div>
-            <h2 id="titulo-etapa-creacion" class="ui-card__title">
-              {{ etapaActiva().titulo }}
+            <h2 id="titulo-paso-creacion" class="ui-card__title">
+              {{ pasoActivo().titulo }}
             </h2>
-            <p class="pagina-creacion__descripcion-etapa">
-              {{ etapaActiva().descripcion }}
+            <p class="pagina-creacion__descripcion-paso">
+              {{ pasoActivo().descripcion }}
             </p>
           </div>
         </div>

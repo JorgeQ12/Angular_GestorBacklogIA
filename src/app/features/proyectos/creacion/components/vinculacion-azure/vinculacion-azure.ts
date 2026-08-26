@@ -5,6 +5,7 @@ import {
   ErrorCampoDirective,
   MensajesFormularioDirective,
 } from '../../../../../shared/forms/errores-validacion';
+import { validarTextoRequerido } from '../../../../../shared/forms/validadores';
 import {
   DatosVinculacionAzure,
   ResultadoVinculacionAzure,
@@ -49,7 +50,7 @@ export class VinculacionAzure {
     this.constructorFormulario.group({
       urlBoard: [
         '',
-        [Validators.required, Validators.maxLength(500), Validators.pattern(PATRON_URL_SEGURA)],
+        [validarTextoRequerido, Validators.maxLength(500), Validators.pattern(PATRON_URL_SEGURA)],
       ],
       idEpica: this.constructorFormulario.control<number | null>(null, [
         Validators.required,

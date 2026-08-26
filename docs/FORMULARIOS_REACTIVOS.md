@@ -100,6 +100,19 @@ El componente no:
 - Traduce manualmente `ValidationErrors` en cada formulario.
 - Hereda de una clase base únicamente para acceder a `touched`, `dirty` o `invalid`.
 
+### Colecciones dinámicas
+
+Cuando una sección permite agregar o retirar elementos, el componente del formulario administra
+un `FormArray` tipado. La página consumidora recibe únicamente el modelo final y no modifica
+controles, índices ni validadores.
+
+- El mínimo y el máximo se declaran en la configuración de la sección.
+- Agregar y eliminar usan la API de `FormArray`; no se mantiene una colección paralela.
+- Cada control dinámico conserva `id`, etiqueta y mensaje accesible propios.
+- Los mensajes repetidos pueden proporcionarse directamente mediante `appMensajesError`.
+- La hidratación reemplaza los controles existentes y deja el formulario limpio y sin tocar.
+- Los límites se prueban, incluida la imposibilidad de eliminar el último elemento requerido.
+
 ### `MensajesFormularioDirective`
 
 La directiva aplicada al `<form>` proporciona el mapa de mensajes específicos a los controles
@@ -129,12 +142,14 @@ Cada control con `appErrorCampo` debe:
 
 - Tener un `id` único.
 - Estar dentro de un ancestro `.ui-field`.
-- Tener un `<label>` cuyo `for` coincida con el `id`.
+- Tener un nombre accesible. Se prefiere un `<label>` cuyo `for` coincida con el `id`; un control
+  dinámico compacto puede usar `aria-label` cuando una etiqueta visible resulte redundante.
 - Estar asociado mediante `formControlName`, `[formControl]` o `ngModel`.
 
 ## Tipado del formulario
 
-El valor emitido es la fuente para derivar los controles:
+Cuando cada propiedad del valor corresponde a un `FormControl`, se usa el contrato compartido
+`ControlesFormularioPlano<T>` como fuente única del tipado:
 
 ```ts
 export interface DatosFormulario {
@@ -142,15 +157,19 @@ export interface DatosFormulario {
   descripcion: string;
 }
 
-export type ControlesFormulario = {
-  [TCampo in keyof DatosFormulario]: FormControl<DatosFormulario[TCampo]>;
-};
+export type ControlesFormulario = ControlesFormularioPlano<DatosFormulario>;
 
 export type FormularioTipado = FormGroup<ControlesFormulario>;
 export type CampoFormulario = keyof ControlesFormulario;
 ```
 
-Esto evita declarar por separado el tipo del valor y el tipo de cada control.
+Esto evita repetir las propiedades en el valor, los controles y la unión de nombres de campo. El
+tipo compartido vive en `shared/forms/models` y solo aplica a estructuras planas.
+
+Si el valor editable difiere del modelo de dominio, se declara primero una interfaz específica de
+valores del formulario y los controles se derivan desde ella. Si la estructura contiene
+`FormArray`, grupos anidados u otros controles compuestos, sus controles se tipan explícitamente;
+el nombre de campo se sigue derivando con `keyof` y no mediante uniones manuales de cadenas.
 
 ## Configuración de mensajes
 
@@ -162,6 +181,12 @@ Los mensajes genéricos viven en:
 ```text
 shared/forms/errores-validacion/config/mensajes-error.config.ts
 ```
+
+Los campos de texto libre obligatorios usan `validarTextoRequerido`, ubicado en
+`shared/forms/validadores`. Esta regla rechaza cadenas vacías o compuestas únicamente por espacios
+y devuelve la clave estándar `required`, por lo que reutiliza los mismos mensajes y directivas.
+`Validators.required` se conserva para fechas, números, selects y controles cuyo valor no sea
+texto libre. Las contraseñas no se recortan ni adoptan automáticamente esta validación.
 
 Ejemplos:
 
@@ -267,14 +292,77 @@ effect(() => {
 Los botones que no pertenecen al `FormGroup` deben usar `[disabled]="enviando()"` cuando
 corresponda.
 
+## Controles compuestos compartidos
+
+Los selectores visuales que sustituyen controles nativos viven en `shared/forms/controles` y se
+integran con Reactive Forms mediante `ControlValueAccessor`:
+
+```text
+controles/
+├── selector-campo/
+│   ├── models/opcion-selector.model.ts
+│   ├── selector-campo.ts
+│   ├── selector-campo.html
+│   ├── selector-campo.css
+│   └── selector-campo.spec.ts
+├── selector-fecha/
+    ├── models/dia-calendario.model.ts
+    ├── selector-fecha.ts
+    ├── selector-fecha.html
+    ├── selector-fecha.css
+│   └── selector-fecha.spec.ts
+└── selector-tarjetas/
+    ├── models/opcion-selector-tarjeta.model.ts
+    ├── selector-tarjetas.ts
+    ├── selector-tarjetas.html
+    ├── selector-tarjetas.css
+    └── selector-tarjetas.spec.ts
+```
+
+- `SelectorCampo` recibe opciones neutrales con `valor`, `etiqueta`, descripción opcional y estado
+  deshabilitado. La feature adapta sus catálogos a este contrato; el control no conoce DTO ni
+  modelos de dominio.
+- `SelectorFecha` conserva fechas sin hora como `YYYY-MM-DD`. El formato visible pertenece a
+  `FormateadorFechaService`, por lo que no se crean instancias de `Intl` en componentes.
+- `SelectorTarjetas` representa alternativas excluyentes con radios nativos cuando las opciones
+  necesitan icono y descripción; no sustituye a `SelectorCampo` para listas compactas.
+- Todos propagan valor, estado tocado y estado deshabilitado mediante la interfaz de Angular.
+- Los paneles flotantes utilizan el overlay conectado de CDK para evitar cálculos manuales de
+  posición, listeners globales y recortes dentro de tarjetas o modales.
+- Sus iconos provienen de `ICONOS_APLICACION` y sus estilos consumen tokens semánticos.
+- Deben permitir operación por teclado, foco visible y asociación explícita con su etiqueta.
+
+`ErrorCampoDirective` también admite estos controles compuestos. El token
+`CONTROL_CAMPO_PERSONALIZADO` permite aplicar `aria-invalid`, `aria-describedby` y el estado visual
+al botón interno que realmente recibe foco, sin acoplar la directiva a una implementación concreta.
+
+No se copian selectores o calendarios dentro de una feature ni se modelan sus valores mediante
+eventos paralelos a `formControlName`.
+
+La distribución repetida de campos utiliza primitivas globales en lugar de CSS de feature:
+
+```html
+<div class="ui-form-grid ui-form-grid--2">
+  <div class="ui-field">...</div>
+  <div class="ui-field">...</div>
+</div>
+```
+
+`ui-form-grid--2` crea dos columnas del mismo ancho y las convierte en una sola columna en tamaños
+reducidos. Los tokens proporcionan el espaciado; la primitiva administra el comportamiento del
+layout. Una feature solo debe crear una distribución propia cuando su composición sea realmente
+particular del dominio.
+
+Los pies repetidos de formularios dentro de tarjetas utilizan `ui-form-footer` y
+`ui-form-footer__note`. La página proyecta las acciones y conserva los textos del flujo, mientras la
+primitiva administra distribución, superficie y adaptación móvil.
+
 ## DOM y accesibilidad
 
 Cuando existe un error, `ErrorCampoDirective` genera:
 
 ```html
-<span id="campo-nombre-error" class="ui-field-error" role="alert">
-  El nombre es obligatorio.
-</span>
+<span id="campo-nombre-error" class="ui-field-error" role="alert"> El nombre es obligatorio. </span>
 ```
 
 Además:
@@ -299,6 +387,9 @@ Las directivas compartidas deben probar:
 - Conservación de otros valores de `aria-describedby`.
 - Ausencia de elementos de error duplicados.
 
+Los controles compuestos deben probar además la propagación del valor ISO o de catálogo, el estado
+deshabilitado y la selección mediante teclado.
+
 Cada componente de formulario debe probar, como mínimo:
 
 - Creación del formulario.
@@ -307,6 +398,7 @@ Cada componente de formulario debe probar, como mínimo:
 - Envío válido con el objeto tipado correcto.
 - Estados interactivos propios del formulario.
 - Deshabilitación durante operaciones remotas.
+- Límites de adición y eliminación cuando utiliza un `FormArray`.
 
 ## Prácticas que deben evitarse
 

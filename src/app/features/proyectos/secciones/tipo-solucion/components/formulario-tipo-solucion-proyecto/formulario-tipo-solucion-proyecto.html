@@ -1,0 +1,43 @@
+<form
+  class="formulario-tipo-solucion"
+  [formGroup]="formulario"
+  [appMensajesFormulario]="mensajesFormulario"
+  (ngSubmit)="enviar()"
+>
+  <div class="formulario-tipo-solucion__contenido">
+    <section class="ui-field formulario-tipo-solucion__seccion">
+      <div class="formulario-tipo-solucion__encabezado">
+        <h3 id="tipo-solucion-interfaz-label">¿La solución tendrá una interfaz?</h3>
+        <p>Define cómo interactuarán las personas con la solución.</p>
+      </div>
+      <app-selector-tarjetas
+        id="tipo-solucion-interfaz"
+        etiquetadoPor="tipo-solucion-interfaz-label"
+        [opciones]="opcionesInterfaz"
+        formControlName="tieneInterfaz"
+        appErrorCampo
+      />
+    </section>
+
+    @if (formulario.controls.tieneInterfaz.value === true) {
+      <section
+        class="ui-field formulario-tipo-solucion__seccion formulario-tipo-solucion__plataforma"
+      >
+        <div class="formulario-tipo-solucion__encabezado">
+          <h3 id="tipo-solucion-plataforma-label">Plataforma principal</h3>
+          <p>Selecciona el entorno donde ocurrirá la mayor parte de la experiencia.</p>
+        </div>
+        <app-selector-tarjetas
+          id="tipo-solucion-plataforma"
+          etiquetadoPor="tipo-solucion-plataforma-label"
+          [columnas]="3"
+          [opciones]="opcionesPlataforma"
+          formControlName="plataforma"
+          appErrorCampo
+        />
+      </section>
+    }
+  </div>
+
+  <ng-content select="[accionesFormularioTipoSolucion]" />
+</form>

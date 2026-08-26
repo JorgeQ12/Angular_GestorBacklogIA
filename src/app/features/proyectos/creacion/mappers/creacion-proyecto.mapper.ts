@@ -1,5 +1,13 @@
-import { CrearBorradorProyectoRespuestaDto } from '../models/borrador-proyecto.dto';
-import { BorradorProyectoCreado } from '../models/borrador-proyecto.model';
+import {
+  ActualizarBorradorProyectoSolicitudDto,
+  BorradorProyectoDto,
+  CrearBorradorProyectoRespuestaDto,
+} from '../models/borrador-proyecto.dto';
+import {
+  BorradorProyecto,
+  BorradorProyectoCreado,
+  CambiosBorradorProyecto,
+} from '../models/borrador-proyecto.model';
 import {
   ValidarVinculacionAzureRespuestaDto,
   VinculacionAzureSolicitudDto,
@@ -43,5 +51,57 @@ export function mapearBorradorProyectoCreado(
     id: dto.proyectoId,
     revision: dto.revision,
     pasoActual: dto.pasoActual,
+  };
+}
+
+/** Adapta la fotografía remota al estado editable del recorrido. */
+export function mapearBorradorProyecto(dto: BorradorProyectoDto): BorradorProyecto {
+  return {
+    id: dto.proyectoId,
+    revision: dto.revision,
+    pasoActual: dto.pasoActual,
+    contexto: {
+      nombre: dto.nombre,
+      responsable: dto.responsable,
+      descripcion: dto.descripcion,
+      prioridadCatalogoId: dto.prioridadCatalogoId,
+      fechaObjetivo: dto.fechaObjetivo?.slice(0, 10) ?? '',
+    },
+    estadoCatalogoId: dto.estadoCatalogoId,
+    tipoSolucionJson: dto.tipoSolucionJson,
+    necesidadJson: dto.necesidadJson,
+    objetivosJson: dto.objetivosJson,
+    alcanceJson: dto.alcanceJson,
+    rolesJson: dto.rolesJson,
+    equipoJson: dto.equipoJson,
+    diagramFlujoJson: dto.diagramFlujoJson,
+    fechaUltimoGuardado: dto.fechaUltimoGuardado,
+  };
+}
+
+/** Combina Contexto con los datos aún no modificados del borrador. */
+export function mapearActualizacionBorrador(
+  borrador: BorradorProyecto,
+  cambios: CambiosBorradorProyecto,
+  pasoActual: number,
+): ActualizarBorradorProyectoSolicitudDto {
+  const contexto = cambios.contexto ?? borrador.contexto;
+  return {
+    proyectoId: borrador.id,
+    revisionEsperada: borrador.revision,
+    pasoActual,
+    nombre: contexto.nombre,
+    responsable: contexto.responsable,
+    descripcion: contexto.descripcion,
+    prioridadCatalogoId: contexto.prioridadCatalogoId,
+    estadoCatalogoId: borrador.estadoCatalogoId,
+    fechaObjetivo: contexto.fechaObjetivo,
+    tipoSolucionJson: cambios.tipoSolucionJson ?? borrador.tipoSolucionJson,
+    necesidadJson: cambios.necesidadJson ?? borrador.necesidadJson,
+    objetivosJson: cambios.objetivosJson ?? borrador.objetivosJson,
+    alcanceJson: cambios.alcanceJson ?? borrador.alcanceJson,
+    rolesJson: borrador.rolesJson,
+    equipoJson: borrador.equipoJson,
+    diagramFlujoJson: borrador.diagramFlujoJson,
   };
 }

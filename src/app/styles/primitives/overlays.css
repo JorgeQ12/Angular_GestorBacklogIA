@@ -1,0 +1,4 @@
+/* Mantiene desplegables compartidos por encima de modales y bajo estados globales. */
+.cdk-overlay-container {
+  z-index: var(--z-popover);
+}

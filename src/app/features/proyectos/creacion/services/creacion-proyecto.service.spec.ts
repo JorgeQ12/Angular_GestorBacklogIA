@@ -81,6 +81,260 @@ describe('CreacionProyectoService', () => {
     await expect(respuesta).resolves.toEqual({ id: 42, revision: 1, pasoActual: 1 });
   });
 
+  it('obtiene la fotografía editable del borrador', async () => {
+    const respuesta = firstValueFrom(servicio.obtenerBorrador(42));
+    const solicitud = httpTesting.expectOne(
+      (peticion) =>
+        peticion.url === ENDPOINTS_CREACION_PROYECTO.obtenerBorrador &&
+        peticion.params.get('proyectoId') === '42',
+    );
+
+    expect(solicitud.request.method).toBe('GET');
+    solicitud.flush(crearResultado(crearBorradorDto()));
+
+    await expect(respuesta).resolves.toMatchObject({
+      id: 42,
+      revision: 1,
+      contexto: {
+        nombre: 'InterIA',
+        prioridadCatalogoId: null,
+      },
+    });
+  });
+
+  it('actualiza Contexto conservando los datos de las demás secciones', async () => {
+    const borradorDto = crearBorradorDto();
+    const cargaBorrador = firstValueFrom(servicio.obtenerBorrador(42));
+    httpTesting
+      .expectOne(
+        (peticion) =>
+          peticion.url === ENDPOINTS_CREACION_PROYECTO.obtenerBorrador &&
+          peticion.params.get('proyectoId') === '42',
+      )
+      .flush(crearResultado(borradorDto));
+    const borrador = await cargaBorrador;
+    const contexto = {
+      nombre: 'InterIA renovado',
+      responsable: 'María Gómez',
+      descripcion: 'Una descripción completa.',
+      prioridadCatalogoId: 13,
+      fechaObjetivo: '2026-09-30',
+    };
+
+    const respuesta = firstValueFrom(servicio.actualizarContexto(borrador, contexto, 2));
+    const solicitud = httpTesting.expectOne(ENDPOINTS_CREACION_PROYECTO.actualizarBorrador);
+
+    expect(solicitud.request.method).toBe('PUT');
+    expect(solicitud.request.body).toEqual({
+      proyectoId: 42,
+      revisionEsperada: 1,
+      pasoActual: 2,
+      nombre: contexto.nombre,
+      responsable: contexto.responsable,
+      descripcion: contexto.descripcion,
+      prioridadCatalogoId: 13,
+      estadoCatalogoId: null,
+      fechaObjetivo: '2026-09-30',
+      tipoSolucionJson: '{}',
+      necesidadJson: '{}',
+      objetivosJson: '{}',
+      alcanceJson: '{}',
+      rolesJson: '[]',
+      equipoJson: '[]',
+      diagramFlujoJson: '{}',
+    });
+    solicitud.flush(
+      crearResultado({
+        ...borradorDto,
+        revision: 2,
+        pasoActual: 2,
+        nombre: contexto.nombre,
+        responsable: contexto.responsable,
+        descripcion: contexto.descripcion,
+        prioridadCatalogoId: 13,
+        fechaObjetivo: '2026-09-30T00:00:00',
+      }),
+    );
+
+    await expect(respuesta).resolves.toMatchObject({
+      revision: 2,
+      pasoActual: 2,
+      contexto: { nombre: contexto.nombre, fechaObjetivo: '2026-09-30' },
+    });
+  });
+
+  it('actualiza Tipo de solución con el formato canónico y conserva Contexto', async () => {
+    const borradorDto = crearBorradorDto();
+    const cargaBorrador = firstValueFrom(servicio.obtenerBorrador(42));
+    httpTesting
+      .expectOne(
+        (peticion) =>
+          peticion.url === ENDPOINTS_CREACION_PROYECTO.obtenerBorrador &&
+          peticion.params.get('proyectoId') === '42',
+      )
+      .flush(crearResultado(borradorDto));
+    const borrador = await cargaBorrador;
+
+    const respuesta = firstValueFrom(
+      servicio.actualizarTipoSolucion(borrador, { tieneInterfaz: true, plataforma: 'Web' }, 3),
+    );
+    const solicitud = httpTesting.expectOne(ENDPOINTS_CREACION_PROYECTO.actualizarBorrador);
+
+    expect(solicitud.request.body).toMatchObject({
+      proyectoId: 42,
+      revisionEsperada: 1,
+      pasoActual: 3,
+      nombre: 'InterIA',
+      tipoSolucionJson: '{"tieneInterfaz":true,"plataforma":"Web"}',
+      necesidadJson: '{}',
+    });
+    solicitud.flush(
+      crearResultado({
+        ...borradorDto,
+        revision: 2,
+        pasoActual: 3,
+        tipoSolucionJson: '{"tieneInterfaz":true,"plataforma":"Web"}',
+      }),
+    );
+
+    await expect(respuesta).resolves.toMatchObject({ revision: 2, pasoActual: 3 });
+  });
+
+  it('actualiza Necesidad con el formato canónico y conserva las demás secciones', async () => {
+    const borradorDto = crearBorradorDto();
+    const cargaBorrador = firstValueFrom(servicio.obtenerBorrador(42));
+    httpTesting
+      .expectOne(
+        (peticion) =>
+          peticion.url === ENDPOINTS_CREACION_PROYECTO.obtenerBorrador &&
+          peticion.params.get('proyectoId') === '42',
+      )
+      .flush(crearResultado(borradorDto));
+    const borrador = await cargaBorrador;
+
+    const respuesta = firstValueFrom(
+      servicio.actualizarNecesidad(
+        borrador,
+        {
+          situacionActual: 'Registro manual',
+          problemas: 'Reprocesos',
+          impacto: 'Costos altos',
+        },
+        4,
+      ),
+    );
+    const solicitud = httpTesting.expectOne(ENDPOINTS_CREACION_PROYECTO.actualizarBorrador);
+
+    expect(solicitud.request.body).toMatchObject({
+      proyectoId: 42,
+      revisionEsperada: 1,
+      pasoActual: 4,
+      tipoSolucionJson: '{}',
+      necesidadJson:
+        '{"situacionActual":"Registro manual","problemas":"Reprocesos","impacto":"Costos altos"}',
+      objetivosJson: '{}',
+    });
+    solicitud.flush(
+      crearResultado({
+        ...borradorDto,
+        revision: 2,
+        pasoActual: 4,
+        necesidadJson: solicitud.request.body.necesidadJson,
+      }),
+    );
+
+    await expect(respuesta).resolves.toMatchObject({ revision: 2, pasoActual: 4 });
+  });
+
+  it('actualiza Objetivos con el formato canónico en español', async () => {
+    const borradorDto = crearBorradorDto();
+    const cargaBorrador = firstValueFrom(servicio.obtenerBorrador(42));
+    httpTesting
+      .expectOne(
+        (peticion) =>
+          peticion.url === ENDPOINTS_CREACION_PROYECTO.obtenerBorrador &&
+          peticion.params.get('proyectoId') === '42',
+      )
+      .flush(crearResultado(borradorDto));
+    const borrador = await cargaBorrador;
+
+    const respuesta = firstValueFrom(
+      servicio.actualizarObjetivos(
+        borrador,
+        {
+          objetivoGeneral: 'Reducir tiempos',
+          objetivosEspecificos: ['Automatizar tareas', 'Medir resultados'],
+        },
+        5,
+      ),
+    );
+    const solicitud = httpTesting.expectOne(ENDPOINTS_CREACION_PROYECTO.actualizarBorrador);
+
+    expect(solicitud.request.body).toMatchObject({
+      proyectoId: 42,
+      revisionEsperada: 1,
+      pasoActual: 5,
+      necesidadJson: '{}',
+      objetivosJson:
+        '{"objetivoGeneral":"Reducir tiempos","objetivosEspecificos":["Automatizar tareas","Medir resultados"]}',
+      alcanceJson: '{}',
+    });
+    solicitud.flush(
+      crearResultado({
+        ...borradorDto,
+        revision: 2,
+        pasoActual: 5,
+        objetivosJson: solicitud.request.body.objetivosJson,
+      }),
+    );
+
+    await expect(respuesta).resolves.toMatchObject({ revision: 2, pasoActual: 5 });
+  });
+
+  it('actualiza Alcance con el formato canónico en español', async () => {
+    const borradorDto = crearBorradorDto();
+    const cargaBorrador = firstValueFrom(servicio.obtenerBorrador(42));
+    httpTesting
+      .expectOne(
+        (peticion) =>
+          peticion.url === ENDPOINTS_CREACION_PROYECTO.obtenerBorrador &&
+          peticion.params.get('proyectoId') === '42',
+      )
+      .flush(crearResultado(borradorDto));
+    const borrador = await cargaBorrador;
+
+    const respuesta = firstValueFrom(
+      servicio.actualizarAlcance(
+        borrador,
+        {
+          incluido: 'Seguimiento de envíos',
+          excluido: 'Pagos en línea',
+        },
+        6,
+      ),
+    );
+    const solicitud = httpTesting.expectOne(ENDPOINTS_CREACION_PROYECTO.actualizarBorrador);
+
+    expect(solicitud.request.body).toMatchObject({
+      proyectoId: 42,
+      revisionEsperada: 1,
+      pasoActual: 6,
+      objetivosJson: '{}',
+      alcanceJson: '{"incluido":"Seguimiento de envíos","excluido":"Pagos en línea"}',
+      rolesJson: '[]',
+    });
+    solicitud.flush(
+      crearResultado({
+        ...borradorDto,
+        revision: 2,
+        pasoActual: 6,
+        alcanceJson: solicitud.request.body.alcanceJson,
+      }),
+    );
+
+    await expect(respuesta).resolves.toMatchObject({ revision: 2, pasoActual: 6 });
+  });
+
   it('rechaza una respuesta funcional que no contiene datos válidos', async () => {
     const respuesta = firstValueFrom(servicio.validarVinculacionAzure(DATOS));
     const solicitud = httpTesting.expectOne(ENDPOINTS_CREACION_PROYECTO.validarVinculacionAzure);

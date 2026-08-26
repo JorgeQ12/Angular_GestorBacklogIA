@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { ResultadoApi } from '../../../core/http/models/resultado-api.model';
+import { exigirDatosResultadoApi } from '../../../core/http/mappers/resultado-api.mapper';
 import { ENDPOINTS_INICIO_PANEL } from '../config/endpoints-inicio-panel.config';
 import { mapearResumenInicioPanel } from '../mappers/resumen-inicio-panel.mapper';
 import { ResumenAdministrativoDto } from '../models/resumen-administrativo.dto';
@@ -17,15 +18,8 @@ export class ResumenInicioPanelService {
     return this.http
       .get<ResultadoApi<ResumenAdministrativoDto>>(ENDPOINTS_INICIO_PANEL.resumenAdministrativo)
       .pipe(
-        map((resultado) => this.exigirDatos(resultado)),
+        map((resultado) => exigirDatosResultadoApi(resultado, 'el resumen administrativo')),
         map(mapearResumenInicioPanel),
       );
-  }
-
-  private exigirDatos(resultado: ResultadoApi<ResumenAdministrativoDto>): ResumenAdministrativoDto {
-    if (resultado.exitoso && resultado.datos) return resultado.datos;
-
-    const detalle = resultado.errores?.join(' ') || resultado.mensaje;
-    throw new Error(detalle || 'El backend no proporcionó el resumen administrativo.');
   }
 }

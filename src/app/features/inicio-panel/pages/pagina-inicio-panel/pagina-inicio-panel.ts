@@ -9,11 +9,12 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { AutenticacionService } from '../../../../core/autenticacion/services/autenticacion.service';
-import { URL_NUEVO_PROYECTO, crearUrlContextoProyecto } from '../../../../core/navegacion/rutas';
+import { URL_NUEVO_PROYECTO } from '../../../../core/navegacion/rutas';
 import { EncabezadoPagina } from '../../../../shared/components/encabezado-pagina/encabezado-pagina';
 import { EstadoError } from '../../../../shared/components/estado-error/estado-error';
 import { IconoComponent } from '../../../../shared/components/icono/icono.component';
 import { FechaPipe } from '../../../../shared/fechas/pipes/fecha.pipe';
+import { crearUrlReanudacionProyecto } from '../../../proyectos/creacion/mappers/navegacion-creacion-proyecto.mapper';
 import { BorradoresRecientes } from '../../components/borradores-recientes/borradores-recientes';
 import { EstadoProyectos } from '../../components/estado-proyectos/estado-proyectos';
 import { IndicadoresProyectos } from '../../components/indicadores-proyectos/indicadores-proyectos';
@@ -97,7 +98,7 @@ export class PaginaInicioPanel {
 
   /** Reanuda el borrador desde el recorrido de especificación disponible. */
   protected continuarBorrador(borrador: BorradorInicioPanel): void {
-    void this.router.navigateByUrl(crearUrlContextoProyecto(borrador.id));
+    void this.router.navigateByUrl(crearUrlReanudacionProyecto(borrador.id, borrador.pasoActual));
   }
 
   private obtenerPrimerNombre(nombre: string | null | undefined): string | null {

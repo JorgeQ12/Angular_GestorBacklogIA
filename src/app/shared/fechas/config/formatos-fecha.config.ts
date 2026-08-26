@@ -5,10 +5,20 @@ export const FORMATOS_FECHA = {
     month: 'short',
     year: 'numeric',
   },
+  completa: {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  },
   extendida: {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
+  },
+  mesAnio: {
+    month: 'long',
+    year: 'numeric',
   },
 } as const satisfies Record<string, Intl.DateTimeFormatOptions>;
 

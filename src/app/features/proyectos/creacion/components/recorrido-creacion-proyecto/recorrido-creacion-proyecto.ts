@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { IconoComponent } from '../../../../../shared/components/icono/icono.component';
 import {
-  ClaveEtapaCreacionProyecto,
-  ETAPAS_CREACION_PROYECTO,
-} from '../../config/etapas-creacion-proyecto.config';
+  ClavePasoCreacionProyecto,
+  PASOS_CREACION_PROYECTO,
+} from '../../config/pasos-creacion-proyecto.config';
 
 /** Presenta el avance y las opciones habilitadas dentro de la creación del proyecto. */
 @Component({
@@ -14,54 +14,54 @@ import {
   styleUrl: './recorrido-creacion-proyecto.css',
 })
 export class RecorridoCreacionProyecto {
-  /** Identifica la etapa activa del recorrido. */
-  public readonly etapaActual = input.required<ClaveEtapaCreacionProyecto>();
+  /** Identifica el paso activo del recorrido. */
+  public readonly pasoActual = input.required<ClavePasoCreacionProyecto>();
 
-  /** Identifica las etapas cuya información ya fue completada. */
-  public readonly etapasCompletadas = input<readonly ClaveEtapaCreacionProyecto[]>([]);
+  /** Identifica los pasos cuya información ya fue completada. */
+  public readonly pasosCompletados = input<readonly ClavePasoCreacionProyecto[]>([]);
 
-  /** Identifica las etapas que permiten navegación desde el estado actual. */
-  public readonly etapasNavegables = input<readonly ClaveEtapaCreacionProyecto[]>([]);
+  /** Identifica los pasos que permiten navegación desde el estado actual. */
+  public readonly pasosNavegables = input<readonly ClavePasoCreacionProyecto[]>([]);
 
-  /** Solicita abrir una etapa habilitada del recorrido. */
-  public readonly etapaSeleccionada = output<ClaveEtapaCreacionProyecto>();
+  /** Solicita abrir un paso habilitado del recorrido. */
+  public readonly pasoSeleccionado = output<ClavePasoCreacionProyecto>();
 
-  protected readonly etapas = ETAPAS_CREACION_PROYECTO;
+  protected readonly pasos = PASOS_CREACION_PROYECTO;
   protected readonly posicionActual = computed(() => {
-    const indice = this.etapas.findIndex((etapa) => etapa.clave === this.etapaActual());
+    const indice = this.pasos.findIndex((paso) => paso.clave === this.pasoActual());
     return indice >= 0 ? indice + 1 : 1;
   });
   protected readonly porcentajeRecorrido = computed(
-    () => (this.posicionActual() / this.etapas.length) * 100,
+    () => (this.posicionActual() / this.pasos.length) * 100,
   );
   protected readonly textoProgreso = computed(
-    () => `Paso ${this.posicionActual()} de ${this.etapas.length}`,
+    () => `Paso ${this.posicionActual()} de ${this.pasos.length}`,
   );
 
   private readonly clavesCompletadas = computed(
-    () => new Set<ClaveEtapaCreacionProyecto>(this.etapasCompletadas()),
+    () => new Set<ClavePasoCreacionProyecto>(this.pasosCompletados()),
   );
   private readonly clavesNavegables = computed(
-    () => new Set<ClaveEtapaCreacionProyecto>(this.etapasNavegables()),
+    () => new Set<ClavePasoCreacionProyecto>(this.pasosNavegables()),
   );
 
-  /** Determina si la etapa representa la ubicación actual. */
-  protected esActual(clave: ClaveEtapaCreacionProyecto): boolean {
-    return clave === this.etapaActual();
+  /** Determina si el paso representa la ubicación actual. */
+  protected esActual(clave: ClavePasoCreacionProyecto): boolean {
+    return clave === this.pasoActual();
   }
 
-  /** Determina si la etapa tiene información completada. */
-  protected estaCompletada(clave: ClaveEtapaCreacionProyecto): boolean {
+  /** Determina si el paso tiene información completada. */
+  protected estaCompletado(clave: ClavePasoCreacionProyecto): boolean {
     return this.clavesCompletadas().has(clave);
   }
 
-  /** Determina si la página habilitó la navegación hacia una etapa diferente. */
-  protected puedeSeleccionar(clave: ClaveEtapaCreacionProyecto): boolean {
+  /** Determina si la página habilitó la navegación hacia un paso diferente. */
+  protected puedeSeleccionar(clave: ClavePasoCreacionProyecto): boolean {
     return !this.esActual(clave) && this.clavesNavegables().has(clave);
   }
 
-  /** Comunica la etapa elegida para que la página resuelva su navegación. */
-  protected seleccionarEtapa(clave: ClaveEtapaCreacionProyecto): void {
-    if (this.puedeSeleccionar(clave)) this.etapaSeleccionada.emit(clave);
+  /** Comunica el paso elegido para que la página resuelva su navegación. */
+  protected seleccionarPaso(clave: ClavePasoCreacionProyecto): void {
+    if (this.puedeSeleccionar(clave)) this.pasoSeleccionado.emit(clave);
   }
 }

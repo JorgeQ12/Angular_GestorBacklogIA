@@ -1,0 +1,71 @@
+<button
+  cdkOverlayOrigin
+  #origen="cdkOverlayOrigin"
+  #trigger
+  [id]="id() + '-control'"
+  class="selector-campo__trigger"
+  type="button"
+  role="combobox"
+  aria-haspopup="listbox"
+  [class.selector-campo__trigger--error]="conError()"
+  [attr.aria-controls]="id() + '-lista'"
+  [attr.aria-expanded]="abierto()"
+  [attr.aria-labelledby]="etiquetadoPor()"
+  [disabled]="deshabilitado()"
+  (click)="alternar()"
+  (keydown)="manejarTeclaTrigger($event)"
+>
+  <span [class.selector-campo__placeholder]="!opcionSeleccionada()">
+    {{ opcionSeleccionada()?.etiqueta ?? placeholder() }}
+  </span>
+  <app-icono class="selector-campo__icono" nombre="desplegar" />
+</button>
+
+<ng-template
+  cdk-connected-overlay
+  [cdkConnectedOverlayOrigin]="origen"
+  [cdkConnectedOverlayOpen]="abierto()"
+  [cdkConnectedOverlayPositions]="posiciones"
+  [cdkConnectedOverlayWidth]="anchoOverlay()"
+  [cdkConnectedOverlayHasBackdrop]="true"
+  [cdkConnectedOverlayPush]="true"
+  [cdkConnectedOverlayViewportMargin]="8"
+  cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
+  (attach)="alAdjuntarOverlay()"
+  (backdropClick)="cerrarDesdeExterior()"
+  (detach)="cerrarDesdeExterior()"
+>
+  <div
+    [id]="id() + '-lista'"
+    class="selector-campo__lista"
+    role="listbox"
+    [attr.aria-labelledby]="etiquetadoPor()"
+    (keydown)="manejarTeclaLista($event)"
+  >
+    @for (opcion of opciones(); track opcion.valor; let indice = $index) {
+      <button
+        #opcionElemento
+        class="selector-campo__opcion"
+        type="button"
+        role="option"
+        [class.selector-campo__opcion--activa]="indice === indiceActivo()"
+        [attr.aria-selected]="opcion.valor === valor()"
+        [disabled]="opcion.deshabilitada"
+        [tabindex]="indice === indiceActivo() ? 0 : -1"
+        (click)="seleccionar(opcion)"
+      >
+        <span class="selector-campo__texto">
+          <strong>{{ opcion.etiqueta }}</strong>
+          @if (opcion.descripcion) {
+            <small>{{ opcion.descripcion }}</small>
+          }
+        </span>
+        @if (opcion.valor === valor()) {
+          <app-icono nombre="confirmar" />
+        }
+      </button>
+    } @empty {
+      <p class="selector-campo__vacio">No hay opciones disponibles.</p>
+    }
+  </div>
+</ng-template>

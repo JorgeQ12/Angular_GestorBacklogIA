@@ -12,12 +12,17 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormGroupDirective, NgControl, NgForm, ValidationErrors } from '@angular/forms';
 import { MENSAJES_ERROR_FORMULARIO } from '../config/mensajes-error.config';
+import {
+  CONTROL_CAMPO_PERSONALIZADO,
+  ControlCampoPersonalizado,
+} from '../models/control-campo-personalizado.model';
 import { MensajesError } from '../models/mensajes-error.model';
 import { MensajesFormularioDirective } from './mensajes-formulario.directive';
 
 /** Presenta el error activo de un control con mensajes y atributos accesibles. */
 @Directive({
-  selector: 'input[appErrorCampo], select[appErrorCampo], textarea[appErrorCampo]',
+  selector:
+    'input[appErrorCampo], select[appErrorCampo], textarea[appErrorCampo], app-selector-campo[appErrorCampo], app-selector-fecha[appErrorCampo], app-selector-tarjetas[appErrorCampo]',
   standalone: true,
 })
 export class ErrorCampoDirective implements AfterViewInit, OnChanges, OnDestroy {
@@ -28,8 +33,11 @@ export class ErrorCampoDirective implements AfterViewInit, OnChanges, OnDestroy 
   private readonly formularioReactivo = inject(FormGroupDirective, { optional: true });
   private readonly formularioPlantilla = inject(NgForm, { optional: true });
   private readonly mensajesFormulario = inject(MensajesFormularioDirective, { optional: true });
-  private readonly elemento =
-    inject<ElementRef<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>>(ElementRef);
+  private readonly elemento = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly controlPersonalizado = inject<ControlCampoPersonalizado>(
+    CONTROL_CAMPO_PERSONALIZADO,
+    { optional: true, self: true },
+  );
   private readonly renderer = inject(Renderer2);
   private readonly destroyRef = inject(DestroyRef);
   private readonly mensajesPredeterminados = inject(MENSAJES_ERROR_FORMULARIO);
@@ -100,8 +108,7 @@ export class ErrorCampoDirective implements AfterViewInit, OnChanges, OnDestroy 
       return;
     }
 
-    const controlElemento = this.elemento.nativeElement;
-    const idError = `${controlElemento.id}-error`;
+    const idError = `${this.elemento.nativeElement.id}-error`;
 
     if (!this.elementoError) {
       this.elementoError = this.renderer.createElement('span') as HTMLElement;
@@ -113,6 +120,8 @@ export class ErrorCampoDirective implements AfterViewInit, OnChanges, OnDestroy 
     this.renderer.setAttribute(this.elementoError, 'id', idError);
     this.renderer.setProperty(this.elementoError, 'textContent', mensaje);
     this.renderer.addClass(this.contenedorCampo, 'has-error');
+    this.controlPersonalizado?.establecerEstadoError(true);
+    const controlElemento = this.obtenerElementoInteraccion();
     this.renderer.setAttribute(controlElemento, 'aria-invalid', 'true');
     this.agregarDescripcion(idError);
   }
@@ -145,8 +154,7 @@ export class ErrorCampoDirective implements AfterViewInit, OnChanges, OnDestroy 
 
   /** Limpia el error visual y sus relaciones accesibles. */
   private ocultarError(): void {
-    const controlElemento = this.elemento.nativeElement;
-    const idError = `${controlElemento.id}-error`;
+    const idError = `${this.elemento.nativeElement.id}-error`;
 
     if (this.elementoError && this.contenedorCampo) {
       this.renderer.removeChild(this.contenedorCampo, this.elementoError);
@@ -157,13 +165,14 @@ export class ErrorCampoDirective implements AfterViewInit, OnChanges, OnDestroy 
       this.renderer.removeClass(this.contenedorCampo, 'has-error');
     }
 
-    this.renderer.removeAttribute(controlElemento, 'aria-invalid');
+    this.controlPersonalizado?.establecerEstadoError(false);
+    this.renderer.removeAttribute(this.obtenerElementoInteraccion(), 'aria-invalid');
     this.quitarDescripcion(idError);
   }
 
   /** Vincula el error con la descripción accesible del control. */
   private agregarDescripcion(idError: string): void {
-    const control = this.elemento.nativeElement;
+    const control = this.obtenerElementoInteraccion();
     const descripciones = new Set(this.obtenerDescripciones());
     descripciones.add(idError);
     this.renderer.setAttribute(control, 'aria-describedby', [...descripciones].join(' '));
@@ -171,7 +180,7 @@ export class ErrorCampoDirective implements AfterViewInit, OnChanges, OnDestroy 
 
   /** Retira la descripción administrada por la directiva. */
   private quitarDescripcion(idError: string): void {
-    const control = this.elemento.nativeElement;
+    const control = this.obtenerElementoInteraccion();
     const descripciones = this.obtenerDescripciones().filter((id) => id !== idError);
 
     if (descripciones.length > 0) {
@@ -183,8 +192,13 @@ export class ErrorCampoDirective implements AfterViewInit, OnChanges, OnDestroy 
 
   /** Recupera las descripciones accesibles asociadas al control. */
   private obtenerDescripciones(): string[] {
-    return (this.elemento.nativeElement.getAttribute('aria-describedby') ?? '')
+    return (this.obtenerElementoInteraccion().getAttribute('aria-describedby') ?? '')
       .split(/\s+/)
       .filter(Boolean);
+  }
+
+  /** Localiza el elemento que recibe foco y semántica dentro del control. */
+  private obtenerElementoInteraccion(): HTMLElement {
+    return this.controlPersonalizado?.obtenerElementoInteraccion() ?? this.elemento.nativeElement;
   }
 }

@@ -1,0 +1,17 @@
+:host {
+  display: block;
+}
+
+.pagina-roles__pendiente {
+  display: grid;
+  min-height: 22rem;
+  padding: var(--space-5);
+  place-items: center;
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
+  text-align: center;
+}
+
+.pagina-roles__pendiente p {
+  margin: 0;
+}

@@ -1,0 +1,80 @@
+<button
+  cdkOverlayOrigin
+  #origen="cdkOverlayOrigin"
+  #trigger
+  [id]="id() + '-control'"
+  class="selector-fecha__trigger"
+  type="button"
+  aria-haspopup="dialog"
+  [class.selector-fecha__trigger--error]="conError()"
+  [attr.aria-expanded]="abierto()"
+  [attr.aria-controls]="id() + '-calendario'"
+  [attr.aria-labelledby]="etiquetadoPor()"
+  [disabled]="deshabilitado()"
+  (click)="alternar()"
+  (keydown)="manejarTeclaTrigger($event)"
+>
+  <span [class.selector-fecha__placeholder]="!valor()">{{ textoValor() }}</span>
+  <app-icono class="selector-fecha__icono" nombre="calendario" />
+</button>
+
+<ng-template
+  cdk-connected-overlay
+  [cdkConnectedOverlayOrigin]="origen"
+  [cdkConnectedOverlayOpen]="abierto()"
+  [cdkConnectedOverlayPositions]="posiciones"
+  [cdkConnectedOverlayWidth]="anchoOverlay()"
+  [cdkConnectedOverlayHasBackdrop]="true"
+  [cdkConnectedOverlayPush]="true"
+  [cdkConnectedOverlayViewportMargin]="8"
+  cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
+  (attach)="alAdjuntarOverlay()"
+  (backdropClick)="cerrarDesdeExterior()"
+  (detach)="cerrarDesdeExterior()"
+>
+  <section
+    [id]="id() + '-calendario'"
+    class="selector-fecha__calendario"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-labelledby]="id() + '-mes'"
+    (keydown)="manejarTeclaCalendario($event)"
+  >
+    <header class="selector-fecha__encabezado">
+      <button type="button" aria-label="Mes anterior" (click)="cambiarMes(-1)">
+        <app-icono nombre="volver" />
+      </button>
+      <strong [id]="id() + '-mes'">{{ etiquetaMes() }}</strong>
+      <button type="button" aria-label="Mes siguiente" (click)="cambiarMes(1)">
+        <app-icono nombre="continuar" />
+      </button>
+    </header>
+
+    <div class="selector-fecha__semana" aria-hidden="true">
+      @for (dia of diasSemana; track dia) {
+        <span>{{ dia }}</span>
+      }
+    </div>
+
+    <div class="selector-fecha__dias" role="grid" [attr.aria-label]="etiquetaMes()">
+      @for (dia of dias(); track dia.fecha) {
+        <button
+          #diaElemento
+          type="button"
+          role="gridcell"
+          [class.selector-fecha__dia--otro-mes]="dia.otroMes"
+          [class.selector-fecha__dia--hoy]="dia.hoy"
+          [class.selector-fecha__dia--seleccionado]="dia.seleccionado"
+          [attr.aria-label]="obtenerEtiquetaDia(dia.fecha)"
+          [attr.aria-current]="dia.hoy ? 'date' : null"
+          [attr.aria-selected]="dia.seleccionado"
+          [disabled]="dia.deshabilitado"
+          [tabindex]="dia.fecha === fechaActiva() ? 0 : -1"
+          (click)="seleccionarDia(dia)"
+        >
+          {{ dia.numero }}
+        </button>
+      }
+    </div>
+  </section>
+</ng-template>

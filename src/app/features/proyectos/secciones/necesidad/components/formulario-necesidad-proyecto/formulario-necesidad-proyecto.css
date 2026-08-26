@@ -1,0 +1,40 @@
+:host {
+  display: block;
+}
+
+.formulario-necesidad {
+  display: flex;
+  flex-direction: column;
+}
+
+.formulario-necesidad__contenido {
+  display: grid;
+  gap: var(--space-5);
+  padding: var(--space-6);
+}
+
+.formulario-necesidad__label {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.formulario-necesidad__label > span {
+  flex: 0 0 auto;
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.formulario-necesidad__textarea {
+  min-height: 7.5rem;
+  padding-block: var(--space-3);
+  line-height: var(--line-height-normal);
+  resize: vertical;
+}
+
+@media (max-width: 640px) {
+  .formulario-necesidad__contenido {
+    padding: var(--space-4);
+  }
+}

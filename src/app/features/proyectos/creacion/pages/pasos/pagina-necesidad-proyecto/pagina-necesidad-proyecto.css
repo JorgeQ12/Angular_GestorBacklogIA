@@ -1,0 +1,7 @@
+:host {
+  display: block;
+}
+
+.pagina-necesidad__error {
+  --ui-error-state-min-height: 28rem;
+}

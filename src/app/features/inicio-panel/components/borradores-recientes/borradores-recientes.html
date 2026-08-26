@@ -25,7 +25,7 @@
           </span>
           <span class="borrador-reciente__datos">
             <span class="borrador-reciente__meta">
-              <strong>Paso {{ paso(borrador) }} de 10</strong>
+              <strong>Paso {{ posicionVisual(borrador) }} de {{ totalPasos }}</strong>
               <small>{{ borrador.fechaUltimoGuardado | tiempoRelativo }}</small>
             </span>
             <strong class="borrador-reciente__nombre">

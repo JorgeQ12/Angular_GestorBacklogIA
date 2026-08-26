@@ -11,13 +11,13 @@ describe('RecorridoCreacionProyecto', () => {
       imports: [RecorridoCreacionProyecto],
     }).compileComponents();
     fixture = TestBed.createComponent(RecorridoCreacionProyecto);
-    fixture.componentRef.setInput('etapaActual', 'necesidad');
-    fixture.componentRef.setInput('etapasCompletadas', [
+    fixture.componentRef.setInput('pasoActual', 'necesidad');
+    fixture.componentRef.setInput('pasosCompletados', [
       'vinculacion-azure',
       'contexto',
       'tipo-solucion',
     ]);
-    fixture.componentRef.setInput('etapasNavegables', ['contexto', 'tipo-solucion']);
+    fixture.componentRef.setInput('pasosNavegables', ['contexto', 'tipo-solucion']);
     fixture.detectChanges();
   });
 
@@ -31,14 +31,14 @@ describe('RecorridoCreacionProyecto', () => {
     expect(elemento.textContent).not.toContain('Demanda esperada');
   });
 
-  it('utiliza el icono centralizado de Azure DevOps en la primera etapa', () => {
+  it('utiliza el icono centralizado de Azure DevOps en el primer paso', () => {
     const primerIcono = fixture.debugElement.queryAll(By.directive(IconoComponent))[0]
       .componentInstance as IconoComponent;
 
     expect(primerIcono.nombre()).toBe('azureDevOps');
   });
 
-  it('comunica la etapa actual y el avance del recorrido', () => {
+  it('comunica el paso actual y el avance del recorrido', () => {
     const actual = obtenerElemento().querySelector('[aria-current="step"]');
     const progreso = obtenerElemento().querySelector<HTMLElement>('[role="progressbar"]');
     const indicador = progreso?.querySelector<HTMLElement>('span');
@@ -55,9 +55,9 @@ describe('RecorridoCreacionProyecto', () => {
     expect(obtenerElemento().textContent).toContain('Definición del proyecto');
   });
 
-  it('separa las etapas completadas de las que permiten navegación', () => {
+  it('separa los pasos completados de los que permiten navegación', () => {
     const seleccionar = vi.fn();
-    fixture.componentInstance.etapaSeleccionada.subscribe(seleccionar);
+    fixture.componentInstance.pasoSeleccionado.subscribe(seleccionar);
     const botones = obtenerElemento().querySelectorAll('button');
 
     expect(botones[0].disabled).toBe(true);
@@ -74,7 +74,7 @@ describe('RecorridoCreacionProyecto', () => {
   it('presenta estado y dirección únicamente cuando aportan información', () => {
     const botones = obtenerElemento().querySelectorAll('button');
 
-    expect(botones[0].textContent).toContain('Etapa completada');
+    expect(botones[0].textContent).toContain('Paso completado');
     expect(botones[0].querySelector('.recorrido-creacion__direccion')).toBeNull();
     expect(botones[1].querySelector('.recorrido-creacion__direccion')).not.toBeNull();
     expect(botones[3].textContent).not.toContain('En curso');

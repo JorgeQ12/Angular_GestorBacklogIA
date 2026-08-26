@@ -1,0 +1,7 @@
+:host {
+  display: block;
+}
+
+.pagina-objetivos__error {
+  --ui-error-state-min-height: 28rem;
+}

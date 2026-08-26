@@ -1,0 +1,44 @@
+<form
+  class="formulario-alcance"
+  [formGroup]="formulario"
+  [appMensajesFormulario]="mensajesFormulario"
+  (ngSubmit)="enviar()"
+>
+  <div class="formulario-alcance__contenido">
+    <div class="ui-field">
+      <div class="formulario-alcance__label">
+        <label class="ui-label" for="alcance-incluido">Incluido en el proyecto</label>
+        <span>{{ formulario.controls.incluido.value.length }}/{{ limites.incluido }}</span>
+      </div>
+      <textarea
+        id="alcance-incluido"
+        class="ui-control formulario-alcance__textarea"
+        formControlName="incluido"
+        [maxlength]="limites.incluido"
+        placeholder="Describe los entregables, procesos, módulos o resultados que sí forman parte del proyecto."
+        rows="8"
+        required
+        appErrorCampo
+      ></textarea>
+    </div>
+
+    <div class="ui-field">
+      <div class="formulario-alcance__label">
+        <label class="ui-label" for="alcance-excluido">Fuera del alcance</label>
+        <span>{{ formulario.controls.excluido.value.length }}/{{ limites.excluido }}</span>
+      </div>
+      <textarea
+        id="alcance-excluido"
+        class="ui-control formulario-alcance__textarea"
+        formControlName="excluido"
+        [maxlength]="limites.excluido"
+        placeholder="Aclara las funcionalidades, integraciones o resultados que no se contemplarán en el proyecto."
+        rows="8"
+        required
+        appErrorCampo
+      ></textarea>
+    </div>
+  </div>
+
+  <ng-content select="[accionesFormularioAlcance]" />
+</form>

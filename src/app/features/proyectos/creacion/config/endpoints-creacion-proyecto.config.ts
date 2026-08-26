@@ -7,4 +7,6 @@ const RUTA_PROYECTOS = '/Proyecto';
 export const ENDPOINTS_CREACION_PROYECTO = {
   validarVinculacionAzure: `${environment.apiBaseUrl}${RUTA_AZURE_DEVOPS}/ValidarVinculacionAzure`,
   crearBorrador: `${environment.apiBaseUrl}${RUTA_PROYECTOS}/CrearBorrador`,
+  obtenerBorrador: `${environment.apiBaseUrl}${RUTA_PROYECTOS}/ObtenerBorrador`,
+  actualizarBorrador: `${environment.apiBaseUrl}${RUTA_PROYECTOS}/ActualizarBorrador`,
 } as const;

@@ -118,4 +118,33 @@ describe('PaginaInicioPanel', () => {
 
     expect(navegar).toHaveBeenCalledWith(URL_NUEVO_PROYECTO);
   });
+
+  it('reanuda un borrador en el paso alcanzado y presenta el recorrido real', () => {
+    const navegar = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
+    resumen$.next({
+      ...RESUMEN,
+      totalBorradores: 1,
+      borradoresRecientes: [
+        {
+          id: 42,
+          nombre: 'Portal de clientes',
+          responsable: 'Jorge',
+          pasoActual: 4,
+          fechaUltimoGuardado: '2026-08-25T12:00:00Z',
+        },
+      ],
+    });
+    fixture.detectChanges();
+
+    const elemento = fixture.nativeElement as HTMLElement;
+    const borrador = elemento.querySelector<HTMLButtonElement>('.borrador-reciente');
+    const progreso = elemento.querySelector<HTMLElement>('.borrador-reciente__progreso i');
+
+    expect(borrador?.textContent).toContain('Paso 5 de 9');
+    expect(Number.parseFloat(progreso?.style.width ?? '')).toBeCloseTo(55.56, 1);
+
+    borrador?.click();
+
+    expect(navegar).toHaveBeenCalledWith('/panel/proyectos/42/creacion/objetivos');
+  });
 });

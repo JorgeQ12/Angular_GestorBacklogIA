@@ -1,4 +1,5 @@
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
+import { ControlesFormularioPlano } from '../../../../../../shared/forms/models';
 
 /** Describe los valores editables antes de validar la vinculación. */
 export interface ValoresFormularioVinculacionAzure {
@@ -8,11 +9,8 @@ export interface ValoresFormularioVinculacionAzure {
 }
 
 /** Deriva los controles estrictamente tipados desde los valores del formulario. */
-export type ControlesFormularioVinculacionAzure = {
-  [TCampo in keyof ValoresFormularioVinculacionAzure]: FormControl<
-    ValoresFormularioVinculacionAzure[TCampo]
-  >;
-};
+export type ControlesFormularioVinculacionAzure =
+  ControlesFormularioPlano<ValoresFormularioVinculacionAzure>;
 
 /** Representa el formulario reactivo utilizado para consultar Azure. */
 export type FormularioVinculacionAzureTipado = FormGroup<ControlesFormularioVinculacionAzure>;

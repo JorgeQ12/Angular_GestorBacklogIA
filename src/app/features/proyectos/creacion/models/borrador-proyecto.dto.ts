@@ -19,8 +19,8 @@ export interface InsumoProyectoDto {
   fechaCreacion: string;
 }
 
-/** Refleja el borrador completo creado por el backend. */
-export interface CrearBorradorProyectoRespuestaDto {
+/** Refleja el borrador completo entregado por el backend. */
+export interface BorradorProyectoDto {
   proyectoId: number;
   revision: number;
   pasoActual: number;
@@ -42,4 +42,27 @@ export interface CrearBorradorProyectoRespuestaDto {
   fechaUltimoGuardado: string;
   azure: VinculacionAzureDto | null;
   insumos: readonly InsumoProyectoDto[];
+}
+
+/** Representa el borrador devuelto después de confirmar Azure. */
+export type CrearBorradorProyectoRespuestaDto = BorradorProyectoDto;
+
+/** Representa la fotografía completa requerida para actualizar un borrador. */
+export interface ActualizarBorradorProyectoSolicitudDto {
+  proyectoId: number;
+  revisionEsperada: number;
+  pasoActual: number;
+  nombre: string;
+  responsable: string;
+  descripcion: string;
+  prioridadCatalogoId: number | null;
+  estadoCatalogoId: number | null;
+  fechaObjetivo: string | null;
+  tipoSolucionJson: string;
+  necesidadJson: string;
+  objetivosJson: string;
+  alcanceJson: string;
+  rolesJson: string;
+  equipoJson: string;
+  diagramFlujoJson: string;
 }

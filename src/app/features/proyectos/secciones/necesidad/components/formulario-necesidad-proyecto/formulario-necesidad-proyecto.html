@@ -1,0 +1,63 @@
+<form
+  class="formulario-necesidad"
+  [formGroup]="formulario"
+  [appMensajesFormulario]="mensajesFormulario"
+  (ngSubmit)="enviar()"
+>
+  <div class="formulario-necesidad__contenido">
+    <div class="ui-field">
+      <div class="formulario-necesidad__label">
+        <label class="ui-label" for="necesidad-situacion-actual">Proceso actual</label>
+        <span>
+          {{ formulario.controls.situacionActual.value.length }}/{{ limites.situacionActual }}
+        </span>
+      </div>
+      <textarea
+        id="necesidad-situacion-actual"
+        class="ui-control formulario-necesidad__textarea"
+        formControlName="situacionActual"
+        [maxlength]="limites.situacionActual"
+        placeholder="Describe cómo se trabaja hoy, las herramientas utilizadas y las principales limitaciones."
+        rows="5"
+        required
+        appErrorCampo
+      ></textarea>
+    </div>
+
+    <div class="ui-field">
+      <div class="formulario-necesidad__label">
+        <label class="ui-label" for="necesidad-problemas">Problemas principales</label>
+        <span>{{ formulario.controls.problemas.value.length }}/{{ limites.problemas }}</span>
+      </div>
+      <textarea
+        id="necesidad-problemas"
+        class="ui-control formulario-necesidad__textarea"
+        formControlName="problemas"
+        [maxlength]="limites.problemas"
+        placeholder="Explica los problemas que generan mayor fricción, retrasos, riesgos o reprocesos."
+        rows="5"
+        required
+        appErrorCampo
+      ></textarea>
+    </div>
+
+    <div class="ui-field">
+      <div class="formulario-necesidad__label">
+        <label class="ui-label" for="necesidad-impacto">Impacto en el negocio</label>
+        <span>{{ formulario.controls.impacto.value.length }}/{{ limites.impacto }}</span>
+      </div>
+      <textarea
+        id="necesidad-impacto"
+        class="ui-control formulario-necesidad__textarea"
+        formControlName="impacto"
+        [maxlength]="limites.impacto"
+        placeholder="Describe el efecto en costos, tiempos, calidad o experiencia si la necesidad no se resuelve."
+        rows="5"
+        required
+        appErrorCampo
+      ></textarea>
+    </div>
+  </div>
+
+  <ng-content select="[accionesFormularioNecesidad]" />
+</form>

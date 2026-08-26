@@ -3,53 +3,91 @@ import { TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { provideRouter, Routes } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
+import { firstValueFrom, of } from 'rxjs';
 import { IconoComponent } from '../../../../../shared/components/icono/icono.component';
-import { DATOS_RUTA_ETAPAS_CREACION } from '../../config/etapas-creacion-proyecto.config';
+import { DATOS_RUTA_PASOS_CREACION } from '../../config/pasos-creacion-proyecto.config';
+import { BorradorProyecto } from '../../models/borrador-proyecto.model';
+import { CreacionProyectoService } from '../../services/creacion-proyecto.service';
+import { EstadoCreacionProyectoService } from '../../services/estado-creacion-proyecto.service';
 import { PaginaCreacionProyecto } from './pagina-creacion-proyecto';
 
-@Component({ template: '<p>Contenido de la etapa</p>' })
-class EtapaPrueba {}
+@Component({ template: '<p>Contenido del paso</p>' })
+class PasoPrueba {}
 
 const RUTAS: Routes = [
   {
     path: 'proyectos/nuevo',
     component: PaginaCreacionProyecto,
+    providers: [EstadoCreacionProyectoService],
     children: [
       {
         path: '',
-        component: EtapaPrueba,
-        data: DATOS_RUTA_ETAPAS_CREACION.vinculacionAzure,
+        component: PasoPrueba,
+        data: DATOS_RUTA_PASOS_CREACION.vinculacionAzure,
       },
     ],
   },
   {
     path: 'proyectos/:proyectoId/creacion',
     component: PaginaCreacionProyecto,
+    providers: [EstadoCreacionProyectoService],
     children: [
       {
         path: 'contexto',
-        component: EtapaPrueba,
-        data: DATOS_RUTA_ETAPAS_CREACION.contexto,
+        component: PasoPrueba,
+        data: DATOS_RUTA_PASOS_CREACION.contexto,
+      },
+      {
+        path: 'tipo-solucion',
+        component: PasoPrueba,
+        data: DATOS_RUTA_PASOS_CREACION.tipoSolucion,
+      },
+      {
+        path: 'necesidad',
+        component: PasoPrueba,
+        data: DATOS_RUTA_PASOS_CREACION.necesidad,
+      },
+      {
+        path: 'objetivos',
+        component: PasoPrueba,
+        data: DATOS_RUTA_PASOS_CREACION.objetivos,
+      },
+      {
+        path: 'alcance',
+        component: PasoPrueba,
+        data: DATOS_RUTA_PASOS_CREACION.alcance,
+      },
+      {
+        path: 'roles',
+        component: PasoPrueba,
+        data: DATOS_RUTA_PASOS_CREACION.roles,
       },
     ],
   },
 ];
 
 describe('PaginaCreacionProyecto', () => {
+  const creacionProyecto = { obtenerBorrador: vi.fn() };
+
   beforeEach(() => {
+    vi.clearAllMocks();
+    creacionProyecto.obtenerBorrador.mockReturnValue(of(BORRADOR_AVANZADO));
     TestBed.configureTestingModule({
-      imports: [PaginaCreacionProyecto, EtapaPrueba],
-      providers: [provideRouter(RUTAS)],
+      imports: [PaginaCreacionProyecto, PasoPrueba],
+      providers: [
+        provideRouter(RUTAS),
+        { provide: CreacionProyectoService, useValue: creacionProyecto },
+      ],
     });
   });
 
-  it('presenta Azure como la primera etapa de un proyecto nuevo', async () => {
+  it('presenta Azure como el primer paso de un proyecto nuevo', async () => {
     const harness = await RouterTestingHarness.create('/proyectos/nuevo');
     const elemento = harness.routeNativeElement as HTMLElement;
 
     expect(elemento.textContent).toContain('Creación de proyectos');
     expect(elemento.textContent).toContain(
-      'Completa las etapas para definir la información esencial del proyecto.',
+      'Completa los pasos para definir la información esencial del proyecto.',
     );
     expect(elemento.textContent).not.toContain('antes de iniciar la definición');
     expect(obtenerPosicionRecorrido(elemento)).toBe('Paso 1 de 9');
@@ -58,10 +96,10 @@ describe('PaginaCreacionProyecto', () => {
     expect(obtenerAccionEncabezado(elemento).classList).toContain('ui-button--primary');
     expect(obtenerAccionEncabezado(elemento).classList).not.toContain('ui-button--secondary');
     expect(elemento.querySelector('[aria-current="step"]')?.textContent).toContain('Azure DevOps');
-    expect(obtenerTituloEtapa(elemento)).toBe('Azure DevOps');
-    expect(obtenerDescripcionEtapa(elemento)).toBe('Vinculación de origen');
-    expect(obtenerIconoEtapa(harness).nombre()).toBe('azureDevOps');
-    expect(elemento.textContent).toContain('Contenido de la etapa');
+    expect(obtenerTituloPaso(elemento)).toBe('Azure DevOps');
+    expect(obtenerDescripcionPaso(elemento)).toBe('Vinculación de origen');
+    expect(obtenerIconoPaso(harness).nombre()).toBe('azureDevOps');
+    expect(elemento.textContent).toContain('Contenido del paso');
   });
 
   it('presenta Azure completada al abrir Contexto desde un borrador', async () => {
@@ -71,31 +109,61 @@ describe('PaginaCreacionProyecto', () => {
 
     expect(elemento.textContent).toContain('Borrador #42');
     expect(elemento.textContent).toContain(
-      'Completa las etapas para definir la información esencial del proyecto.',
+      'Completa los pasos para definir la información esencial del proyecto.',
     );
     expect(obtenerPosicionRecorrido(elemento)).toBe('Paso 2 de 9');
     expect(obtenerContextoEncabezado(elemento)).toBe('');
     expect(elemento.querySelector('[role="progressbar"]')?.getAttribute('aria-valuetext')).toBe(
       'Paso 2 de 9',
     );
-    expect(botones[0].textContent).toContain('Etapa completada');
+    expect(botones[0].textContent).toContain('Paso completado');
     expect((botones[0] as HTMLButtonElement).disabled).toBe(true);
     expect(elemento.querySelector('[aria-current="step"]')?.textContent).toContain(
       'Contexto del proyecto',
     );
-    expect(obtenerTituloEtapa(elemento)).toBe('Contexto del proyecto');
-    expect(obtenerDescripcionEtapa(elemento)).toBe('Identidad y datos base');
-    expect(obtenerIconoEtapa(harness).nombre()).toBe('contextoProyecto');
+    expect(obtenerTituloPaso(elemento)).toBe('Contexto del proyecto');
+    expect(obtenerDescripcionPaso(elemento)).toBe('Identidad y datos base');
+    expect(obtenerIconoPaso(harness).nombre()).toBe('contextoProyecto');
   });
 
-  function obtenerTituloEtapa(elemento: HTMLElement): string {
+  it('presenta el nombre vigente del proyecto en el encabezado', async () => {
+    const harness = await RouterTestingHarness.create('/proyectos/42/creacion/contexto');
+    const estado = harness.routeDebugElement?.injector.get(EstadoCreacionProyectoService);
+
+    estado?.actualizarNombreProyecto('Portal de clientes');
+    harness.detectChanges();
+
+    expect(
+      (harness.routeNativeElement as HTMLElement).querySelector('.ui-page-header__title')
+        ?.textContent,
+    ).toContain('Portal de clientes');
+  });
+
+  it('conserva los pasos alcanzados al regresar a Contexto', async () => {
+    const harness = await RouterTestingHarness.create('/proyectos/42/creacion/contexto');
+    const estado = harness.routeDebugElement?.injector.get(EstadoCreacionProyectoService);
+    await firstValueFrom(estado!.cargar(42));
+    harness.detectChanges();
+    const botones = (harness.routeNativeElement as HTMLElement).querySelectorAll<HTMLButtonElement>(
+      '.recorrido-creacion__boton',
+    );
+
+    expect(botones[1].disabled).toBe(true);
+    expect(botones[1].textContent).toContain('Paso completado');
+    expect(botones[2].disabled).toBe(false);
+    expect(botones[3].disabled).toBe(false);
+    expect(botones[3].textContent).toContain('Paso completado');
+    expect(botones[4].disabled).toBe(false);
+  });
+
+  function obtenerTituloPaso(elemento: HTMLElement): string {
     return (
-      elemento.querySelector('.pagina-creacion__encabezado-etapa h2')?.textContent?.trim() ?? ''
+      elemento.querySelector('.pagina-creacion__encabezado-paso h2')?.textContent?.trim() ?? ''
     );
   }
 
-  function obtenerDescripcionEtapa(elemento: HTMLElement): string {
-    return elemento.querySelector('.pagina-creacion__descripcion-etapa')?.textContent?.trim() ?? '';
+  function obtenerDescripcionPaso(elemento: HTMLElement): string {
+    return elemento.querySelector('.pagina-creacion__descripcion-paso')?.textContent?.trim() ?? '';
   }
 
   function obtenerPosicionRecorrido(elemento: HTMLElement): string {
@@ -110,10 +178,33 @@ describe('PaginaCreacionProyecto', () => {
     return elemento.querySelector('[encabezadoPaginaAcciones]') as HTMLButtonElement;
   }
 
-  function obtenerIconoEtapa(harness: RouterTestingHarness): IconoComponent {
+  function obtenerIconoPaso(harness: RouterTestingHarness): IconoComponent {
     const encabezado = harness.routeDebugElement?.query(
-      By.css('.pagina-creacion__encabezado-etapa'),
+      By.css('.pagina-creacion__encabezado-paso'),
     );
     return encabezado?.query(By.directive(IconoComponent)).componentInstance as IconoComponent;
   }
 });
+
+const BORRADOR_AVANZADO: BorradorProyecto = {
+  id: 42,
+  revision: 4,
+  pasoActual: 4,
+  contexto: {
+    nombre: 'InterIA',
+    responsable: 'Jorge',
+    descripcion: 'Gestión inteligente del backlog.',
+    prioridadCatalogoId: 14,
+    fechaObjetivo: '2026-09-30',
+  },
+  estadoCatalogoId: null,
+  tipoSolucionJson: '{"tieneInterfaz":true,"plataforma":"Web"}',
+  necesidadJson:
+    '{"situacionActual":"Registro manual","problemas":"Reprocesos","impacto":"Costos"}',
+  objetivosJson: '{}',
+  alcanceJson: '{}',
+  rolesJson: '[]',
+  equipoJson: '[]',
+  diagramFlujoJson: '{}',
+  fechaUltimoGuardado: '2026-08-25T12:00:00Z',
+};

@@ -1,0 +1,94 @@
+<form
+  class="formulario-contexto"
+  [formGroup]="formulario"
+  [appMensajesFormulario]="mensajesFormulario"
+  (ngSubmit)="enviar()"
+>
+  <div class="formulario-contexto__contenido">
+    <div class="ui-form-grid ui-form-grid--2">
+      <div class="ui-field">
+        <div class="formulario-contexto__label">
+          <label class="ui-label" for="contexto-nombre">Nombre del proyecto</label>
+          <span>{{ formulario.controls.nombre.value.length }}/{{ limites.nombre }}</span>
+        </div>
+        <input
+          id="contexto-nombre"
+          class="ui-control"
+          type="text"
+          formControlName="nombre"
+          [maxlength]="limites.nombre"
+          placeholder="Ej. Portal de autoservicio para clientes"
+          autocomplete="off"
+          appErrorCampo
+        />
+      </div>
+
+      <div class="ui-field">
+        <div class="formulario-contexto__label">
+          <label class="ui-label" for="contexto-responsable">Responsable</label>
+          <span>{{ formulario.controls.responsable.value.length }}/{{ limites.responsable }}</span>
+        </div>
+        <input
+          id="contexto-responsable"
+          class="ui-control"
+          type="text"
+          formControlName="responsable"
+          [maxlength]="limites.responsable"
+          placeholder="Ej. María Gómez, líder de producto"
+          autocomplete="name"
+          appErrorCampo
+        />
+      </div>
+    </div>
+
+    <div class="ui-form-grid ui-form-grid--2">
+      <div class="ui-field">
+        <label
+          id="contexto-fecha-objetivo-label"
+          class="ui-label"
+          for="contexto-fecha-objetivo-control"
+        >
+          Fecha proyectada
+        </label>
+        <app-selector-fecha
+          id="contexto-fecha-objetivo"
+          etiquetadoPor="contexto-fecha-objetivo-label"
+          formControlName="fechaObjetivo"
+          appErrorCampo
+        />
+      </div>
+
+      <div class="ui-field">
+        <label id="contexto-prioridad-label" class="ui-label" for="contexto-prioridad-control">
+          Prioridad
+        </label>
+        <app-selector-campo
+          id="contexto-prioridad"
+          etiquetadoPor="contexto-prioridad-label"
+          placeholder="Selecciona una prioridad"
+          [opciones]="opcionesPrioridad()"
+          formControlName="prioridadCatalogoId"
+          appErrorCampo
+        />
+      </div>
+    </div>
+
+    <div class="ui-field formulario-contexto__descripcion">
+      <div class="formulario-contexto__label">
+        <label class="ui-label" for="contexto-descripcion">Descripción del proyecto</label>
+        <span>{{ formulario.controls.descripcion.value.length }}/{{ limites.descripcion }}</span>
+      </div>
+      <textarea
+        id="contexto-descripcion"
+        class="ui-control formulario-contexto__textarea"
+        formControlName="descripcion"
+        [maxlength]="limites.descripcion"
+        placeholder="Describe brevemente el propósito, el contexto actual y el valor esperado."
+        rows="6"
+        appErrorCampo
+      ></textarea>
+    </div>
+  </div>
+
+  <ng-content select="[accionesFormularioContexto]" />
+</form>

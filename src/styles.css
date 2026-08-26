@@ -1,7 +1,9 @@
 /* Punto de entrada del sistema visual. El orden de los imports define la cascada global. */
+@import '@angular/cdk/overlay-prebuilt.css';
 @import './app/styles/tokens.css';
 @import './app/styles/base.css';
 @import './app/styles/primitives/forms.css';
 @import './app/styles/primitives/buttons.css';
 @import './app/styles/primitives/cards.css';
 @import './app/styles/primitives/page-headers.css';
+@import './app/styles/primitives/overlays.css';

@@ -7,12 +7,16 @@ import { EncabezadoPagina } from '../../../../../shared/components/encabezado-pa
 import { IconoComponent } from '../../../../../shared/components/icono/icono.component';
 import { RecorridoCreacionProyecto } from '../../components/recorrido-creacion-proyecto/recorrido-creacion-proyecto';
 import {
-  DATOS_RUTA_ETAPAS_CREACION,
-  DatosRutaEtapaCreacionProyecto,
-  ETAPAS_CREACION_PROYECTO,
-} from '../../config/etapas-creacion-proyecto.config';
+  ClavePasoCreacionProyecto,
+  DATOS_RUTA_PASOS_CREACION,
+  DatosRutaPasoCreacionProyecto,
+  PASOS_CREACION_PROYECTO,
+} from '../../config/pasos-creacion-proyecto.config';
+import { construirEstadoRecorridoCreacion } from '../../mappers/estado-recorrido-creacion-proyecto.mapper';
+import { crearUrlPasoCreacionProyecto } from '../../mappers/navegacion-creacion-proyecto.mapper';
+import { EstadoCreacionProyectoService } from '../../services/estado-creacion-proyecto.service';
 
-/** Compone el encabezado, el recorrido y la etapa activa de creación. */
+/** Compone el encabezado, el recorrido y el paso activo de creación. */
 @Component({
   selector: 'app-pagina-creacion-proyecto',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -23,6 +27,7 @@ import {
 export class PaginaCreacionProyecto {
   private readonly ruta = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly estadoCreacion = inject(EstadoCreacionProyectoService);
   private readonly idProyecto =
     this.ruta.snapshot.paramMap.get(PARAMETROS_RUTA.proyectoId)?.trim() ?? '';
   private readonly navegacionFinalizada = toSignal(
@@ -36,34 +41,44 @@ export class PaginaCreacionProyecto {
   protected readonly estadoRecorrido = computed(() => {
     this.navegacionFinalizada();
     const predeterminado = this.idProyecto
-      ? DATOS_RUTA_ETAPAS_CREACION.contexto
-      : DATOS_RUTA_ETAPAS_CREACION.vinculacionAzure;
+      ? DATOS_RUTA_PASOS_CREACION.contexto
+      : DATOS_RUTA_PASOS_CREACION.vinculacionAzure;
     const datos = this.ruta.firstChild?.snapshot.data as
-      Partial<DatosRutaEtapaCreacionProyecto> | undefined;
+      Partial<DatosRutaPasoCreacionProyecto> | undefined;
+    const pasoActual = datos?.pasoActual ?? predeterminado.pasoActual;
+    const avanceBorrador = this.idProyecto
+      ? (this.estadoCreacion.borrador()?.pasoActual ?? 1)
+      : null;
 
-    return {
-      etapaActual: datos?.etapaActual ?? predeterminado.etapaActual,
-      etapasCompletadas: datos?.etapasCompletadas ?? predeterminado.etapasCompletadas,
-      etapasNavegables: datos?.etapasNavegables ?? predeterminado.etapasNavegables,
-    } satisfies DatosRutaEtapaCreacionProyecto;
+    return construirEstadoRecorridoCreacion(pasoActual, avanceBorrador);
   });
 
   protected readonly etiquetaEncabezado = this.idProyecto
     ? `Borrador #${this.idProyecto}`
     : 'Creación de proyectos';
   protected readonly descripcionEncabezado =
-    'Completa las etapas para definir la información esencial del proyecto.';
+    'Completa los pasos para definir la información esencial del proyecto.';
+  protected readonly tituloEncabezado = computed(
+    () => this.estadoCreacion.nombreProyecto() || 'Nuevo proyecto',
+  );
 
   /** Proporciona al encabezado la misma identidad declarada en el recorrido. */
-  protected readonly etapaActiva = computed(
+  protected readonly pasoActivo = computed(
     () =>
-      ETAPAS_CREACION_PROYECTO.find(
-        (etapa) => etapa.clave === this.estadoRecorrido().etapaActual,
-      ) ?? ETAPAS_CREACION_PROYECTO[0],
+      PASOS_CREACION_PROYECTO.find((paso) => paso.clave === this.estadoRecorrido().pasoActual) ??
+      PASOS_CREACION_PROYECTO[0],
   );
 
   /** Abandona el recorrido conservando cualquier borrador creado. */
   protected volverAlInicio(): void {
     void this.router.navigateByUrl(URL_INICIO_PANEL);
+  }
+
+  /** Abre un paso cuando el estado del recorrido lo habilita. */
+  protected abrirPaso(clave: ClavePasoCreacionProyecto): void {
+    if (!this.idProyecto) return;
+
+    const destino = crearUrlPasoCreacionProyecto(this.idProyecto, clave);
+    if (destino) void this.router.navigateByUrl(destino);
   }
 }

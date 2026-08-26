@@ -1,0 +1,42 @@
+<div
+  #grupo
+  class="selector-tarjetas"
+  role="radiogroup"
+  [class.selector-tarjetas--2]="columnas() === 2"
+  [class.selector-tarjetas--3]="columnas() === 3"
+  [class.selector-tarjetas--error]="conError()"
+  [attr.aria-labelledby]="etiquetadoPor()"
+>
+  @for (opcion of opciones(); track opcion.valor; let indice = $index) {
+    <label
+      class="selector-tarjetas__opcion"
+      [class.selector-tarjetas__opcion--seleccionada]="opcion.valor === valor()"
+      [class.selector-tarjetas__opcion--deshabilitada]="deshabilitado() || opcion.deshabilitada"
+    >
+      <input
+        [id]="id() + '-opcion-' + indice"
+        class="selector-tarjetas__control"
+        type="radio"
+        [name]="id()"
+        [value]="opcion.valor"
+        [checked]="opcion.valor === valor()"
+        [disabled]="deshabilitado() || opcion.deshabilitada"
+        (change)="seleccionar(opcion)"
+        (blur)="marcarTocado()"
+      />
+      <span class="selector-tarjetas__icono" aria-hidden="true">
+        <app-icono [nombre]="opcion.icono" />
+      </span>
+      <span class="selector-tarjetas__contenido">
+        @if (opcion.categoria) {
+          <small>{{ opcion.categoria }}</small>
+        }
+        <strong>{{ opcion.etiqueta }}</strong>
+        <span>{{ opcion.descripcion }}</span>
+      </span>
+      <span class="selector-tarjetas__marca" aria-hidden="true">
+        <app-icono nombre="confirmar" />
+      </span>
+    </label>
+  }
+</div>
