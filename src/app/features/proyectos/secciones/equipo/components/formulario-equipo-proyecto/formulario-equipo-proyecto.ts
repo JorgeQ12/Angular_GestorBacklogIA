@@ -10,10 +10,11 @@ import {
   output,
   signal,
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { EstadoVacio } from '../../../../../../shared/components/estado-vacio/estado-vacio';
 import { IconoComponent } from '../../../../../../shared/components/icono/icono.component';
+import { CampoBusqueda } from '../../../../../../shared/forms/controles/campo-busqueda/campo-busqueda';
 import { SelectorCampo } from '../../../../../../shared/forms/controles/selector-campo/selector-campo';
 import { OpcionSelector } from '../../../../../../shared/forms/controles/selector-campo/models/opcion-selector.model';
 import { ErrorCampoDirective } from '../../../../../../shared/forms/errores-validacion';
@@ -39,7 +40,14 @@ const EQUIPO_VACIO: EquipoProyecto = { integrantes: [] };
 @Component({
   selector: 'app-formulario-equipo-proyecto',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, ErrorCampoDirective, EstadoVacio, IconoComponent, SelectorCampo],
+  imports: [
+    ReactiveFormsModule,
+    CampoBusqueda,
+    ErrorCampoDirective,
+    EstadoVacio,
+    IconoComponent,
+    SelectorCampo,
+  ],
   templateUrl: './formulario-equipo-proyecto.html',
   styleUrl: './formulario-equipo-proyecto.css',
 })
@@ -73,7 +81,7 @@ export class FormularioEquipoProyecto {
   public readonly progresoCambiado = output<ProgresoEquipoProyecto>();
 
   protected readonly mensajesAsignacion = MENSAJES_ASIGNACION_EQUIPO;
-  protected readonly busqueda = signal('');
+  protected readonly controlBusqueda = this.constructorFormulario.control('');
   protected readonly filtro = signal<FiltroEquipoProyecto>('todos');
   protected readonly seleccionados = signal<ReadonlySet<string>>(new Set());
   protected readonly formulario: FormularioEquipoProyectoTipado = this.constructorFormulario.group({
@@ -83,6 +91,7 @@ export class FormularioEquipoProyecto {
     perfilTecnicoCodigo: [''],
     dedicacionCodigo: [''],
   });
+  private readonly busqueda = toSignal(this.controlBusqueda.valueChanges, { initialValue: '' });
   protected readonly controlesIntegrantes = computed(() => {
     this.versionFormulario();
     return [...this.formulario.controls.integrantes.controls];
@@ -116,6 +125,14 @@ export class FormularioEquipoProyecto {
       visibles.every((grupo) => seleccionados.has(grupo.controls.idAzure.value))
     );
   });
+  protected readonly algunosVisiblesSeleccionados = computed(() => {
+    const visibles = this.controlesVisibles();
+    const seleccionados = this.seleccionados();
+    const cantidadSeleccionada = visibles.filter((grupo) =>
+      seleccionados.has(grupo.controls.idAzure.value),
+    ).length;
+    return cantidadSeleccionada > 0 && cantidadSeleccionada < visibles.length;
+  });
   protected readonly puedeAplicarAsignacion = computed(() => {
     this.versionFormulario();
     const asignacion = this.asignacionMasiva.getRawValue();
@@ -126,12 +143,10 @@ export class FormularioEquipoProyecto {
   });
 
   public constructor() {
-    this.formulario.valueChanges
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        this.versionFormulario.update((version) => version + 1);
-        this.comunicarProgreso();
-      });
+    this.formulario.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+      this.versionFormulario.update((version) => version + 1);
+      this.comunicarProgreso();
+    });
     this.asignacionMasiva.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.versionFormulario.update((version) => version + 1));
@@ -139,20 +154,21 @@ export class FormularioEquipoProyecto {
     effect(() => this.presentarDatos(this.datosIniciales()));
     effect(() => {
       const bloquear = this.procesando() || this.sincronizando();
-      if (bloquear && this.formulario.enabled) {
-        this.formulario.disable({ emitEvent: false });
-        this.asignacionMasiva.disable({ emitEvent: false });
-      } else if (!bloquear && this.formulario.disabled) {
-        this.formulario.enable({ emitEvent: false });
-        this.asignacionMasiva.enable({ emitEvent: false });
+      if (bloquear) {
+        if (this.formulario.enabled) this.formulario.disable({ emitEvent: false });
+        if (this.controlBusqueda.enabled) this.controlBusqueda.disable({ emitEvent: false });
+        if (this.asignacionMasiva.enabled) {
+          this.asignacionMasiva.disable({ emitEvent: false });
+        }
+      } else {
+        if (this.formulario.disabled) this.formulario.enable({ emitEvent: false });
+        if (this.controlBusqueda.disabled) this.controlBusqueda.enable({ emitEvent: false });
+        if (this.asignacionMasiva.disabled) {
+          this.asignacionMasiva.enable({ emitEvent: false });
+        }
       }
       this.versionFormulario.update((version) => version + 1);
     });
-  }
-
-  /** Actualiza el criterio aplicado sobre nombre y correo. */
-  protected actualizarBusqueda(evento: Event): void {
-    this.busqueda.set((evento.target as HTMLInputElement).value);
   }
 
   /** Cambia el subconjunto presentado sin alterar la configuración. */

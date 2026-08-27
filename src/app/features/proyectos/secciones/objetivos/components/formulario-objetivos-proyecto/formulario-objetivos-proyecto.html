@@ -51,8 +51,13 @@
 
       <div class="formulario-objetivos__lista" formArrayName="objetivosEspecificos">
         @for (objetivo of controlesObjetivosEspecificos; track objetivo; let indice = $index) {
-          <div class="formulario-objetivos__item">
-            <span class="formulario-objetivos__numero" aria-hidden="true">{{ indice + 1 }}</span>
+          <app-fila-formulario
+            [numero]="indice + 1"
+            [eliminable]="controlesObjetivosEspecificos.length > 1"
+            [procesando]="procesando()"
+            [etiquetaEliminar]="'Eliminar objetivo específico ' + (indice + 1)"
+            (eliminar)="eliminarObjetivoEspecifico(indice)"
+          >
             <div class="ui-field formulario-objetivos__campo-especifico">
               <input
                 [id]="'objetivos-especifico-' + indice"
@@ -66,16 +71,7 @@
                 appErrorCampo
               />
             </div>
-            <button
-              type="button"
-              class="formulario-objetivos__eliminar"
-              [disabled]="procesando() || controlesObjetivosEspecificos.length <= 1"
-              [attr.aria-label]="'Eliminar objetivo específico ' + (indice + 1)"
-              (click)="eliminarObjetivoEspecifico(indice)"
-            >
-              <app-icono nombre="eliminar" aria-hidden="true" />
-            </button>
-          </div>
+          </app-fila-formulario>
         }
       </div>
     </section>

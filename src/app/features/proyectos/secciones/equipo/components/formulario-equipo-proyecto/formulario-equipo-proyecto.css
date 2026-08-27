@@ -1,71 +1,11 @@
 :host {
+  --altura-fila-equipo: 5.75rem;
+
   display: block;
 }
 
 .formulario-equipo {
-  overflow: hidden;
-  border: var(--border-width) solid var(--card-border);
-  border-radius: var(--radius-lg);
   background: var(--surface-default);
-  box-shadow: var(--card-shadow);
-}
-
-.formulario-equipo__encabezado {
-  display: flex;
-  min-height: 5.5rem;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
-  padding: var(--space-4) var(--space-6);
-  border-bottom: var(--border-width) solid var(--card-divider);
-  background: var(--card-header-surface);
-}
-
-.formulario-equipo__origen {
-  display: flex;
-  min-width: 0;
-  align-items: center;
-  gap: var(--space-3);
-}
-
-.formulario-equipo__icono {
-  display: grid;
-  width: var(--control-height-lg);
-  height: var(--control-height-lg);
-  flex: 0 0 var(--control-height-lg);
-  place-items: center;
-  border: var(--border-width) solid var(--border-default);
-  border-radius: var(--radius-md);
-  background: var(--surface-default);
-  color: var(--text-primary);
-}
-
-.formulario-equipo__icono app-icono {
-  width: var(--font-size-lg);
-  height: var(--font-size-lg);
-}
-
-.formulario-equipo__origen span,
-.formulario-equipo__origen p {
-  color: var(--text-muted);
-  font-size: var(--font-size-xs);
-}
-
-.formulario-equipo__origen > div > span {
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: var(--tracking-wide);
-  text-transform: uppercase;
-}
-
-.formulario-equipo__origen h3,
-.formulario-equipo__origen p {
-  margin: 0;
-}
-
-.formulario-equipo__origen h3 {
-  margin-top: var(--space-1);
-  color: var(--text-primary);
-  font-size: var(--font-size-base);
 }
 
 .formulario-equipo__herramientas {
@@ -78,36 +18,9 @@
 }
 
 .formulario-equipo__buscar {
-  position: relative;
-  display: flex;
-  width: min(22rem, 100%);
-  align-items: center;
-}
-
-.formulario-equipo__buscar app-icono {
-  position: absolute;
-  left: var(--space-3);
-  width: var(--font-size-base);
-  height: var(--font-size-base);
-  color: var(--text-muted);
-}
-
-.formulario-equipo__buscar input {
   width: 100%;
-  min-height: var(--control-height-md);
-  padding: 0 var(--space-3) 0 var(--space-10);
-  border: var(--border-width) solid var(--field-border);
-  border-radius: var(--radius-md);
-  background: var(--field-surface);
-  color: var(--text-primary);
-  font: inherit;
-}
-
-.formulario-equipo__buscar input:focus {
-  border-color: var(--field-border-focus);
-  background: var(--field-surface-focus);
-  box-shadow: var(--shadow-focus);
-  outline: 0;
+  max-width: 56rem;
+  flex: 1 1 56rem;
 }
 
 .formulario-equipo__filtros {
@@ -174,8 +87,11 @@
 }
 
 .formulario-equipo__columnas {
-  padding: var(--space-3) var(--space-6);
+  min-height: 2.75rem;
+  align-items: center;
+  padding: var(--space-2) var(--space-6);
   border-bottom: var(--border-width) solid var(--card-divider);
+  background: var(--surface-subtle);
   color: var(--text-muted);
   font-size: var(--font-size-2xs);
   font-weight: var(--font-weight-semibold);
@@ -183,8 +99,17 @@
   text-transform: uppercase;
 }
 
+.formulario-equipo__integrantes {
+  max-height: calc(var(--altura-fila-equipo) * 4);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-color: var(--border-strong) transparent;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+}
+
 .formulario-equipo__fila {
-  min-height: 5.75rem;
+  min-height: var(--altura-fila-equipo);
   padding: var(--space-4) var(--space-6);
   border-bottom: var(--border-width) solid var(--card-divider);
 }
@@ -200,16 +125,14 @@
   align-items: center;
 }
 
-.formulario-equipo input[type='checkbox'] {
-  width: var(--font-size-base);
-  height: var(--font-size-base);
-  accent-color: var(--action-primary-bg);
+.formulario-equipo__columnas label {
+  min-height: auto;
 }
 
 .formulario-equipo__persona {
   display: grid;
   min-width: 0;
-  grid-template-columns: var(--control-height-lg) minmax(0, 1fr) auto;
+  grid-template-columns: var(--control-height-lg) minmax(0, 1fr);
   align-items: center;
   gap: var(--space-3);
 }
@@ -226,12 +149,12 @@
   font-weight: var(--font-weight-bold);
 }
 
-.formulario-equipo__persona div {
+.formulario-equipo__datos-persona {
   min-width: 0;
 }
 
 .formulario-equipo__persona strong,
-.formulario-equipo__persona div span {
+.formulario-equipo__datos-persona > span {
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -242,13 +165,15 @@
   font-size: var(--font-size-sm);
 }
 
-.formulario-equipo__persona div span,
+.formulario-equipo__datos-persona > span,
 .formulario-equipo__persona small {
   color: var(--text-muted);
   font-size: var(--font-size-xs);
 }
 
 .formulario-equipo__persona small {
+  display: inline-flex;
+  margin-top: var(--space-1);
   padding: var(--space-1) var(--space-2);
   border-radius: var(--radius-pill);
   background: var(--surface-muted);
@@ -281,6 +206,12 @@
     display: none;
   }
 
+  .formulario-equipo__integrantes {
+    max-height: none;
+    overflow-y: visible;
+    scrollbar-gutter: auto;
+  }
+
   .formulario-equipo__fila {
     grid-template-columns: 2rem minmax(0, 1fr) minmax(12rem, 0.8fr);
   }
@@ -305,17 +236,11 @@
 }
 
 @media (max-width: 640px) {
-  .formulario-equipo__encabezado,
   .formulario-equipo__herramientas,
   .formulario-equipo__masivo,
   .formulario-equipo__fila {
     padding-right: var(--space-4);
     padding-left: var(--space-4);
-  }
-
-  .formulario-equipo__encabezado {
-    align-items: stretch;
-    flex-direction: column;
   }
 
   .formulario-equipo__filtros {
@@ -341,15 +266,6 @@
   .formulario-equipo__persona,
   .formulario-equipo__asignacion:first-of-type {
     grid-column: 1;
-  }
-
-  .formulario-equipo__persona {
-    grid-template-columns: var(--control-height-lg) minmax(0, 1fr);
-  }
-
-  .formulario-equipo__persona small {
-    grid-column: 2;
-    justify-self: start;
   }
 }
 

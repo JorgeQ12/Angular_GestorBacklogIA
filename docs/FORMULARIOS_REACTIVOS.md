@@ -44,6 +44,17 @@ src/app/shared/forms/errores-validacion/
 └── index.ts
 ```
 
+Las composiciones estables de formularios se ubican junto a esta infraestructura:
+
+```text
+src/app/shared/forms/components/
+└── fila-formulario/
+    ├── fila-formulario.ts
+    ├── fila-formulario.html
+    ├── fila-formulario.css
+    └── fila-formulario.spec.ts
+```
+
 Cada formulario mantiene sus contratos y textos particulares dentro de su feature:
 
 ```text
@@ -112,6 +123,10 @@ controles, índices ni validadores.
 - Los mensajes repetidos pueden proporcionarse directamente mediante `appMensajesError`.
 - La hidratación reemplaza los controles existentes y deja el formulario limpio y sin tocar.
 - Los límites se prueban, incluida la imposibilidad de eliminar el último elemento requerido.
+- `FilaFormulario` comparte la numeración, distribución y eliminación accesible cuando la misma
+  composición aparece en varias secciones. El formulario propietario conserva el `FormArray`, los
+  campos proyectados, sus validadores y la modificación de la colección.
+- Una coincidencia visual aislada no justifica trasladar reglas de dominio a la fila compartida.
 
 ### `MensajesFormularioDirective`
 
@@ -299,6 +314,11 @@ integran con Reactive Forms mediante `ControlValueAccessor`:
 
 ```text
 controles/
+├── campo-busqueda/
+│   ├── campo-busqueda.ts
+│   ├── campo-busqueda.html
+│   ├── campo-busqueda.css
+│   └── campo-busqueda.spec.ts
 ├── selector-campo/
 │   ├── models/opcion-selector.model.ts
 │   ├── selector-campo.ts
@@ -322,6 +342,9 @@ controles/
 - `SelectorCampo` recibe opciones neutrales con `valor`, `etiqueta`, descripción opcional y estado
   deshabilitado. La feature adapta sus catálogos a este contrato; el control no conoce DTO ni
   modelos de dominio.
+- `CampoBusqueda` centraliza estructura, icono, foco, accesibilidad y estados visuales. La feature
+  proporciona su etiqueta, placeholder y `FormControl`, y conserva únicamente las reglas de ancho
+  o distribución propias de su layout.
 - `SelectorFecha` conserva fechas sin hora como `YYYY-MM-DD`. El formato visible pertenece a
   `FormateadorFechaService`, por lo que no se crean instancias de `Intl` en componentes.
 - `SelectorTarjetas` representa alternativas excluyentes con radios nativos cuando las opciones

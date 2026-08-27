@@ -1,40 +1,46 @@
+import { OverlayContainer } from '@angular/cdk/overlay';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormGroup } from '@angular/forms';
-import { ControlesAsignacionMasivaEquipoProyecto } from '../../models/formulario-equipo-proyecto.model';
 import { EquipoProyecto } from '../../models/equipo-proyecto.model';
 import { FormularioEquipoProyecto } from './formulario-equipo-proyecto';
 
 describe('FormularioEquipoProyecto', () => {
   let fixture: ComponentFixture<FormularioEquipoProyecto>;
+  let overlay: HTMLElement;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [FormularioEquipoProyecto],
     }).compileComponents();
     fixture = TestBed.createComponent(FormularioEquipoProyecto);
+    overlay = TestBed.inject(OverlayContainer).getContainerElement();
     fixture.componentRef.setInput('datosIniciales', EQUIPO);
-    fixture.componentRef.setInput('nombreEquipo', 'Producto digital');
     fixture.detectChanges();
   });
 
-  it('presenta progreso, identidad y Team de origen', () => {
+  it('presenta los integrantes y sus filtros de configuración', () => {
     const elemento = obtenerElemento();
 
-    expect(elemento.textContent).toContain('Producto digital');
-    expect(elemento.textContent).toContain('1 configurados · 1 pendientes');
+    expect(elemento.textContent).toContain('Todos 2');
+    expect(elemento.textContent).toContain('Pendientes 1');
+    expect(elemento.textContent).toContain('Configurados 1');
     expect(elemento.textContent).toContain('Jorge Quintero');
     expect(elemento.textContent).toContain('María Gómez');
   });
 
-  it('actualiza los totales cuando los integrantes llegan después de la primera renderización', () => {
+  it('presenta la administración de Azure debajo del correo del integrante', () => {
+    const datos = obtenerElemento().querySelector('.formulario-equipo__datos-persona');
+
+    expect(datos?.querySelector(':scope > span')?.textContent).toContain('jorge@interia.co');
+    expect(datos?.querySelector(':scope > small')?.textContent).toBe('Administrador Azure');
+  });
+
+  it('actualiza la lista cuando los integrantes llegan después de la primera renderización', () => {
     const fixtureTardia = TestBed.createComponent(FormularioEquipoProyecto);
     fixtureTardia.detectChanges();
     fixtureTardia.componentRef.setInput('datosIniciales', EQUIPO);
     fixtureTardia.detectChanges();
 
-    expect((fixtureTardia.nativeElement as HTMLElement).textContent).toContain(
-      '1 configurados · 1 pendientes',
-    );
+    expect((fixtureTardia.nativeElement as HTMLElement).textContent).toContain('Todos 2');
     expect(
       (fixtureTardia.nativeElement as HTMLElement).querySelectorAll('.formulario-equipo__fila'),
     ).toHaveLength(2);
@@ -58,6 +64,27 @@ describe('FormularioEquipoProyecto', () => {
     expect(obtenerElemento().textContent).toContain('Jorge Quintero');
   });
 
+  it('distingue la selección parcial y completa de integrantes visibles', () => {
+    const controles = obtenerElemento().querySelectorAll<HTMLInputElement>(
+      '.formulario-equipo__seleccion input',
+    );
+    const controlGeneral = obtenerElemento().querySelector<HTMLInputElement>(
+      '.formulario-equipo__columnas input',
+    )!;
+
+    controles[0].checked = true;
+    controles[0].dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+    expect(controlGeneral.indeterminate).toBe(true);
+    expect(controlGeneral.checked).toBe(false);
+
+    controles[1].checked = true;
+    controles[1].dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+    expect(controlGeneral.indeterminate).toBe(false);
+    expect(controlGeneral.checked).toBe(true);
+  });
+
   it('asigna el mismo perfil y dedicación a varios integrantes', () => {
     obtenerElemento()
       .querySelectorAll<HTMLInputElement>('.formulario-equipo__seleccion input')
@@ -67,14 +94,10 @@ describe('FormularioEquipoProyecto', () => {
       });
     fixture.detectChanges();
 
-    const componente = fixture.componentInstance as unknown as {
-      asignacionMasiva: FormGroup<ControlesAsignacionMasivaEquipoProyecto>;
-    };
-    componente.asignacionMasiva.setValue({
-      perfilTecnicoCodigo: 'qa',
-      dedicacionCodigo: '75',
-    });
+    seleccionarOpcionMasiva('equipo-perfil-masivo-control', 'QA');
+    seleccionarOpcionMasiva('equipo-dedicacion-masiva-control', '75%');
     fixture.detectChanges();
+    expect(obtenerBoton('Aplicar').disabled).toBe(false);
     pulsarBoton('Aplicar');
     fixture.detectChanges();
 
@@ -89,6 +112,26 @@ describe('FormularioEquipoProyecto', () => {
     });
   });
 
+  it('reactiva la asignación masiva después de sincronizar los integrantes', () => {
+    fixture.componentRef.setInput('sincronizando', true);
+    fixture.detectChanges();
+    fixture.componentRef.setInput('datosIniciales', EQUIPO);
+    fixture.detectChanges();
+    fixture.componentRef.setInput('sincronizando', false);
+    fixture.detectChanges();
+
+    obtenerElemento()
+      .querySelectorAll<HTMLInputElement>('.formulario-equipo__seleccion input')
+      .forEach((control) => {
+        control.checked = true;
+        control.dispatchEvent(new Event('change'));
+      });
+    fixture.detectChanges();
+
+    expect(obtenerControlBoton('#equipo-perfil-masivo-control').disabled).toBe(false);
+    expect(obtenerControlBoton('#equipo-dedicacion-masiva-control').disabled).toBe(false);
+  });
+
   it('muestra únicamente los pendientes al intentar guardar asignaciones incompletas', () => {
     enviarFormulario();
     fixture.detectChanges();
@@ -98,23 +141,36 @@ describe('FormularioEquipoProyecto', () => {
     expect(obtenerElemento().textContent).toContain('Completa esta asignación.');
   });
 
-  it('entrega la edición vigente al solicitar sincronización', () => {
-    const sincronizar = vi.fn();
-    fixture.componentInstance.sincronizar.subscribe(sincronizar);
-    pulsarBoton('Actualizar desde Azure');
-
-    expect(sincronizar).toHaveBeenCalledWith(EQUIPO);
+  it('entrega la edición vigente a la página coordinadora', () => {
+    expect(fixture.componentInstance.obtenerDatosVigentes()).toEqual(EQUIPO);
   });
 
   function pulsarBoton(texto: string): void {
-    const boton = Array.from(obtenerElemento().querySelectorAll('button')).find((elemento) =>
+    obtenerBoton(texto).click();
+  }
+
+  function obtenerBoton(texto: string): HTMLButtonElement {
+    return Array.from(obtenerElemento().querySelectorAll('button')).find((elemento) =>
       elemento.textContent?.includes(texto),
+    ) as HTMLButtonElement;
+  }
+
+  function seleccionarOpcionMasiva(idControl: string, texto: string): void {
+    obtenerElemento().querySelector<HTMLButtonElement>(`#${idControl}`)?.click();
+    fixture.detectChanges();
+    const opcion = Array.from(overlay.querySelectorAll<HTMLButtonElement>('[role="option"]')).find(
+      (elemento) => elemento.textContent?.includes(texto),
     );
-    boton?.click();
+    opcion?.click();
+    fixture.detectChanges();
   }
 
   function obtenerControl(selector: string): HTMLInputElement {
     return obtenerElemento().querySelector(selector) as HTMLInputElement;
+  }
+
+  function obtenerControlBoton(selector: string): HTMLButtonElement {
+    return obtenerElemento().querySelector(selector) as HTMLButtonElement;
   }
 
   function obtenerElemento(): HTMLElement {

@@ -206,10 +206,91 @@
   line-height: var(--line-height-snug);
 }
 
+/* Mantiene reconocibles los estados de selección sin sustituir el control nativo. */
+.ui-checkbox {
+  display: grid;
+  width: 1.125rem;
+  height: 1.125rem;
+  flex: 0 0 1.125rem;
+  margin: 0;
+  appearance: none;
+  place-content: center;
+  border: var(--border-width) solid var(--field-border);
+  border-radius: var(--radius-xs);
+  background: var(--surface-default);
+  color: var(--text-inverse);
+  cursor: pointer;
+  transition:
+    border-color var(--transition-fast) var(--ease-standard),
+    background-color var(--transition-fast) var(--ease-standard),
+    box-shadow var(--transition-fast) var(--ease-standard);
+}
+
+.ui-checkbox::before {
+  width: 0.3rem;
+  height: 0.55rem;
+  border: solid currentcolor;
+  border-width: 0 0.125rem 0.125rem 0;
+  content: '';
+  transform: translateY(-0.05rem) rotate(45deg) scale(0);
+  transition: transform var(--transition-fast) var(--ease-emphasized);
+}
+
+.ui-checkbox:hover:not(:disabled) {
+  border-color: var(--field-border-hover);
+  background: var(--field-surface-hover);
+}
+
+.ui-checkbox:checked,
+.ui-checkbox:indeterminate {
+  border-color: var(--action-primary-bg);
+  background: var(--action-primary-bg);
+}
+
+.ui-checkbox:checked:hover:not(:disabled),
+.ui-checkbox:indeterminate:hover:not(:disabled) {
+  border-color: var(--action-primary-bg-hover);
+  background: var(--action-primary-bg-hover);
+}
+
+.ui-checkbox:checked::before {
+  transform: translateY(-0.05rem) rotate(45deg) scale(1);
+}
+
+.ui-checkbox:indeterminate::before {
+  width: 0.55rem;
+  height: 0.125rem;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: currentcolor;
+  transform: scale(1);
+}
+
+.ui-checkbox:focus-visible {
+  outline: 0;
+  box-shadow: var(--shadow-focus);
+}
+
+.ui-checkbox:disabled {
+  border-color: var(--field-border);
+  background: var(--field-surface-disabled);
+  color: var(--text-disabled);
+  cursor: not-allowed;
+  opacity: 0.75;
+}
+
 /* Respeta la preferencia del usuario sin alterar los estados del control. */
 @media (prefers-reduced-motion: reduce) {
-  .ui-control {
+  .ui-control,
+  .ui-checkbox,
+  .ui-checkbox::before {
     transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .ui-checkbox {
+    appearance: auto;
   }
 }
 

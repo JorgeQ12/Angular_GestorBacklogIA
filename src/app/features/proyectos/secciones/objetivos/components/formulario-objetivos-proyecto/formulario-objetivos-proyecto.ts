@@ -6,6 +6,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { IconoComponent } from '../../../../../../shared/components/icono/icono.component';
+import { FilaFormulario } from '../../../../../../shared/forms/components/fila-formulario/fila-formulario';
 import {
   ErrorCampoDirective,
   MensajesFormularioDirective,
@@ -23,7 +24,13 @@ import { ObjetivosProyecto } from '../../models/objetivos-proyecto.model';
 @Component({
   selector: 'app-formulario-objetivos-proyecto',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, ErrorCampoDirective, MensajesFormularioDirective, IconoComponent],
+  imports: [
+    ReactiveFormsModule,
+    ErrorCampoDirective,
+    MensajesFormularioDirective,
+    IconoComponent,
+    FilaFormulario,
+  ],
   templateUrl: './formulario-objetivos-proyecto.html',
   styleUrl: './formulario-objetivos-proyecto.css',
 })

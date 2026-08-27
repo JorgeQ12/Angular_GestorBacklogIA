@@ -74,70 +74,8 @@
   gap: var(--space-3);
 }
 
-.formulario-objetivos__item {
-  display: grid;
-  grid-template-columns: 2rem minmax(0, 1fr) 2.75rem;
-  align-items: start;
-  column-gap: var(--space-3);
-}
-
-.formulario-objetivos__numero {
-  display: grid;
-  width: 2rem;
-  height: 2rem;
-  place-items: center;
-  grid-column: 1;
-  grid-row: 1;
-  margin-top: calc((var(--control-height-lg) - 2rem) / 2);
-  border: var(--border-width) solid var(--card-divider);
-  border-radius: var(--radius-sm);
-  background: var(--surface-muted);
-  color: var(--text-secondary);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-bold);
-}
-
 .formulario-objetivos__campo-especifico {
   min-width: 0;
-  grid-column: 2;
-  grid-row: 1;
-}
-
-.formulario-objetivos__eliminar {
-  display: grid;
-  width: 2.75rem;
-  height: var(--control-height-lg);
-  place-items: center;
-  padding: 0;
-  border: var(--border-width) solid transparent;
-  border-radius: var(--radius-md);
-  background: transparent;
-  color: var(--text-muted);
-  grid-column: 3;
-  grid-row: 1;
-  transition:
-    background-color var(--transition-base) var(--ease-standard),
-    color var(--transition-base) var(--ease-standard);
-}
-
-.formulario-objetivos__eliminar app-icono {
-  width: 1rem;
-  height: 1rem;
-}
-
-.formulario-objetivos__eliminar:hover:not(:disabled) {
-  background: var(--color-danger-surface);
-  color: var(--color-danger);
-}
-
-.formulario-objetivos__eliminar:focus-visible {
-  outline: 0;
-  box-shadow: var(--shadow-focus);
-}
-
-.formulario-objetivos__eliminar:disabled {
-  color: var(--text-disabled);
-  opacity: 0.55;
 }
 
 @media (max-width: 640px) {
@@ -152,21 +90,5 @@
 
   .formulario-objetivos__acciones-lista {
     justify-content: space-between;
-  }
-
-  .formulario-objetivos__item {
-    grid-template-columns: minmax(0, 1fr) 2.75rem;
-  }
-
-  .formulario-objetivos__campo-especifico {
-    grid-column: 1;
-  }
-
-  .formulario-objetivos__eliminar {
-    grid-column: 2;
-  }
-
-  .formulario-objetivos__numero {
-    display: none;
   }
 }

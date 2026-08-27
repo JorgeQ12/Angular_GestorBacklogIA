@@ -18,8 +18,15 @@
 
     <div class="formulario-roles__lista" formArrayName="roles">
       @for (rol of controlesRoles; track rol; let indice = $index) {
-        <div class="formulario-roles__item" [formGroupName]="indice">
-          <span class="formulario-roles__numero" aria-hidden="true">{{ indice + 1 }}</span>
+        <app-fila-formulario
+          [formGroupName]="indice"
+          [numero]="indice + 1"
+          [camposEtiquetados]="true"
+          [eliminable]="controlesRoles.length > 1"
+          [procesando]="procesando()"
+          [etiquetaEliminar]="'Eliminar rol ' + (indice + 1)"
+          (eliminar)="eliminarRol(indice)"
+        >
           <div class="formulario-roles__campos">
             <div class="ui-field">
               <label class="ui-label" [for]="'rol-nombre-' + indice">Nombre del rol</label>
@@ -48,16 +55,7 @@
               />
             </div>
           </div>
-          <button
-            type="button"
-            class="formulario-roles__eliminar"
-            [disabled]="procesando() || controlesRoles.length <= 1"
-            [attr.aria-label]="'Eliminar rol ' + (indice + 1)"
-            (click)="eliminarRol(indice)"
-          >
-            <app-icono nombre="eliminar" aria-hidden="true" />
-          </button>
-        </div>
+        </app-fila-formulario>
       }
     </div>
   </section>

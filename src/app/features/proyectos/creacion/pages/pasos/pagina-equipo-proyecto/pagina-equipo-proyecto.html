@@ -9,10 +9,9 @@
 } @else if (paso.contenidoListo()) {
   <app-formulario-equipo-proyecto
     [datosIniciales]="equipo()"
-    [nombreEquipo]="nombreEquipo()"
     [procesando]="paso.procesando()"
     [sincronizando]="sincronizando()"
-    (sincronizar)="sincronizarEquipo($event)"
+    (progresoCambiado)="actualizarProgreso($event)"
     (guardar)="guardarEquipo($event)"
   >
     <footer accionesFormularioEquipo class="ui-form-footer">

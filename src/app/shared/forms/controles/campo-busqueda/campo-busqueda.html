@@ -1,0 +1,14 @@
+<label class="campo-busqueda" [for]="id()">
+  <span class="ui-visually-hidden">{{ etiqueta() }}</span>
+  <app-icono nombre="buscar" aria-hidden="true" />
+  <input
+    [id]="id()"
+    type="search"
+    autocomplete="off"
+    [placeholder]="placeholder()"
+    [value]="valor()"
+    [disabled]="deshabilitado()"
+    (input)="actualizarValor($event)"
+    (blur)="marcarTocado()"
+  />
+</label>

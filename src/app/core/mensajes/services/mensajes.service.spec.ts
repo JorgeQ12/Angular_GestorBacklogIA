@@ -57,4 +57,13 @@ describe('MensajesService', () => {
     servicio.aceptar();
     await expect(segundaDecision).resolves.toBe(true);
   });
+
+  it('conserva los detalles funcionales de un error', () => {
+    void servicio.error('No fue posible continuar', 'La solicitud no es válida.', [
+      'El identificador es obligatorio.',
+    ]);
+
+    expect(servicio.mensajeActual()?.detalles).toEqual(['El identificador es obligatorio.']);
+    servicio.aceptar();
+  });
 });

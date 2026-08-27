@@ -342,18 +342,27 @@ DevOps. No duplica los roles funcionales definidos en el paso anterior:
 - `proyectos/secciones/equipo` contiene el modelo, el formulario, la configuración y el mapper
   reutilizables.
 - La identidad de cada integrante (`idAzure`, nombre, correo y condición de administrador) es de
-  solo lectura y siempre se renueva desde Azure.
+  solo lectura y se origina en Azure.
 - La configuración local asigna `perfilTecnicoCodigo` y `dedicacionCodigo`; ambos son obligatorios
   para guardar la sección.
 - El formulario presenta búsqueda por nombre o correo y filtros de todos, pendientes y
-  configurados. No pagina el Team ni oculta el progreso general.
+  configurados. No pagina el Team; comunica el progreso vigente a la página coordinadora.
+- Equipo no crea una segunda tarjeta ni un encabezado interno. El nombre del Team, el progreso y
+  “Actualizar desde Azure” se integran en el único encabezado del paso mediante un contexto
+  opcional proporcionado en la ruta de creación.
 - La selección múltiple permite aplicar un perfil técnico, una dedicación o ambos valores a todas
   las personas seleccionadas. La selección es estado temporal de interfaz y no se persiste.
 - “Actualizar desde Azure” consulta nuevamente la membresía, relaciona integrantes mediante
   `idAzure`, conserva sus asignaciones, incorpora personas nuevas sin configurar y retira las que
   ya no pertenecen al Team.
-- El componente compartido emite la fotografía vigente antes de sincronizar; la página coordina
-  HTTP, errores y la combinación resultante sin trasladar esas responsabilidades al formulario.
+- Al entrar por primera vez sin una configuración guardada, la página sincroniza la membresía
+  después de cargar el borrador. Cuando `equipoJson` ya contiene integrantes, restaura primero esa
+  fotografía y no ejecuta una nueva sincronización que pueda desplazar sus asignaciones.
+- La acción “Actualizar desde Azure” queda disponible para renovar explícitamente la membresía
+  después de restaurar una configuración existente.
+- La página obtiene del formulario una fotografía de la edición antes de sincronizar. Así coordina
+  HTTP, errores y la combinación resultante sin perder cambios ni trasladar esas responsabilidades
+  al formulario compartido.
 - Guardar Equipo lleva `pasoActual` al menos a 8 y abre el destino estable de Flujo de usuario.
 
 El formato persistido es una colección canónica en español:

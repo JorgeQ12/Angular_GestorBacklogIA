@@ -66,8 +66,12 @@ export class MensajesService {
   }
 
   /** Informa un fallo que impidió completar la operación actual. */
-  public async error(titulo: string, descripcion: string): Promise<void> {
-    await this.abrir({ titulo, descripcion, variante: 'error' });
+  public async error(
+    titulo: string,
+    descripcion: string,
+    detalles: readonly string[] = [],
+  ): Promise<void> {
+    await this.abrir({ titulo, descripcion, detalles, variante: 'error' });
   }
 
   /** Solicita una decisión explícita antes de continuar. */

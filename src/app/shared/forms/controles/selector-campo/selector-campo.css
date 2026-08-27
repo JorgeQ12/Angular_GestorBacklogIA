@@ -67,6 +67,9 @@
 }
 
 .selector-campo__lista {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   max-height: 18rem;
   overflow-y: auto;
   padding: var(--space-2);

@@ -2,8 +2,12 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
-import { MensajesService } from '../../../../../../core/mensajes/services/mensajes.service';
+import { NotificadorErroresApiService } from '../../../../../../core/mensajes/services/notificador-errores-api.service';
 import { crearUrlContextoProyecto } from '../../../../../../core/navegacion/rutas';
+import {
+  ERROR_CONSULTA_AZURE,
+  ERROR_CREACION_BORRADOR,
+} from '../../../config/mensajes-error-creacion-proyecto.config';
 import { VinculacionAzure } from '../../../components/vinculacion-azure/vinculacion-azure';
 import {
   DatosVinculacionAzure,
@@ -21,7 +25,7 @@ import { CreacionProyectoService } from '../../../services/creacion-proyecto.ser
 })
 export class PaginaVinculacionAzure {
   private readonly creacionProyecto = inject(CreacionProyectoService);
-  private readonly mensajes = inject(MensajesService);
+  private readonly notificadorErrores = inject(NotificadorErroresApiService);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -43,12 +47,7 @@ export class PaginaVinculacionAzure {
       )
       .subscribe({
         next: (resultado) => this.resultadoValidacion.set(resultado),
-        error: (error) => {
-          void this.mensajes.error(
-            'No fue posible consultar Azure',
-            'Revisa el enlace, la épica principal y el Team seleccionado.',
-          );
-        },
+        error: (error: unknown) => this.notificadorErrores.comunicar(error, ERROR_CONSULTA_AZURE),
       });
   }
 
@@ -73,12 +72,8 @@ export class PaginaVinculacionAzure {
         next: (borrador) => {
           void this.router.navigateByUrl(crearUrlContextoProyecto(borrador.id));
         },
-        error: () => {
-          void this.mensajes.error(
-            'No fue posible crear el proyecto',
-            'La información de Azure fue validada, pero el borrador no pudo ser creado.',
-          );
-        },
+        error: (error: unknown) =>
+          this.notificadorErrores.comunicar(error, ERROR_CREACION_BORRADOR),
       });
   }
 }

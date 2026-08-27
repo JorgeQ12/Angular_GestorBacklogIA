@@ -60,7 +60,7 @@ describe('FormularioObjetivosProyecto', () => {
 
   it('conserva al menos un objetivo específico', () => {
     const eliminar = obtenerElemento().querySelector(
-      '.formulario-objetivos__eliminar',
+      'app-fila-formulario button',
     ) as HTMLButtonElement;
 
     expect(eliminar.disabled).toBe(true);

@@ -1,0 +1,59 @@
+/* Unifica la presentación y los estados de los buscadores de la aplicación. */
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.campo-busqueda {
+  position: relative;
+  display: flex;
+  width: 100%;
+  align-items: center;
+}
+
+.campo-busqueda app-icono {
+  position: absolute;
+  left: var(--space-3);
+  width: var(--font-size-base);
+  height: var(--font-size-base);
+  color: var(--field-icon-color);
+  pointer-events: none;
+}
+
+.campo-busqueda input {
+  width: 100%;
+  min-height: var(--control-height-md);
+  padding: 0 var(--space-3) 0 var(--space-10);
+  border: var(--border-width) solid var(--field-border);
+  border-radius: var(--radius-md);
+  background: var(--field-surface);
+  color: var(--text-primary);
+  font: inherit;
+  transition:
+    border-color var(--transition-base) var(--ease-standard),
+    background-color var(--transition-base) var(--ease-standard),
+    box-shadow var(--transition-base) var(--ease-standard);
+}
+
+.campo-busqueda input:hover:not(:disabled) {
+  border-color: var(--field-border-hover);
+  background: var(--field-surface-hover);
+}
+
+.campo-busqueda input:focus {
+  border-color: var(--field-border-focus);
+  background: var(--field-surface-focus);
+  box-shadow: var(--shadow-focus);
+  outline: 0;
+}
+
+.campo-busqueda input:disabled {
+  background: var(--field-surface-disabled);
+  color: var(--text-disabled);
+  cursor: not-allowed;
+}
+
+.campo-busqueda input::placeholder {
+  color: var(--text-disabled);
+  font-size: var(--font-size-sm);
+}

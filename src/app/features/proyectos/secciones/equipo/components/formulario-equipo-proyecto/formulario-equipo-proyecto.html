@@ -1,40 +1,14 @@
 <form class="formulario-equipo" [formGroup]="formulario" (ngSubmit)="enviar()">
-  <section class="formulario-equipo__contenido" aria-labelledby="titulo-equipo-proyecto">
-    <header class="formulario-equipo__encabezado">
-      <div class="formulario-equipo__origen">
-        <span class="formulario-equipo__icono" aria-hidden="true">
-          <app-icono nombre="azureDevOps" />
-        </span>
-        <div>
-          <span>Equipo importado desde Azure DevOps</span>
-          <h3 id="titulo-equipo-proyecto">{{ nombreEquipo() }}</h3>
-          <p>{{ cantidadConfigurados() }} configurados · {{ cantidadPendientes() }} pendientes</p>
-        </div>
-      </div>
-      <button
-        type="button"
-        class="ui-button ui-button--secondary ui-button--md"
-        [disabled]="procesando() || sincronizando()"
-        (click)="solicitarSincronizacion()"
-      >
-        <app-icono class="ui-button__icon" nombre="reintentar" />
-        {{ sincronizando() ? 'Sincronizando' : 'Actualizar desde Azure' }}
-      </button>
-    </header>
-
+  <section class="formulario-equipo__contenido" aria-label="Configuración del equipo">
     @if (controlesIntegrantes().length > 0) {
       <div class="formulario-equipo__herramientas">
-        <label class="formulario-equipo__buscar">
-          <span class="ui-visually-hidden">Buscar integrante</span>
-          <app-icono nombre="buscar" aria-hidden="true" />
-          <input
-            type="search"
-            placeholder="Buscar por nombre o correo"
-            [value]="busqueda()"
-            [disabled]="procesando() || sincronizando()"
-            (input)="actualizarBusqueda($event)"
-          />
-        </label>
+        <app-campo-busqueda
+          id="busqueda-integrantes-equipo"
+          class="formulario-equipo__buscar"
+          etiqueta="Buscar integrante"
+          placeholder="Buscar por nombre o correo"
+          [formControl]="controlBusqueda"
+        />
         <div class="formulario-equipo__filtros" aria-label="Filtrar integrantes">
           <button
             type="button"
@@ -82,6 +56,7 @@
               [disabled]="!puedeAplicarAsignacion()"
               (click)="aplicarAsignacionMasiva()"
             >
+              <app-icono class="ui-button__icon" nombre="confirmar" />
               Aplicar
             </button>
           </div>
@@ -92,8 +67,10 @@
         <div class="formulario-equipo__columnas">
           <label>
             <input
+              class="ui-checkbox"
               type="checkbox"
               [checked]="todosVisiblesSeleccionados()"
+              [indeterminate]="algunosVisiblesSeleccionados()"
               [disabled]="controlesVisibles().length === 0 || procesando() || sincronizando()"
               (change)="alternarSeleccionVisible($any($event.target).checked)"
             />
@@ -104,11 +81,12 @@
           <span>Dedicación</span>
         </div>
 
-        <div formArrayName="integrantes">
+        <div class="formulario-equipo__integrantes" formArrayName="integrantes">
           @for (integrante of controlesVisibles(); track integrante.controls.idAzure.value) {
             <article class="formulario-equipo__fila" [formGroup]="integrante">
               <label class="formulario-equipo__seleccion">
                 <input
+                  class="ui-checkbox"
                   type="checkbox"
                   [checked]="seleccionados().has(integrante.controls.idAzure.value)"
                   [disabled]="procesando() || sincronizando()"
@@ -127,13 +105,13 @@
                 <span class="formulario-equipo__avatar" aria-hidden="true">
                   {{ integrante.controls.nombre.value.charAt(0).toUpperCase() }}
                 </span>
-                <div>
+                <div class="formulario-equipo__datos-persona">
                   <strong>{{ integrante.controls.nombre.value }}</strong>
                   <span>{{ integrante.controls.correo.value || 'Sin correo disponible' }}</span>
+                  @if (integrante.controls.esAdministradorAzure.value) {
+                    <small>Administrador Azure</small>
+                  }
                 </div>
-                @if (integrante.controls.esAdministradorAzure.value) {
-                  <small>Administrador Azure</small>
-                }
               </div>
               <div class="ui-field formulario-equipo__asignacion">
                 <label

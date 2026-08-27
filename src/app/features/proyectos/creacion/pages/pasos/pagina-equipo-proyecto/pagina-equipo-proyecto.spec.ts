@@ -1,10 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router, convertToParamMap } from '@angular/router';
 import { of } from 'rxjs';
-import { MensajesService } from '../../../../../../core/mensajes/services/mensajes.service';
+import { NotificadorErroresApiService } from '../../../../../../core/mensajes/services/notificador-errores-api.service';
 import { ClaveSeccionProyecto } from '../../../../config/secciones-proyecto.config';
 import { BorradorProyecto } from '../../../models/borrador-proyecto.model';
 import { CreacionProyectoService } from '../../../services/creacion-proyecto.service';
+import { ContenidoEncabezadoPasoCreacionService } from '../../../services/contenido-encabezado-paso-creacion.service';
 import { EstadoCreacionProyectoService } from '../../../services/estado-creacion-proyecto.service';
 import { NotificadorErroresBorradorProyectoService } from '../../../services/notificador-errores-borrador-proyecto.service';
 import { PaginaEquipoProyecto } from './pagina-equipo-proyecto';
@@ -17,7 +18,7 @@ describe('PaginaEquipoProyecto', () => {
   };
   const creacionProyecto = { sincronizarEquipoAzure: vi.fn() };
   const router = { navigateByUrl: vi.fn() };
-  const mensajes = { error: vi.fn() };
+  const notificadorErroresApi = { comunicar: vi.fn() };
 
   beforeEach(async () => {
     vi.clearAllMocks();
@@ -30,7 +31,8 @@ describe('PaginaEquipoProyecto', () => {
       providers: [
         { provide: EstadoCreacionProyectoService, useValue: estadoCreacion },
         { provide: CreacionProyectoService, useValue: creacionProyecto },
-        { provide: MensajesService, useValue: mensajes },
+        ContenidoEncabezadoPasoCreacionService,
+        { provide: NotificadorErroresApiService, useValue: notificadorErroresApi },
         { provide: NotificadorErroresBorradorProyectoService, useValue: { comunicar: vi.fn() } },
         { provide: Router, useValue: router },
         {
@@ -45,13 +47,25 @@ describe('PaginaEquipoProyecto', () => {
     fixture.detectChanges();
   });
 
-  it('combina la identidad de Azure con las asignaciones guardadas', () => {
+  it('restaura las asignaciones guardadas sin sincronizar nuevamente', () => {
     const elemento = fixture.nativeElement as HTMLElement;
+    const encabezado = TestBed.inject(ContenidoEncabezadoPasoCreacionService).contenido();
 
     expect(estadoCreacion.cargar).toHaveBeenCalledWith(42);
-    expect(elemento.textContent).toContain('Producto digital');
+    expect(creacionProyecto.sincronizarEquipoAzure).not.toHaveBeenCalled();
+    expect(encabezado?.detallePrincipal()).toBe('Producto digital');
+    expect(encabezado?.detalleSecundario()).toBe('1 configurados · 0 pendientes');
     expect(elemento.textContent).toContain('Jorge Quintero');
-    expect(elemento.textContent).toContain('1 configurados · 0 pendientes');
+  });
+
+  it('sincroniza Azure al ingresar cuando Equipo aún no tiene configuración', () => {
+    estadoCreacion.cargar.mockReturnValueOnce(of({ ...BORRADOR, equipoJson: '[]' }));
+    const fixtureSinEquipo = TestBed.createComponent(PaginaEquipoProyecto);
+    fixtureSinEquipo.detectChanges();
+
+    expect(creacionProyecto.sincronizarEquipoAzure).toHaveBeenCalledOnce();
+    expect(creacionProyecto.sincronizarEquipoAzure).toHaveBeenCalledWith(42);
+    expect((fixtureSinEquipo.nativeElement as HTMLElement).textContent).toContain('Jorge Quintero');
   });
 
   it('guarda Equipo y abre Flujo de usuario', () => {
@@ -75,14 +89,14 @@ describe('PaginaEquipoProyecto', () => {
   });
 
   it('actualiza Azure conservando las asignaciones vigentes', () => {
-    const boton = Array.from(
-      (fixture.nativeElement as HTMLElement).querySelectorAll('button'),
-    ).find((elemento) => elemento.textContent?.includes('Actualizar desde Azure'));
-    boton?.click();
+    creacionProyecto.sincronizarEquipoAzure.mockClear();
+    const encabezado = TestBed.inject(ContenidoEncabezadoPasoCreacionService).contenido();
+    encabezado?.accion?.ejecutar();
     fixture.detectChanges();
 
+    expect(creacionProyecto.sincronizarEquipoAzure).toHaveBeenCalledOnce();
     expect(creacionProyecto.sincronizarEquipoAzure).toHaveBeenCalledWith(42);
-    expect((fixture.nativeElement as HTMLElement).textContent).toContain('1 configurados');
+    expect(encabezado?.detalleSecundario()).toBe('1 configurados · 0 pendientes');
   });
 });
 

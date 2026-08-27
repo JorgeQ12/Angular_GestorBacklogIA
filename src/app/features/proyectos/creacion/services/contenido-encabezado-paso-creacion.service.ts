@@ -1,5 +1,5 @@
-import { Injectable, Signal, signal } from '@angular/core';
-import { NombreIconoAplicacion } from '../../../../shared/components/icono/iconos-aplicacion';
+import { Injectable, signal, type Signal } from '@angular/core';
+import type { NombreIconoAplicacion } from '../../../../shared/components/icono/iconos-aplicacion';
 
 /** Describe información contextual que complementa la identidad de un paso. */
 export interface ContenidoEncabezadoPasoCreacion {

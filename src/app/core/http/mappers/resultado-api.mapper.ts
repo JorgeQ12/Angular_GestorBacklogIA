@@ -1,4 +1,5 @@
-import { ResultadoApi } from '../models/resultado-api.model';
+import type { ResultadoApi } from '../models/resultado-api.model';
+import { crearErrorApiDesdeResultado } from './error-api.mapper';
 
 /** Exige los datos de una respuesta funcional y conserva el detalle proporcionado por el API. */
 export function exigirDatosResultadoApi<T>(resultado: ResultadoApi<T>, recurso: string): T {
@@ -6,6 +7,5 @@ export function exigirDatosResultadoApi<T>(resultado: ResultadoApi<T>, recurso: 
     return resultado.datos;
   }
 
-  const detalle = resultado.errores?.join(' ') || resultado.mensaje;
-  throw new Error(detalle || `El backend no proporcionó ${recurso}.`);
+  throw crearErrorApiDesdeResultado(resultado, `El backend no proporcionó ${recurso}.`);
 }

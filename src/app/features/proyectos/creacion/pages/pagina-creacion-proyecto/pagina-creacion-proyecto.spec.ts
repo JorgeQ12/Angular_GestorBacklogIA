@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { provideRouter, Routes } from '@angular/router';
@@ -9,6 +9,7 @@ import { IconoComponent } from '../../../../../shared/components/icono/icono.com
 import { DATOS_RUTA_PASOS_CREACION } from '../../config/pasos-creacion-proyecto.config';
 import { BorradorProyecto } from '../../models/borrador-proyecto.model';
 import { CreacionProyectoService } from '../../services/creacion-proyecto.service';
+import { ContenidoEncabezadoPasoCreacionService } from '../../services/contenido-encabezado-paso-creacion.service';
 import { EstadoCreacionProyectoService } from '../../services/estado-creacion-proyecto.service';
 import { PaginaCreacionProyecto } from './pagina-creacion-proyecto';
 
@@ -19,7 +20,7 @@ const RUTAS: Routes = [
   {
     path: `${SEGMENTOS_RUTA.proyectos}/${SEGMENTOS_RUTA.nuevo}`,
     component: PaginaCreacionProyecto,
-    providers: [EstadoCreacionProyectoService],
+    providers: [EstadoCreacionProyectoService, ContenidoEncabezadoPasoCreacionService],
     children: [
       {
         path: '',
@@ -31,7 +32,7 @@ const RUTAS: Routes = [
   {
     path: `${SEGMENTOS_RUTA.proyectos}/:proyectoId/${SEGMENTOS_RUTA.creacion}`,
     component: PaginaCreacionProyecto,
-    providers: [EstadoCreacionProyectoService],
+    providers: [EstadoCreacionProyectoService, ContenidoEncabezadoPasoCreacionService],
     children: [
       {
         path: SEGMENTOS_RUTA.contexto,
@@ -138,6 +139,39 @@ describe('PaginaCreacionProyecto', () => {
       (harness.routeNativeElement as HTMLElement).querySelector('.ui-page-header__title')
         ?.textContent,
     ).toContain('Portal de clientes');
+  });
+
+  it('integra el contexto y la acción del paso en un único encabezado', async () => {
+    const harness = await RouterTestingHarness.create('/proyectos/42/creacion/contexto');
+    const servicio = harness.routeDebugElement?.injector.get(
+      ContenidoEncabezadoPasoCreacionService,
+    );
+    const ejecutar = vi.fn();
+    servicio?.registrar({
+      iconoDetalle: 'azureDevOps',
+      detallePrincipal: signal('Producto digital'),
+      detalleSecundario: signal('2 configurados · 16 pendientes'),
+      accion: {
+        icono: 'reintentar',
+        texto: signal('Actualizar desde Azure'),
+        deshabilitada: signal(false),
+        ejecutar,
+      },
+    });
+    harness.detectChanges();
+    const elemento = harness.routeNativeElement as HTMLElement;
+
+    expect(elemento.querySelector('.pagina-creacion__detalle-paso')?.textContent).toContain(
+      'Producto digital',
+    );
+    expect(elemento.querySelector('.pagina-creacion__detalle-paso')?.textContent).toContain(
+      '2 configurados · 16 pendientes',
+    );
+    const accion = Array.from(
+      elemento.querySelectorAll<HTMLButtonElement>('.pagina-creacion__encabezado-paso button'),
+    ).find((boton) => boton.textContent?.includes('Actualizar desde Azure'));
+    accion?.click();
+    expect(ejecutar).toHaveBeenCalledOnce();
   });
 
   it('conserva los pasos alcanzados al regresar a Contexto', async () => {

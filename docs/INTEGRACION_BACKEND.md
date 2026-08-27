@@ -115,6 +115,30 @@ prioriza los errores o el mensaje enviados por el backend y recibe el nombre del
 mensaje de respaldo. Los servicios deciden cuándo usarla; no se desenvuelve el sobre mediante un
 interceptor ni se considera que `datos: null` sea inválido para todas las operaciones.
 
+### Normalización y presentación de errores
+
+`core/http` convierte los fallos funcionales y de transporte en `ErrorApi`. El normalizador admite
+el sobre `ResultadoApi`, cuerpos HTTP con `mensaje`, respuestas compatibles con Problem Details y
+colecciones de errores de validación. Así se conserva, cuando existe:
+
+- `mensaje` como descripción principal para el usuario.
+- `errores` como detalles adicionales del mensaje.
+- `codigoError` para especializar reglas de dominio.
+- El estado HTTP para respaldos técnicos conocidos, como conflicto o falta de permisos.
+
+Las páginas no interpretan `HttpErrorResponse` ni abren mensajes manualmente. Entregan el error y
+el contexto de la operación a `NotificadorErroresApiService`. La prioridad de presentación es:
+
+1. Mensaje funcional proporcionado por el backend.
+2. Detalles funcionales proporcionados por el backend.
+3. Mensaje especializado por `codigoError` o estado HTTP.
+4. Mensaje de respaldo declarado por la feature.
+
+Los mensajes de respaldo permanecen en la configuración de la feature porque describen la
+operación de dominio. La lectura del contrato, la deduplicación de detalles y la presentación
+permanecen en `core`. No se utiliza directamente `Error.message`, ni se presentan cuerpos HTML o
+respuestas técnicas no reconocidas.
+
 ## Carga y errores
 
 - El interceptor de carga global cubre automáticamente las solicitudes HTTP.
@@ -123,6 +147,8 @@ interceptor ni se considera que `datos: null` sea inválido para todas las opera
 - La página utiliza `EstadoError`, permite reintentar y oculta el contenido que depende de la
   consulta. Un shell estable puede conservar su encabezado; un encabezado derivado de la respuesta
   también debe ocultarse.
+- Los callbacks HTTP utilizan `NotificadorErroresApiService`; no duplican decisiones por estado ni
+  textos de error dentro de cada página.
 - Los detalles técnicos del backend no se muestran directamente al usuario.
 
 ## Pruebas
@@ -149,4 +175,6 @@ interceptor de credenciales existente incluirá automáticamente la cookie de se
 5. Mapear DTO a modelo explícitamente.
 6. Encapsular HTTP en un servicio de la feature.
 7. Diferenciar error, vacío y datos disponibles.
-8. Probar mapper, servicio y página.
+8. Declarar el respaldo de cada operación en la configuración de la feature y comunicar fallos con
+   `NotificadorErroresApiService`.
+9. Probar mapper, servicio, normalización del error y página.

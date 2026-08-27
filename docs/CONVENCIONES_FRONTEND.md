@@ -70,6 +70,9 @@ y documentación relacionada.
 - Al terminar, buscar métodos anteriores, imports, tipos, constantes, pruebas y ramas que hayan
   quedado obsoletos; la refactorización no deja compatibilidad interna ni código muerto sin una
   necesidad vigente.
+- Al integrar operaciones HTTP, buscar callbacks que interpreten estados o abran mensajes
+  directamente. Los errores se normalizan y notifican mediante la infraestructura de `core`; la
+  feature conserva únicamente el contexto funcional y sus mensajes de respaldo.
 
 La propuesta previa a una migración debe señalar las duplicidades encontradas, qué se compartirá y
 qué permanecerá específico. Si la auditoría no encuentra una mejora justificada, se conserva la

@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { Subject } from 'rxjs';
-import { MensajesService } from '../../../../../../core/mensajes/services/mensajes.service';
+import { NotificadorErroresApiService } from '../../../../../../core/mensajes/services/notificador-errores-api.service';
 import { crearUrlContextoProyecto } from '../../../../../../core/navegacion/rutas';
 import { BorradorProyectoCreado } from '../../../models/borrador-proyecto.model';
 import {
@@ -31,20 +31,18 @@ describe('PaginaVinculacionAzure', () => {
   let fixture: ComponentFixture<PaginaVinculacionAzure>;
   let validacion$: Subject<ResultadoVinculacionAzure>;
   let borrador$: Subject<BorradorProyectoCreado>;
-  const mensajes = {
-    error: vi.fn(() => Promise.resolve()),
-  };
+  const notificadorErrores = { comunicar: vi.fn() };
 
   beforeEach(async () => {
     validacion$ = new Subject<ResultadoVinculacionAzure>();
     borrador$ = new Subject<BorradorProyectoCreado>();
-    mensajes.error.mockClear();
+    notificadorErrores.comunicar.mockClear();
 
     await TestBed.configureTestingModule({
       imports: [PaginaVinculacionAzure],
       providers: [
         provideRouter([]),
-        { provide: MensajesService, useValue: mensajes },
+        { provide: NotificadorErroresApiService, useValue: notificadorErrores },
         {
           provide: CreacionProyectoService,
           useValue: {
@@ -94,9 +92,9 @@ describe('PaginaVinculacionAzure', () => {
     validar();
     validacion$.error(new Error('Azure no disponible'));
 
-    expect(mensajes.error).toHaveBeenCalledWith(
-      'No fue posible consultar Azure',
-      'Revisa el enlace, la épica principal y el Team seleccionado.',
+    expect(notificadorErrores.comunicar).toHaveBeenCalledWith(
+      expect.any(Error),
+      expect.objectContaining({ titulo: 'No fue posible consultar Azure' }),
     );
   });
 

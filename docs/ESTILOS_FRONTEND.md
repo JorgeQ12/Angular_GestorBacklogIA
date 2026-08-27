@@ -424,6 +424,13 @@ Se documentan:
 No se documentan propiedades evidentes ni cada selector de un componente. Un nombre como
 `.inicio-sesion__tarjeta` ya comunica su responsabilidad y no necesita un comentario adicional.
 
+Los buscadores utilizan `CampoBusqueda` desde `shared/forms/controles`. No se replica en una
+feature la estructura del icono, el input ni sus estados; el CSS local puede definir únicamente el
+ancho y la posición que correspondan a su composición.
+
+Los checkbox nativos utilizan `.ui-checkbox`. La primitiva centraliza selección, estado parcial,
+hover, foco y deshabilitado; la feature conserva las etiquetas y la lógica que actualiza el valor.
+
 ## Cuándo promover una regla
 
 Una regla debe pasar del componente a una primitiva cuando:

@@ -65,7 +65,7 @@ describe('FormularioRolesProyecto', () => {
 
   it('conserva al menos un rol', () => {
     const eliminar = obtenerElemento().querySelector(
-      '.formulario-roles__eliminar',
+      'app-fila-formulario button',
     ) as HTMLButtonElement;
 
     expect(eliminar.disabled).toBe(true);

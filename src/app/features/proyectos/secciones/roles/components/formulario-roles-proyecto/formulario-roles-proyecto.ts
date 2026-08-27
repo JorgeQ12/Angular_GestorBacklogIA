@@ -19,6 +19,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { IconoComponent } from '../../../../../../shared/components/icono/icono.component';
+import { FilaFormulario } from '../../../../../../shared/forms/components/fila-formulario/fila-formulario';
 import { ErrorCampoDirective } from '../../../../../../shared/forms/errores-validacion';
 import { validarTextoRequerido } from '../../../../../../shared/forms/validadores';
 import {
@@ -35,7 +36,7 @@ import { RolProyecto, RolesProyecto } from '../../models/roles-proyecto.model';
 @Component({
   selector: 'app-formulario-roles-proyecto',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, ErrorCampoDirective, IconoComponent],
+  imports: [ReactiveFormsModule, ErrorCampoDirective, IconoComponent, FilaFormulario],
   templateUrl: './formulario-roles-proyecto.html',
   styleUrl: './formulario-roles-proyecto.css',
 })
