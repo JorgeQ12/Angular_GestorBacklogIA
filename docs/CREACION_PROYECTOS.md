@@ -437,10 +437,13 @@ contenido.
 - `reanudacionCreacionProyectoGuard` resuelve únicamente la ruta base
   `/panel/proyectos/:proyectoId/creacion` y la dirige al último paso alcanzado que ya tenga una
   página migrada. Las rutas hijas explícitas continúan bajo el guard de avance.
-- El panel utiliza `crearUrlReanudacionProyecto` para abrir el mismo destino que la ruta base. La
-  correspondencia entre `pasoActual` y URL no se replica en componentes ni guards.
-- La posición visible agrega Azure al avance funcional del backend y el total siempre proviene de
-  `PASOS_CREACION_PROYECTO.length`; no se escriben cantidades o porcentajes fijos en el panel.
+- Consumidores externos como el panel navegan únicamente a la ruta base de creación. El guard
+  decide el destino vigente y mantiene privada la correspondencia entre `pasoActual` y URL.
+- El avance que necesita otra feature se expone mediante `proyectos/public-api.ts`. Ese contrato
+  entrega posición, total y porcentaje sin filtrar `PASOS_CREACION_PROYECTO` ni mappers internos.
+- El `proyectoId` se deriva de `paramMap`; no se captura mediante `snapshot`. Al cambiar el
+  parámetro se descarta la fotografía anterior, se cancela la carga de la página y se recupera el
+  borrador vigente antes de guardar o navegar.
 - La tarjeta del paso obtiene icono, título y descripción desde `PASOS_CREACION_PROYECTO`, igual
   que el recorrido. Las páginas hijas no replican esa identidad.
 - El encabezado y el footer del paso comparten una superficie tenue; el contenido conserva la

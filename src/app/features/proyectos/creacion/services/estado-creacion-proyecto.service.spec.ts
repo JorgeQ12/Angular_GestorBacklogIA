@@ -51,6 +51,21 @@ describe('EstadoCreacionProyectoService', () => {
     expect(servicio.nombreProyecto()).toBe('InterIA');
   });
 
+  it('descarta la fotografía anterior cuando cambia el proyecto vigente', async () => {
+    await firstValueFrom(servicio.cargar(42));
+    creacionProyecto.obtenerBorrador.mockReturnValue(of({ ...BORRADOR, id: 84 }));
+
+    servicio.seleccionarProyecto(84);
+
+    expect(servicio.borrador()).toBeNull();
+    expect(servicio.nombreProyecto()).toBe('');
+
+    await firstValueFrom(servicio.cargar(84));
+
+    expect(servicio.borrador()?.id).toBe(84);
+    expect(creacionProyecto.obtenerBorrador).toHaveBeenLastCalledWith(84);
+  });
+
   it('conserva el nombre escrito para el encabezado del recorrido', () => {
     servicio.actualizarNombreProyecto('  Portal de clientes  ');
 

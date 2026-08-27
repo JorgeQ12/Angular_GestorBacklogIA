@@ -1,8 +1,8 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/router';
-import { filter, startWith } from 'rxjs';
-import { PARAMETROS_RUTA, URL_INICIO_PANEL } from '../../../../../core/navegacion/rutas';
+import { distinctUntilChanged, filter, map, startWith } from 'rxjs';
+import { URL_INICIO_PANEL, obtenerProyectoIdRuta } from '../../../../../core/navegacion/rutas';
 import { EncabezadoPagina } from '../../../../../shared/components/encabezado-pagina/encabezado-pagina';
 import { IconoComponent } from '../../../../../shared/components/icono/icono.component';
 import { RecorridoCreacionProyecto } from '../../components/recorrido-creacion-proyecto/recorrido-creacion-proyecto';
@@ -30,8 +30,10 @@ export class PaginaCreacionProyecto {
   private readonly router = inject(Router);
   private readonly estadoCreacion = inject(EstadoCreacionProyectoService);
   protected readonly encabezadoPaso = inject(ContenidoEncabezadoPasoCreacionService);
-  private readonly idProyecto =
-    this.ruta.snapshot.paramMap.get(PARAMETROS_RUTA.proyectoId)?.trim() ?? '';
+  private readonly idProyecto = toSignal(
+    this.ruta.paramMap.pipe(map(obtenerProyectoIdRuta), distinctUntilChanged()),
+    { initialValue: null },
+  );
   private readonly navegacionFinalizada = toSignal(
     this.router.events.pipe(
       filter((evento): evento is NavigationEnd => evento instanceof NavigationEnd),
@@ -40,24 +42,28 @@ export class PaginaCreacionProyecto {
     { initialValue: null },
   );
 
+  public constructor() {
+    effect(() => this.estadoCreacion.seleccionarProyecto(this.idProyecto()));
+  }
+
   protected readonly estadoRecorrido = computed(() => {
     this.navegacionFinalizada();
-    const predeterminado = this.idProyecto
+    const proyectoId = this.idProyecto();
+    const predeterminado = proyectoId
       ? DATOS_RUTA_PASOS_CREACION.contexto
       : DATOS_RUTA_PASOS_CREACION.vinculacionAzure;
     const datos = this.ruta.firstChild?.snapshot.data as
       Partial<DatosRutaPasoCreacionProyecto> | undefined;
     const pasoActual = datos?.pasoActual ?? predeterminado.pasoActual;
-    const avanceBorrador = this.idProyecto
-      ? (this.estadoCreacion.borrador()?.pasoActual ?? 1)
-      : null;
+    const avanceBorrador = proyectoId ? (this.estadoCreacion.borrador()?.pasoActual ?? 1) : null;
 
     return construirEstadoRecorridoCreacion(pasoActual, avanceBorrador);
   });
 
-  protected readonly etiquetaEncabezado = this.idProyecto
-    ? `Borrador #${this.idProyecto}`
-    : 'Creación de proyectos';
+  protected readonly etiquetaEncabezado = computed(() => {
+    const proyectoId = this.idProyecto();
+    return proyectoId ? `Borrador #${proyectoId}` : 'Creación de proyectos';
+  });
   protected readonly descripcionEncabezado =
     'Completa los pasos para definir la información esencial del proyecto.';
   protected readonly tituloEncabezado = computed(
@@ -78,9 +84,10 @@ export class PaginaCreacionProyecto {
 
   /** Abre un paso cuando el estado del recorrido lo habilita. */
   protected abrirPaso(clave: ClavePasoCreacionProyecto): void {
-    if (!this.idProyecto) return;
+    const proyectoId = this.idProyecto();
+    if (!proyectoId) return;
 
-    const destino = crearUrlPasoCreacionProyecto(this.idProyecto, clave);
+    const destino = crearUrlPasoCreacionProyecto(proyectoId, clave);
     if (destino) void this.router.navigateByUrl(destino);
   }
 }

@@ -70,6 +70,14 @@ describe('SelectorFecha', () => {
     expect(obtenerTrigger().disabled).toBe(true);
   });
 
+  it('presenta el calendario como un popover no modal', () => {
+    obtenerTrigger().click();
+    fixture.detectChanges();
+    const calendario = overlay.querySelector('[role="dialog"]');
+
+    expect(calendario?.hasAttribute('aria-modal')).toBe(false);
+  });
+
   function obtenerTrigger(): HTMLButtonElement {
     return fixture.nativeElement.querySelector('#fecha-control') as HTMLButtonElement;
   }

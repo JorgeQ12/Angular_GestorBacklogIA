@@ -2,9 +2,9 @@ import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { catchError, map, of } from 'rxjs';
 import {
-  PARAMETROS_RUTA,
   URL_INICIO_PANEL,
   crearUrlContextoProyecto,
+  obtenerProyectoIdRuta,
 } from '../../../../core/navegacion/rutas';
 import { crearUrlReanudacionProyecto } from '../mappers/navegacion-creacion-proyecto.mapper';
 import { EstadoCreacionProyectoService } from '../services/estado-creacion-proyecto.service';
@@ -15,9 +15,9 @@ export const reanudacionCreacionProyectoGuard: CanActivateFn = (ruta) => {
 
   const estadoCreacion = inject(EstadoCreacionProyectoService);
   const router = inject(Router);
-  const proyectoId = Number(ruta.paramMap.get(PARAMETROS_RUTA.proyectoId));
+  const proyectoId = obtenerProyectoIdRuta(ruta.paramMap);
 
-  if (!Number.isInteger(proyectoId) || proyectoId <= 0) {
+  if (proyectoId === null) {
     return router.parseUrl(URL_INICIO_PANEL);
   }
 

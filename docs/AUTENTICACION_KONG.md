@@ -65,9 +65,10 @@ El popup debe abrirse directamente como consecuencia del clic para evitar el blo
 del navegador. Mientras navega por dominios externos, Angular no intenta leer su contenido. Solo
 comprueba cuándo vuelve al mismo origen.
 
-Si el usuario cierra la ventana antes de volver, el observable finaliza sin confirmar el retorno y
-la página habilita nuevamente el acceso. Si el navegador impide crear el popup, se utiliza una
-redirección completa como respaldo.
+Cuando la ventana se cierra antes de que Angular pueda observar el retorno, el servicio consulta
+`/me` una vez. Esto diferencia un cierre automático posterior a la autenticación de una cancelación
+manual: solo una sesión confirmada emite la continuación. Si el navegador impide crear el popup, se
+utiliza una redirección completa como respaldo.
 
 No se consulta `/me` periódicamente mientras el popup está abierto. Tampoco se introduce una ruta
 ficticia como `/home` para completar el flujo.
@@ -104,7 +105,8 @@ Las pruebas deben comprobar:
 
 - El popup no finaliza mientras permanece en `about:blank` u otro origen.
 - El retorno al origen emite una única confirmación y produce la navegación al panel.
-- Cerrar el popup completa el flujo sin emitir una confirmación y restaura el acceso.
+- Cerrar el popup consulta `/me`: emite si Kong confirma sesión y finaliza sin emitir si fue una
+  cancelación.
 - El interceptor no modifica solicitudes a terceros.
 - El guard reutiliza una sesión ya confirmada sin repetir `/me`.
 - El loader permanece visible durante la consulta inicial de `/me`.

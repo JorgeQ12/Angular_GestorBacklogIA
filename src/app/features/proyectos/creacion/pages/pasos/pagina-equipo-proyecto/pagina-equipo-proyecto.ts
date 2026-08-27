@@ -149,11 +149,12 @@ export class PaginaEquipoProyecto {
 
   /** Mantiene la membresía local alineada con Azure DevOps. */
   private sincronizarEquipo(equipoVigente: EquipoProyecto): void {
-    if (this.sincronizando()) return;
+    const proyectoId = this.paso.proyectoId;
+    if (this.sincronizando() || proyectoId === null) return;
 
     this.sincronizando.set(true);
     this.creacionProyecto
-      .sincronizarEquipoAzure(this.paso.proyectoId)
+      .sincronizarEquipoAzure(proyectoId)
       .pipe(
         finalize(() => this.sincronizando.set(false)),
         takeUntilDestroyed(this.destroyRef),

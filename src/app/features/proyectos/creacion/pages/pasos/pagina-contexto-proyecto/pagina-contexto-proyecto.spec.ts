@@ -46,7 +46,7 @@ describe('PaginaContextoProyecto', () => {
         {
           provide: ActivatedRoute,
           useValue: {
-            parent: { snapshot: { paramMap: convertToParamMap({ proyectoId: '42' }) } },
+            parent: { paramMap: of(convertToParamMap({ proyectoId: '42' })) },
           },
         },
       ],

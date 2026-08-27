@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router, convertToParamMap } from '@angular/router';
-import { Subject, throwError } from 'rxjs';
+import { BehaviorSubject, Subject, throwError } from 'rxjs';
 import { ClaveSeccionProyecto } from '../../config/secciones-proyecto.config';
 import { ActualizacionSeccionBorrador } from '../models/actualizacion-seccion-borrador.model';
 import { BorradorProyecto } from '../models/borrador-proyecto.model';
@@ -10,9 +10,11 @@ import { NotificadorErroresBorradorProyectoService } from './notificador-errores
 
 describe('CoordinadorPasoCreacionProyectoService', () => {
   let servicio: CoordinadorPasoCreacionProyectoService;
+  let parametrosRuta$: BehaviorSubject<ReturnType<typeof convertToParamMap>>;
   let carga$: Subject<BorradorProyecto>;
   let guardado$: Subject<BorradorProyecto>;
   const estadoCreacion = {
+    seleccionarProyecto: vi.fn(),
     cargar: vi.fn(),
     guardarSeccion: vi.fn(),
   };
@@ -23,6 +25,7 @@ describe('CoordinadorPasoCreacionProyectoService', () => {
     vi.clearAllMocks();
     carga$ = new Subject<BorradorProyecto>();
     guardado$ = new Subject<BorradorProyecto>();
+    parametrosRuta$ = new BehaviorSubject(convertToParamMap({ proyectoId: '42' }));
     estadoCreacion.cargar.mockReturnValue(carga$);
     estadoCreacion.guardarSeccion.mockReturnValue(guardado$);
 
@@ -35,7 +38,7 @@ describe('CoordinadorPasoCreacionProyectoService', () => {
         {
           provide: ActivatedRoute,
           useValue: {
-            parent: { snapshot: { paramMap: convertToParamMap({ proyectoId: '42' }) } },
+            parent: { paramMap: parametrosRuta$ },
           },
         },
       ],
@@ -63,6 +66,25 @@ describe('CoordinadorPasoCreacionProyectoService', () => {
 
     expect(servicio.errorCarga()).toBe(true);
     expect(servicio.contenidoListo()).toBe(false);
+  });
+
+  it('descarta la fotografía anterior y carga el proyecto vigente al cambiar la ruta', () => {
+    servicio.cargar();
+    carga$.next(BORRADOR);
+    const nuevaCarga$ = new Subject<BorradorProyecto>();
+    estadoCreacion.cargar.mockReturnValue(nuevaCarga$);
+
+    parametrosRuta$.next(convertToParamMap({ proyectoId: '84' }));
+
+    expect(estadoCreacion.seleccionarProyecto).toHaveBeenLastCalledWith(84);
+    expect(estadoCreacion.cargar).toHaveBeenLastCalledWith(84);
+    expect(servicio.borrador()).toBeNull();
+    expect(servicio.contenidoListo()).toBe(false);
+
+    nuevaCarga$.next({ ...BORRADOR, id: 84 });
+
+    expect(servicio.borrador()?.id).toBe(84);
+    expect(servicio.contenidoListo()).toBe(true);
   });
 
   it('guarda una sola vez y navega al destino construido por la página', () => {

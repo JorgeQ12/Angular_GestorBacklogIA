@@ -1,7 +1,7 @@
 import { DOCUMENT } from '@angular/common';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
-import { Observable, catchError, map, of, tap, throwError } from 'rxjs';
+import { Observable, Subscription, catchError, map, of, tap, throwError } from 'rxjs';
 import {
   ENDPOINTS_AUTENTICACION,
   NOMBRE_VENTANA_AUTENTICACION,
@@ -38,9 +38,17 @@ export class AutenticacionService {
         return;
       }
 
+      let comprobacionSesion: Subscription | null = null;
       const temporizador = ventana.setInterval(() => {
         if (ventanaAutenticacion.closed) {
-          observador.complete();
+          ventana.clearInterval(temporizador);
+          comprobacionSesion = this.verificarSesion().subscribe({
+            next: () => {
+              observador.next();
+              observador.complete();
+            },
+            error: () => observador.complete(),
+          });
           return;
         }
 
@@ -59,7 +67,10 @@ export class AutenticacionService {
         }
       }, INTERVALO_COMPROBACION_RETORNO);
 
-      return () => ventana.clearInterval(temporizador);
+      return () => {
+        ventana.clearInterval(temporizador);
+        comprobacionSesion?.unsubscribe();
+      };
     });
   }
 

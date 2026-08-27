@@ -1,8 +1,8 @@
 import { DestroyRef, Injectable, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
-import { finalize } from 'rxjs';
-import { PARAMETROS_RUTA } from '../../../../core/navegacion/rutas';
+import { Subscription, distinctUntilChanged, finalize, map } from 'rxjs';
+import { obtenerProyectoIdRuta } from '../../../../core/navegacion/rutas';
 import { ActualizacionSeccionBorrador } from '../models/actualizacion-seccion-borrador.model';
 import { BorradorProyecto } from '../models/borrador-proyecto.model';
 import { EstadoCreacionProyectoService } from './estado-creacion-proyecto.service';
@@ -18,13 +18,26 @@ export class CoordinadorPasoCreacionProyectoService {
   private readonly estadoCreacion = inject(EstadoCreacionProyectoService);
   private readonly notificadorErrores = inject(NotificadorErroresBorradorProyectoService);
   private readonly destroyRef = inject(DestroyRef);
-  public readonly proyectoId = Number(
-    this.ruta.parent?.snapshot.paramMap.get(PARAMETROS_RUTA.proyectoId),
-  );
+  private readonly estadoProyectoId = signal<number | null>(null);
   private readonly estadoBorrador = signal<BorradorProyecto | null>(null);
   private readonly estadoContenidoListo = signal(false);
   private readonly estadoErrorCarga = signal(false);
   private readonly estadoProcesando = signal(false);
+  private cargaSolicitada = false;
+  private cargaActual: Subscription | null = null;
+  private guardadoActual: Subscription | null = null;
+
+  public constructor() {
+    const parametros = this.ruta.parent?.paramMap ?? this.ruta.paramMap;
+    parametros
+      .pipe(map(obtenerProyectoIdRuta), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
+      .subscribe((proyectoId) => this.cambiarProyecto(proyectoId));
+  }
+
+  /** Expone el identificador vigente para las operaciones complementarias del paso. */
+  public get proyectoId(): number | null {
+    return this.estadoProyectoId();
+  }
 
   /** Expone la fotografía cargada para que la página adapte su sección. */
   public readonly borrador = this.estadoBorrador.asReadonly();
@@ -40,24 +53,14 @@ export class CoordinadorPasoCreacionProyectoService {
 
   /** Recupera el borrador requerido por la sección vigente. */
   public cargar(): void {
-    if (!Number.isInteger(this.proyectoId) || this.proyectoId <= 0) {
+    this.cargaSolicitada = true;
+    const proyectoId = this.proyectoId;
+    if (proyectoId === null) {
       this.estadoErrorCarga.set(true);
       return;
     }
 
-    this.estadoBorrador.set(null);
-    this.estadoErrorCarga.set(false);
-    this.estadoContenidoListo.set(false);
-    this.estadoCreacion
-      .cargar(this.proyectoId)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (borrador) => {
-          this.estadoBorrador.set(borrador);
-          this.estadoContenidoListo.set(true);
-        },
-        error: () => this.estadoErrorCarga.set(true),
-      });
+    this.cargarProyecto(proyectoId);
   }
 
   /** Guarda una sección y abre el destino definido por su página. */
@@ -65,10 +68,11 @@ export class CoordinadorPasoCreacionProyectoService {
     actualizacion: ActualizacionSeccionBorrador,
     construirDestino: ConstructorDestinoPaso,
   ): void {
-    if (this.estadoProcesando()) return;
+    const proyectoId = this.proyectoId;
+    if (this.estadoProcesando() || proyectoId === null) return;
 
     this.estadoProcesando.set(true);
-    this.estadoCreacion
+    this.guardadoActual = this.estadoCreacion
       .guardarSeccion(actualizacion)
       .pipe(
         finalize(() => this.estadoProcesando.set(false)),
@@ -76,10 +80,51 @@ export class CoordinadorPasoCreacionProyectoService {
       )
       .subscribe({
         next: (borrador) => {
+          if (this.proyectoId !== proyectoId) return;
+
           this.estadoBorrador.set(borrador);
-          void this.router.navigateByUrl(construirDestino(this.proyectoId));
+          void this.router.navigateByUrl(construirDestino(proyectoId));
         },
         error: (error: unknown) => this.notificadorErrores.comunicar(error, actualizacion.seccion),
+      });
+  }
+
+  /** Descarta el contenido anterior cuando cambia el proyecto de la ruta. */
+  private cambiarProyecto(proyectoId: number | null): void {
+    if (this.proyectoId === proyectoId) return;
+
+    this.cargaActual?.unsubscribe();
+    this.guardadoActual?.unsubscribe();
+    this.cargaActual = null;
+    this.guardadoActual = null;
+    this.estadoProyectoId.set(proyectoId);
+    this.estadoCreacion.seleccionarProyecto(proyectoId);
+    this.estadoBorrador.set(null);
+    this.estadoErrorCarga.set(false);
+    this.estadoContenidoListo.set(false);
+
+    if (this.cargaSolicitada && proyectoId !== null) this.cargarProyecto(proyectoId);
+  }
+
+  /** Ejecuta la carga cancelable del proyecto que permanece vigente. */
+  private cargarProyecto(proyectoId: number): void {
+    this.cargaActual?.unsubscribe();
+    this.estadoBorrador.set(null);
+    this.estadoErrorCarga.set(false);
+    this.estadoContenidoListo.set(false);
+    this.cargaActual = this.estadoCreacion
+      .cargar(proyectoId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (borrador) => {
+          if (this.proyectoId !== proyectoId) return;
+
+          this.estadoBorrador.set(borrador);
+          this.estadoContenidoListo.set(true);
+        },
+        error: () => {
+          if (this.proyectoId === proyectoId) this.estadoErrorCarga.set(true);
+        },
       });
   }
 }

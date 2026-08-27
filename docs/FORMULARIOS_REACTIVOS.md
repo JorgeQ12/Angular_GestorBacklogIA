@@ -37,6 +37,8 @@ src/app/shared/forms/errores-validacion/
 ├── directives/
 │   ├── error-campo.directive.ts
 │   ├── error-campo.directive.spec.ts
+│   ├── enfocar-primer-control-invalido.directive.ts
+│   ├── enfocar-primer-control-invalido.directive.spec.ts
 │   ├── mensajes-formulario.directive.ts
 │   └── mensajes-formulario.directive.spec.ts
 ├── models/
@@ -287,6 +289,12 @@ protected enviar(): void {
 `markAllAsTouched()` mantiene correctamente el estado del modelo y permite que cada directiva
 reaccione sin llamadas manuales desde el template.
 
+Cuando el envío también debe llevar el foco al primer error, el `<form>` utiliza
+`appEnfocarPrimerControlInvalido`. La directiva espera la presentación de los errores y busca el
+primer `[aria-invalid="true"]`; no consulta clases privadas de inputs, selectores o calendarios.
+Los eventos de controles nativos se reciben como `Event` y se estrechan en TypeScript. No se usa
+`$any` en el template para leer `event.target`.
+
 ## Estado de envío remoto
 
 Cuando exista una entrada como `enviando`, los controles se deshabilitan mediante la API del
@@ -347,6 +355,8 @@ controles/
   o distribución propias de su layout.
 - `SelectorFecha` conserva fechas sin hora como `YYYY-MM-DD`. El formato visible pertenece a
   `FormateadorFechaService`, por lo que no se crean instancias de `Intl` en componentes.
+- El calendario de `SelectorFecha` es un popover no modal: puede usar `role="dialog"`, pero no
+  declara `aria-modal` ni retiene el foco. `Tab` lo cierra y mantiene el recorrido natural.
 - `SelectorTarjetas` representa alternativas excluyentes con radios nativos cuando las opciones
   necesitan icono y descripción; no sustituye a `SelectorCampo` para listas compactas.
 - Todos propagan valor, estado tocado y estado deshabilitado mediante la interfaz de Angular.

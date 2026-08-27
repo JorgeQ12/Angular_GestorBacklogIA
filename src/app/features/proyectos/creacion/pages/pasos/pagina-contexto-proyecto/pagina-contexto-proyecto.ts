@@ -1,12 +1,19 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
-import { finalize, forkJoin } from 'rxjs';
+import { Subscription, distinctUntilChanged, finalize, forkJoin, map } from 'rxjs';
 import { OpcionCatalogo } from '../../../../../../core/catalogos/models/opcion-catalogo.model';
 import { CatalogosService } from '../../../../../../core/catalogos/services/catalogos.service';
 import {
-  PARAMETROS_RUTA,
   crearUrlTipoSolucionProyecto,
+  obtenerProyectoIdRuta,
 } from '../../../../../../core/navegacion/rutas';
 import { EstadoError } from '../../../../../../shared/components/estado-error/estado-error';
 import { IconoComponent } from '../../../../../../shared/components/icono/icono.component';
@@ -32,9 +39,16 @@ export class PaginaContextoProyecto {
   private readonly estadoCreacion = inject(EstadoCreacionProyectoService);
   private readonly notificadorErrores = inject(NotificadorErroresBorradorProyectoService);
   private readonly destroyRef = inject(DestroyRef);
-  private readonly proyectoId = Number(
-    this.ruta.parent?.snapshot.paramMap.get(PARAMETROS_RUTA.proyectoId),
+  private readonly proyectoId = toSignal(
+    (this.ruta.parent?.paramMap ?? this.ruta.paramMap).pipe(
+      map(obtenerProyectoIdRuta),
+      distinctUntilChanged(),
+    ),
+    { initialValue: null },
   );
+  private cargaActual: Subscription | null = null;
+  private guardadoActual: Subscription | null = null;
+  private proyectoAnterior: number | null = null;
 
   protected readonly contexto = signal<ContextoProyecto | null>(null);
   protected readonly prioridades = signal<readonly OpcionCatalogo[]>([]);
@@ -42,19 +56,32 @@ export class PaginaContextoProyecto {
   protected readonly procesando = signal(false);
 
   public constructor() {
-    this.cargarContexto();
+    effect(() => {
+      const proyectoId = this.proyectoId();
+      if (this.proyectoAnterior !== proyectoId) {
+        this.guardadoActual?.unsubscribe();
+        this.guardadoActual = null;
+        this.procesando.set(false);
+        this.proyectoAnterior = proyectoId;
+      }
+      this.cargarContexto();
+    });
   }
 
   /** Prepara el borrador y los catálogos necesarios para editar Contexto. */
   protected cargarContexto(): void {
-    if (!Number.isInteger(this.proyectoId) || this.proyectoId <= 0) {
+    const proyectoId = this.proyectoId();
+    this.cargaActual?.unsubscribe();
+    this.contexto.set(null);
+    this.prioridades.set([]);
+    if (proyectoId === null) {
       this.errorCarga.set(true);
       return;
     }
 
     this.errorCarga.set(false);
-    forkJoin({
-      borrador: this.estadoCreacion.cargar(this.proyectoId),
+    this.cargaActual = forkJoin({
+      borrador: this.estadoCreacion.cargar(proyectoId),
       prioridades: this.catalogos.obtenerOpciones(CATALOGO_PRIORIDADES_PROYECTO),
     })
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -74,10 +101,11 @@ export class PaginaContextoProyecto {
 
   /** Guarda Contexto y abre el siguiente paso del recorrido. */
   protected guardarContexto(contexto: ContextoProyecto): void {
-    if (this.procesando()) return;
+    const proyectoId = this.proyectoId();
+    if (this.procesando() || proyectoId === null) return;
 
     this.procesando.set(true);
-    this.estadoCreacion
+    this.guardadoActual = this.estadoCreacion
       .guardarSeccion({ seccion: ClaveSeccionProyecto.Contexto, datos: contexto })
       .pipe(
         finalize(() => this.procesando.set(false)),
@@ -85,7 +113,9 @@ export class PaginaContextoProyecto {
       )
       .subscribe({
         next: () => {
-          void this.router.navigateByUrl(crearUrlTipoSolucionProyecto(this.proyectoId));
+          if (this.proyectoId() === proyectoId) {
+            void this.router.navigateByUrl(crearUrlTipoSolucionProyecto(proyectoId));
+          }
         },
         error: (error: unknown) =>
           this.notificadorErrores.comunicar(error, ClaveSeccionProyecto.Contexto),

@@ -19,13 +19,14 @@
   } @else {
     <div class="ui-card__body lista-borradores" aria-label="Proyectos en borrador">
       @for (borrador of borradores(); track borrador.id) {
+        @let progreso = obtenerProgreso(borrador.pasoActual);
         <button type="button" class="borrador-reciente" (click)="continuarBorrador.emit(borrador)">
           <span class="borrador-reciente__icono" aria-hidden="true">
             <app-icono nombre="borrador" />
           </span>
           <span class="borrador-reciente__datos">
             <span class="borrador-reciente__meta">
-              <strong>Paso {{ posicionVisual(borrador) }} de {{ totalPasos }}</strong>
+              <strong>Paso {{ progreso.posicion }} de {{ progreso.total }}</strong>
               <small>{{ borrador.fechaUltimoGuardado | tiempoRelativo }}</small>
             </span>
             <strong class="borrador-reciente__nombre">
@@ -33,7 +34,7 @@
             </strong>
             <small>{{ borrador.responsable || 'Equipo por completar' }}</small>
             <span class="borrador-reciente__progreso" aria-hidden="true">
-              <i [style.width.%]="progreso(borrador)"></i>
+              <i [style.width.%]="progreso.porcentaje"></i>
             </span>
           </span>
           <span class="borrador-reciente__accion">

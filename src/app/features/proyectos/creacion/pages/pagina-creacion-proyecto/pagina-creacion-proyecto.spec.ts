@@ -141,6 +141,24 @@ describe('PaginaCreacionProyecto', () => {
     ).toContain('Portal de clientes');
   });
 
+  it('actualiza la identidad y descarta el nombre anterior cuando cambia el parámetro', async () => {
+    const harness = await RouterTestingHarness.create('/proyectos/42/creacion/contexto');
+    const estado = harness.routeDebugElement?.injector.get(EstadoCreacionProyectoService);
+    estado?.actualizarNombreProyecto('Proyecto anterior');
+
+    await harness.navigateByUrl('/proyectos/84/creacion/contexto', PaginaCreacionProyecto);
+    harness.detectChanges();
+    const elemento = harness.routeNativeElement as HTMLElement;
+
+    expect(elemento.querySelector('.ui-page-header__eyebrow')?.textContent).toContain(
+      'Borrador #84',
+    );
+    expect(elemento.querySelector('.ui-page-header__title')?.textContent).toContain(
+      'Nuevo proyecto',
+    );
+    expect(elemento.textContent).not.toContain('Proyecto anterior');
+  });
+
   it('integra el contexto y la acción del paso en un único encabezado', async () => {
     const harness = await RouterTestingHarness.create('/proyectos/42/creacion/contexto');
     const servicio = harness.routeDebugElement?.injector.get(

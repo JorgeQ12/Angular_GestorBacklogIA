@@ -145,6 +145,6 @@ describe('PaginaInicioPanel', () => {
 
     borrador?.click();
 
-    expect(navegar).toHaveBeenCalledWith('/panel/proyectos/42/creacion/objetivos');
+    expect(navegar).toHaveBeenCalledWith('/panel/proyectos/42/creacion');
   });
 });

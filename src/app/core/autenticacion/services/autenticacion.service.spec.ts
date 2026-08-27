@@ -58,7 +58,7 @@ describe('AutenticacionService', () => {
     expect(popup.close).toHaveBeenCalledOnce();
   });
 
-  it('finaliza sin confirmar un retorno cuando el usuario cierra el popup', () => {
+  it('confirma la sesión antes de aceptar el cierre automático del popup', () => {
     vi.useFakeTimers();
     const popup = {
       closed: false,
@@ -75,6 +75,36 @@ describe('AutenticacionService', () => {
     });
     Object.defineProperty(popup, 'closed', { value: true });
     vi.advanceTimersByTime(400);
+
+    httpTesting.expectOne(ENDPOINTS_AUTENTICACION.sesionActual).flush('', {
+      headers: new HttpHeaders({ 'X-User-Name': 'Jorge Quintero' }),
+    });
+
+    expect(retornos).toBe(1);
+    expect(flujoFinalizado).toBe(true);
+  });
+
+  it('trata el cierre manual como cancelación cuando Kong no confirma sesión', () => {
+    vi.useFakeTimers();
+    const popup = {
+      closed: false,
+      close: vi.fn(),
+      location: { href: 'about:blank', origin: window.location.origin },
+    } as unknown as Window;
+    vi.spyOn(window, 'open').mockReturnValue(popup);
+    let retornos = 0;
+    let flujoFinalizado = false;
+
+    servicio.iniciarSesionConMicrosoft().subscribe({
+      next: () => retornos++,
+      complete: () => (flujoFinalizado = true),
+    });
+    Object.defineProperty(popup, 'closed', { value: true });
+    vi.advanceTimersByTime(400);
+    httpTesting.expectOne(ENDPOINTS_AUTENTICACION.sesionActual).flush(null, {
+      status: 401,
+      statusText: 'Unauthorized',
+    });
 
     expect(retornos).toBe(0);
     expect(flujoFinalizado).toBe(true);

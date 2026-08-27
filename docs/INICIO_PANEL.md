@@ -48,6 +48,10 @@ features/inicio-panel/
   tarjetas de alturas diferentes y conserva un orden lineal en pantallas angostas.
 - El servicio consulta `ObtenerResumenAdministrativo` mediante la URL definida por el environment.
 - El mapper separa el DTO del backend del modelo consumido por los componentes.
+- La continuación de un borrador abre `/panel/proyectos/:proyectoId/creacion`; el guard de
+  Proyectos resuelve el paso alcanzado. El inicio no importa configuraciones ni mappers internos
+  del recorrido.
+- Los indicadores de avance consumen el contrato público de `features/proyectos/public-api.ts`.
 
 ## Integraciones pendientes
 

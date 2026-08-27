@@ -10,6 +10,7 @@ import { PaginaObjetivosProyecto } from './pagina-objetivos-proyecto';
 describe('PaginaObjetivosProyecto', () => {
   let fixture: ComponentFixture<PaginaObjetivosProyecto>;
   const estadoCreacion = {
+    seleccionarProyecto: vi.fn(),
     cargar: vi.fn(),
     guardarSeccion: vi.fn(),
   };
@@ -32,7 +33,7 @@ describe('PaginaObjetivosProyecto', () => {
         {
           provide: ActivatedRoute,
           useValue: {
-            parent: { snapshot: { paramMap: convertToParamMap({ proyectoId: '42' }) } },
+            parent: { paramMap: of(convertToParamMap({ proyectoId: '42' })) },
           },
         },
       ],

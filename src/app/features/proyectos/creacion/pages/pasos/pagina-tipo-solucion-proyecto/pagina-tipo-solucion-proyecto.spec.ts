@@ -11,6 +11,7 @@ import { PaginaTipoSolucionProyecto } from './pagina-tipo-solucion-proyecto';
 describe('PaginaTipoSolucionProyecto', () => {
   let fixture: ComponentFixture<PaginaTipoSolucionProyecto>;
   const estadoCreacion = {
+    seleccionarProyecto: vi.fn(),
     cargar: vi.fn(),
     guardarSeccion: vi.fn(),
   };
@@ -33,7 +34,7 @@ describe('PaginaTipoSolucionProyecto', () => {
         {
           provide: ActivatedRoute,
           useValue: {
-            parent: { snapshot: { paramMap: convertToParamMap({ proyectoId: '42' }) } },
+            parent: { paramMap: of(convertToParamMap({ proyectoId: '42' })) },
           },
         },
       ],

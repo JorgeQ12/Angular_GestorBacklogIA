@@ -1,3 +1,5 @@
+import { type ParamMap } from '@angular/router';
+
 /** Centraliza los segmentos canónicos usados por el enrutador. */
 export const SEGMENTOS_RUTA = {
   alcance: 'alcance',
@@ -21,6 +23,12 @@ export const SEGMENTOS_RUTA = {
 export const PARAMETROS_RUTA = {
   proyectoId: 'proyectoId',
 } as const;
+
+/** Obtiene un identificador de proyecto válido desde los parámetros de ruta. */
+export function obtenerProyectoIdRuta(parametros: ParamMap): number | null {
+  const proyectoId = Number(parametros.get(PARAMETROS_RUTA.proyectoId));
+  return Number.isInteger(proyectoId) && proyectoId > 0 ? proyectoId : null;
+}
 
 /** Identifica la ruta relativa del inicio de sesión. */
 export const RUTA_INICIO_SESION =
@@ -48,58 +56,49 @@ export const RUTA_NUEVO_PROYECTO =
 /** Proporciona la URL absoluta para iniciar un proyecto. */
 export const URL_NUEVO_PROYECTO = `/${RUTA_NUEVO_PROYECTO}` as const;
 
-/** Construye la URL de Contexto dentro de la creación de un proyecto. */
-export function crearUrlContextoProyecto(proyectoId: number | string): string {
+/** Construye la URL base que delega la reanudación al enrutador de Proyectos. */
+export function crearUrlCreacionProyecto(proyectoId: number | string): string {
   return `/${RUTA_PANEL}/${SEGMENTOS_RUTA.proyectos}/${encodeURIComponent(
     String(proyectoId),
-  )}/${SEGMENTOS_RUTA.creacion}/${SEGMENTOS_RUTA.contexto}`;
+  )}/${SEGMENTOS_RUTA.creacion}`;
+}
+
+/** Construye la URL de Contexto dentro de la creación de un proyecto. */
+export function crearUrlContextoProyecto(proyectoId: number | string): string {
+  return `${crearUrlCreacionProyecto(proyectoId)}/${SEGMENTOS_RUTA.contexto}`;
 }
 
 /** Construye la URL de Tipo de solución dentro de la creación de un proyecto. */
 export function crearUrlTipoSolucionProyecto(proyectoId: number | string): string {
-  return `/${RUTA_PANEL}/${SEGMENTOS_RUTA.proyectos}/${encodeURIComponent(
-    String(proyectoId),
-  )}/${SEGMENTOS_RUTA.creacion}/${SEGMENTOS_RUTA.tipoSolucion}`;
+  return `${crearUrlCreacionProyecto(proyectoId)}/${SEGMENTOS_RUTA.tipoSolucion}`;
 }
 
 /** Construye la URL de Necesidad dentro de la creación de un proyecto. */
 export function crearUrlNecesidadProyecto(proyectoId: number | string): string {
-  return `/${RUTA_PANEL}/${SEGMENTOS_RUTA.proyectos}/${encodeURIComponent(
-    String(proyectoId),
-  )}/${SEGMENTOS_RUTA.creacion}/${SEGMENTOS_RUTA.necesidad}`;
+  return `${crearUrlCreacionProyecto(proyectoId)}/${SEGMENTOS_RUTA.necesidad}`;
 }
 
 /** Construye la URL de Objetivos dentro de la creación de un proyecto. */
 export function crearUrlObjetivosProyecto(proyectoId: number | string): string {
-  return `/${RUTA_PANEL}/${SEGMENTOS_RUTA.proyectos}/${encodeURIComponent(
-    String(proyectoId),
-  )}/${SEGMENTOS_RUTA.creacion}/${SEGMENTOS_RUTA.objetivos}`;
+  return `${crearUrlCreacionProyecto(proyectoId)}/${SEGMENTOS_RUTA.objetivos}`;
 }
 
 /** Construye la URL de Alcance dentro de la creación de un proyecto. */
 export function crearUrlAlcanceProyecto(proyectoId: number | string): string {
-  return `/${RUTA_PANEL}/${SEGMENTOS_RUTA.proyectos}/${encodeURIComponent(
-    String(proyectoId),
-  )}/${SEGMENTOS_RUTA.creacion}/${SEGMENTOS_RUTA.alcance}`;
+  return `${crearUrlCreacionProyecto(proyectoId)}/${SEGMENTOS_RUTA.alcance}`;
 }
 
 /** Construye la URL de Roles dentro de la creación de un proyecto. */
 export function crearUrlRolesProyecto(proyectoId: number | string): string {
-  return `/${RUTA_PANEL}/${SEGMENTOS_RUTA.proyectos}/${encodeURIComponent(
-    String(proyectoId),
-  )}/${SEGMENTOS_RUTA.creacion}/${SEGMENTOS_RUTA.roles}`;
+  return `${crearUrlCreacionProyecto(proyectoId)}/${SEGMENTOS_RUTA.roles}`;
 }
 
 /** Construye la URL de Equipo dentro de la creación de un proyecto. */
 export function crearUrlEquipoProyecto(proyectoId: number | string): string {
-  return `/${RUTA_PANEL}/${SEGMENTOS_RUTA.proyectos}/${encodeURIComponent(
-    String(proyectoId),
-  )}/${SEGMENTOS_RUTA.creacion}/${SEGMENTOS_RUTA.equipo}`;
+  return `${crearUrlCreacionProyecto(proyectoId)}/${SEGMENTOS_RUTA.equipo}`;
 }
 
 /** Construye la URL de Flujo de usuario dentro de la creación de un proyecto. */
 export function crearUrlFlujoProyecto(proyectoId: number | string): string {
-  return `/${RUTA_PANEL}/${SEGMENTOS_RUTA.proyectos}/${encodeURIComponent(
-    String(proyectoId),
-  )}/${SEGMENTOS_RUTA.creacion}/${SEGMENTOS_RUTA.flujo}`;
+  return `${crearUrlCreacionProyecto(proyectoId)}/${SEGMENTOS_RUTA.flujo}`;
 }

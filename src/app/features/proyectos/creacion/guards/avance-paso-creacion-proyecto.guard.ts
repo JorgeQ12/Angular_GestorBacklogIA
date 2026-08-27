@@ -1,7 +1,7 @@
 import { inject } from '@angular/core';
 import { CanActivateChildFn, Router } from '@angular/router';
 import { catchError, map, of } from 'rxjs';
-import { PARAMETROS_RUTA } from '../../../../core/navegacion/rutas';
+import { obtenerProyectoIdRuta } from '../../../../core/navegacion/rutas';
 import {
   ClavePasoCreacionProyecto,
   PASOS_CREACION_PROYECTO,
@@ -14,10 +14,10 @@ import { EstadoCreacionProyectoService } from '../services/estado-creacion-proye
 export const avancePasoCreacionProyectoGuard: CanActivateChildFn = (ruta) => {
   const estadoCreacion = inject(EstadoCreacionProyectoService);
   const router = inject(Router);
-  const proyectoId = Number(ruta.parent?.paramMap.get(PARAMETROS_RUTA.proyectoId));
+  const proyectoId = ruta.parent ? obtenerProyectoIdRuta(ruta.parent.paramMap) : null;
   const pasoSolicitado = obtenerPaso(ruta.data['pasoActual']);
 
-  if (!pasoSolicitado || !Number.isInteger(proyectoId) || proyectoId <= 0) return true;
+  if (!pasoSolicitado || proyectoId === null) return true;
 
   return estadoCreacion.cargar(proyectoId).pipe(
     map((borrador) =>

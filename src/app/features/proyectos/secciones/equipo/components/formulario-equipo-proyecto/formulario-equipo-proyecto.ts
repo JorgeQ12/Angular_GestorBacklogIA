@@ -2,7 +2,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
-  ElementRef,
   computed,
   effect,
   inject,
@@ -17,7 +16,10 @@ import { IconoComponent } from '../../../../../../shared/components/icono/icono.
 import { CampoBusqueda } from '../../../../../../shared/forms/controles/campo-busqueda/campo-busqueda';
 import { SelectorCampo } from '../../../../../../shared/forms/controles/selector-campo/selector-campo';
 import { OpcionSelector } from '../../../../../../shared/forms/controles/selector-campo/models/opcion-selector.model';
-import { ErrorCampoDirective } from '../../../../../../shared/forms/errores-validacion';
+import {
+  EnfocarPrimerControlInvalidoDirective,
+  ErrorCampoDirective,
+} from '../../../../../../shared/forms/errores-validacion';
 import {
   MENSAJES_ASIGNACION_EQUIPO,
   OPCIONES_DEDICACION_EQUIPO,
@@ -43,6 +45,7 @@ const EQUIPO_VACIO: EquipoProyecto = { integrantes: [] };
   imports: [
     ReactiveFormsModule,
     CampoBusqueda,
+    EnfocarPrimerControlInvalidoDirective,
     ErrorCampoDirective,
     EstadoVacio,
     IconoComponent,
@@ -54,7 +57,6 @@ const EQUIPO_VACIO: EquipoProyecto = { integrantes: [] };
 export class FormularioEquipoProyecto {
   private readonly constructorFormulario = inject(NonNullableFormBuilder);
   private readonly destroyRef = inject(DestroyRef);
-  private readonly elemento = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly versionFormulario = signal(0);
 
   /** Proporciona los integrantes y asignaciones que deben presentarse. */
@@ -186,6 +188,11 @@ export class FormularioEquipoProyecto {
     });
   }
 
+  /** Traduce el evento del checkbox de integrante a una selección tipada. */
+  protected alternarSeleccionDesdeEvento(idAzure: string, evento: Event): void {
+    this.alternarSeleccion(idAzure, obtenerEstadoCheckbox(evento));
+  }
+
   /** Selecciona o libera únicamente los integrantes visibles. */
   protected alternarSeleccionVisible(seleccionar: boolean): void {
     const ids = this.controlesVisibles().map((grupo) => grupo.controls.idAzure.value);
@@ -194,6 +201,11 @@ export class FormularioEquipoProyecto {
       ids.forEach((id) => (seleccionar ? nuevos.add(id) : nuevos.delete(id)));
       return nuevos;
     });
+  }
+
+  /** Traduce el evento del checkbox general a una selección tipada. */
+  protected alternarSeleccionVisibleDesdeEvento(evento: Event): void {
+    this.alternarSeleccionVisible(obtenerEstadoCheckbox(evento));
   }
 
   /** Aplica los valores indicados a todos los integrantes seleccionados. */
@@ -226,11 +238,6 @@ export class FormularioEquipoProyecto {
     if (this.formulario.invalid || this.controlesIntegrantes().length === 0) {
       this.formulario.markAllAsTouched();
       this.filtro.set(FiltroEquipoProyecto.Pendientes);
-      queueMicrotask(() =>
-        this.elemento.nativeElement
-          .querySelector<HTMLElement>('.selector-campo__trigger--error')
-          ?.focus(),
-      );
       return;
     }
     this.guardar.emit(this.obtenerEquipo());
@@ -299,4 +306,8 @@ function normalizarBusqueda(valor: string): string {
     .replace(/[\u0300-\u036f]/g, '')
     .trim()
     .toLocaleLowerCase('es-CO');
+}
+
+function obtenerEstadoCheckbox(evento: Event): boolean {
+  return evento.target instanceof HTMLInputElement && evento.target.checked;
 }
