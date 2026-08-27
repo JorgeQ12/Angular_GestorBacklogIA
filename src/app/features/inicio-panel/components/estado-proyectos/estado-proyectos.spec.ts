@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ESTADOS_PROYECTO, IndicadoresInicioPanel } from '../../models/resumen-inicio-panel.model';
+import { EstadoProyecto, IndicadoresInicioPanel } from '../../models/resumen-inicio-panel.model';
 import { EstadoProyectos } from './estado-proyectos';
 
 const INDICADORES: IndicadoresInicioPanel = {
@@ -45,6 +45,6 @@ describe('EstadoProyectos', () => {
     ) as HTMLButtonElement;
     boton.click();
 
-    expect(estadoSeleccionado).toBe(ESTADOS_PROYECTO.activo);
+    expect(estadoSeleccionado).toBe(EstadoProyecto.Activo);
   });
 });

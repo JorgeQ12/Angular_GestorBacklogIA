@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { firstValueFrom, of } from 'rxjs';
 import { ClaveSeccionProyecto } from '../../config/secciones-proyecto.config';
+import { PlataformaSolucion } from '../../secciones/tipo-solucion/models/tipo-solucion-proyecto.model';
 import { ActualizacionSeccionBorrador } from '../models/actualizacion-seccion-borrador.model';
 import { BorradorProyecto } from '../models/borrador-proyecto.model';
 import { CreacionProyectoService } from './creacion-proyecto.service';
@@ -104,7 +105,7 @@ describe('EstadoCreacionProyectoService', () => {
     await firstValueFrom(
       servicio.guardarSeccion({
         seccion: ClaveSeccionProyecto.TipoSolucion,
-        datos: { tieneInterfaz: true, plataforma: 'Web' },
+        datos: { tieneInterfaz: true, plataforma: PlataformaSolucion.Web },
       }),
     );
 
@@ -112,7 +113,7 @@ describe('EstadoCreacionProyectoService', () => {
       BORRADOR,
       {
         seccion: ClaveSeccionProyecto.TipoSolucion,
-        datos: { tieneInterfaz: true, plataforma: 'Web' },
+        datos: { tieneInterfaz: true, plataforma: PlataformaSolucion.Web },
       },
       3,
     );

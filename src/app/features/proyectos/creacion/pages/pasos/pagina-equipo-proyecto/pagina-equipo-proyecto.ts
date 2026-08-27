@@ -73,7 +73,7 @@ export class PaginaEquipoProyecto {
 
     const guardado = this.equipoGuardado();
     const origen = this.origenEquipo();
-    return origen ? combinarEquipoConAzure(origen, guardado) : guardado;
+    return origen?.integrantes.length ? combinarEquipoConAzure(origen, guardado) : guardado;
   });
 
   private readonly nombreEquipo = computed(
@@ -136,10 +136,9 @@ export class PaginaEquipoProyecto {
     if (!this.paso.contenidoListo() || this.sincronizacionInicialSolicitada) return;
 
     this.sincronizacionInicialSolicitada = true;
-    const guardado = this.equipoGuardado();
-    if (guardado.integrantes.length > 0) return;
+    if (this.origenEquipo()?.integrantes.length) return;
 
-    this.sincronizarEquipo(guardado);
+    this.sincronizarEquipo(this.equipoGuardado());
   }
 
   /** Conserva la edición local durante una actualización manual. */

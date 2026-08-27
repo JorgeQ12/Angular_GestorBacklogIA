@@ -1,3 +1,4 @@
+import { PlataformaSolucion } from '../models/tipo-solucion-proyecto.model';
 import {
   deserializarTipoSolucionProyecto,
   serializarTipoSolucionProyecto,
@@ -7,7 +8,7 @@ describe('mapeadores de Tipo de solución', () => {
   it('recupera el formato canónico', () => {
     expect(deserializarTipoSolucionProyecto('{"tieneInterfaz":true,"plataforma":"Web"}')).toEqual({
       tieneInterfaz: true,
-      plataforma: 'Web',
+      plataforma: PlataformaSolucion.Web,
     });
   });
 
@@ -28,8 +29,11 @@ describe('mapeadores de Tipo de solución', () => {
   });
 
   it('serializa únicamente el contrato canónico', () => {
-    expect(serializarTipoSolucionProyecto({ tieneInterfaz: true, plataforma: 'Móvil' })).toBe(
-      '{"tieneInterfaz":true,"plataforma":"Móvil"}',
-    );
+    expect(
+      serializarTipoSolucionProyecto({
+        tieneInterfaz: true,
+        plataforma: PlataformaSolucion.Movil,
+      }),
+    ).toBe('{"tieneInterfaz":true,"plataforma":"Móvil"}');
   });
 });

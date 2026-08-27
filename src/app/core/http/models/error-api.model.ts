@@ -1,5 +1,10 @@
 /** Identifica el origen utilizado para interpretar un fallo de integración. */
-export type OrigenErrorApi = 'funcional' | 'http' | 'conexion' | 'desconocido';
+export enum OrigenErrorApi {
+  Funcional = 'funcional',
+  Http = 'http',
+  Conexion = 'conexion',
+  Desconocido = 'desconocido',
+}
 
 export interface ConfiguracionErrorApi {
   readonly estadoHttp: number | null;

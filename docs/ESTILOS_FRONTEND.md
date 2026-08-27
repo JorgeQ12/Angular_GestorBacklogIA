@@ -364,10 +364,16 @@ const confirmado = await this.mensajes.confirmar(
 ```
 
 - `informar`, `exito`, `advertir` y `error` comunican un resultado con una acción de reconocimiento.
-- `confirmar` y `confirmarDestructiva` devuelven la decisión mediante `Promise<boolean>` y no se
-  descartan mediante Escape o backdrop.
+- Los mensajes globales se resuelven únicamente mediante sus acciones del footer; no muestran un
+  cierre superior ni se descartan mediante Escape o backdrop.
+- `confirmar` y `confirmarDestructiva` devuelven la decisión mediante `Promise<boolean>`.
 - Una acción destructiva utiliza `ui-button--danger`; el color de peligro no se usa para errores
   informativos ni como acento general de la aplicación.
+- Los mensajes compactos conservan una única superficie continua para encabezado, detalles y
+  acciones. Los divisores y fondos regionales se reservan para modales con formularios o contenido
+  que necesite separar explícitamente sus zonas de trabajo.
+- El icono de estado se centra respecto al bloque textual y las acciones se centran en el footer
+  para mantener una composición equilibrada.
 - Abrir un mensaje nuevo resuelve como cancelada cualquier decisión anterior pendiente para evitar
   promesas sin completar.
 

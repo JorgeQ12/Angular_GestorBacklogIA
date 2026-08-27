@@ -81,8 +81,9 @@ export class FormularioEquipoProyecto {
   public readonly progresoCambiado = output<ProgresoEquipoProyecto>();
 
   protected readonly mensajesAsignacion = MENSAJES_ASIGNACION_EQUIPO;
+  protected readonly filtros = FiltroEquipoProyecto;
   protected readonly controlBusqueda = this.constructorFormulario.control('');
-  protected readonly filtro = signal<FiltroEquipoProyecto>('todos');
+  protected readonly filtro = signal(FiltroEquipoProyecto.Todos);
   protected readonly seleccionados = signal<ReadonlySet<string>>(new Set());
   protected readonly formulario: FormularioEquipoProyectoTipado = this.constructorFormulario.group({
     integrantes: this.constructorFormulario.array<FormGroup<ControlesIntegranteEquipoProyecto>>([]),
@@ -103,9 +104,9 @@ export class FormularioEquipoProyecto {
       const integrante = grupo.getRawValue();
       const configurado = estaConfigurado(integrante);
       const coincideFiltro =
-        filtro === 'todos' ||
-        (filtro === 'configurados' && configurado) ||
-        (filtro === 'pendientes' && !configurado);
+        filtro === FiltroEquipoProyecto.Todos ||
+        (filtro === FiltroEquipoProyecto.Configurados && configurado) ||
+        (filtro === FiltroEquipoProyecto.Pendientes && !configurado);
       const contenido = normalizarBusqueda(`${integrante.nombre} ${integrante.correo ?? ''}`);
       return coincideFiltro && (!termino || contenido.includes(termino));
     });
@@ -224,7 +225,7 @@ export class FormularioEquipoProyecto {
   protected enviar(): void {
     if (this.formulario.invalid || this.controlesIntegrantes().length === 0) {
       this.formulario.markAllAsTouched();
-      this.filtro.set('pendientes');
+      this.filtro.set(FiltroEquipoProyecto.Pendientes);
       queueMicrotask(() =>
         this.elemento.nativeElement
           .querySelector<HTMLElement>('.selector-campo__trigger--error')

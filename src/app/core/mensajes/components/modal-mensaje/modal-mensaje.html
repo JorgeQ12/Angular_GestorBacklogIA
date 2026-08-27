@@ -7,14 +7,14 @@
     [descripcion]="mensajeActual.descripcion"
     [icono]="iconoPorVariante[mensajeActual.variante]"
     [rol]="obtenerRol(mensajeActual.variante)"
-    [descartable]="mensajeActual.descartable"
+    [descartable]="false"
     [mostrarCuerpo]="mensajeActual.detalles.length > 0"
     [mostrarCancelar]="mensajeActual.mostrarCancelar"
     [textoCancelar]="mensajeActual.textoCancelar"
     [textoConfirmar]="mensajeActual.textoConfirmar"
-    [varianteConfirmacion]="mensajeActual.variante === 'destructiva' ? 'danger' : 'primary'"
+    [varianteConfirmacion]="mensajeActual.variante === variantes.Destructiva ? 'danger' : 'primary'"
     tamano="sm"
-    (cerrar)="gestionarCierre()"
+    (cerrar)="mensajes.cancelar()"
     (confirmar)="mensajes.aceptar()"
   >
     @if (mensajeActual.detalles.length) {

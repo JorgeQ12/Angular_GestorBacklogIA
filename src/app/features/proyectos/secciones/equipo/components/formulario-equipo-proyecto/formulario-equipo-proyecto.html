@@ -12,22 +12,22 @@
         <div class="formulario-equipo__filtros" aria-label="Filtrar integrantes">
           <button
             type="button"
-            [class.formulario-equipo__filtro--activo]="filtro() === 'todos'"
-            (click)="cambiarFiltro('todos')"
+            [class.formulario-equipo__filtro--activo]="filtro() === filtros.Todos"
+            (click)="cambiarFiltro(filtros.Todos)"
           >
             Todos <span>{{ controlesIntegrantes().length }}</span>
           </button>
           <button
             type="button"
-            [class.formulario-equipo__filtro--activo]="filtro() === 'pendientes'"
-            (click)="cambiarFiltro('pendientes')"
+            [class.formulario-equipo__filtro--activo]="filtro() === filtros.Pendientes"
+            (click)="cambiarFiltro(filtros.Pendientes)"
           >
             Pendientes <span>{{ cantidadPendientes() }}</span>
           </button>
           <button
             type="button"
-            [class.formulario-equipo__filtro--activo]="filtro() === 'configurados'"
-            (click)="cambiarFiltro('configurados')"
+            [class.formulario-equipo__filtro--activo]="filtro() === filtros.Configurados"
+            (click)="cambiarFiltro(filtros.Configurados)"
           >
             Configurados <span>{{ cantidadConfigurados() }}</span>
           </button>

@@ -355,9 +355,12 @@ DevOps. No duplica los roles funcionales definidos en el paso anterior:
 - “Actualizar desde Azure” consulta nuevamente la membresía, relaciona integrantes mediante
   `idAzure`, conserva sus asignaciones, incorpora personas nuevas sin configurar y retira las que
   ya no pertenecen al Team.
-- Al entrar por primera vez sin una configuración guardada, la página sincroniza la membresía
-  después de cargar el borrador. Cuando `equipoJson` ya contiene integrantes, restaura primero esa
-  fotografía y no ejecuta una nueva sincronización que pueda desplazar sus asignaciones.
+- `equipoJson` es la fuente de la configuración guardada. Si la consulta del borrador no incluye
+  integrantes de Azure, la página presenta inmediatamente esa fotografía y sincroniza la membresía
+  en segundo plano, conservando las asignaciones mediante `idAzure`.
+- Cuando la consulta del borrador ya incluye la membresía de Azure, la página la combina con
+  `equipoJson` sin ejecutar otra solicitud. Una sincronización explícita sí considera autoritativa
+  la colección recibida, incluso cuando esté vacía, para retirar integrantes que dejaron el Team.
 - La acción “Actualizar desde Azure” queda disponible para renovar explícitamente la membresía
   después de restaurar una configuración existente.
 - La página obtiene del formulario una fotografía de la edición antes de sincronizar. Así coordina

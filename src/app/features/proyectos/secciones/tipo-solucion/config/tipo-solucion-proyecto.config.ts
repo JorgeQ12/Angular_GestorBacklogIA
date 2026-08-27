@@ -1,6 +1,7 @@
 import { OpcionSelectorTarjeta } from '../../../../../shared/forms/controles/selector-tarjetas/models/opcion-selector-tarjeta.model';
 import { MensajesFormulario } from '../../../../../shared/forms/errores-validacion';
 import { CampoTipoSolucionProyecto } from '../models/formulario-tipo-solucion-proyecto.model';
+import { PlataformaSolucion } from '../models/tipo-solucion-proyecto.model';
 
 /** Presenta las alternativas disponibles para el canal de interacción. */
 export const OPCIONES_INTERFAZ_SOLUCION = [
@@ -21,21 +22,21 @@ export const OPCIONES_INTERFAZ_SOLUCION = [
 /** Presenta las plataformas principales disponibles para soluciones con interfaz. */
 export const OPCIONES_PLATAFORMA_SOLUCION = [
   {
-    valor: 'Web',
+    valor: PlataformaSolucion.Web,
     etiqueta: 'Web',
     categoria: 'Navegador',
     descripcion: 'Disponible desde distintos equipos sin instalación local.',
     icono: 'aplicacionWeb',
   },
   {
-    valor: 'Escritorio',
+    valor: PlataformaSolucion.Escritorio,
     etiqueta: 'Escritorio',
     categoria: 'Operación interna',
     descripcion: 'Orientada a puestos fijos o entornos de trabajo controlados.',
     icono: 'aplicacionEscritorio',
   },
   {
-    valor: 'Móvil',
+    valor: PlataformaSolucion.Movil,
     etiqueta: 'Móvil',
     categoria: 'Trabajo en campo',
     descripcion: 'Pensada para consultar o capturar información desde celulares.',

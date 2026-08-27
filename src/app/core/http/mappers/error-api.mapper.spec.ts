@@ -1,4 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
+import { OrigenErrorApi } from '../models/error-api.model';
 import { normalizarErrorApi } from './error-api.mapper';
 
 describe('normalizador de errores del API', () => {
@@ -23,7 +24,7 @@ describe('normalizador de errores del API', () => {
         codigo: 'epica_no_encontrada',
         mensajeUsuario: 'La épica indicada no existe.',
         detalles: ['Verifica el identificador de la épica.'],
-        origen: 'http',
+        origen: OrigenErrorApi.Http,
       }),
     );
   });

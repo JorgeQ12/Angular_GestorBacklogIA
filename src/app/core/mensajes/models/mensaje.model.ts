@@ -1,5 +1,12 @@
-export type VarianteMensaje =
-  'informacion' | 'exito' | 'advertencia' | 'error' | 'confirmacion' | 'destructiva';
+/** Identifica la intención funcional de un mensaje global. */
+export enum VarianteMensaje {
+  Informacion = 'informacion',
+  Exito = 'exito',
+  Advertencia = 'advertencia',
+  Error = 'error',
+  Confirmacion = 'confirmacion',
+  Destructiva = 'destructiva',
+}
 
 /** Configura el contenido y las decisiones disponibles en un mensaje global. */
 export interface OpcionesMensaje {
@@ -11,7 +18,6 @@ export interface OpcionesMensaje {
   textoConfirmar?: string;
   textoCancelar?: string;
   mostrarCancelar?: boolean;
-  descartable?: boolean;
 }
 
 /** Representa el mensaje normalizado que consume la presentación global. */
@@ -24,5 +30,4 @@ export interface EstadoMensaje {
   textoConfirmar: string;
   textoCancelar: string;
   mostrarCancelar: boolean;
-  descartable: boolean;
 }

@@ -109,6 +109,35 @@ layouts/panel/
 - Centralizar constantes compartidas en el nivel más cercano que permita reutilizarlas.
 - Evitar clases base cuando composición, directivas o servicios expresen mejor la responsabilidad.
 
+### Enums e identidades estables
+
+Los conjuntos finitos que representan identidad de dominio, estado funcional o decisiones
+comparadas por la aplicación se declaran como enums de cadenas en el dueño más cercano.
+
+```ts
+export enum PlataformaSolucion {
+  Web = 'Web',
+  Escritorio = 'Escritorio',
+  Movil = 'Móvil',
+}
+```
+
+- Configuraciones, comparaciones, mappers y pruebas utilizan el miembro del enum; no repiten su
+  cadena serializada.
+- Los mappers validan los valores externos antes de convertirlos al enum. El tipado no reemplaza
+  la validación de datos recibidos del backend o recuperados desde JSON.
+- Se prefieren enums de cadenas porque conservan contratos legibles y no dependen del orden de los
+  miembros.
+- Cada enum permanece en el dominio o capacidad que define sus valores; no se crea un catálogo
+  global de enums sin cohesión.
+- Los textos visibles, descripciones, placeholders y mensajes pertenecen a configuración o
+  internacionalización, no a enums.
+- Los protocolos técnicos escritos directamente en plantillas o definidos por estándares
+  externos permanecen como uniones literales. Esto incluye tamaños visuales, roles ARIA, teclas y
+  variantes CSS.
+- Los valores administrados por catálogos remotos se representan mediante su ID o código recibido;
+  no se duplican en enums del frontend.
+
 ## Fechas y configuración regional
 
 - El locale de la aplicación se define una sola vez mediante `LOCALE_ID`.

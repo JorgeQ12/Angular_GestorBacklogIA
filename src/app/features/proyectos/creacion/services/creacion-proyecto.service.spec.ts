@@ -4,6 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { firstValueFrom } from 'rxjs';
 import { ResultadoApi } from '../../../../core/http/models/resultado-api.model';
 import { ClaveSeccionProyecto } from '../../config/secciones-proyecto.config';
+import { PlataformaSolucion } from '../../secciones/tipo-solucion/models/tipo-solucion-proyecto.model';
 import { ENDPOINTS_CREACION_PROYECTO } from '../config/endpoints-creacion-proyecto.config';
 import { CrearBorradorProyectoRespuestaDto } from '../models/borrador-proyecto.dto';
 import {
@@ -231,7 +232,7 @@ describe('CreacionProyectoService', () => {
         borrador,
         {
           seccion: ClaveSeccionProyecto.TipoSolucion,
-          datos: { tieneInterfaz: true, plataforma: 'Web' },
+          datos: { tieneInterfaz: true, plataforma: PlataformaSolucion.Web },
         },
         3,
       ),

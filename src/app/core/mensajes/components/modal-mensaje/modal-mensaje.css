@@ -2,6 +2,19 @@
   display: contents;
 }
 
+.modal-mensaje {
+  --ui-modal-header-padding: var(--space-6) var(--space-6) var(--space-3);
+  --ui-modal-body-padding: var(--space-2) var(--space-6) var(--space-3);
+  --ui-modal-actions-padding: var(--space-3) var(--space-6) var(--space-5);
+  --ui-modal-header-border: transparent;
+  --ui-modal-actions-border: transparent;
+  --ui-modal-header-surface: var(--surface-default);
+  --ui-modal-actions-surface: var(--surface-default);
+  --ui-modal-heading-alignment: center;
+  --ui-modal-icon-margin-top: 0;
+  --ui-modal-actions-alignment: center;
+}
+
 .modal-mensaje[data-variante='informacion'] {
   --ui-modal-icon-surface: var(--color-info-surface);
   --ui-modal-icon-border: var(--color-info-border);
@@ -47,9 +60,15 @@
 .modal-mensaje__detalles li {
   position: relative;
   padding: var(--space-3) var(--space-3) var(--space-3) var(--space-8);
-  border: var(--border-width) solid var(--border-subtle);
+  border: var(--border-width) solid var(--border-divider);
   border-radius: var(--radius-md);
   background: var(--surface-subtle);
+}
+
+@media (max-width: 640px) {
+  .modal-mensaje {
+    --ui-modal-mobile-padding: var(--space-4);
+  }
 }
 
 .modal-mensaje__detalles li::before {

@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { VarianteMensaje } from '../models/mensaje.model';
 import { MensajesService } from './mensajes.service';
 
 describe('MensajesService', () => {
@@ -9,14 +10,13 @@ describe('MensajesService', () => {
     servicio = TestBed.inject(MensajesService);
   });
 
-  it('normaliza una confirmación como una decisión no descartable', async () => {
+  it('normaliza una confirmación como una decisión explícita', async () => {
     const decision = servicio.confirmar('Crear proyecto', 'Se creará un nuevo borrador.');
 
     expect(servicio.mensajeActual()).toEqual(
       expect.objectContaining({
-        variante: 'confirmacion',
+        variante: VarianteMensaje.Confirmacion,
         mostrarCancelar: true,
-        descartable: false,
         textoConfirmar: 'Confirmar',
       }),
     );
@@ -36,15 +36,6 @@ describe('MensajesService', () => {
     servicio.cancelar();
 
     await expect(decision).resolves.toBe(false);
-  });
-
-  it('impide descartar un mensaje que requiere decisión explícita', () => {
-    void servicio.confirmar('Publicar proyecto', 'Confirma la publicación.');
-
-    servicio.descartar();
-
-    expect(servicio.mensajeActual()).not.toBeNull();
-    servicio.cancelar();
   });
 
   it('resuelve el mensaje anterior antes de presentar uno nuevo', async () => {

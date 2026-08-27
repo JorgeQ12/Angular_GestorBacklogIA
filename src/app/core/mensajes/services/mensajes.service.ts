@@ -1,13 +1,13 @@
 import { Injectable, signal } from '@angular/core';
-import type { EstadoMensaje, OpcionesMensaje, VarianteMensaje } from '../models/mensaje.model';
+import { type EstadoMensaje, type OpcionesMensaje, VarianteMensaje } from '../models/mensaje.model';
 
 const CONTEXTO_POR_VARIANTE = {
-  informacion: 'Información',
-  exito: 'Proceso completado',
-  advertencia: 'Requiere tu atención',
-  error: 'No fue posible continuar',
-  confirmacion: 'Confirma esta acción',
-  destructiva: 'Acción destructiva',
+  [VarianteMensaje.Informacion]: 'Información',
+  [VarianteMensaje.Exito]: 'Proceso completado',
+  [VarianteMensaje.Advertencia]: 'Requiere tu atención',
+  [VarianteMensaje.Error]: 'No fue posible continuar',
+  [VarianteMensaje.Confirmacion]: 'Confirma esta acción',
+  [VarianteMensaje.Destructiva]: 'Acción destructiva',
 } satisfies Record<VarianteMensaje, string>;
 
 /** Coordina los mensajes y las decisiones globales solicitadas por la aplicación. */
@@ -23,9 +23,10 @@ export class MensajesService {
   public abrir(opciones: OpcionesMensaje): Promise<boolean> {
     this.resolverAnterior(false);
 
-    const variante = opciones.variante ?? 'informacion';
+    const variante = opciones.variante ?? VarianteMensaje.Informacion;
     const mostrarCancelar =
-      opciones.mostrarCancelar ?? (variante === 'confirmacion' || variante === 'destructiva');
+      opciones.mostrarCancelar ??
+      (variante === VarianteMensaje.Confirmacion || variante === VarianteMensaje.Destructiva);
 
     this.mensaje.set({
       titulo: opciones.titulo,
@@ -35,10 +36,13 @@ export class MensajesService {
       contexto: opciones.contexto ?? CONTEXTO_POR_VARIANTE[variante],
       textoConfirmar:
         opciones.textoConfirmar ??
-        (variante === 'destructiva' ? 'Eliminar' : mostrarCancelar ? 'Confirmar' : 'Aceptar'),
+        (variante === VarianteMensaje.Destructiva
+          ? 'Eliminar'
+          : mostrarCancelar
+            ? 'Confirmar'
+            : 'Aceptar'),
       textoCancelar: opciones.textoCancelar ?? 'Cancelar',
       mostrarCancelar,
-      descartable: opciones.descartable ?? !mostrarCancelar,
     });
 
     return new Promise<boolean>((resolver) => {
@@ -48,12 +52,12 @@ export class MensajesService {
 
   /** Presenta información transversal que requiere reconocimiento. */
   public async informar(titulo: string, descripcion: string): Promise<void> {
-    await this.abrir({ titulo, descripcion, variante: 'informacion' });
+    await this.abrir({ titulo, descripcion, variante: VarianteMensaje.Informacion });
   }
 
   /** Comunica que una operación finalizó correctamente. */
   public async exito(titulo: string, descripcion: string): Promise<void> {
-    await this.abrir({ titulo, descripcion, variante: 'exito' });
+    await this.abrir({ titulo, descripcion, variante: VarianteMensaje.Exito });
   }
 
   /** Advierte una condición que el usuario debe revisar. */
@@ -62,7 +66,7 @@ export class MensajesService {
     descripcion: string,
     detalles: readonly string[] = [],
   ): Promise<void> {
-    await this.abrir({ titulo, descripcion, detalles, variante: 'advertencia' });
+    await this.abrir({ titulo, descripcion, detalles, variante: VarianteMensaje.Advertencia });
   }
 
   /** Informa un fallo que impidió completar la operación actual. */
@@ -71,7 +75,7 @@ export class MensajesService {
     descripcion: string,
     detalles: readonly string[] = [],
   ): Promise<void> {
-    await this.abrir({ titulo, descripcion, detalles, variante: 'error' });
+    await this.abrir({ titulo, descripcion, detalles, variante: VarianteMensaje.Error });
   }
 
   /** Solicita una decisión explícita antes de continuar. */
@@ -84,7 +88,7 @@ export class MensajesService {
     return this.abrir({
       titulo,
       descripcion,
-      variante: 'confirmacion',
+      variante: VarianteMensaje.Confirmacion,
       textoConfirmar,
       textoCancelar,
     });
@@ -100,7 +104,7 @@ export class MensajesService {
     return this.abrir({
       titulo,
       descripcion,
-      variante: 'destructiva',
+      variante: VarianteMensaje.Destructiva,
       textoConfirmar,
       textoCancelar,
     });
@@ -114,13 +118,6 @@ export class MensajesService {
   /** Resuelve el mensaje vigente como cancelado. */
   public cancelar(): void {
     this.cerrar(false);
-  }
-
-  /** Descarta únicamente los mensajes que no requieren una decisión explícita. */
-  public descartar(): void {
-    if (this.mensaje()?.descartable) {
-      this.cerrar(false);
-    }
   }
 
   private cerrar(aceptado: boolean): void {

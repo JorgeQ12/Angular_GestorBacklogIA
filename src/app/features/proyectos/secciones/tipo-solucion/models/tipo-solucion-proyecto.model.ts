@@ -1,5 +1,9 @@
 /** Identifica las plataformas principales admitidas para soluciones con interfaz. */
-export type PlataformaSolucion = 'Web' | 'Escritorio' | 'Móvil';
+export enum PlataformaSolucion {
+  Web = 'Web',
+  Escritorio = 'Escritorio',
+  Movil = 'Móvil',
+}
 
 /** Describe el canal principal definido para una solución. */
 export interface TipoSolucionProyecto {

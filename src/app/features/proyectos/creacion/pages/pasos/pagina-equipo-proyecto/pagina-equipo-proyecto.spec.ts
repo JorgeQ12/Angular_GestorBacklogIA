@@ -1,8 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router, convertToParamMap } from '@angular/router';
-import { of } from 'rxjs';
+import { NEVER, of } from 'rxjs';
 import { NotificadorErroresApiService } from '../../../../../../core/mensajes/services/notificador-errores-api.service';
 import { ClaveSeccionProyecto } from '../../../../config/secciones-proyecto.config';
+import { type OrigenEquipoAzureProyecto } from '../../../../secciones/equipo/models/equipo-proyecto.model';
 import { BorradorProyecto } from '../../../models/borrador-proyecto.model';
 import { CreacionProyectoService } from '../../../services/creacion-proyecto.service';
 import { ContenidoEncabezadoPasoCreacionService } from '../../../services/contenido-encabezado-paso-creacion.service';
@@ -24,7 +25,7 @@ describe('PaginaEquipoProyecto', () => {
     vi.clearAllMocks();
     estadoCreacion.cargar.mockReturnValue(of(BORRADOR));
     estadoCreacion.guardarSeccion.mockReturnValue(of({ ...BORRADOR, revision: 9, pasoActual: 8 }));
-    creacionProyecto.sincronizarEquipoAzure.mockReturnValue(of(BORRADOR.equipoAzure));
+    creacionProyecto.sincronizarEquipoAzure.mockReturnValue(of(EQUIPO_AZURE_SINCRONIZADO));
 
     await TestBed.configureTestingModule({
       imports: [PaginaEquipoProyecto],
@@ -47,18 +48,31 @@ describe('PaginaEquipoProyecto', () => {
     fixture.detectChanges();
   });
 
-  it('restaura las asignaciones guardadas sin sincronizar nuevamente', () => {
+  it('restaura las asignaciones guardadas y completa la membresía ausente en el borrador', () => {
     const elemento = fixture.nativeElement as HTMLElement;
     const encabezado = TestBed.inject(ContenidoEncabezadoPasoCreacionService).contenido();
 
     expect(estadoCreacion.cargar).toHaveBeenCalledWith(42);
-    expect(creacionProyecto.sincronizarEquipoAzure).not.toHaveBeenCalled();
+    expect(creacionProyecto.sincronizarEquipoAzure).toHaveBeenCalledOnce();
     expect(encabezado?.detallePrincipal()).toBe('Producto digital');
     expect(encabezado?.detalleSecundario()).toBe('1 configurados · 0 pendientes');
     expect(elemento.textContent).toContain('Jorge Quintero');
   });
 
+  it('mantiene visible el equipo guardado mientras completa la membresía de Azure', () => {
+    creacionProyecto.sincronizarEquipoAzure.mockClear();
+    creacionProyecto.sincronizarEquipoAzure.mockReturnValueOnce(NEVER);
+    const fixtureSinRespuesta = TestBed.createComponent(PaginaEquipoProyecto);
+    fixtureSinRespuesta.detectChanges();
+
+    expect(creacionProyecto.sincronizarEquipoAzure).toHaveBeenCalledOnce();
+    expect((fixtureSinRespuesta.nativeElement as HTMLElement).textContent).toContain(
+      'Nombre anterior',
+    );
+  });
+
   it('sincroniza Azure al ingresar cuando Equipo aún no tiene configuración', () => {
+    creacionProyecto.sincronizarEquipoAzure.mockClear();
     estadoCreacion.cargar.mockReturnValueOnce(of({ ...BORRADOR, equipoJson: '[]' }));
     const fixtureSinEquipo = TestBed.createComponent(PaginaEquipoProyecto);
     fixtureSinEquipo.detectChanges();
@@ -66,6 +80,20 @@ describe('PaginaEquipoProyecto', () => {
     expect(creacionProyecto.sincronizarEquipoAzure).toHaveBeenCalledOnce();
     expect(creacionProyecto.sincronizarEquipoAzure).toHaveBeenCalledWith(42);
     expect((fixtureSinEquipo.nativeElement as HTMLElement).textContent).toContain('Jorge Quintero');
+  });
+
+  it('evita sincronizar cuando el borrador ya incluye la membresía de Azure', () => {
+    creacionProyecto.sincronizarEquipoAzure.mockClear();
+    estadoCreacion.cargar.mockReturnValueOnce(
+      of({ ...BORRADOR, equipoAzure: EQUIPO_AZURE_SINCRONIZADO }),
+    );
+    const fixtureConMembresia = TestBed.createComponent(PaginaEquipoProyecto);
+    fixtureConMembresia.detectChanges();
+
+    expect(creacionProyecto.sincronizarEquipoAzure).not.toHaveBeenCalled();
+    expect((fixtureConMembresia.nativeElement as HTMLElement).textContent).toContain(
+      'Jorge Quintero',
+    );
   });
 
   it('guarda Equipo y abre Flujo de usuario', () => {
@@ -108,14 +136,7 @@ const BORRADOR: BorradorProyecto = {
     idEquipo: 'team-1',
     nombreEquipo: 'Producto digital',
     fechaSincronizacion: null,
-    integrantes: [
-      {
-        idAzure: 'usuario-1',
-        nombre: 'Jorge Quintero',
-        correo: 'jorge@interia.co',
-        esAdministradorAzure: true,
-      },
-    ],
+    integrantes: [],
   },
   contexto: {
     nombre: 'InterIA',
@@ -134,4 +155,18 @@ const BORRADOR: BorradorProyecto = {
     '[{"idAzure":"usuario-1","nombre":"Nombre anterior","correo":null,"esAdministradorAzure":false,"perfilTecnicoCodigo":"devops","dedicacionCodigo":"100"}]',
   diagramFlujoJson: '{}',
   fechaUltimoGuardado: '2026-08-25T12:00:00Z',
+};
+
+const EQUIPO_AZURE_SINCRONIZADO: OrigenEquipoAzureProyecto = {
+  idEquipo: 'team-1',
+  nombreEquipo: 'Producto digital',
+  fechaSincronizacion: null,
+  integrantes: [
+    {
+      idAzure: 'usuario-1',
+      nombre: 'Jorge Quintero',
+      correo: 'jorge@interia.co',
+      esAdministradorAzure: true,
+    },
+  ],
 };

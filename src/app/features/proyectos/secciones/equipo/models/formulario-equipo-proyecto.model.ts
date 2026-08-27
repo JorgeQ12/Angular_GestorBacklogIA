@@ -20,4 +20,8 @@ export interface ControlesAsignacionMasivaEquipoProyecto {
 }
 
 /** Limita los filtros disponibles para revisar el estado del equipo. */
-export type FiltroEquipoProyecto = 'todos' | 'pendientes' | 'configurados';
+export enum FiltroEquipoProyecto {
+  Todos = 'todos',
+  Pendientes = 'pendientes',
+  Configurados = 'configurados',
+}

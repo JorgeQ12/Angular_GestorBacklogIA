@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { ErrorApi, type OrigenErrorApi } from '../models/error-api.model';
+import { ErrorApi, OrigenErrorApi } from '../models/error-api.model';
 import type { ResultadoApi } from '../models/resultado-api.model';
 
 /** Normaliza errores funcionales y de transporte en un contrato seguro para la interfaz. */
@@ -7,7 +7,7 @@ export function normalizarErrorApi(error: unknown): ErrorApi {
   if (error instanceof ErrorApi) return error;
 
   if (error instanceof HttpErrorResponse) {
-    const origen: OrigenErrorApi = error.status === 0 ? 'conexion' : 'http';
+    const origen = error.status === 0 ? OrigenErrorApi.Conexion : OrigenErrorApi.Http;
     return crearErrorApiDesdeCuerpo(error.error, error.status, origen);
   }
 
@@ -16,7 +16,7 @@ export function normalizarErrorApi(error: unknown): ErrorApi {
     codigo: null,
     mensajeUsuario: null,
     detalles: [],
-    origen: 'desconocido',
+    origen: OrigenErrorApi.Desconocido,
   });
 }
 
@@ -30,7 +30,7 @@ export function crearErrorApiDesdeResultado(
     codigo: normalizarTexto(resultado.codigoError),
     mensajeUsuario: normalizarTexto(resultado.mensaje),
     detalles: normalizarDetalles(resultado.errores),
-    origen: 'funcional',
+    origen: OrigenErrorApi.Funcional,
     mensajeRespaldo,
   });
 }

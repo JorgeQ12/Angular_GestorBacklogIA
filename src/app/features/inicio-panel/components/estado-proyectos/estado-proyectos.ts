@@ -1,10 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { IconoComponent } from '../../../../shared/components/icono/icono.component';
-import {
-  ESTADOS_PROYECTO,
-  EstadoProyecto,
-  IndicadoresInicioPanel,
-} from '../../models/resumen-inicio-panel.model';
+import { EstadoProyecto, IndicadoresInicioPanel } from '../../models/resumen-inicio-panel.model';
 
 interface EstadoRepresentado {
   estado: EstadoProyecto;
@@ -34,21 +30,16 @@ export class EstadoProyectos {
 
   /** Expone los estados con sus cantidades y proporciones normalizadas. */
   protected readonly estados = computed<readonly EstadoRepresentado[]>(() => [
-    this.construirEstado(ESTADOS_PROYECTO.nuevo, 'Nuevos', this.indicadores().nuevos, 'es-nuevo'),
+    this.construirEstado(EstadoProyecto.Nuevo, 'Nuevos', this.indicadores().nuevos, 'es-nuevo'),
+    this.construirEstado(EstadoProyecto.Activo, 'Activos', this.indicadores().activos, 'es-activo'),
     this.construirEstado(
-      ESTADOS_PROYECTO.activo,
-      'Activos',
-      this.indicadores().activos,
-      'es-activo',
-    ),
-    this.construirEstado(
-      ESTADOS_PROYECTO.finalizado,
+      EstadoProyecto.Finalizado,
       'Finalizados',
       this.indicadores().finalizados,
       'es-finalizado',
     ),
     this.construirEstado(
-      ESTADOS_PROYECTO.cerrado,
+      EstadoProyecto.Cerrado,
       'Cerrados',
       this.indicadores().cerrados,
       'es-cerrado',

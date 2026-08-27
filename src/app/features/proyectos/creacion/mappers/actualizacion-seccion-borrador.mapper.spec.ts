@@ -1,4 +1,5 @@
 import { ClaveSeccionProyecto } from '../../config/secciones-proyecto.config';
+import { PlataformaSolucion } from '../../secciones/tipo-solucion/models/tipo-solucion-proyecto.model';
 import { mapearCambioSeccionBorrador } from './actualizacion-seccion-borrador.mapper';
 
 describe('mapearCambioSeccionBorrador', () => {
@@ -22,7 +23,7 @@ describe('mapearCambioSeccionBorrador', () => {
   it.each([
     {
       seccion: ClaveSeccionProyecto.TipoSolucion,
-      datos: { tieneInterfaz: true, plataforma: 'Web' as const },
+      datos: { tieneInterfaz: true, plataforma: PlataformaSolucion.Web },
       cambio: { tipoSolucionJson: '{"tieneInterfaz":true,"plataforma":"Web"}' },
     },
     {

@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { VarianteMensaje } from '../../models/mensaje.model';
 import { MensajesService } from '../../services/mensajes.service';
 import { ModalMensaje } from './modal-mensaje';
 
@@ -25,6 +26,7 @@ describe('ModalMensaje', () => {
     expect(dialogo.querySelector('.ui-modal__title')?.textContent).toContain(
       'Vinculación validada',
     );
+    expect(dialogo.querySelector('.ui-modal__close')).toBeNull();
     expect(dialogo.querySelector('.ui-button--secondary')).toBeNull();
     expect(dialogo.querySelector('.ui-button--primary')?.textContent).toContain('Aceptar');
 
@@ -37,7 +39,7 @@ describe('ModalMensaje', () => {
     void mensajes.abrir({
       titulo: 'Información incompleta',
       descripcion: 'Revisa los datos antes de continuar.',
-      variante: 'advertencia',
+      variante: VarianteMensaje.Advertencia,
       detalles: ['Falta el responsable', 'Falta la fecha objetivo'],
     });
     fixture.detectChanges();

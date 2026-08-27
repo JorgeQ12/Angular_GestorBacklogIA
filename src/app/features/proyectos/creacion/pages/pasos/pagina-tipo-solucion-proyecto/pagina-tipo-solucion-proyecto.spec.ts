@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router, convertToParamMap } from '@angular/router';
 import { of } from 'rxjs';
 import { ClaveSeccionProyecto } from '../../../../config/secciones-proyecto.config';
+import { PlataformaSolucion } from '../../../../secciones/tipo-solucion/models/tipo-solucion-proyecto.model';
 import { BorradorProyecto } from '../../../models/borrador-proyecto.model';
 import { EstadoCreacionProyectoService } from '../../../services/estado-creacion-proyecto.service';
 import { NotificadorErroresBorradorProyectoService } from '../../../services/notificador-errores-borrador-proyecto.service';
@@ -52,7 +53,7 @@ describe('PaginaTipoSolucionProyecto', () => {
 
     expect(estadoCreacion.cargar).toHaveBeenCalledWith(42);
     expect(interfaz?.value).toBe('true');
-    expect(plataforma?.value).toBe('Web');
+    expect(plataforma?.value).toBe(PlataformaSolucion.Web);
   });
 
   it('guarda la selección y abre Necesidad', () => {
@@ -62,7 +63,7 @@ describe('PaginaTipoSolucionProyecto', () => {
 
     expect(estadoCreacion.guardarSeccion).toHaveBeenCalledWith({
       seccion: ClaveSeccionProyecto.TipoSolucion,
-      datos: { tieneInterfaz: true, plataforma: 'Web' },
+      datos: { tieneInterfaz: true, plataforma: PlataformaSolucion.Web },
     });
     expect(router.navigateByUrl).toHaveBeenCalledWith('/panel/proyectos/42/creacion/necesidad');
   });

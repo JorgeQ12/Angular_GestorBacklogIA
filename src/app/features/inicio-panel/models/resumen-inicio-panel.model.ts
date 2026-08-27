@@ -1,13 +1,10 @@
 /** Identifica los estados de proyecto representados en el inicio del panel. */
-export const ESTADOS_PROYECTO = {
-  nuevo: 'Nuevo',
-  activo: 'Activo',
-  finalizado: 'Finalizado',
-  cerrado: 'Cerrado',
-} as const;
-
-/** Limita los estados que pueden utilizarse para filtrar los proyectos. */
-export type EstadoProyecto = (typeof ESTADOS_PROYECTO)[keyof typeof ESTADOS_PROYECTO];
+export enum EstadoProyecto {
+  Nuevo = 'Nuevo',
+  Activo = 'Activo',
+  Finalizado = 'Finalizado',
+  Cerrado = 'Cerrado',
+}
 
 /** Reúne los indicadores agregados proporcionados para el usuario vigente. */
 export interface IndicadoresInicioPanel {

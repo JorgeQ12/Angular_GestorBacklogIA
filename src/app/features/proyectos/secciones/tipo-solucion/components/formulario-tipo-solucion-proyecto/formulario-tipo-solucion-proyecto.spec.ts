@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { PlataformaSolucion } from '../../models/tipo-solucion-proyecto.model';
 import { FormularioTipoSolucionProyecto } from './formulario-tipo-solucion-proyecto';
 
 describe('FormularioTipoSolucionProyecto', () => {
@@ -41,7 +42,10 @@ describe('FormularioTipoSolucionProyecto', () => {
 
     enviarFormulario();
 
-    expect(guardar).toHaveBeenCalledWith({ tieneInterfaz: true, plataforma: 'Web' });
+    expect(guardar).toHaveBeenCalledWith({
+      tieneInterfaz: true,
+      plataforma: PlataformaSolucion.Web,
+    });
   });
 
   it('limpia la plataforma al cambiar a una solución sin interfaz', () => {

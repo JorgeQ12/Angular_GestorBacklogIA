@@ -2,9 +2,9 @@ import { deserializarObjetoJson } from '../../../../../shared/serializacion/json
 import { PlataformaSolucion, TipoSolucionProyecto } from '../models/tipo-solucion-proyecto.model';
 
 const PLATAFORMAS: Readonly<Record<string, PlataformaSolucion>> = {
-  web: 'Web',
-  escritorio: 'Escritorio',
-  movil: 'Móvil',
+  web: PlataformaSolucion.Web,
+  escritorio: PlataformaSolucion.Escritorio,
+  movil: PlataformaSolucion.Movil,
 };
 
 /** Recupera Tipo de solución desde su contrato canónico en español. */
