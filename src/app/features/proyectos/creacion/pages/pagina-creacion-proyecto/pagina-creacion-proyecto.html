@@ -35,11 +35,31 @@
             <h2 id="titulo-paso-creacion" class="ui-card__title">
               {{ pasoActivo().titulo }}
             </h2>
-            <p class="pagina-creacion__descripcion-paso">
-              {{ pasoActivo().descripcion }}
-            </p>
+            @if (encabezadoPaso.contenido(); as contenido) {
+              <div class="pagina-creacion__detalle-paso">
+                <app-icono [nombre]="contenido.iconoDetalle" aria-hidden="true" />
+                <strong>{{ contenido.detallePrincipal() }}</strong>
+                <span aria-hidden="true">·</span>
+                <span>{{ contenido.detalleSecundario() }}</span>
+              </div>
+            } @else {
+              <p class="pagina-creacion__descripcion-paso">
+                {{ pasoActivo().descripcion }}
+              </p>
+            }
           </div>
         </div>
+        @if (encabezadoPaso.contenido()?.accion; as accion) {
+          <button
+            type="button"
+            class="ui-button ui-button--secondary ui-button--md"
+            [disabled]="accion.deshabilitada()"
+            (click)="accion.ejecutar()"
+          >
+            <app-icono class="ui-button__icon" [nombre]="accion.icono" />
+            {{ accion.texto() }}
+          </button>
+        }
       </header>
       <div class="ui-card__body pagina-creacion__contenido">
         <router-outlet />

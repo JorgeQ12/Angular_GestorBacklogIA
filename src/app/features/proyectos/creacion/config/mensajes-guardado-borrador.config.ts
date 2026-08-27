@@ -23,6 +23,14 @@ export const MENSAJES_GUARDADO_BORRADOR = {
     titulo: 'No fue posible guardar el alcance',
     descripcion: 'Conservamos los límites definidos para que puedas intentarlo nuevamente.',
   },
+  [ClaveSeccionProyecto.Roles]: {
+    titulo: 'No fue posible guardar los roles',
+    descripcion: 'Conservamos los perfiles definidos para que puedas intentarlo nuevamente.',
+  },
+  [ClaveSeccionProyecto.Equipo]: {
+    titulo: 'No fue posible guardar el equipo',
+    descripcion: 'Conservamos las asignaciones para que puedas intentarlo nuevamente.',
+  },
 } as const satisfies Record<SeccionActualizableBorrador, MensajeGuardadoBorrador>;
 
 interface MensajeGuardadoBorrador {

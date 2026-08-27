@@ -43,7 +43,7 @@ export class PaginaVinculacionAzure {
       )
       .subscribe({
         next: (resultado) => this.resultadoValidacion.set(resultado),
-        error: () => {
+        error: (error) => {
           void this.mensajes.error(
             'No fue posible consultar Azure',
             'Revisa el enlace, la épica principal y el Team seleccionado.',

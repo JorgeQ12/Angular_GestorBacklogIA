@@ -83,6 +83,7 @@ const BORRADOR: BorradorProyecto = {
   id: 42,
   revision: 4,
   pasoActual: 3,
+  equipoAzure: null,
   contexto: {
     nombre: 'InterIA',
     responsable: 'Jorge',

@@ -45,6 +45,34 @@ describe('mapearCambioSeccionBorrador', () => {
       datos: { incluido: 'Seguimiento', excluido: 'Pagos' },
       cambio: { alcanceJson: '{"incluido":"Seguimiento","excluido":"Pagos"}' },
     },
+    {
+      seccion: ClaveSeccionProyecto.Roles,
+      datos: {
+        roles: [{ nombre: 'Administrador', descripcion: 'Configura la solución.' }],
+      },
+      cambio: {
+        rolesJson: '[{"nombre":"Administrador","descripcion":"Configura la solución."}]',
+      },
+    },
+    {
+      seccion: ClaveSeccionProyecto.Equipo,
+      datos: {
+        integrantes: [
+          {
+            idAzure: 'u1',
+            nombre: 'Jorge',
+            correo: null,
+            esAdministradorAzure: true,
+            perfilTecnicoCodigo: 'devops',
+            dedicacionCodigo: '100',
+          },
+        ],
+      },
+      cambio: {
+        equipoJson:
+          '[{"idAzure":"u1","nombre":"Jorge","correo":null,"esAdministradorAzure":true,"perfilTecnicoCodigo":"devops","dedicacionCodigo":"100"}]',
+      },
+    },
   ] as const)('serializa la sección $seccion con su mapper canónico', (caso) => {
     expect(mapearCambioSeccionBorrador(caso)).toEqual(caso.cambio);
   });

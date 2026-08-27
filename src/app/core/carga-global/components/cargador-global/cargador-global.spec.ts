@@ -18,7 +18,9 @@ describe('CargadorGlobal', () => {
     fixture.detectChanges();
 
     const estado = fixture.nativeElement.querySelector('[role="status"]') as HTMLElement;
-    const camion = fixture.nativeElement.querySelector('.cargador-global__camion') as HTMLImageElement;
+    const camion = fixture.nativeElement.querySelector(
+      '.cargador-global__camion',
+    ) as HTMLImageElement;
 
     expect(estado.textContent).toContain('Procesando información');
     expect(camion.getAttribute('src')).toBe('/brand/camion_carga.webp');

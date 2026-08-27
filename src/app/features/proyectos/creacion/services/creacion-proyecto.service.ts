@@ -8,6 +8,7 @@ import {
   mapearBorradorProyectoCreado,
   mapearActualizacionBorrador,
   mapearBorradorProyecto,
+  mapearOrigenEquipoAzure,
   mapearResultadoVinculacionAzure,
   mapearSolicitudVinculacionAzure,
 } from '../mappers/creacion-proyecto.mapper';
@@ -19,11 +20,15 @@ import {
 } from '../models/borrador-proyecto.dto';
 import { BorradorProyecto, BorradorProyectoCreado } from '../models/borrador-proyecto.model';
 import { ActualizacionSeccionBorrador } from '../models/actualizacion-seccion-borrador.model';
-import { ValidarVinculacionAzureRespuestaDto } from '../models/vinculacion-azure.dto';
+import {
+  SincronizarEquipoAzureRespuestaDto,
+  ValidarVinculacionAzureRespuestaDto,
+} from '../models/vinculacion-azure.dto';
 import {
   DatosVinculacionAzure,
   ResultadoVinculacionAzure,
 } from '../models/vinculacion-azure.model';
+import { OrigenEquipoAzureProyecto } from '../../secciones/equipo/models/equipo-proyecto.model';
 
 /** Ejecuta y adapta las operaciones remotas del recorrido de creación. */
 @Injectable({ providedIn: 'root' })
@@ -73,6 +78,21 @@ export class CreacionProyectoService {
       .pipe(
         map((resultado) => exigirDatosResultadoApi(resultado, 'el borrador del proyecto')),
         map(mapearBorradorProyecto),
+      );
+  }
+
+  /** Renueva los integrantes del Team vinculado en Azure DevOps. */
+  public sincronizarEquipoAzure(proyectoId: number): Observable<OrigenEquipoAzureProyecto> {
+    const params = new HttpParams().set('ProyectoId', proyectoId);
+    return this.http
+      .post<ResultadoApi<SincronizarEquipoAzureRespuestaDto>>(
+        ENDPOINTS_CREACION_PROYECTO.sincronizarEquipoAzure,
+        null,
+        { params },
+      )
+      .pipe(
+        map((resultado) => exigirDatosResultadoApi(resultado, 'el equipo de Azure')),
+        map(mapearOrigenEquipoAzure),
       );
   }
 

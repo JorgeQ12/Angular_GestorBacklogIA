@@ -1,10 +1,7 @@
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { CATALOGO_NAVEGACION_PANEL } from '../config/navegacion-panel.config';
-import {
-  ClavePermisoNavegacion,
-  ItemNavegacionPanel,
-} from '../models/item-navegacion-panel.model';
+import { ClavePermisoNavegacion, ItemNavegacionPanel } from '../models/item-navegacion-panel.model';
 import { NavegacionPanelService, PERMISOS_NAVEGACION_PANEL } from './navegacion-panel.service';
 
 describe('NavegacionPanelService', () => {

@@ -1,4 +1,4 @@
-import { deserializarObjetoJson, obtenerTextoJson } from './lector-json';
+import { deserializarListaJson, deserializarObjetoJson, obtenerTextoJson } from './lector-json';
 
 describe('lector JSON', () => {
   it('recupera un objeto sin asignarle un contrato de dominio', () => {
@@ -21,5 +21,13 @@ describe('lector JSON', () => {
     expect(obtenerTextoJson(objeto, 'nombre')).toBe('InterIA');
     expect(obtenerTextoJson(objeto, 'cantidad')).toBeNull();
     expect(obtenerTextoJson(objeto, 'inexistente')).toBeNull();
+  });
+
+  it('recupera únicamente colecciones JSON', () => {
+    expect(deserializarListaJson('[{"nombre":"Administrador"}]')).toEqual([
+      { nombre: 'Administrador' },
+    ]);
+    expect(deserializarListaJson('{}')).toBeNull();
+    expect(deserializarListaJson('json-invalido')).toBeNull();
   });
 });

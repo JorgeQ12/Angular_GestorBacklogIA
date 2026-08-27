@@ -33,7 +33,10 @@ src/app/
 - `shared` contiene directivas, componentes y contratos reutilizables entre features.
 - Una página compone el flujo; los componentes presentacionales emiten acciones sin conocer HTTP,
   sesión o navegación.
-- Las páginas se cargan de forma diferida desde `app.routes.ts`.
+- `app.routes.ts` declara únicamente capacidades de primer nivel. Cuando una feature contiene
+  rutas hijas, guards o providers propios, conserva su archivo `<feature>.routes.ts` y se carga
+  mediante `loadChildren` para no incorporar su orquestación al bundle inicial.
+- Las páginas finales se cargan mediante `loadComponent` dentro del archivo de rutas de su dueño.
 - Las rutas reutilizables se centralizan en `core/navegacion/rutas.ts`.
 - Los estados globales de carga se centralizan en `core/carga-global` y se montan una sola vez.
 - Los mensajes y confirmaciones globales se coordinan desde `core/mensajes` y se presentan mediante
@@ -43,6 +46,34 @@ src/app/
 
 No se crean carpetas genéricas como `utils`, `helpers` o `models` para un único archivo sin una
 necesidad real de crecimiento.
+
+## Auditoría previa a una migración o extensión
+
+Antes de agregar archivos, métodos o abstracciones, se revisa de forma proporcional la capacidad
+completa alrededor del cambio. La auditoría no se limita al componente nombrado por la solicitud:
+incluye sus páginas, modelos, configuración, mappers, estado, servicios, endpoints, rutas, pruebas
+y documentación relacionada.
+
+- Buscar primero comportamientos y contratos existentes, no solamente nombres de archivos.
+- Comparar las implementaciones vecinas ya migradas y reconocer qué permanece igual y qué cambia
+  por dominio.
+- Si varias operaciones usan el mismo endpoint y el mismo flujo técnico, centralizar la operación
+  invariable en su dueño más cercano y representar las variantes mediante contratos tipados.
+- Mantener separados los mappers, validaciones y textos cuando expresan reglas propias de una
+  sección; la centralización no debe borrar responsabilidades de dominio.
+- No detectar interfaces inspeccionando la forma de un objeto en ejecución. Cuando una operación
+  admite varios modelos, utilizar una unión discriminada, una clave estable y tipado exhaustivo.
+- Centralizar identificadores repetidos mediante enums o catálogos cuando representan identidad de
+  dominio; conservar literales únicamente en su fuente de definición o en contratos externos.
+- No crear una abstracción por coincidencia visual o por una única repetición local. Debe existir
+  un comportamiento común estable o una extensión inmediata que justifique el contrato.
+- Al terminar, buscar métodos anteriores, imports, tipos, constantes, pruebas y ramas que hayan
+  quedado obsoletos; la refactorización no deja compatibilidad interna ni código muerto sin una
+  necesidad vigente.
+
+La propuesta previa a una migración debe señalar las duplicidades encontradas, qué se compartirá y
+qué permanecerá específico. Si la auditoría no encuentra una mejora justificada, se conserva la
+implementación directa.
 
 ## Layouts y navegación
 
@@ -70,6 +101,8 @@ layouts/panel/
 - Mantener contratos y formularios estrictamente tipados.
 - Mantener HTTP, sesión y navegación fuera de los componentes presentacionales.
 - Proteger las rutas mediante guards que devuelvan su resultado al router, sin navegar internamente.
+- Compartir ciclos estables de carga, error, guardado y bloqueo mediante un servicio proporcionado
+  por la página. Los formularios no heredan una base ni reciben responsabilidades de navegación.
 - Centralizar constantes compartidas en el nivel más cercano que permita reutilizarlas.
 - Evitar clases base cuando composición, directivas o servicios expresen mejor la responsabilidad.
 

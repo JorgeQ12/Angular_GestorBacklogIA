@@ -12,15 +12,19 @@ describe('navegación de creación de proyectos', () => {
     [4, '/panel/proyectos/42/creacion/objetivos'],
     [5, '/panel/proyectos/42/creacion/alcance'],
     [6, '/panel/proyectos/42/creacion/roles'],
+    [7, '/panel/proyectos/42/creacion/equipo'],
+    [8, '/panel/proyectos/42/creacion/flujo'],
   ])('reanuda el avance %s en su ruta correspondiente', (pasoActual, urlEsperada) => {
     expect(crearUrlReanudacionProyecto(42, pasoActual)).toBe(urlEsperada);
   });
 
   it('conserva el último destino migrado para avances posteriores', () => {
-    expect(crearUrlReanudacionProyecto(42, 8)).toBe('/panel/proyectos/42/creacion/roles');
+    expect(crearUrlReanudacionProyecto(42, 9)).toBe('/panel/proyectos/42/creacion/flujo');
   });
 
-  it('no inventa rutas para pasos todavía no migrados', () => {
-    expect(crearUrlPasoCreacionProyecto(42, ClaveSeccionProyecto.Equipo)).toBeNull();
+  it('construye la ruta estable del siguiente paso', () => {
+    expect(crearUrlPasoCreacionProyecto(42, ClaveSeccionProyecto.Equipo)).toBe(
+      '/panel/proyectos/42/creacion/equipo',
+    );
   });
 });

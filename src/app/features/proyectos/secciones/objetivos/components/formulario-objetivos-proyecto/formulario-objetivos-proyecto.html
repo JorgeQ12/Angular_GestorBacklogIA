@@ -24,7 +24,10 @@
       ></textarea>
     </div>
 
-    <section class="formulario-objetivos__especificos" aria-labelledby="titulo-objetivos-especificos">
+    <section
+      class="formulario-objetivos__especificos"
+      aria-labelledby="titulo-objetivos-especificos"
+    >
       <header class="formulario-objetivos__encabezado-lista">
         <div>
           <h3 id="titulo-objetivos-especificos">Objetivos específicos</h3>
@@ -35,7 +38,9 @@
           <button
             type="button"
             class="ui-button ui-button--secondary ui-button--md"
-            [disabled]="procesando() || controlesObjetivosEspecificos.length >= limites.objetivosEspecificos"
+            [disabled]="
+              procesando() || controlesObjetivosEspecificos.length >= limites.objetivosEspecificos
+            "
             (click)="agregarObjetivoEspecifico()"
           >
             <app-icono class="ui-button__icon" nombre="agregar" />

@@ -43,10 +43,18 @@ Migra compartidos dentro del mismo flujo cuando exista un contrato transversal a
 una pieza a `shared` por reutilización hipotética ni crees carpetas para un único archivo sin una
 expectativa concreta de crecimiento.
 
+## Auditar antes de diseñar
+
+Aplica la sección “Auditoría previa a una migración o extensión” de las convenciones generales. En
+proporción al cambio, revisa horizontalmente la capacidad destino y no solo el archivo solicitado.
+Antes de implementar, identifica duplicidades, contratos ya disponibles, puntos de centralización
+y responsabilidades que deben continuar específicas. Usa esos hallazgos para proponer o ajustar la
+estructura; no esperes a que la repetición aparezca después de migrar varios pasos.
+
 ## Ejecutar la migración
 
 1. Compara estructura, comportamiento, estados, accesibilidad, estilos, dependencias y contratos
-   entre origen y destino.
+   entre origen y destino, incorporando los hallazgos de la auditoría previa.
 2. Identifica qué se conserva, qué ya existe en el destino y qué mejora es necesaria para integrarlo.
 3. Implementa el cambio en la capa correspondiente. Mantén HTTP, router, sesión y permisos fuera de
    componentes presentacionales.
@@ -56,7 +64,8 @@ expectativa concreta de crecimiento.
    dupliques el loader global ni conviertas errores en estados vacíos.
 6. Añade o actualiza pruebas sobre contratos y comportamiento observable; evita pruebas que solo
    reproduzcan la implementación.
-7. Verifica el resultado en proporción al cambio y ejecuta la verificación mínima establecida en las
+7. Busca implementaciones anteriores, imports y tipos obsoletos para no dejar código muerto.
+8. Verifica el resultado en proporción al cambio y ejecuta la verificación mínima establecida en las
    convenciones antes de cerrar una migración completa.
 
 No introduzcas roles, endpoints, servicios o abstracciones ficticias para completar partes todavía

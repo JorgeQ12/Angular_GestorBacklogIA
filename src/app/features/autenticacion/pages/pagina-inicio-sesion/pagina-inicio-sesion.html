@@ -1,5 +1,9 @@
 <main class="inicio-sesion">
-  <section class="inicio-sesion__tarjeta" aria-labelledby="inicio-sesion-titulo" aria-describedby="inicio-sesion-subtitulo">
+  <section
+    class="inicio-sesion__tarjeta"
+    aria-labelledby="inicio-sesion-titulo"
+    aria-describedby="inicio-sesion-subtitulo"
+  >
     <header class="inicio-sesion__encabezado">
       <span class="inicio-sesion__marca" aria-hidden="true">
         <img src="/brand/logo.svg" width="109" height="158" alt="" />
@@ -9,6 +13,9 @@
         Continúa con tu cuenta corporativa de Microsoft.
       </p>
     </header>
-    <app-acceso-microsoft [autenticando]="autenticando()" (iniciarSesion)="iniciarSesionConMicrosoft()" />
+    <app-acceso-microsoft
+      [autenticando]="autenticando()"
+      (iniciarSesion)="iniciarSesionConMicrosoft()"
+    />
   </section>
 </main>

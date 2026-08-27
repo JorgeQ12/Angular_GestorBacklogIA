@@ -15,6 +15,7 @@ import {
 import { construirEstadoRecorridoCreacion } from '../../mappers/estado-recorrido-creacion-proyecto.mapper';
 import { crearUrlPasoCreacionProyecto } from '../../mappers/navegacion-creacion-proyecto.mapper';
 import { EstadoCreacionProyectoService } from '../../services/estado-creacion-proyecto.service';
+import { ContenidoEncabezadoPasoCreacionService } from '../../services/contenido-encabezado-paso-creacion.service';
 
 /** Compone el encabezado, el recorrido y el paso activo de creación. */
 @Component({
@@ -28,6 +29,7 @@ export class PaginaCreacionProyecto {
   private readonly ruta = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly estadoCreacion = inject(EstadoCreacionProyectoService);
+  protected readonly encabezadoPaso = inject(ContenidoEncabezadoPasoCreacionService);
   private readonly idProyecto =
     this.ruta.snapshot.paramMap.get(PARAMETROS_RUTA.proyectoId)?.trim() ?? '';
   private readonly navegacionFinalizada = toSignal(

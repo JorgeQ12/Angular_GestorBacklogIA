@@ -6,7 +6,10 @@ import { ResultadoApi } from '../../../../core/http/models/resultado-api.model';
 import { ClaveSeccionProyecto } from '../../config/secciones-proyecto.config';
 import { ENDPOINTS_CREACION_PROYECTO } from '../config/endpoints-creacion-proyecto.config';
 import { CrearBorradorProyectoRespuestaDto } from '../models/borrador-proyecto.dto';
-import { ValidarVinculacionAzureRespuestaDto } from '../models/vinculacion-azure.dto';
+import {
+  SincronizarEquipoAzureRespuestaDto,
+  ValidarVinculacionAzureRespuestaDto,
+} from '../models/vinculacion-azure.dto';
 import { DatosVinculacionAzure } from '../models/vinculacion-azure.model';
 import { CreacionProyectoService } from './creacion-proyecto.service';
 
@@ -100,6 +103,47 @@ describe('CreacionProyectoService', () => {
         nombre: 'InterIA',
         prioridadCatalogoId: null,
       },
+      equipoAzure: {
+        idEquipo: VINCULACION_DTO.teamId,
+        nombreEquipo: 'Producto',
+      },
+    });
+  });
+
+  it('sincroniza el Team de Azure y adapta sus integrantes', async () => {
+    const respuesta = firstValueFrom(servicio.sincronizarEquipoAzure(42));
+    const solicitud = httpTesting.expectOne(
+      (peticion) =>
+        peticion.url === ENDPOINTS_CREACION_PROYECTO.sincronizarEquipoAzure &&
+        peticion.params.get('ProyectoId') === '42',
+    );
+
+    expect(solicitud.request.method).toBe('POST');
+    expect(solicitud.request.body).toBeNull();
+    solicitud.flush(
+      crearResultado({
+        teamId: 'team-1',
+        teamNombre: 'Producto',
+        miembros: [
+          { id: 'u1', nombre: 'Jorge', correo: 'jorge@interia.co', esAdministrador: true },
+        ],
+        grupos: [],
+        fechaSincronizacion: '2026-08-27T10:00:00Z',
+      } satisfies SincronizarEquipoAzureRespuestaDto),
+    );
+
+    await expect(respuesta).resolves.toEqual({
+      idEquipo: 'team-1',
+      nombreEquipo: 'Producto',
+      integrantes: [
+        {
+          idAzure: 'u1',
+          nombre: 'Jorge',
+          correo: 'jorge@interia.co',
+          esAdministradorAzure: true,
+        },
+      ],
+      fechaSincronizacion: '2026-08-27T10:00:00Z',
     });
   });
 

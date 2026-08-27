@@ -18,10 +18,7 @@ describe('PaginaInicioSesion', () => {
 
     await TestBed.configureTestingModule({
       imports: [PaginaInicioSesion],
-      providers: [
-        provideRouter([]),
-        { provide: AutenticacionService, useValue: autenticacion },
-      ],
+      providers: [provideRouter([]), { provide: AutenticacionService, useValue: autenticacion }],
     }).compileComponents();
 
     fixture = TestBed.createComponent(PaginaInicioSesion);

@@ -1,7 +1,4 @@
-import {
-  MensajesError,
-  MensajesFormulario,
-} from '../../../../../shared/forms/errores-validacion';
+import { MensajesError, MensajesFormulario } from '../../../../../shared/forms/errores-validacion';
 import { CampoObjetivosProyecto } from '../models/formulario-objetivos-proyecto.model';
 
 /** Conserva los límites funcionales de la definición de Objetivos. */

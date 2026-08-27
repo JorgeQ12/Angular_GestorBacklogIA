@@ -25,10 +25,7 @@ describe('sesionGuard', () => {
     autenticacion.verificarSesion.mockReturnValue(of({ nombre: 'Jorge' }));
 
     TestBed.configureTestingModule({
-      providers: [
-        provideRouter([]),
-        { provide: AutenticacionService, useValue: autenticacion },
-      ],
+      providers: [provideRouter([]), { provide: AutenticacionService, useValue: autenticacion }],
     });
   });
 

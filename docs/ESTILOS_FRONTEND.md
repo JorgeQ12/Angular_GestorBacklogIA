@@ -149,6 +149,7 @@ profundos como `.mi-feature .ui-control` si el cambio representa una variante re
 
 `primitives/forms.css` es responsable de:
 
+- `.ui-visually-hidden` para conservar etiquetas accesibles sin alterar el layout.
 - `.ui-field` y `.ui-label`.
 - `.ui-control-wrap` y `.ui-control`.
 - Tamaños y espaciado para iconos o acciones.

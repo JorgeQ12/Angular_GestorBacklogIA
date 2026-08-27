@@ -55,6 +55,12 @@ describe('avancePasoCreacionProyectoGuard', () => {
     await expect(ejecutarGuard(ClaveSeccionProyecto.Roles)).resolves.toBe(true);
   });
 
+  it('permite abrir Equipo cuando Roles ya fue completado', async () => {
+    estadoCreacion.cargar.mockReturnValue(of({ ...BORRADOR, pasoActual: 7 }));
+
+    await expect(ejecutarGuard(ClaveSeccionProyecto.Equipo)).resolves.toBe(true);
+  });
+
   it('deja que la página presente el error cuando no puede recuperar el borrador', async () => {
     estadoCreacion.cargar.mockReturnValue(throwError(() => new Error('Sin conexión')));
 

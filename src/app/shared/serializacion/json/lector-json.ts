@@ -1,6 +1,16 @@
 /** Representa un objeto JSON comprobado sin asumir un contrato de dominio. */
 export type ObjetoJson = Readonly<Record<string, unknown>>;
 
+/** Recupera una colección JSON sin propagar errores ni aceptar otros tipos de valor. */
+export function deserializarListaJson(contenido: string): readonly unknown[] | null {
+  try {
+    const valor: unknown = JSON.parse(contenido || 'null');
+    return Array.isArray(valor) ? valor : null;
+  } catch {
+    return null;
+  }
+}
+
 /** Recupera un objeto JSON sin propagar errores ni aceptar colecciones como objetos. */
 export function deserializarObjetoJson(contenido: string): ObjetoJson {
   try {

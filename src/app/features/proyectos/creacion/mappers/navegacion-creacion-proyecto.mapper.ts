@@ -1,6 +1,8 @@
 import {
   crearUrlAlcanceProyecto,
   crearUrlContextoProyecto,
+  crearUrlEquipoProyecto,
+  crearUrlFlujoProyecto,
   crearUrlNecesidadProyecto,
   crearUrlObjetivosProyecto,
   crearUrlRolesProyecto,
@@ -23,6 +25,8 @@ const CONSTRUCTORES_URL_PASO: Partial<Record<ClavePasoCreacionProyecto, Construc
   [ClaveSeccionProyecto.Objetivos]: crearUrlObjetivosProyecto,
   [ClaveSeccionProyecto.Alcance]: crearUrlAlcanceProyecto,
   [ClaveSeccionProyecto.Roles]: crearUrlRolesProyecto,
+  [ClaveSeccionProyecto.Equipo]: crearUrlEquipoProyecto,
+  [ClaveSeccionProyecto.Flujo]: crearUrlFlujoProyecto,
 };
 
 /** Construye la URL de un paso disponible dentro del recorrido migrado. */

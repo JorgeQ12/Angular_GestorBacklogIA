@@ -1,0 +1,147 @@
+:host {
+  display: block;
+}
+
+.formulario-roles {
+  display: flex;
+  flex-direction: column;
+}
+
+.formulario-roles__contenido {
+  display: grid;
+  gap: var(--space-5);
+  padding: var(--space-6);
+}
+
+.formulario-roles__encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.formulario-roles__encabezado h3,
+.formulario-roles__encabezado p {
+  margin: 0;
+}
+
+.formulario-roles__encabezado h3 {
+  color: var(--text-primary);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+}
+
+.formulario-roles__encabezado p {
+  margin-top: var(--space-1);
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.formulario-roles__lista {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.formulario-roles__item {
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr) 2.75rem;
+  align-items: start;
+  column-gap: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: var(--border-width) solid var(--card-divider);
+}
+
+.formulario-roles__campos {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.formulario-roles__numero {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  grid-column: 1;
+  grid-row: 1;
+  margin-top: 1.75rem;
+  border: var(--border-width) solid var(--card-divider);
+  border-radius: var(--radius-sm);
+  background: var(--surface-muted);
+  color: var(--text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+}
+
+.formulario-roles__eliminar {
+  display: grid;
+  width: 2.75rem;
+  height: var(--control-height-lg);
+  place-items: center;
+  grid-column: 3;
+  grid-row: 1;
+  margin-top: 1.25rem;
+  padding: 0;
+  border: var(--border-width) solid transparent;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text-muted);
+  transition:
+    background-color var(--transition-base) var(--ease-standard),
+    color var(--transition-base) var(--ease-standard);
+}
+
+.formulario-roles__eliminar app-icono {
+  width: 1rem;
+  height: 1rem;
+}
+
+.formulario-roles__eliminar:hover:not(:disabled) {
+  background: var(--color-danger-surface);
+  color: var(--color-danger);
+}
+
+.formulario-roles__eliminar:focus-visible {
+  outline: 0;
+  box-shadow: var(--shadow-focus);
+}
+
+.formulario-roles__eliminar:disabled {
+  color: var(--text-disabled);
+  opacity: 0.55;
+}
+
+@media (max-width: 760px) {
+  .formulario-roles__contenido {
+    padding: var(--space-4);
+  }
+
+  .formulario-roles__encabezado {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .formulario-roles__encabezado .ui-button {
+    align-self: flex-start;
+  }
+
+  .formulario-roles__item {
+    grid-template-columns: minmax(0, 1fr) 2.75rem;
+  }
+
+  .formulario-roles__campos {
+    grid-template-columns: 1fr;
+    grid-column: 1;
+  }
+
+  .formulario-roles__eliminar {
+    grid-column: 2;
+  }
+
+  .formulario-roles__numero {
+    display: none;
+  }
+}

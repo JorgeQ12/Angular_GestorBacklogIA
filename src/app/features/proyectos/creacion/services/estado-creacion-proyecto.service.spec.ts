@@ -231,12 +231,54 @@ describe('EstadoCreacionProyectoService', () => {
       8,
     );
   });
+
+  it('avanza a Equipo al guardar Roles', async () => {
+    const roles = {
+      roles: [{ nombre: 'Administrador', descripcion: 'Configura la solución.' }],
+    };
+    await firstValueFrom(servicio.cargar(42));
+    await firstValueFrom(
+      servicio.guardarSeccion({ seccion: ClaveSeccionProyecto.Roles, datos: roles }),
+    );
+
+    expect(creacionProyecto.actualizarBorrador).toHaveBeenCalledWith(
+      BORRADOR,
+      { seccion: ClaveSeccionProyecto.Roles, datos: roles },
+      7,
+    );
+  });
+
+  it('avanza a Flujo al guardar Equipo', async () => {
+    const equipo = {
+      integrantes: [
+        {
+          idAzure: 'u1',
+          nombre: 'Jorge',
+          correo: null,
+          esAdministradorAzure: false,
+          perfilTecnicoCodigo: 'devops',
+          dedicacionCodigo: '100',
+        },
+      ],
+    };
+    await firstValueFrom(servicio.cargar(42));
+    await firstValueFrom(
+      servicio.guardarSeccion({ seccion: ClaveSeccionProyecto.Equipo, datos: equipo }),
+    );
+
+    expect(creacionProyecto.actualizarBorrador).toHaveBeenCalledWith(
+      BORRADOR,
+      { seccion: ClaveSeccionProyecto.Equipo, datos: equipo },
+      8,
+    );
+  });
 });
 
 const BORRADOR: BorradorProyecto = {
   id: 42,
   revision: 3,
   pasoActual: 1,
+  equipoAzure: null,
   contexto: {
     nombre: 'InterIA',
     responsable: 'Jorge',

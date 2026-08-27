@@ -1,4 +1,5 @@
 import { ContextoProyecto } from '../../secciones/contexto/models/contexto-proyecto.model';
+import { OrigenEquipoAzureProyecto } from '../../secciones/equipo/models/equipo-proyecto.model';
 
 /** Identifica el borrador que continuará en el recorrido de creación. */
 export interface BorradorProyectoCreado {
@@ -13,6 +14,7 @@ export interface BorradorProyecto {
   readonly revision: number;
   readonly pasoActual: number;
   readonly contexto: ContextoProyecto;
+  readonly equipoAzure: OrigenEquipoAzureProyecto | null;
   readonly estadoCatalogoId: number | null;
   readonly tipoSolucionJson: string;
   readonly necesidadJson: string;
@@ -31,4 +33,6 @@ export interface CambiosBorradorProyecto {
   readonly necesidadJson?: string;
   readonly objetivosJson?: string;
   readonly alcanceJson?: string;
+  readonly rolesJson?: string;
+  readonly equipoJson?: string;
 }

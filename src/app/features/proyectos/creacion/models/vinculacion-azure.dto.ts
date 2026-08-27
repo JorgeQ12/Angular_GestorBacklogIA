@@ -45,3 +45,12 @@ export interface VinculacionAzureDto {
 
 /** Refleja la respuesta de la validación previa en Azure. */
 export type ValidarVinculacionAzureRespuestaDto = VinculacionAzureDto;
+
+/** Refleja la membresía renovada desde el Team vinculado en Azure. */
+export interface SincronizarEquipoAzureRespuestaDto {
+  teamId: string;
+  teamNombre: string;
+  miembros: readonly MiembroEquipoAzureDto[];
+  grupos: readonly MiembroEquipoAzureDto[];
+  fechaSincronizacion: string;
+}

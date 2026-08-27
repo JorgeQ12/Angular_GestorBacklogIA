@@ -4,6 +4,8 @@ export const SEGMENTOS_RUTA = {
   autenticacion: 'autenticacion',
   contexto: 'contexto',
   creacion: 'creacion',
+  equipo: 'equipo',
+  flujo: 'flujo',
   iniciarSesion: 'iniciar-sesion',
   inicio: 'inicio',
   necesidad: 'necesidad',
@@ -86,4 +88,18 @@ export function crearUrlRolesProyecto(proyectoId: number | string): string {
   return `/${RUTA_PANEL}/${SEGMENTOS_RUTA.proyectos}/${encodeURIComponent(
     String(proyectoId),
   )}/${SEGMENTOS_RUTA.creacion}/${SEGMENTOS_RUTA.roles}`;
+}
+
+/** Construye la URL de Equipo dentro de la creación de un proyecto. */
+export function crearUrlEquipoProyecto(proyectoId: number | string): string {
+  return `/${RUTA_PANEL}/${SEGMENTOS_RUTA.proyectos}/${encodeURIComponent(
+    String(proyectoId),
+  )}/${SEGMENTOS_RUTA.creacion}/${SEGMENTOS_RUTA.equipo}`;
+}
+
+/** Construye la URL de Flujo de usuario dentro de la creación de un proyecto. */
+export function crearUrlFlujoProyecto(proyectoId: number | string): string {
+  return `/${RUTA_PANEL}/${SEGMENTOS_RUTA.proyectos}/${encodeURIComponent(
+    String(proyectoId),
+  )}/${SEGMENTOS_RUTA.creacion}/${SEGMENTOS_RUTA.flujo}`;
 }

@@ -69,4 +69,10 @@ export const DATOS_RUTA_PASOS_CREACION = {
   roles: {
     pasoActual: ClaveSeccionProyecto.Roles,
   },
+  equipo: {
+    pasoActual: ClaveSeccionProyecto.Equipo,
+  },
+  flujo: {
+    pasoActual: ClaveSeccionProyecto.Flujo,
+  },
 } as const satisfies Record<string, DatosRutaPasoCreacionProyecto>;

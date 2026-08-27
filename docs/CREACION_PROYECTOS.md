@@ -59,6 +59,7 @@ páginas, persistencia, navegación y estado de flujo.
 
 ```text
 features/proyectos/
+├── proyectos.routes.ts
 ├── config/
 │   └── secciones-proyecto.config.ts
 ├── secciones/
@@ -90,6 +91,10 @@ features/proyectos/
 
 La capacidad `informacion` se incorporará cuando se migre su experiencia real; no se crean
 carpetas o componentes vacíos como anticipación.
+
+`app.routes.ts` carga el segmento `proyectos` mediante `loadChildren`. La feature conserva en
+`proyectos.routes.ts` sus rutas hijas, guards y providers; así el recorrido de creación no forma
+parte del bundle inicial y cada página continúa usando `loadComponent`.
 
 ### Convención entre secciones y pasos
 
@@ -181,6 +186,13 @@ creación.
 Carga el borrador una sola vez mientras el recorrido permanece activo, conserva su revisión y
 entrega la fotografía actualizada al siguiente paso.
 
+`CoordinadorPasoCreacionProyectoService` se proporciona en cada página de sección que utiliza el
+ciclo común. Centraliza el parámetro del proyecto, la carga reintentable, el bloqueo de envíos
+duplicados, el guardado, la notificación y la navegación exitosa. Su instancia se destruye al salir
+de la página; el componente conserva únicamente la adaptación de su sección y el destino siguiente.
+Contexto mantiene su coordinación particular porque también combina catálogos y comunica el nombre
+al shell. No se introduce una clase base ni se trasladan estas responsabilidades a los formularios.
+
 El mismo estado conserva el nombre vigente del proyecto. `FormularioContextoProyecto` comunica el
 nombre mientras se escribe, la página de Contexto actualiza el estado y el shell lo presenta como
 título del encabezado. El formulario no conoce el encabezado y los pasos siguientes conservan la
@@ -260,9 +272,9 @@ datos versionada en el backend. No se trasladan reglas temporales de migración 
 de cada sección.
 
 La comprobación estructural repetida vive en `shared/serializacion/json/lector-json.ts`. Este lector
-solo confirma que el contenido sea un objeto JSON y permite recuperar texto normalizado; no asigna
-tipos de dominio ni valida contratos funcionales. Cada sección conserva su propio mapper para
-decidir las claves admitidas, los valores parciales y el formato que persiste.
+solo confirma si el contenido es un objeto o una colección JSON y permite recuperar texto
+normalizado; no asigna tipos de dominio ni valida contratos funcionales. Cada sección conserva su
+propio mapper para decidir las claves admitidas, los valores parciales y el formato que persiste.
 
 ## Implementación de Objetivos
 
@@ -298,6 +310,75 @@ Alcance define de forma explícita los límites funcionales del proyecto:
 
 El formato persistido es `{"incluido":"...","excluido":"..."}`. Información del proyecto
 reutilizará el modelo y el mapper, pero presentará los límites mediante una vista de lectura propia.
+
+## Implementación de Roles
+
+Roles representa perfiles funcionales del proyecto, no permisos ni roles de seguridad del
+aplicativo:
+
+- `proyectos/secciones/roles` contiene el modelo, el formulario dinámico, la configuración y el
+  mapper reutilizables.
+- El contrato canónico usa una colección de objetos con `nombre` y `descripcion`; no admite las
+  claves anteriores `name` y `description`.
+- Se exige al menos un rol, ambos campos son obligatorios y los nombres deben ser únicos ignorando
+  mayúsculas y espacios exteriores.
+- El formulario administra el `FormArray`, conserva alineadas las acciones aunque aparezcan
+  errores y no conoce el borrador ni la navegación.
+- Los roles sugeridos del componente anterior no se conservan como literales. Si el producto los
+  requiere, deben provenir de una configuración o catálogo explícito.
+- La página carga y guarda mediante el coordinador común de los pasos de creación.
+- Guardar Roles lleva `pasoActual` al menos a 7 y abre el destino estable de Equipo.
+
+El formato persistido es
+`[{"nombre":"Administrador","descripcion":"Configura la solución."}]`. Información del
+proyecto reutilizará este modelo y el mapper, pero mostrará los perfiles mediante una vista de
+lectura propia.
+
+## Implementación de Equipo
+
+Equipo configura la participación de las personas importadas desde el Team vinculado en Azure
+DevOps. No duplica los roles funcionales definidos en el paso anterior:
+
+- `proyectos/secciones/equipo` contiene el modelo, el formulario, la configuración y el mapper
+  reutilizables.
+- La identidad de cada integrante (`idAzure`, nombre, correo y condición de administrador) es de
+  solo lectura y siempre se renueva desde Azure.
+- La configuración local asigna `perfilTecnicoCodigo` y `dedicacionCodigo`; ambos son obligatorios
+  para guardar la sección.
+- El formulario presenta búsqueda por nombre o correo y filtros de todos, pendientes y
+  configurados. No pagina el Team ni oculta el progreso general.
+- La selección múltiple permite aplicar un perfil técnico, una dedicación o ambos valores a todas
+  las personas seleccionadas. La selección es estado temporal de interfaz y no se persiste.
+- “Actualizar desde Azure” consulta nuevamente la membresía, relaciona integrantes mediante
+  `idAzure`, conserva sus asignaciones, incorpora personas nuevas sin configurar y retira las que
+  ya no pertenecen al Team.
+- El componente compartido emite la fotografía vigente antes de sincronizar; la página coordina
+  HTTP, errores y la combinación resultante sin trasladar esas responsabilidades al formulario.
+- Guardar Equipo lleva `pasoActual` al menos a 8 y abre el destino estable de Flujo de usuario.
+
+El formato persistido es una colección canónica en español:
+
+```json
+[
+  {
+    "idAzure": "usuario-1",
+    "nombre": "María Gómez",
+    "correo": "maria@empresa.co",
+    "esAdministradorAzure": false,
+    "perfilTecnicoCodigo": "qa",
+    "dedicacionCodigo": "75"
+  }
+]
+```
+
+Los perfiles técnicos y dedicaciones viven temporalmente en
+`equipo/config/equipo-proyecto.config.ts`. Los componentes consumen códigos estables y no repiten
+literales. Cuando el backend exponga catálogos oficiales, la página los proporcionará al formulario
+sin modificar el contrato persistido ni la composición de la sección.
+
+En Información del proyecto, Equipo reutilizará el modelo y el mapper. La identidad proveniente de
+Azure se mostrará mediante una vista de detalle; cualquier edición futura de asignaciones usará una
+operación propia de Información y no la persistencia del recorrido de creación.
 
 ## Recorrido de creación
 

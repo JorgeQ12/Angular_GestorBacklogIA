@@ -34,9 +34,7 @@
 .cargador-global__recorrido {
   --cargador-ancho-camion: 10rem;
   position: relative;
-  width: calc(
-    100% + var(--cargador-padding-horizontal) + var(--cargador-padding-horizontal)
-  );
+  width: calc(100% + var(--cargador-padding-horizontal) + var(--cargador-padding-horizontal));
   height: 7rem;
   flex-shrink: 0;
   margin-inline: calc(-1 * var(--cargador-padding-horizontal));
@@ -145,12 +143,7 @@
 
   100% {
     opacity: 0;
-    transform: translate3d(
-        calc(-1 * var(--space-8)),
-        calc(-1 * var(--space-3)),
-        0
-      )
-      scale(1.55);
+    transform: translate3d(calc(-1 * var(--space-8)), calc(-1 * var(--space-3)), 0) scale(1.55);
   }
 }
 

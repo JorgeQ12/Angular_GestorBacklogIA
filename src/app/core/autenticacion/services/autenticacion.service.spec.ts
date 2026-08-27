@@ -89,10 +89,9 @@ describe('AutenticacionService', () => {
 
     const solicitud = httpTesting.expectOne(ENDPOINTS_AUTENTICACION.sesionActual);
     expect(solicitud.request.withCredentials).toBe(true);
-    solicitud.flush(
-      'contenido ignorado',
-      { headers: new HttpHeaders({ 'X-User-Name': 'Jorge Quintero' }) },
-    );
+    solicitud.flush('contenido ignorado', {
+      headers: new HttpHeaders({ 'X-User-Name': 'Jorge Quintero' }),
+    });
 
     expect(nombre).toBe('Jorge Quintero');
     expect(servicio.sesionActual()).toEqual({ nombre: 'Jorge Quintero' });

@@ -98,6 +98,19 @@ describe('mapeadores de creación de proyecto', () => {
       fechaObjetivo: '2026-09-30',
     });
     expect(borrador.tipoSolucionJson).toBe('{"tieneInterfaz":true}');
+    expect(borrador.equipoAzure).toEqual({
+      idEquipo: VINCULACION_DTO.teamId,
+      nombreEquipo: 'Producto',
+      integrantes: [
+        {
+          idAzure: 'usuario-1',
+          nombre: 'Jorge',
+          correo: null,
+          esAdministradorAzure: true,
+        },
+      ],
+      fechaSincronizacion: null,
+    });
   });
 
   it('combina Contexto con las secciones no modificadas del borrador', () => {
@@ -174,6 +187,32 @@ describe('mapeadores de creación de proyecto', () => {
       objetivosJson: '{}',
       alcanceJson: '{"incluido":"Seguimiento","excluido":"Pagos"}',
       rolesJson: '[]',
+    });
+  });
+
+  it('reemplaza únicamente el JSON de Roles', () => {
+    const borrador = mapearBorradorProyecto(crearBorradorDto());
+    const rolesJson = '[{"nombre":"Administrador","descripcion":"Configura"}]';
+    const solicitud = mapearActualizacionBorrador(borrador, { rolesJson }, 7);
+
+    expect(solicitud).toMatchObject({
+      pasoActual: 7,
+      alcanceJson: '{}',
+      rolesJson,
+      equipoJson: '[]',
+    });
+  });
+
+  it('reemplaza únicamente el JSON de Equipo', () => {
+    const borrador = mapearBorradorProyecto(crearBorradorDto());
+    const equipoJson = '[{"idAzure":"u1","perfilTecnicoCodigo":"qa"}]';
+    const solicitud = mapearActualizacionBorrador(borrador, { equipoJson }, 8);
+
+    expect(solicitud).toMatchObject({
+      pasoActual: 8,
+      rolesJson: '[]',
+      equipoJson,
+      diagramFlujoJson: '{}',
     });
   });
 });

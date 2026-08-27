@@ -54,8 +54,8 @@
 
 .formulario-objetivos__encabezado-lista h3 {
   color: var(--text-primary);
-  font-size: var(--font-size-base);
-  line-height: var(--line-height-tight);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
 }
 
 .formulario-objetivos__encabezado-lista p {

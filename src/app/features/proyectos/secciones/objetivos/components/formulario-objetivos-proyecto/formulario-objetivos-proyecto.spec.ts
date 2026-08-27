@@ -50,9 +50,11 @@ describe('FormularioObjetivosProyecto', () => {
 
     expect(obtenerElemento().querySelectorAll('[id^="objetivos-especifico-"]')).toHaveLength(8);
     expect(
-      (obtenerElemento().querySelector(
-        '.formulario-objetivos__acciones-lista button',
-      ) as HTMLButtonElement).disabled,
+      (
+        obtenerElemento().querySelector(
+          '.formulario-objetivos__acciones-lista button',
+        ) as HTMLButtonElement
+      ).disabled,
     ).toBe(true);
   });
 
@@ -93,9 +95,11 @@ describe('FormularioObjetivosProyecto', () => {
     expect(obtenerControl('#objetivos-general').disabled).toBe(true);
     expect(obtenerControl('#objetivos-especifico-0').disabled).toBe(true);
     expect(
-      (obtenerElemento().querySelector(
-        '.formulario-objetivos__acciones-lista button',
-      ) as HTMLButtonElement).disabled,
+      (
+        obtenerElemento().querySelector(
+          '.formulario-objetivos__acciones-lista button',
+        ) as HTMLButtonElement
+      ).disabled,
     ).toBe(true);
   });
 

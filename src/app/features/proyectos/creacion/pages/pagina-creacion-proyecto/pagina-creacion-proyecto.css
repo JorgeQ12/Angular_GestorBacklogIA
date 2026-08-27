@@ -33,6 +33,41 @@
   line-height: var(--line-height-snug);
 }
 
+.pagina-creacion__detalle-paso {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-snug);
+}
+
+.pagina-creacion__detalle-paso app-icono {
+  width: var(--font-size-sm);
+  height: var(--font-size-sm);
+  flex: 0 0 auto;
+}
+
+.pagina-creacion__detalle-paso strong {
+  overflow: hidden;
+  color: var(--text-secondary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .pagina-creacion__encabezado-paso {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .pagina-creacion__encabezado-paso .ui-button {
+    width: 100%;
+  }
+}
+
 .pagina-creacion__contenido {
   background: var(--card-surface);
 }

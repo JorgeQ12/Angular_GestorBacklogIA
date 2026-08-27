@@ -1,0 +1,198 @@
+<form class="formulario-equipo" [formGroup]="formulario" (ngSubmit)="enviar()">
+  <section class="formulario-equipo__contenido" aria-labelledby="titulo-equipo-proyecto">
+    <header class="formulario-equipo__encabezado">
+      <div class="formulario-equipo__origen">
+        <span class="formulario-equipo__icono" aria-hidden="true">
+          <app-icono nombre="azureDevOps" />
+        </span>
+        <div>
+          <span>Equipo importado desde Azure DevOps</span>
+          <h3 id="titulo-equipo-proyecto">{{ nombreEquipo() }}</h3>
+          <p>{{ cantidadConfigurados() }} configurados · {{ cantidadPendientes() }} pendientes</p>
+        </div>
+      </div>
+      <button
+        type="button"
+        class="ui-button ui-button--secondary ui-button--md"
+        [disabled]="procesando() || sincronizando()"
+        (click)="solicitarSincronizacion()"
+      >
+        <app-icono class="ui-button__icon" nombre="reintentar" />
+        {{ sincronizando() ? 'Sincronizando' : 'Actualizar desde Azure' }}
+      </button>
+    </header>
+
+    @if (controlesIntegrantes().length > 0) {
+      <div class="formulario-equipo__herramientas">
+        <label class="formulario-equipo__buscar">
+          <span class="ui-visually-hidden">Buscar integrante</span>
+          <app-icono nombre="buscar" aria-hidden="true" />
+          <input
+            type="search"
+            placeholder="Buscar por nombre o correo"
+            [value]="busqueda()"
+            [disabled]="procesando() || sincronizando()"
+            (input)="actualizarBusqueda($event)"
+          />
+        </label>
+        <div class="formulario-equipo__filtros" aria-label="Filtrar integrantes">
+          <button
+            type="button"
+            [class.formulario-equipo__filtro--activo]="filtro() === 'todos'"
+            (click)="cambiarFiltro('todos')"
+          >
+            Todos <span>{{ controlesIntegrantes().length }}</span>
+          </button>
+          <button
+            type="button"
+            [class.formulario-equipo__filtro--activo]="filtro() === 'pendientes'"
+            (click)="cambiarFiltro('pendientes')"
+          >
+            Pendientes <span>{{ cantidadPendientes() }}</span>
+          </button>
+          <button
+            type="button"
+            [class.formulario-equipo__filtro--activo]="filtro() === 'configurados'"
+            (click)="cambiarFiltro('configurados')"
+          >
+            Configurados <span>{{ cantidadConfigurados() }}</span>
+          </button>
+        </div>
+      </div>
+
+      @if (seleccionados().size > 0) {
+        <div class="formulario-equipo__masivo" aria-label="Asignación masiva">
+          <strong>{{ seleccionados().size }} seleccionados</strong>
+          <div class="formulario-equipo__masivo-campos">
+            <app-selector-campo
+              id="equipo-perfil-masivo"
+              placeholder="Asignar perfil técnico"
+              [opciones]="perfilesTecnicos()"
+              [formControl]="asignacionMasiva.controls.perfilTecnicoCodigo"
+            />
+            <app-selector-campo
+              id="equipo-dedicacion-masiva"
+              placeholder="Asignar dedicación"
+              [opciones]="dedicaciones()"
+              [formControl]="asignacionMasiva.controls.dedicacionCodigo"
+            />
+            <button
+              type="button"
+              class="ui-button ui-button--primary ui-button--md"
+              [disabled]="!puedeAplicarAsignacion()"
+              (click)="aplicarAsignacionMasiva()"
+            >
+              Aplicar
+            </button>
+          </div>
+        </div>
+      }
+
+      <div class="formulario-equipo__tabla">
+        <div class="formulario-equipo__columnas">
+          <label>
+            <input
+              type="checkbox"
+              [checked]="todosVisiblesSeleccionados()"
+              [disabled]="controlesVisibles().length === 0 || procesando() || sincronizando()"
+              (change)="alternarSeleccionVisible($any($event.target).checked)"
+            />
+            <span class="ui-visually-hidden">Seleccionar integrantes visibles</span>
+          </label>
+          <span>Integrante</span>
+          <span>Perfil técnico</span>
+          <span>Dedicación</span>
+        </div>
+
+        <div formArrayName="integrantes">
+          @for (integrante of controlesVisibles(); track integrante.controls.idAzure.value) {
+            <article class="formulario-equipo__fila" [formGroup]="integrante">
+              <label class="formulario-equipo__seleccion">
+                <input
+                  type="checkbox"
+                  [checked]="seleccionados().has(integrante.controls.idAzure.value)"
+                  [disabled]="procesando() || sincronizando()"
+                  (change)="
+                    alternarSeleccion(
+                      integrante.controls.idAzure.value,
+                      $any($event.target).checked
+                    )
+                  "
+                />
+                <span class="ui-visually-hidden">
+                  Seleccionar {{ integrante.controls.nombre.value }}
+                </span>
+              </label>
+              <div class="formulario-equipo__persona">
+                <span class="formulario-equipo__avatar" aria-hidden="true">
+                  {{ integrante.controls.nombre.value.charAt(0).toUpperCase() }}
+                </span>
+                <div>
+                  <strong>{{ integrante.controls.nombre.value }}</strong>
+                  <span>{{ integrante.controls.correo.value || 'Sin correo disponible' }}</span>
+                </div>
+                @if (integrante.controls.esAdministradorAzure.value) {
+                  <small>Administrador Azure</small>
+                }
+              </div>
+              <div class="ui-field formulario-equipo__asignacion">
+                <label
+                  class="ui-label formulario-equipo__etiqueta-movil"
+                  [id]="'equipo-perfil-etiqueta-' + integrante.controls.idAzure.value"
+                >
+                  Perfil técnico
+                </label>
+                <app-selector-campo
+                  [id]="'equipo-perfil-' + integrante.controls.idAzure.value"
+                  [attr.id]="'equipo-perfil-' + integrante.controls.idAzure.value"
+                  [etiquetadoPor]="'equipo-perfil-etiqueta-' + integrante.controls.idAzure.value"
+                  [opciones]="perfilesTecnicos()"
+                  placeholder="Selecciona un perfil"
+                  formControlName="perfilTecnicoCodigo"
+                  [appMensajesError]="mensajesAsignacion"
+                  appErrorCampo
+                />
+              </div>
+              <div class="ui-field formulario-equipo__asignacion">
+                <label
+                  class="ui-label formulario-equipo__etiqueta-movil"
+                  [id]="'equipo-dedicacion-etiqueta-' + integrante.controls.idAzure.value"
+                >
+                  Dedicación
+                </label>
+                <app-selector-campo
+                  [id]="'equipo-dedicacion-' + integrante.controls.idAzure.value"
+                  [attr.id]="'equipo-dedicacion-' + integrante.controls.idAzure.value"
+                  [etiquetadoPor]="
+                    'equipo-dedicacion-etiqueta-' + integrante.controls.idAzure.value
+                  "
+                  [opciones]="dedicaciones()"
+                  placeholder="Selecciona dedicación"
+                  formControlName="dedicacionCodigo"
+                  [appMensajesError]="mensajesAsignacion"
+                  appErrorCampo
+                />
+              </div>
+            </article>
+          } @empty {
+            <app-estado-vacio
+              class="formulario-equipo__sin-resultados"
+              icono="equipo"
+              titulo="No encontramos integrantes"
+              descripcion="Ajusta la búsqueda o cambia el filtro para continuar."
+            />
+          }
+        </div>
+      </div>
+    } @else {
+      <app-estado-vacio
+        class="formulario-equipo__vacio"
+        icono="equipo"
+        titulo="El Team no tiene integrantes disponibles"
+        descripcion="Actualiza desde Azure después de revisar la membresía del Team vinculado."
+      />
+    }
+  </section>
+
+  <ng-content select="[accionesFormularioEquipo]" />
+</form>

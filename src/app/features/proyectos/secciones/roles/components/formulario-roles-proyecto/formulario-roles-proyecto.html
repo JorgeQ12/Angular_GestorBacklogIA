@@ -1,0 +1,66 @@
+<form class="formulario-roles" [formGroup]="formulario" (ngSubmit)="enviar()">
+  <section class="formulario-roles__contenido" aria-labelledby="titulo-roles-proyecto">
+    <header class="formulario-roles__encabezado">
+      <div>
+        <h3 id="titulo-roles-proyecto">Perfiles que participarán en la solución</h3>
+        <p>Define su nombre y la responsabilidad que tendrán dentro del proyecto.</p>
+      </div>
+      <button
+        type="button"
+        class="ui-button ui-button--secondary ui-button--md"
+        [disabled]="procesando()"
+        (click)="agregarRol()"
+      >
+        <app-icono class="ui-button__icon" nombre="agregar" />
+        Agregar rol
+      </button>
+    </header>
+
+    <div class="formulario-roles__lista" formArrayName="roles">
+      @for (rol of controlesRoles; track rol; let indice = $index) {
+        <div class="formulario-roles__item" [formGroupName]="indice">
+          <span class="formulario-roles__numero" aria-hidden="true">{{ indice + 1 }}</span>
+          <div class="formulario-roles__campos">
+            <div class="ui-field">
+              <label class="ui-label" [for]="'rol-nombre-' + indice">Nombre del rol</label>
+              <input
+                [id]="'rol-nombre-' + indice"
+                class="ui-control"
+                type="text"
+                formControlName="nombre"
+                [appMensajesError]="mensajesNombre"
+                placeholder="Ej. Administrador"
+                required
+                appErrorCampo
+              />
+            </div>
+            <div class="ui-field">
+              <label class="ui-label" [for]="'rol-descripcion-' + indice">Descripción</label>
+              <input
+                [id]="'rol-descripcion-' + indice"
+                class="ui-control"
+                type="text"
+                formControlName="descripcion"
+                [appMensajesError]="mensajesDescripcion"
+                placeholder="Describe qué hará este rol dentro de la solución."
+                required
+                appErrorCampo
+              />
+            </div>
+          </div>
+          <button
+            type="button"
+            class="formulario-roles__eliminar"
+            [disabled]="procesando() || controlesRoles.length <= 1"
+            [attr.aria-label]="'Eliminar rol ' + (indice + 1)"
+            (click)="eliminarRol(indice)"
+          >
+            <app-icono nombre="eliminar" aria-hidden="true" />
+          </button>
+        </div>
+      }
+    </div>
+  </section>
+
+  <ng-content select="[accionesFormularioRoles]" />
+</form>
