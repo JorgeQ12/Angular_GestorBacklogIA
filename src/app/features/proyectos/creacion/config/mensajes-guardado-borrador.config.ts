@@ -31,6 +31,10 @@ export const MENSAJES_GUARDADO_BORRADOR = {
     titulo: 'No fue posible guardar el equipo',
     descripcion: 'Conservamos las asignaciones para que puedas intentarlo nuevamente.',
   },
+  [ClaveSeccionProyecto.Flujo]: {
+    titulo: 'No fue posible guardar el flujo',
+    descripcion: 'Conservamos el diagrama para que puedas intentarlo nuevamente.',
+  },
 } as const satisfies Record<SeccionActualizableBorrador, MensajeGuardadoBorrador>;
 
 interface MensajeGuardadoBorrador {

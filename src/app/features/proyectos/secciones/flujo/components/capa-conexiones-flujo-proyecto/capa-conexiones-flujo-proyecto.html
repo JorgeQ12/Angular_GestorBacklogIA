@@ -1,0 +1,124 @@
+@if (mode() === 'lines') {
+  <svg
+    class="flow-connection-layer"
+    [attr.viewBox]="'0 0 ' + store.canvasSize.width + ' ' + store.canvasSize.height"
+    [attr.width]="store.canvasSize.width"
+    [attr.height]="store.canvasSize.height"
+    aria-hidden="true">
+    <defs>
+      <marker
+        id="flow-arrow"
+        markerWidth="8"
+        markerHeight="8"
+        refX="7"
+        refY="4"
+        orient="auto"
+        markerUnits="userSpaceOnUse">
+        <path d="M1 1 L7 4 L1 7" fill="none" stroke="var(--text-muted)" stroke-width="1.6"></path>
+      </marker>
+      <marker
+        id="flow-arrow-decision"
+        markerWidth="8"
+        markerHeight="8"
+        refX="7"
+        refY="4"
+        orient="auto"
+        markerUnits="userSpaceOnUse">
+        <path d="M1 1 L7 4 L1 7" fill="none" stroke="var(--color-warning)" stroke-width="1.6"></path>
+      </marker>
+      <marker
+        id="flow-arrow-selected"
+        markerWidth="8"
+        markerHeight="8"
+        refX="7"
+        refY="4"
+        orient="auto"
+        markerUnits="userSpaceOnUse">
+        <path d="M1 1 L7 4 L1 7" fill="none" stroke="var(--text-primary)" stroke-width="1.8"></path>
+      </marker>
+      <marker
+        id="flow-arrow-preview"
+        markerWidth="8"
+        markerHeight="8"
+        refX="7"
+        refY="4"
+        orient="auto"
+        markerUnits="userSpaceOnUse">
+        <path d="M1 1 L7 4 L1 7" fill="none" stroke="var(--color-warning)" stroke-width="1.7"></path>
+      </marker>
+    </defs>
+
+    @for (connection of renderedConnections(); track connection.id) {
+      <g>
+        <path
+          class="flow-connection-layer__halo"
+          [class.is-selected]="store.selectedConnectionId() === connection.id"
+          [attr.d]="connection.path">
+        </path>
+
+        <path
+          class="flow-connection-layer__line"
+          [class.is-selected]="store.selectedConnectionId() === connection.id"
+          [class.is-decision-branch]="connection.isDecisionBranch"
+          [attr.d]="connection.path"
+          [attr.marker-end]="store.selectedConnectionId() === connection.id
+            ? 'url(#flow-arrow-selected)'
+            : connection.isDecisionBranch
+              ? 'url(#flow-arrow-decision)'
+              : 'url(#flow-arrow)'">
+        </path>
+
+        <path
+          class="flow-connection-layer__hit"
+          data-connection-hit="true"
+          [attr.d]="connection.path"
+          (click)="selectConnection(connection.id)">
+        </path>
+
+        @if (connection.label && !connection.isDecisionBranch) {
+          <g class="flow-connection-layer__label-chip" [class.is-decision-branch]="connection.isDecisionBranch">
+            <rect
+              class="flow-connection-layer__label-chip-surface"
+              rx="10"
+              ry="10"
+              [attr.x]="connection.labelRectX"
+              [attr.y]="connection.labelRectY"
+              [attr.width]="connection.labelWidth"
+              height="20">
+            </rect>
+            <text class="flow-connection-layer__label" [attr.x]="connection.labelCenterX" [attr.y]="connection.labelTextY">
+              {{ connection.label }}
+            </text>
+          </g>
+        }
+      </g>
+    }
+
+    @if (previewConnection(); as preview) {
+      <path
+        class="flow-connection-layer__line flow-connection-layer__line--preview"
+        [class.is-snapped]="preview.targetId"
+        [class.is-decision-branch]="preview.label === 'Si' || preview.label === 'No'"
+        [attr.d]="preview.path"
+        marker-end="url(#flow-arrow-preview)">
+      </path>
+    }
+  </svg>
+} @else {
+  <div class="flow-connection-layer__delete-overlay">
+    @for (connection of renderedConnections(); track connection.id) {
+      @if (!store.isReadOnly() && store.selectedConnectionId() === connection.id) {
+        <button
+          type="button"
+          class="flow-connection-layer__delete-chip-button"
+          [style.left.px]="connection.deleteChipX"
+          [style.top.px]="connection.deleteChipY"
+          (click)="deleteConnection(connection.id)">
+          <app-icono nombre="eliminar" />
+          Eliminar conexión
+        </button>
+      }
+    }
+  </div>
+}
+

@@ -1,0 +1,45 @@
+<section class="flow-block-palette" aria-labelledby="flow-block-palette-title">
+  <header class="flow-block-palette__header">
+    <div class="flow-block-palette__heading">
+      <span class="flow-block-palette__heading-icon" aria-hidden="true">
+        <app-icono nombre="agregar" />
+      </span>
+      <div>
+        <span>Nuevo bloque</span>
+        <h2 id="flow-block-palette-title">¿Qué quieres agregar?</h2>
+        <p>Selecciona el elemento que mejor representa el siguiente punto del recorrido.</p>
+      </div>
+    </div>
+
+    <button type="button" class="flow-block-palette__close" aria-label="Cerrar selector" (click)="store.closeBlockPicker()">
+      <app-icono nombre="cerrar" />
+    </button>
+  </header>
+
+  <div class="flow-block-palette__guide">
+    <app-icono nombre="informacion" aria-hidden="true" />
+    <span>Después de completar su información podrás ubicarlo y conectarlo en el lienzo.</span>
+  </div>
+
+  <div class="flow-block-palette__list">
+    @for (option of options(); track option.type) {
+      <button
+        type="button"
+        class="flow-block-palette__item"
+        [attr.data-type]="option.type"
+        (click)="createBlock(option.type)">
+        <span class="flow-block-palette__item-icon" aria-hidden="true">
+          <app-icono [nombre]="typeIcons[option.type]" />
+        </span>
+        <span class="flow-block-palette__item-copy">
+          <strong>{{ option.label }}</strong>
+          <small>{{ option.description }}</small>
+        </span>
+        <span class="flow-block-palette__item-arrow" aria-hidden="true">
+          <app-icono nombre="continuar" />
+        </span>
+      </button>
+    }
+  </div>
+</section>
+

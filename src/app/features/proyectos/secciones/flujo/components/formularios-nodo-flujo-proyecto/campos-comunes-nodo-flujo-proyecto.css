@@ -1,0 +1,469 @@
+:host {
+  display: contents;
+  --node-role-surface: var(--surface-default);
+  --node-role-surface-soft: var(--surface-canvas);
+  --node-role-surface-selected-top: rgba(var(--overlay-brand-primary, 33, 37, 41), 0.035);
+  --node-role-surface-selected-bottom: rgba(var(--overlay-brand-primary, 33, 37, 41), 0.012);
+  --node-role-border: var(--color-border-default, var(--border-default));
+  --node-role-border-hover: rgba(var(--overlay-brand-primary, 33, 37, 41), 0.16);
+  --node-role-border-selected: var(--border-strong);
+  --node-role-shadow-selected: 0 5px 14px rgba(31, 36, 43, 0.06);
+  --node-role-text: var(--text-primary);
+  --node-role-text-muted: var(--text-muted);
+  --node-role-accent: var(--action-primary-bg);
+  --node-role-accent-strong: var(--text-primary);
+  --node-role-accent-soft: rgba(var(--overlay-brand-primary, 33, 37, 41), 0.06);
+}
+
+.workflow-node-common-fields {
+  display: contents;
+}
+
+.workflow-node-section {
+  display: grid;
+  grid-column: 1 / -1;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--border-default);
+  border-radius: 0.9rem;
+  background: var(--surface-default);
+}
+
+.workflow-node-section__header {
+  display: grid;
+  grid-template-columns: 2.25rem minmax(0, 1fr);
+  align-items: center;
+  gap: 0.72rem;
+  padding-bottom: 0.78rem;
+  border-bottom: 1px solid var(--surface-subtle);
+}
+
+.workflow-node-section__header--action {
+  grid-template-columns: 2.25rem minmax(0, 1fr) auto;
+}
+
+.workflow-node-section__icon {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.62rem;
+  background: var(--surface-subtle);
+  color: var(--text-secondary);
+}
+
+.workflow-node-section__icon app-icono,
+.workflow-node-common-fields__criteria-add app-icono,
+.workflow-node-common-fields__roles-empty app-icono,
+.workflow-node-common-fields__criteria-remove app-icono,
+.workflow-node-common-fields__role-check app-icono,
+.workflow-node-common-fields__permission-check app-icono {
+  width: 1rem;
+  height: 1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.workflow-node-section__header h3 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  font-weight: var(--font-weight-bold);
+  line-height: 1.25;
+}
+
+.workflow-node-section__header p {
+  margin: 0.18rem 0 0;
+  color: var(--text-muted);
+  font-size: 0.67rem;
+  line-height: 1.42;
+}
+
+.workflow-node-common-fields__roles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr));
+  align-items: start;
+  gap: 0.65rem;
+}
+
+.workflow-node-common-fields__criteria-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.workflow-node-common-fields__criteria-add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.25rem;
+  gap: 0.4rem;
+  padding-inline: 1rem;
+  border: 1px solid var(--text-primary);
+  border-radius: 0.62rem;
+  border-color: var(--color-action-primary-bg, var(--text-primary));
+  background: var(--color-action-primary-bg, var(--text-primary));
+  color: var(--color-action-primary-text, var(--surface-default));
+  
+  font-size: 0.82rem;
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+}
+
+.workflow-node-common-fields__criteria-add:hover {
+  border-color: var(--color-action-primary-bg-hover, var(--text-primary));
+  background: var(--color-action-primary-bg-hover, var(--text-primary));
+  color: var(--color-action-primary-text, var(--surface-default));
+}
+
+.workflow-node-common-fields__criteria-list {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.workflow-node-common-fields__criteria-item {
+  display: grid;
+  grid-template-columns: 1.8rem minmax(0, 1fr) 2rem;
+  align-items: center;
+  gap: 0.42rem;
+  min-height: 3.15rem;
+  padding: 0.34rem 0.38rem 0.34rem 0.46rem;
+  border: 1px solid var(--node-role-border);
+  border-radius: 0.72rem;
+  background: var(--surface-default);
+  transition:
+    border-color 0.18s ease,
+    background-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.workflow-node-common-fields__criteria-item:hover {
+  border-color: var(--node-role-border-hover);
+  background: var(--surface-default);
+}
+
+.workflow-node-common-fields__criteria-item:focus-within {
+  border-color: var(--text-muted);
+  background: var(--surface-default);
+  box-shadow: 0 0 0 3px rgba(41, 44, 50, 0.07);
+}
+
+.workflow-node-common-fields__criteria-item.has-error {
+  border-color: var(--field-error-color);
+  background: var(--field-error-bg, rgba(180, 35, 24, 0.06));
+}
+
+.workflow-node-common-fields__criteria-item .ui-field {
+  min-width: 0;
+  margin: 0;
+}
+
+.workflow-node-common-fields__criteria-item .ui-control {
+  width: 100%;
+  min-height: 2.35rem;
+  padding: 0.45rem 0.35rem;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.workflow-node-common-fields__criteria-item .ui-control:hover,
+.workflow-node-common-fields__criteria-item .ui-control:focus {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.workflow-node-common-fields__criteria-marker {
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 1px solid var(--border-default);
+  border-radius: 0.5rem;
+  background: var(--surface-subtle);
+  color: var(--text-secondary);
+}
+
+.workflow-node-common-fields__criteria-marker app-icono {
+  width: 0.85rem;
+  height: 0.85rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.workflow-node-common-fields__criteria-item.has-error .workflow-node-common-fields__criteria-marker {
+  border-color: var(--border-strong);
+  background: var(--surface-subtle);
+  color: var(--field-error-color);
+}
+
+.workflow-node-common-fields__criteria-remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  flex-shrink: 0;
+  margin-top: 0;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  background: transparent;
+  color: var(--color-text-secondary, var(--text-muted));
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.workflow-node-common-fields__criteria-remove:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-subtle);
+  color: var(--color-danger);
+}
+
+.workflow-node-common-fields__criteria-remove app-icono {
+  width: 0.9rem;
+  height: 0.9rem;
+  stroke: currentColor;
+}
+
+.workflow-node-common-fields__roles-empty {
+  display: flex;
+  grid-column: 1 / -1;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px dashed var(--node-role-border);
+  border-radius: 0.9rem;
+  background: var(--surface-canvas);
+}
+
+.workflow-node-common-fields__roles-empty > span {
+  display: grid;
+  place-items: center;
+  width: 2.35rem;
+  height: 2.35rem;
+  flex: 0 0 2.35rem;
+  border-radius: 0.65rem;
+  background: var(--surface-subtle);
+  color: var(--text-secondary);
+}
+
+.workflow-node-common-fields__roles-empty strong {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: var(--node-role-text);
+  font-size: 0.92rem;
+}
+
+.workflow-node-common-fields__roles-empty p {
+  margin: 0;
+  color: var(--node-role-text-muted);
+  font-size: 0.84rem;
+  line-height: 1.3rem;
+}
+
+.workflow-node-common-fields__role-card {
+  display: grid;
+  gap: 0.65rem;
+  padding: 0.78rem 0.82rem;
+  border: 1px solid var(--node-role-border);
+  border-radius: 0.82rem;
+  background: var(--node-role-surface);
+  transition:
+    border-color 0.18s ease,
+    background-color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
+}
+
+.workflow-node-common-fields__role-card:hover {
+  border-color: var(--node-role-border-hover);
+  background: var(--node-role-surface-soft);
+}
+
+.workflow-node-common-fields__role-card.is-selected {
+  border-color: var(--node-role-border-selected);
+  background: linear-gradient(
+    180deg,
+    var(--node-role-surface-selected-top) 0%,
+    var(--node-role-surface-selected-bottom) 100%
+  );
+  box-shadow: var(--node-role-shadow-selected);
+}
+
+.workflow-node-common-fields__role-header {
+  display: flex;
+  align-items: center;
+  gap: 0.62rem;
+  cursor: pointer;
+}
+
+.workflow-node-common-fields__role-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.3rem;
+  height: 1.3rem;
+  flex-shrink: 0;
+  margin-top: 0;
+  border: 1.5px solid var(--node-role-border);
+  border-radius: 0.35rem;
+  background: var(--node-role-surface);
+  color: transparent;
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease;
+}
+
+.workflow-node-common-fields__role-check app-icono {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+.workflow-node-common-fields__permission-check app-icono {
+  width: 0.68rem;
+  height: 0.68rem;
+  stroke-width: 2.2;
+}
+
+.workflow-node-common-fields__role-header:focus-within .workflow-node-common-fields__role-check {
+  box-shadow: var(--shadow-focus);
+}
+
+.workflow-node-common-fields__role-card.is-selected .workflow-node-common-fields__role-check {
+  border-color: var(--node-role-accent);
+  background: var(--node-role-accent);
+  color: var(--color-neutral-0, var(--surface-default));
+}
+
+.workflow-node-common-fields__role-meta {
+  display: grid;
+  gap: 0.12rem;
+}
+
+.workflow-node-common-fields__role-meta strong {
+  color: var(--node-role-text);
+  font-size: 0.76rem;
+}
+
+.workflow-node-common-fields__role-meta small {
+  color: var(--text-muted);
+  font-size: 0.63rem;
+  line-height: 1.3;
+}
+
+.workflow-node-common-fields__permission-section {
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
+  gap: 0.42rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--node-role-border);
+}
+
+.workflow-node-common-fields__permission-label {
+  flex-shrink: 0;
+  color: var(--node-role-text-muted);
+  font-size: 0.61rem;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+}
+
+.workflow-node-common-fields__permission-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.38rem;
+}
+
+.workflow-node-common-fields__permission-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.85rem;
+  gap: 0.28rem;
+  padding: 0 0.5rem 0 0.36rem;
+  border: 1px solid var(--node-role-border);
+  border-radius: 999px;
+  background: var(--color-bg-surface, var(--surface-default));
+  color: var(--color-text-primary, var(--text-primary));
+  font-size: 0.66rem;
+  font-weight: var(--font-weight-semibold);
+  transition:
+    border-color 0.16s ease,
+    background-color 0.16s ease,
+    color 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.workflow-node-common-fields__permission-check {
+  display: grid;
+  place-items: center;
+  width: 0.92rem;
+  height: 0.92rem;
+  flex: 0 0 0.92rem;
+  border: 1px solid var(--border-default);
+  border-radius: 999px;
+  color: transparent;
+}
+
+.workflow-node-common-fields__permission-chip:hover {
+  border-color: rgba(var(--overlay-brand-primary, 33, 37, 41), 0.35);
+  background: var(--color-bg-surface-muted, var(--surface-subtle));
+  color: var(--color-text-primary, var(--text-primary));
+}
+
+.workflow-node-common-fields__permission-chip.is-active {
+  border-color: var(--node-role-accent);
+  background: var(--node-role-accent);
+  color: var(--color-neutral-0, var(--surface-default));
+  box-shadow: inset 0 0 0 1px rgba(var(--overlay-brand-primary, 33, 37, 41), 0.06);
+}
+
+.workflow-node-common-fields__permission-chip.is-active .workflow-node-common-fields__permission-check {
+  border-color: rgba(255, 255, 255, 0.34);
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--surface-default);
+}
+
+@media (max-width: 640px) {
+  .workflow-node-section__header--action {
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+  }
+
+  .workflow-node-section__header--action .workflow-node-common-fields__criteria-add {
+    grid-column: 1 / -1;
+  }
+
+  .workflow-node-common-fields__roles {
+    grid-template-columns: 1fr;
+  }
+
+  .workflow-node-common-fields__permission-section {
+    grid-template-columns: 1fr;
+  }
+
+  .workflow-node-common-fields__criteria-heading {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .workflow-node-common-fields__criteria-add {
+    width: 100%;
+  }
+
+}
+

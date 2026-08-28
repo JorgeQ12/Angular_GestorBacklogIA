@@ -1,0 +1,54 @@
+@if (editorState(); as state) {
+  <app-modal
+    [etiqueta]="modalEyebrow()"
+    [titulo]="modalTitle()"
+    [descripcion]="modalDescription()"
+    icono="flujo"
+    tamano="lg"
+    [idFormulario]="formId"
+    [textoCancelar]="store.isReadOnly() ? 'Cerrar' : 'Cancelar'"
+    [textoConfirmar]="primaryActionText()"
+    [confirmacionDeshabilitada]="form().invalid"
+    [mostrarConfirmar]="!store.isReadOnly()"
+    (cerrar)="close()">
+    <form
+      class="workflow-node-modal__form"
+      [attr.data-type]="state.type"
+      [id]="formId"
+      [formGroup]="form()"
+      (ngSubmit)="save()">
+      <fieldset class="workflow-node-modal__fieldset" [disabled]="store.isReadOnly()">
+        <div class="workflow-node-modal__overview">
+        <span class="workflow-node-modal__type-icon" aria-hidden="true">
+          <app-icono [nombre]="typeIcons[state.type]" />
+        </span>
+        <span class="workflow-node-modal__overview-copy">
+          <small>Tipo de bloque</small>
+          <strong>{{ typeLabel() }}</strong>
+          <span>{{ typeDescription() }}</span>
+        </span>
+          <span class="workflow-node-modal__mode">{{ store.isReadOnly() ? 'Solo lectura' : state.mode === 'create' ? 'Nuevo' : 'Existente' }}</span>
+        </div>
+
+        @switch (state.type) {
+          @case ('module') {
+            <project-flow-module-form [form]="form()"></project-flow-module-form>
+          }
+          @case ('screen') {
+            <project-flow-screen-form [form]="form()"></project-flow-screen-form>
+          }
+          @case ('action') {
+            <project-flow-action-form [form]="form()"></project-flow-action-form>
+          }
+          @case ('decision') {
+            <project-flow-decision-form [form]="form()"></project-flow-decision-form>
+          }
+          @case ('form') {
+            <project-flow-form-node-form [form]="form()"></project-flow-form-node-form>
+          }
+        }
+      </fieldset>
+    </form>
+  </app-modal>
+}
+

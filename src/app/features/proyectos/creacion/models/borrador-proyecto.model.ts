@@ -35,4 +35,5 @@ export interface CambiosBorradorProyecto {
   readonly alcanceJson?: string;
   readonly rolesJson?: string;
   readonly equipoJson?: string;
+  readonly diagramFlujoJson?: string;
 }

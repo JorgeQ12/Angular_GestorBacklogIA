@@ -5,6 +5,7 @@ import { serializarEquipoProyecto } from '../../secciones/equipo/mappers/equipo-
 import { serializarObjetivosProyecto } from '../../secciones/objetivos/mappers/objetivos-proyecto.mapper';
 import { serializarRolesProyecto } from '../../secciones/roles/mappers/roles-proyecto.mapper';
 import { serializarTipoSolucionProyecto } from '../../secciones/tipo-solucion/mappers/tipo-solucion-proyecto.mapper';
+import { serializarFlujoProyecto } from '../../secciones/flujo/mappers/flujo-proyecto.mapper';
 import { ActualizacionSeccionBorrador } from '../models/actualizacion-seccion-borrador.model';
 import { CambiosBorradorProyecto } from '../models/borrador-proyecto.model';
 
@@ -27,5 +28,7 @@ export function mapearCambioSeccionBorrador(
       return { rolesJson: serializarRolesProyecto(actualizacion.datos) };
     case ClaveSeccionProyecto.Equipo:
       return { equipoJson: serializarEquipoProyecto(actualizacion.datos) };
+    case ClaveSeccionProyecto.Flujo:
+      return { diagramFlujoJson: serializarFlujoProyecto(actualizacion.datos) };
   }
 }

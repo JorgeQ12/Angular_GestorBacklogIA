@@ -1,0 +1,79 @@
+<section class="flow-canvas" [class.is-readonly]="store.isReadOnly()" aria-label="Diagrama funcional del proyecto">
+  <div
+    #viewportElement
+    class="flow-canvas__viewport"
+    [attr.aria-label]="store.activeConnectionSourceId() ? 'Lienzo en modo conexión' : 'Lienzo funcional del proyecto'"
+    [style.background-size]="viewportGridStyle().backgroundSize"
+    [style.background-position]="viewportGridStyle().backgroundPosition"
+    (click)="onSurfaceClick($event)"
+    (pointerdown)="onSurfacePointerDown($event)">
+    <div class="flow-canvas__floating-actions" aria-label="Acciones del diagrama">
+      <ng-content select="[flowCanvasNavigation]"></ng-content>
+
+      @if (!store.isReadOnly()) {
+        <button type="button" class="flow-canvas__add-button" (click)="openBlockPicker()">
+          <span aria-hidden="true">
+            <app-icono nombre="agregar" />
+          </span>
+          Agregar bloque
+        </button>
+      }
+    </div>
+
+    <div class="flow-canvas__zoom" aria-label="Controles de zoom">
+      <button type="button" aria-label="Alejar" (click)="zoomOut()">
+        <app-icono nombre="alejar" />
+      </button>
+      <button type="button" class="flow-canvas__zoom-value" aria-label="Restablecer vista" (click)="resetView()">
+        {{ zoomLabel() }}
+      </button>
+      <button type="button" aria-label="Acercar" (click)="zoomIn()">
+        <app-icono nombre="acercar" />
+      </button>
+    </div>
+
+    @if (store.activeConnectionSourceId()) {
+      <button type="button" class="flow-canvas__status" (click)="store.cancelConnection()">
+        <span aria-hidden="true">
+          <app-icono nombre="enlace" />
+        </span>
+        <span><strong>Conectando bloques</strong><small>Selecciona un punto de entrada o pulsa aquí para cancelar.</small></span>
+      </button>
+    }
+
+    @if (!store.hasContent()) {
+      <div class="flow-canvas__empty-state">
+        <span class="flow-canvas__empty-icon" aria-hidden="true">
+          <app-icono nombre="flujo" />
+        </span>
+        <span class="flow-canvas__empty-kicker">Tu flujo comienza aquí</span>
+        <h2>Construye el recorrido del proyecto</h2>
+        <p>Agrega el primer bloque y conecta módulos, páginas, acciones, decisiones y componentes.</p>
+        @if (!store.isReadOnly()) {
+          <button type="button" (click)="openBlockPicker()">
+            <app-icono nombre="agregar" />
+            Crear primer bloque
+          </button>
+        }
+      </div>
+    }
+
+    <div class="flow-canvas__scene" [style.width]="canvasSizeStyle().width" [style.height]="canvasSizeStyle().height" [style.transform]="canvasSizeStyle().transform">
+      <app-capa-conexiones-flujo-proyecto mode="lines"></app-capa-conexiones-flujo-proyecto>
+
+      @for (block of store.visibleBlocks(); track block.id) {
+        <app-tarjeta-bloque-flujo-proyecto [block]="block"></app-tarjeta-bloque-flujo-proyecto>
+      }
+
+      <app-capa-conexiones-flujo-proyecto mode="deleteOverlay"></app-capa-conexiones-flujo-proyecto>
+    </div>
+
+    @if (store.hasContent()) {
+      <div class="flow-canvas__hint" aria-hidden="true">
+        <app-icono nombre="contextoProyecto" />
+        {{ store.isReadOnly() ? 'Selecciona un bloque para consultar su información' : 'Selecciona un bloque para editarlo' }}
+      </div>
+    }
+  </div>
+</section>
+

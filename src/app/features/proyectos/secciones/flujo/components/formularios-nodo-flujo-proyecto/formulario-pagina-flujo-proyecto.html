@@ -1,0 +1,24 @@
+<div class="workflow-node-form" [formGroup]="form()">
+  <div class="workflow-node-form__grid">
+    <section class="workflow-node-form__identity">
+      <header class="workflow-node-form__identity-header">
+        <span aria-hidden="true"><app-icono nombre="aplicacionWeb" /></span>
+        <div><h3>Información principal</h3><p>Asigna un nombre claro a la página que verá el usuario.</p></div>
+      </header>
+      <div class="workflow-node-form__identity-fields is-single">
+        <label class="ui-field">
+          <span class="ui-label">Nombre de la página</span>
+          <input class="ui-control" type="text" formControlName="title" placeholder="Ej: Inicio de sesión">
+        </label>
+      </div>
+    </section>
+
+    <project-flow-node-common-fields
+      [form]="form()"
+      descriptionLabel="Descripción de la página"
+      descriptionPlaceholder="Explica brevemente el propósito de esta página."
+      acceptancePlaceholder="Ej: La pagina muestra la informacion clave, permite ejecutar su accion principal y responde como se espera."
+      rolesHint="Selecciona los roles ya creados que ven o usan esta pagina."></project-flow-node-common-fields>
+  </div>
+</div>
+

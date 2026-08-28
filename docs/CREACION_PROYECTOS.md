@@ -398,6 +398,39 @@ En Información del proyecto, Equipo reutilizará el modelo y el mapper. La iden
 Azure se mostrará mediante una vista de detalle; cualquier edición futura de asignaciones usará una
 operación propia de Información y no la persistencia del recorrido de creación.
 
+## Implementación de Flujo
+
+Flujo incorpora el constructor visual anterior como la última sección reutilizable del proyecto:
+
+- `proyectos/secciones/flujo` contiene el editor, lienzo, bloques, conexiones, formularios de nodo,
+  modelos, configuración, mapper y estado local del constructor.
+- `EditorFlujoProyecto` recibe una fotografía y emite el documento completo cuando cambia. No
+  conoce rutas, HTTP, revisiones ni el borrador de creación.
+- `EstadoEditorFlujoProyectoService` se proporciona en el editor; la selección, el viewport y los
+  modales no se convierten en estado global de la aplicación.
+- `PasoFlujoProyecto` deserializa `diagramFlujoJson`, distingue un contrato inválido y guarda
+  mediante `EstadoCreacionProyectoService` con la clave discriminante `Flujo`.
+- La página independiente anterior, su acceso a `ActivatedRoute`, el guardado directo y el facade
+  temporal en memoria no se migran. El recorrido conserva una sola página y una sola ruta.
+- La consulta de versiones históricas pertenece a la futura capacidad de Información; no se mezcla
+  con la creación del borrador.
+
+El contrato persistido utiliza nombres canónicos en español. El modelo interno del editor se adapta
+exclusivamente desde `flujo-proyecto.mapper.ts`:
+
+```json
+{
+  "proyectoId": "42",
+  "roles": [],
+  "nodos": [],
+  "conexiones": [],
+  "fechaActualizacion": "2026-08-28T10:00:00.000Z"
+}
+```
+
+Guardar Flujo lleva `pasoActual` al menos a 9 y conserva la fotografía completa de las secciones
+anteriores.
+
 ## Recorrido de creación
 
 El recorrido de creación contiene nueve pasos:

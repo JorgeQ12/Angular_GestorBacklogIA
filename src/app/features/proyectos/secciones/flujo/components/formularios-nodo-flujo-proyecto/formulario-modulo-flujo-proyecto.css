@@ -1,0 +1,282 @@
+:host {
+  display: block;
+}
+
+.workflow-module-form__peak-hours {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0.9rem;
+  border: 1px solid var(--border-default);
+  border-radius: 0.9rem;
+  background: var(--surface-default);
+}
+
+.workflow-module-form__peak-toolbar {
+  display: grid;
+  grid-template-columns: 2.25rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.72rem;
+  padding-bottom: 0.78rem;
+  border-bottom: 1px solid var(--surface-subtle);
+}
+
+.workflow-module-form__section-icon {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.62rem;
+  background: var(--surface-subtle);
+  color: var(--text-secondary);
+}
+
+.workflow-module-form__section-icon app-icono {
+  width: 1rem;
+  height: 1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.workflow-module-form__section-title {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  font-weight: var(--font-weight-bold);
+}
+
+.workflow-module-form__section-hint {
+  margin: 0.25rem 0 0;
+  color: var(--text-muted);
+  font-size: 0.67rem;
+  line-height: 1.42;
+}
+
+.workflow-module-form__add-period {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.25rem;
+  gap: 0.4rem;
+  padding: 0 0.9rem;
+  border: 1px solid var(--text-primary);
+  border-radius: 0.62rem;
+  background: var(--text-primary);
+  color: var(--surface-default);
+  
+  font-size: 0.68rem;
+  font-weight: var(--font-weight-bold);
+  white-space: nowrap;
+}
+
+.workflow-module-form__add-period app-icono {
+  width: 0.9rem;
+  height: 0.9rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.workflow-module-form__peak-list {
+  display: grid;
+  gap: 0.72rem;
+}
+
+.workflow-module-form__peak-card {
+  overflow: hidden;
+  border: 1px solid var(--border-default);
+  border-radius: 0.82rem;
+  background: var(--surface-default);
+}
+
+.workflow-module-form__peak-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.68rem 0.78rem;
+  border-bottom: 1px solid var(--border-default);
+  background: var(--surface-default);
+}
+
+.workflow-module-form__peak-card-title {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 0.62rem;
+}
+
+.workflow-module-form__peak-card-title > span {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 2rem;
+  border: 1px solid var(--border-default);
+  border-radius: 0.58rem;
+  background: var(--surface-default);
+  color: var(--text-secondary);
+}
+
+.workflow-module-form__peak-card-title > span app-icono {
+  width: 0.92rem;
+  height: 0.92rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.workflow-module-form__peak-card-title > div {
+  display: grid;
+  min-width: 0;
+  gap: 0.08rem;
+}
+
+.workflow-module-form__peak-card-header h6 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 0.76rem;
+  font-weight: var(--font-weight-bold);
+}
+
+.workflow-module-form__peak-card-title small {
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: 0.62rem;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workflow-module-form__remove-period {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.workflow-module-form__remove-period:hover:not(:disabled) {
+  border-color: var(--border-strong);
+  background: var(--surface-subtle);
+  color: var(--color-danger);
+}
+
+.workflow-module-form__remove-period:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.workflow-module-form__remove-period app-icono {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.workflow-module-form__peak-card-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(18rem, 1fr);
+  align-items: end;
+  gap: 1rem;
+  padding: 0.9rem;
+}
+
+.workflow-module-form__day-picker {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.workflow-module-form__day-buttons {
+  display: grid;
+  max-width: 21rem;
+  grid-template-columns: repeat(7, minmax(2rem, 1fr));
+  gap: 0.35rem;
+}
+
+.workflow-module-form__day-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-width: 2rem;
+  height: 2.15rem;
+  padding: 0;
+  border: 1px solid var(--border-default);
+  border-radius: 999px;
+  background: var(--surface-default);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-semibold);
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 0.18s ease, background-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.workflow-module-form__day-btn:hover {
+  border-color: rgba(var(--overlay-brand-primary), 0.35);
+  color: var(--text-primary);
+  transform: translateY(-1px);
+}
+
+.workflow-module-form__day-btn.is-selected {
+  border-color: var(--action-primary-bg);
+  background: var(--action-primary-bg);
+  color: var(--text-inverse);
+  box-shadow: 0 0 0 3px rgba(var(--overlay-brand-primary), 0.12);
+}
+
+.workflow-module-form__time-config {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 1.8rem minmax(0, 1fr);
+  align-items: end;
+  gap: 0.45rem;
+}
+
+.workflow-module-form__time-separator {
+  display: grid;
+  place-items: center;
+  width: 1.8rem;
+  height: 2.65rem;
+  color: var(--text-muted);
+}
+
+.workflow-module-form__time-separator app-icono {
+  width: 0.9rem;
+  height: 0.9rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+
+@media (max-width: 768px) {
+  .workflow-module-form__peak-toolbar {
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+  }
+
+  .workflow-module-form__add-period {
+    grid-column: 1 / -1;
+  }
+
+  .workflow-module-form__peak-card-body,
+  .workflow-module-form__time-config {
+    grid-template-columns: 1fr;
+  }
+
+  .workflow-module-form__time-separator {
+    display: none;
+  }
+}
+

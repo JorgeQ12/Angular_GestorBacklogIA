@@ -1,0 +1,127 @@
+:host {
+  display: contents;
+}
+
+.workflow-node-modal__form {
+  display: grid;
+  gap: 1rem;
+}
+
+.workflow-node-modal__fieldset {
+  display: grid;
+  min-width: 0;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.workflow-node-modal__overview {
+  position: relative;
+  display: grid;
+  grid-template-columns: 2.7rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.78rem;
+  overflow: hidden;
+  border: 1px solid var(--border-default);
+  border-radius: 0.82rem;
+  background: linear-gradient(135deg, var(--surface-default) 0%, var(--surface-subtle) 100%);
+}
+
+.workflow-node-modal__overview::before {
+  content: '';
+  position: absolute;
+  top: 0.7rem;
+  bottom: 0.7rem;
+  left: 0;
+  width: 3px;
+  border-radius: 0 999px 999px 0;
+  background: var(--text-muted);
+}
+
+.workflow-node-modal__form[data-type='module'] .workflow-node-modal__overview::before { background: var(--text-primary); }
+.workflow-node-modal__form[data-type='screen'] .workflow-node-modal__overview::before { background: var(--text-muted); }
+.workflow-node-modal__form[data-type='action'] .workflow-node-modal__overview::before { background: var(--text-secondary); }
+.workflow-node-modal__form[data-type='decision'] .workflow-node-modal__overview::before { background: var(--color-warning); }
+.workflow-node-modal__form[data-type='form'] .workflow-node-modal__overview::before { background: var(--text-muted); }
+
+.workflow-node-modal__type-icon {
+  display: grid;
+  place-items: center;
+  width: 2.7rem;
+  height: 2.7rem;
+  border-radius: 0.72rem;
+  background: var(--text-primary);
+  color: var(--surface-default);
+  box-shadow: 0 6px 14px rgba(31, 35, 41, 0.14);
+}
+
+.workflow-node-modal__form[data-type='decision'] .workflow-node-modal__type-icon {
+  background: var(--color-warning);
+}
+
+.workflow-node-modal__form[data-type='form'] .workflow-node-modal__type-icon {
+  background: var(--text-secondary);
+}
+
+.workflow-node-modal__type-icon app-icono {
+  width: 1.18rem;
+  height: 1.18rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.workflow-node-modal__overview-copy {
+  display: grid;
+  min-width: 0;
+  gap: 0.08rem;
+}
+
+.workflow-node-modal__overview-copy small {
+  color: var(--text-muted);
+  font-size: 0.58rem;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.workflow-node-modal__overview-copy strong {
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  font-weight: var(--font-weight-bold);
+}
+
+.workflow-node-modal__overview-copy > span {
+  color: var(--text-muted);
+  font-size: 0.66rem;
+  line-height: 1.35;
+}
+
+.workflow-node-modal__mode {
+  display: inline-flex;
+  align-items: center;
+  height: 1.55rem;
+  padding: 0 0.58rem;
+  border: 1px solid var(--border-default);
+  border-radius: 999px;
+  background: var(--surface-default);
+  color: var(--text-secondary);
+  font-size: 0.59rem;
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+}
+
+@media (max-width: 640px) {
+  .workflow-node-modal__overview {
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+  }
+
+  .workflow-node-modal__mode {
+    display: none;
+  }
+}
+

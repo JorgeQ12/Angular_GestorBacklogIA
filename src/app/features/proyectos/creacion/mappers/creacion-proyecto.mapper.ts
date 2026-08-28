@@ -123,6 +123,6 @@ export function mapearActualizacionBorrador(
     alcanceJson: cambios.alcanceJson ?? borrador.alcanceJson,
     rolesJson: cambios.rolesJson ?? borrador.rolesJson,
     equipoJson: cambios.equipoJson ?? borrador.equipoJson,
-    diagramFlujoJson: borrador.diagramFlujoJson,
+    diagramFlujoJson: cambios.diagramFlujoJson ?? borrador.diagramFlujoJson,
   };
 }

@@ -1,0 +1,16 @@
+<section
+  class="editor-flujo"
+  [class.editor-flujo--con-panel]="store.isBlockPickerOpen()"
+  aria-label="Editor del flujo de usuario"
+>
+  <div class="editor-flujo__espacio-trabajo">
+    <app-lienzo-flujo-proyecto />
+    @if (store.isBlockPickerOpen()) {
+      <app-panel-lateral-flujo-proyecto />
+    }
+  </div>
+
+  @if (store.isNodeEditorOpen()) {
+    <app-modal-nodo-flujo-proyecto />
+  }
+</section>

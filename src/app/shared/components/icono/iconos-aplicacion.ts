@@ -25,6 +25,7 @@ import {
   LucideLogOut,
   LucideMonitorCog,
   LucideMonitor,
+  LucideEllipsis,
   LucidePanelLeftClose,
   LucidePanelLeftOpen,
   LucidePencilLine,
@@ -41,6 +42,8 @@ import {
   LucideUserRoundCog,
   LucideUsersRound,
   LucideWorkflow,
+  LucideZoomIn,
+  LucideZoomOut,
   LucideX,
   type LucideIconData,
 } from '@lucide/angular';
@@ -89,6 +92,7 @@ export const ICONOS_APLICACION = {
   enlace: LucideLink.icon,
   necesidadNegocio: LucideLightbulb.icon,
   mostrar: LucideEye.icon,
+  masOpciones: LucideEllipsis.icon,
   ocultar: LucideEyeOff.icon,
   objetivos: LucideListChecks.icon,
   panel: LucideLayoutDashboard.icon,
@@ -106,6 +110,8 @@ export const ICONOS_APLICACION = {
   tipoSinInterfaz: LucideServerCog.icon,
   usuario: LucideUserRound.icon,
   volver: LucideArrowLeft.icon,
+  acercar: LucideZoomIn.icon,
+  alejar: LucideZoomOut.icon,
 } as const satisfies Record<string, LucideIconData>;
 
 /** Limita los nombres permitidos a los iconos registrados. */
