@@ -1,7 +1,0 @@
-:host {
-  display: block;
-}
-
-.pagina-contexto__error {
-  --ui-error-state-min-height: 24rem;
-}

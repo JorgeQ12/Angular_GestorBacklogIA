@@ -28,11 +28,6 @@ export const PASOS_CREACION_PROYECTO = [
   ...SECCIONES_PROYECTO,
 ] as const satisfies readonly PasoCreacionProyecto[];
 
-/** Identifica el paso activo declarado por una ruta de creación. */
-export interface DatosRutaPasoCreacionProyecto {
-  readonly pasoActual: ClavePasoCreacionProyecto;
-}
-
 /** Relaciona cada paso visual con el avance persistido por el backend. */
 export const AVANCE_BORRADOR_POR_PASO = {
   [CLAVE_PASO_VINCULACION_AZURE]: null,
@@ -45,34 +40,3 @@ export const AVANCE_BORRADOR_POR_PASO = {
   [ClaveSeccionProyecto.Equipo]: 7,
   [ClaveSeccionProyecto.Flujo]: 8,
 } as const satisfies Record<ClavePasoCreacionProyecto, number | null>;
-
-/** Centraliza la identidad de las rutas disponibles durante la migración. */
-export const DATOS_RUTA_PASOS_CREACION = {
-  vinculacionAzure: {
-    pasoActual: CLAVE_PASO_VINCULACION_AZURE,
-  },
-  contexto: {
-    pasoActual: ClaveSeccionProyecto.Contexto,
-  },
-  tipoSolucion: {
-    pasoActual: ClaveSeccionProyecto.TipoSolucion,
-  },
-  necesidad: {
-    pasoActual: ClaveSeccionProyecto.Necesidad,
-  },
-  objetivos: {
-    pasoActual: ClaveSeccionProyecto.Objetivos,
-  },
-  alcance: {
-    pasoActual: ClaveSeccionProyecto.Alcance,
-  },
-  roles: {
-    pasoActual: ClaveSeccionProyecto.Roles,
-  },
-  equipo: {
-    pasoActual: ClaveSeccionProyecto.Equipo,
-  },
-  flujo: {
-    pasoActual: ClaveSeccionProyecto.Flujo,
-  },
-} as const satisfies Record<string, DatosRutaPasoCreacionProyecto>;

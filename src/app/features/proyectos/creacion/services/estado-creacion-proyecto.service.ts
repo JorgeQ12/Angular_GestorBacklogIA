@@ -10,6 +10,7 @@ import { CreacionProyectoService } from './creacion-proyecto.service';
 @Injectable()
 export class EstadoCreacionProyectoService {
   private readonly creacionProyecto = inject(CreacionProyectoService);
+  private readonly estadoProyectoId = signal<number | null>(null);
   private readonly estadoBorrador = signal<BorradorProyecto | null>(null);
   private readonly estadoNombreProyecto = signal('');
   private proyectoIdActivo: number | null = null;
@@ -17,6 +18,9 @@ export class EstadoCreacionProyectoService {
 
   /** Expone la fotografía vigente sin permitir su modificación externa. */
   public readonly borrador = this.estadoBorrador.asReadonly();
+
+  /** Expone el proyecto seleccionado por la página contenedora. */
+  public readonly proyectoId = this.estadoProyectoId.asReadonly();
 
   /** Expone el nombre vigente para identificar el recorrido. */
   public readonly nombreProyecto = this.estadoNombreProyecto.asReadonly();
@@ -26,12 +30,13 @@ export class EstadoCreacionProyectoService {
     if (this.proyectoIdActivo === proyectoId) return;
 
     this.proyectoIdActivo = proyectoId;
+    this.estadoProyectoId.set(proyectoId);
     this.cargaEnCurso = null;
     this.estadoBorrador.set(null);
     this.estadoNombreProyecto.set('');
   }
 
-  /** Recupera el borrador una sola vez para las páginas hijas del recorrido. */
+  /** Recupera el borrador una sola vez para los componentes del recorrido. */
   public cargar(proyectoId: number): Observable<BorradorProyecto> {
     this.seleccionarProyecto(proyectoId);
     const vigente = this.estadoBorrador();

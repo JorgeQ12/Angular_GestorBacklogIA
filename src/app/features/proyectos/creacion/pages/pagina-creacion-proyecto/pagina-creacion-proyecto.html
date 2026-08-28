@@ -62,7 +62,66 @@
         }
       </header>
       <div class="ui-card__body pagina-creacion__contenido">
-        <router-outlet />
+        @if (errorCargaRecorrido()) {
+          <app-estado-error
+            class="pagina-creacion__error"
+            titulo="No fue posible obtener el borrador"
+            descripcion="Verifica la conexión e intenta cargar nuevamente la información."
+            [reintentable]="true"
+            (reintentar)="cargarRecorrido()"
+          />
+        } @else if (recorridoListo()) {
+          @switch (estadoRecorrido().pasoActual) {
+            @case (clavePasoVinculacionAzure) {
+              <app-vinculacion-azure
+                [datosIniciales]="datosVinculacion()"
+                [resultadoValidacion]="resultadoValidacion()"
+                [procesando]="procesandoVinculacion()"
+                (validar)="validarVinculacion($event)"
+                (editar)="editarVinculacion()"
+                (confirmar)="crearBorrador()"
+              />
+            }
+            @case (clavesSeccion.Contexto) {
+              <app-paso-contexto-proyecto
+                (completado)="abrirPaso(clavesSeccion.TipoSolucion)"
+              />
+            }
+            @case (clavesSeccion.TipoSolucion) {
+              <app-paso-tipo-solucion-proyecto
+                (completado)="abrirPaso(clavesSeccion.Necesidad)"
+              />
+            }
+            @case (clavesSeccion.Necesidad) {
+              <app-paso-necesidad-proyecto
+                (completado)="abrirPaso(clavesSeccion.Objetivos)"
+              />
+            }
+            @case (clavesSeccion.Objetivos) {
+              <app-paso-objetivos-proyecto
+                (completado)="abrirPaso(clavesSeccion.Alcance)"
+              />
+            }
+            @case (clavesSeccion.Alcance) {
+              <app-paso-alcance-proyecto
+                (completado)="abrirPaso(clavesSeccion.Roles)"
+              />
+            }
+            @case (clavesSeccion.Roles) {
+              <app-paso-roles-proyecto
+                (completado)="abrirPaso(clavesSeccion.Equipo)"
+              />
+            }
+            @case (clavesSeccion.Equipo) {
+              <app-paso-equipo-proyecto
+                (completado)="abrirPaso(clavesSeccion.Flujo)"
+              />
+            }
+            @case (clavesSeccion.Flujo) {
+              <app-paso-flujo-proyecto />
+            }
+          }
+        }
       </div>
     </article>
   </div>

@@ -1,0 +1,7 @@
+:host {
+  display: block;
+}
+
+.paso-tipo-solucion__error {
+  --ui-error-state-min-height: 24rem;
+}
