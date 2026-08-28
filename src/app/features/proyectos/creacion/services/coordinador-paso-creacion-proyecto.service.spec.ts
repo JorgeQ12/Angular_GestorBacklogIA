@@ -1,6 +1,6 @@
+import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { ActivatedRoute, Router, convertToParamMap } from '@angular/router';
-import { BehaviorSubject, Subject, throwError } from 'rxjs';
+import { Subject, throwError } from 'rxjs';
 import { ClaveSeccionProyecto } from '../../config/secciones-proyecto.config';
 import { ActualizacionSeccionBorrador } from '../models/actualizacion-seccion-borrador.model';
 import { BorradorProyecto } from '../models/borrador-proyecto.model';
@@ -10,22 +10,21 @@ import { NotificadorErroresBorradorProyectoService } from './notificador-errores
 
 describe('CoordinadorPasoCreacionProyectoService', () => {
   let servicio: CoordinadorPasoCreacionProyectoService;
-  let parametrosRuta$: BehaviorSubject<ReturnType<typeof convertToParamMap>>;
   let carga$: Subject<BorradorProyecto>;
   let guardado$: Subject<BorradorProyecto>;
+  let proyectoId: ReturnType<typeof signal<number | null>>;
   const estadoCreacion = {
-    seleccionarProyecto: vi.fn(),
+    proyectoId: () => proyectoId(),
     cargar: vi.fn(),
     guardarSeccion: vi.fn(),
   };
-  const router = { navigateByUrl: vi.fn() };
   const notificadorErrores = { comunicar: vi.fn() };
 
   beforeEach(() => {
     vi.clearAllMocks();
+    proyectoId = signal<number | null>(42);
     carga$ = new Subject<BorradorProyecto>();
     guardado$ = new Subject<BorradorProyecto>();
-    parametrosRuta$ = new BehaviorSubject(convertToParamMap({ proyectoId: '42' }));
     estadoCreacion.cargar.mockReturnValue(carga$);
     estadoCreacion.guardarSeccion.mockReturnValue(guardado$);
 
@@ -34,16 +33,10 @@ describe('CoordinadorPasoCreacionProyectoService', () => {
         CoordinadorPasoCreacionProyectoService,
         { provide: EstadoCreacionProyectoService, useValue: estadoCreacion },
         { provide: NotificadorErroresBorradorProyectoService, useValue: notificadorErrores },
-        { provide: Router, useValue: router },
-        {
-          provide: ActivatedRoute,
-          useValue: {
-            parent: { paramMap: parametrosRuta$ },
-          },
-        },
       ],
     });
     servicio = TestBed.inject(CoordinadorPasoCreacionProyectoService);
+    TestBed.flushEffects();
   });
 
   it('expone el borrador únicamente después de completar su carga', () => {
@@ -68,36 +61,33 @@ describe('CoordinadorPasoCreacionProyectoService', () => {
     expect(servicio.contenidoListo()).toBe(false);
   });
 
-  it('descarta la fotografía anterior y carga el proyecto vigente al cambiar la ruta', () => {
+  it('descarta la fotografía anterior al cambiar el proyecto activo', () => {
     servicio.cargar();
     carga$.next(BORRADOR);
     const nuevaCarga$ = new Subject<BorradorProyecto>();
     estadoCreacion.cargar.mockReturnValue(nuevaCarga$);
 
-    parametrosRuta$.next(convertToParamMap({ proyectoId: '84' }));
+    proyectoId.set(84);
+    TestBed.flushEffects();
 
-    expect(estadoCreacion.seleccionarProyecto).toHaveBeenLastCalledWith(84);
     expect(estadoCreacion.cargar).toHaveBeenLastCalledWith(84);
     expect(servicio.borrador()).toBeNull();
     expect(servicio.contenidoListo()).toBe(false);
 
     nuevaCarga$.next({ ...BORRADOR, id: 84 });
-
     expect(servicio.borrador()?.id).toBe(84);
-    expect(servicio.contenidoListo()).toBe(true);
   });
 
-  it('guarda una sola vez y navega al destino construido por la página', () => {
-    servicio.guardar(ACTUALIZACION, (proyectoId) => `/destino/${proyectoId}`);
-    servicio.guardar(ACTUALIZACION, (proyectoId) => `/destino/${proyectoId}`);
+  it('guarda una sola vez y notifica al componente que puede continuar', () => {
+    const alCompletar = vi.fn();
+    servicio.guardar(ACTUALIZACION, alCompletar);
+    servicio.guardar(ACTUALIZACION, alCompletar);
 
     expect(estadoCreacion.guardarSeccion).toHaveBeenCalledTimes(1);
-    expect(servicio.procesando()).toBe(true);
-
     guardado$.next({ ...BORRADOR, revision: 4 });
     guardado$.complete();
 
-    expect(router.navigateByUrl).toHaveBeenCalledWith('/destino/42');
+    expect(alCompletar).toHaveBeenCalledOnce();
     expect(servicio.procesando()).toBe(false);
   });
 
@@ -105,24 +95,19 @@ describe('CoordinadorPasoCreacionProyectoService', () => {
     const error = new Error('No fue posible guardar');
     estadoCreacion.guardarSeccion.mockReturnValue(throwError(() => error));
 
-    servicio.guardar(ACTUALIZACION, (proyectoId) => `/destino/${proyectoId}`);
+    servicio.guardar(ACTUALIZACION, vi.fn());
 
     expect(notificadorErrores.comunicar).toHaveBeenCalledWith(
       error,
       ClaveSeccionProyecto.Necesidad,
     );
-    expect(router.navigateByUrl).not.toHaveBeenCalled();
     expect(servicio.procesando()).toBe(false);
   });
 });
 
 const ACTUALIZACION: ActualizacionSeccionBorrador = {
   seccion: ClaveSeccionProyecto.Necesidad,
-  datos: {
-    situacionActual: 'Registro manual',
-    problemas: 'Reprocesos',
-    impacto: 'Costos',
-  },
+  datos: { situacionActual: 'Registro manual', problemas: 'Reprocesos', impacto: 'Costos' },
 };
 
 const BORRADOR: BorradorProyecto = {

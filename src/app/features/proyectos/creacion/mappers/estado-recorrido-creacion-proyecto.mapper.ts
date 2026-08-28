@@ -11,7 +11,7 @@ export interface EstadoRecorridoCreacionProyecto {
   readonly pasosNavegables: readonly ClavePasoCreacionProyecto[];
 }
 
-/** Deriva el recorrido desde la ruta actual y el máximo avance persistido. */
+/** Deriva el recorrido desde la selección actual y el máximo avance persistido. */
 export function construirEstadoRecorridoCreacion(
   clavePasoActual: ClavePasoCreacionProyecto,
   avanceBorrador: number | null,
@@ -42,6 +42,19 @@ export function puedeAbrirPasoCreacion(
   return (
     avanceRequerido !== null && avanceRequerido <= normalizarAvanceCreacionProyecto(pasoActual)
   );
+}
+
+/** Convierte el avance persistido en el último paso disponible del recorrido. */
+export function obtenerUltimoPasoCreacion(pasoActual: number): ClavePasoCreacionProyecto {
+  const avance = normalizarAvanceCreacionProyecto(pasoActual);
+  let ultimoPaso: ClavePasoCreacionProyecto = PASOS_CREACION_PROYECTO[1].clave;
+
+  for (const paso of PASOS_CREACION_PROYECTO) {
+    const avanceRequerido = AVANCE_BORRADOR_POR_PASO[paso.clave];
+    if (avanceRequerido !== null && avanceRequerido <= avance) ultimoPaso = paso.clave;
+  }
+
+  return ultimoPaso;
 }
 
 /** Normaliza el avance persistido dentro de los límites del recorrido. */

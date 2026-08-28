@@ -1,0 +1,33 @@
+:host {
+  display: block;
+}
+
+.paso-flujo__pendiente {
+  display: flex;
+  min-height: 22rem;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  color: var(--text-muted);
+  text-align: left;
+}
+
+.paso-flujo__pendiente > app-icono {
+  width: var(--font-size-xl);
+  height: var(--font-size-xl);
+}
+
+.paso-flujo__pendiente h3,
+.paso-flujo__pendiente p {
+  margin: 0;
+}
+
+.paso-flujo__pendiente h3 {
+  color: var(--text-primary);
+  font-size: var(--font-size-base);
+}
+
+.paso-flujo__pendiente p {
+  margin-top: var(--space-1);
+  font-size: var(--font-size-sm);
+}

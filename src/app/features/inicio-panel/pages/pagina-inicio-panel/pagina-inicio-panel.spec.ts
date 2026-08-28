@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { AutenticacionService } from '../../../../core/autenticacion/services/autenticacion.service';
-import { URL_NUEVO_PROYECTO } from '../../../../core/navegacion/rutas';
+import { URL_CREACION_PROYECTO } from '../../../../core/navegacion/rutas';
 import { ResumenInicioPanel } from '../../models/resumen-inicio-panel.model';
 import { ResumenInicioPanelService } from '../../services/resumen-inicio-panel.service';
 import { PaginaInicioPanel } from './pagina-inicio-panel';
@@ -116,7 +116,7 @@ describe('PaginaInicioPanel', () => {
 
     (boton as HTMLButtonElement).click();
 
-    expect(navegar).toHaveBeenCalledWith(URL_NUEVO_PROYECTO);
+    expect(navegar).toHaveBeenCalledWith(URL_CREACION_PROYECTO);
   });
 
   it('reanuda un borrador en el paso alcanzado y presenta el recorrido real', () => {
@@ -145,6 +145,6 @@ describe('PaginaInicioPanel', () => {
 
     borrador?.click();
 
-    expect(navegar).toHaveBeenCalledWith('/panel/proyectos/42/creacion');
+    expect(navegar).toHaveBeenCalledWith('/panel/proyectos/creacion?proyectoId=42');
   });
 });

@@ -9,7 +9,10 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { AutenticacionService } from '../../../../core/autenticacion/services/autenticacion.service';
-import { URL_NUEVO_PROYECTO, crearUrlCreacionProyecto } from '../../../../core/navegacion/rutas';
+import {
+  URL_CREACION_PROYECTO,
+  crearUrlCreacionProyecto,
+} from '../../../../core/navegacion/rutas';
 import { EncabezadoPagina } from '../../../../shared/components/encabezado-pagina/encabezado-pagina';
 import { EstadoError } from '../../../../shared/components/estado-error/estado-error';
 import { IconoComponent } from '../../../../shared/components/icono/icono.component';
@@ -82,7 +85,7 @@ export class PaginaInicioPanel {
 
   /** Abre el punto de partida para crear un proyecto. */
   protected crearProyecto(): void {
-    void this.router.navigateByUrl(URL_NUEVO_PROYECTO);
+    void this.router.navigateByUrl(URL_CREACION_PROYECTO);
   }
 
   /** Conserva el punto de entrada hacia los proyectos disponibles. */

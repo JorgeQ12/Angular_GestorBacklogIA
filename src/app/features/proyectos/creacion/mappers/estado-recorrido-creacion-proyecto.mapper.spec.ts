@@ -2,6 +2,7 @@ import { ClaveSeccionProyecto } from '../../config/secciones-proyecto.config';
 import { CLAVE_PASO_VINCULACION_AZURE } from '../config/pasos-creacion-proyecto.config';
 import {
   construirEstadoRecorridoCreacion,
+  obtenerUltimoPasoCreacion,
   obtenerPosicionVisualCreacion,
   puedeAbrirPasoCreacion,
 } from './estado-recorrido-creacion-proyecto.mapper';
@@ -58,5 +59,11 @@ describe('estado del recorrido de creación', () => {
     expect(obtenerPosicionVisualCreacion(1)).toBe(2);
     expect(obtenerPosicionVisualCreacion(4)).toBe(5);
     expect(obtenerPosicionVisualCreacion(8)).toBe(9);
+  });
+
+  it('selecciona el último paso alcanzado sin depender de la URL', () => {
+    expect(obtenerUltimoPasoCreacion(1)).toBe(ClaveSeccionProyecto.Contexto);
+    expect(obtenerUltimoPasoCreacion(4)).toBe(ClaveSeccionProyecto.Objetivos);
+    expect(obtenerUltimoPasoCreacion(99)).toBe(ClaveSeccionProyecto.Flujo);
   });
 });
