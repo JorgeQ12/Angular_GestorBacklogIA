@@ -12,7 +12,11 @@ export const SEGMENTOS_RUTA = {
 
 /** Centraliza los nombres usados por los parámetros de ruta. */
 export const PARAMETROS_RUTA = {
+  estadoProyecto: 'estado',
+  nombreProyecto: 'nombre',
+  pagina: 'pagina',
   proyectoId: 'proyectoId',
+  responsableProyecto: 'responsable',
 } as const;
 
 /** Obtiene un identificador de proyecto válido desde un mapa de parámetros. */
@@ -40,9 +44,14 @@ export const RUTA_INICIO_PANEL = `${RUTA_PANEL}/${SEGMENTOS_RUTA.inicio}` as con
 /** Proporciona la URL absoluta del inicio del panel. */
 export const URL_INICIO_PANEL = `/${RUTA_INICIO_PANEL}` as const;
 
+/** Identifica la ruta relativa de entrada al dominio de Proyectos. */
+export const RUTA_PROYECTOS = `${RUTA_PANEL}/${SEGMENTOS_RUTA.proyectos}` as const;
+
+/** Proporciona la URL absoluta del listado de proyectos. */
+export const URL_PROYECTOS = `/${RUTA_PROYECTOS}` as const;
+
 /** Identifica la única ruta relativa del recorrido de creación. */
-export const RUTA_CREACION_PROYECTO =
-  `${RUTA_PANEL}/${SEGMENTOS_RUTA.proyectos}/${SEGMENTOS_RUTA.creacion}` as const;
+export const RUTA_CREACION_PROYECTO = `${RUTA_PROYECTOS}/${SEGMENTOS_RUTA.creacion}` as const;
 
 /** Proporciona la URL absoluta para iniciar un proyecto. */
 export const URL_CREACION_PROYECTO = `/${RUTA_CREACION_PROYECTO}` as const;

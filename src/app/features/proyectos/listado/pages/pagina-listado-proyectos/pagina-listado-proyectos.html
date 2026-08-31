@@ -1,0 +1,88 @@
+<section class="pagina-listado-proyectos" aria-labelledby="titulo-listado-proyectos">
+  <app-encabezado-pagina
+    idTitulo="titulo-listado-proyectos"
+    titulo="Proyectos"
+    etiqueta="Portafolio"
+    descripcion="Consulta las iniciativas disponibles y continúa su definición cuando sea necesario."
+    icono="proyectos"
+  >
+    @if (estadoListado.pagina(); as pagina) {
+      <span encabezadoPaginaMetadatos class="ui-page-header__meta-item">
+        <strong>{{ pagina.totalRegistros }}</strong>
+        {{ pagina.totalRegistros === 1 ? 'resultado' : 'resultados' }}
+      </span>
+    }
+    <button
+      encabezadoPaginaAcciones
+      type="button"
+      class="ui-button ui-button--primary ui-button--on-inverse ui-button--md"
+      (click)="crearProyecto()"
+    >
+      <app-icono class="ui-button__icon" nombre="agregar" />
+      Nuevo proyecto
+    </button>
+  </app-encabezado-pagina>
+
+  <article class="ui-card pagina-listado-proyectos__contenido">
+    <div class="pagina-listado-proyectos__filtros">
+      <app-filtros-listado-proyectos
+        [filtrosIniciales]="filtros()"
+        (filtrosCambiados)="actualizarFiltros($event)"
+      />
+    </div>
+
+    <div class="pagina-listado-proyectos__resultados">
+      @if (estadoListado.errorCarga()) {
+        <app-estado-error
+          class="pagina-listado-proyectos__estado"
+          [titulo]="mensajeError.titulo"
+          [descripcion]="mensajeError.descripcion"
+          [reintentable]="true"
+          (reintentar)="estadoListado.reintentar()"
+        />
+      } @else if (estadoListado.pagina(); as pagina) {
+        @if (pagina.proyectos.length) {
+          <app-tabla-proyectos
+            [proyectos]="pagina.proyectos"
+            [paginaActual]="pagina.paginaActual"
+            [totalPaginas]="pagina.totalPaginas"
+            (continuarBorrador)="continuarBorrador($event)"
+            (paginaCambiada)="cambiarPagina($event)"
+          />
+        } @else {
+          <app-estado-vacio
+            class="pagina-listado-proyectos__estado"
+            icono="proyectos"
+            titulo="No encontramos proyectos"
+            [descripcion]="
+              hayFiltros()
+                ? 'Prueba otros criterios o limpia los filtros aplicados.'
+                : 'Las iniciativas disponibles aparecerán en este portafolio.'
+            "
+          >
+            <div estadoVacioAcciones class="pagina-listado-proyectos__acciones-vacio">
+              @if (hayFiltros()) {
+                <button
+                  type="button"
+                  class="ui-button ui-button--secondary ui-button--md"
+                  (click)="limpiarFiltros()"
+                >
+                  <app-icono class="ui-button__icon" nombre="cerrar" />
+                  Limpiar filtros
+                </button>
+              }
+              <button
+                type="button"
+                class="ui-button ui-button--primary ui-button--md"
+                (click)="crearProyecto()"
+              >
+                <app-icono class="ui-button__icon" nombre="agregar" />
+                Nuevo proyecto
+              </button>
+            </div>
+          </app-estado-vacio>
+        }
+      }
+    </div>
+  </article>
+</section>

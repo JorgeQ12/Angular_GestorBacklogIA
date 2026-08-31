@@ -3,7 +3,11 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { AutenticacionService } from '../../../../core/autenticacion/services/autenticacion.service';
-import { URL_CREACION_PROYECTO } from '../../../../core/navegacion/rutas';
+import {
+  PARAMETROS_RUTA,
+  URL_CREACION_PROYECTO,
+  URL_PROYECTOS,
+} from '../../../../core/navegacion/rutas';
 import { ResumenInicioPanel } from '../../models/resumen-inicio-panel.model';
 import { ResumenInicioPanelService } from '../../services/resumen-inicio-panel.service';
 import { PaginaInicioPanel } from './pagina-inicio-panel';
@@ -117,6 +121,19 @@ describe('PaginaInicioPanel', () => {
     (boton as HTMLButtonElement).click();
 
     expect(navegar).toHaveBeenCalledWith(URL_CREACION_PROYECTO);
+  });
+
+  it('abre el listado y conserva el estado seleccionado como filtro', () => {
+    const navegar = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+    const boton = [...(fixture.nativeElement as HTMLElement).querySelectorAll('button')].find(
+      (elemento) => elemento.textContent?.includes('Activos'),
+    );
+
+    (boton as HTMLButtonElement).click();
+
+    expect(navegar).toHaveBeenCalledWith([URL_PROYECTOS], {
+      queryParams: { [PARAMETROS_RUTA.estadoProyecto]: 'Activo' },
+    });
   });
 
   it('reanuda un borrador en el paso alcanzado y presenta el recorrido real', () => {

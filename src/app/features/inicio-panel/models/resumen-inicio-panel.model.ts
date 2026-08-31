@@ -1,11 +1,3 @@
-/** Identifica los estados de proyecto representados en el inicio del panel. */
-export enum EstadoProyecto {
-  Nuevo = 'Nuevo',
-  Activo = 'Activo',
-  Finalizado = 'Finalizado',
-  Cerrado = 'Cerrado',
-}
-
 /** Reúne los indicadores agregados proporcionados para el usuario vigente. */
 export interface IndicadoresInicioPanel {
   totalProyectos: number;

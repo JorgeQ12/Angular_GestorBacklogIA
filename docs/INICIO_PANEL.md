@@ -48,19 +48,20 @@ features/inicio-panel/
   tarjetas de alturas diferentes y conserva un orden lineal en pantallas angostas.
 - El servicio consulta `ObtenerResumenAdministrativo` mediante la URL definida por el environment.
 - El mapper separa el DTO del backend del modelo consumido por los componentes.
-- La continuación de un borrador abre `/panel/proyectos/:proyectoId/creacion`; el guard de
-  Proyectos resuelve el paso alcanzado. El inicio no importa configuraciones ni mappers internos
-  del recorrido.
+- La continuación de un borrador abre
+  `/panel/proyectos/creacion?proyectoId=<id>`; la página de Creación resuelve el paso alcanzado. El
+  inicio no importa configuraciones ni mappers internos del recorrido.
 - Los indicadores de avance consumen el contrato público de `features/proyectos/public-api.ts`.
+- “Ver proyectos” abre `/panel/proyectos`; seleccionar un estado agrega el query param `estado` y
+  deja que el listado resuelva su consulta.
+- Los estados compartidos se consumen desde el contrato público de Proyectos y no se vuelven a
+  declarar dentro de Inicio.
 
 ## Integraciones pendientes
 
 La migración conserva puntos explícitos para conectar posteriormente:
 
-- Proyectos filtrados por estado.
-- Creación de proyectos.
 - Detalle de proyectos.
-- Continuación de borradores.
 
 El resumen vacío solo actúa como valor inicial mientras el loader global cubre la solicitud. Una
 falla presenta un estado de error y no se confunde con totales en cero.
