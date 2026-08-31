@@ -11,15 +11,13 @@ import { EstadoError } from '../../../../../shared/components/estado-error/estad
 import { EstadoVacio } from '../../../../../shared/components/estado-vacio/estado-vacio';
 import { IconoComponent } from '../../../../../shared/components/icono/icono.component';
 import { FormularioFiltrosListadoProyectos } from '../../components/filtros-listado-proyectos/filtros-listado-proyectos';
-import {
-  TablaProyectos,
-  type CambioPaginaListadoProyectos,
-} from '../../components/tabla-proyectos/tabla-proyectos';
+import { TablaProyectos } from '../../components/tabla-proyectos/tabla-proyectos';
 import { MENSAJE_ERROR_LISTADO_PROYECTOS } from '../../config/mensajes-listado-proyectos.config';
+import { sonFiltrosListadoProyectosIguales } from '../../mappers/filtros-listado-proyectos.mapper';
 import { mapearParametrosListadoProyectos } from '../../mappers/parametros-listado-proyectos.mapper';
-import {
-  FILTROS_LISTADO_PROYECTOS_VACIOS,
-  type FiltrosListadoProyectos,
+import type {
+  CambioPaginaListadoProyectos,
+  FiltrosListadoProyectos,
 } from '../../models/consulta-listado-proyectos.model';
 import type { ProyectoListado } from '../../models/proyecto-listado.model';
 import { EstadoListadoProyectosService } from '../../services/estado-listado-proyectos.service';
@@ -77,7 +75,7 @@ export class PaginaListadoProyectos {
 
   /** Refleja los criterios en la URL y reinicia la paginación. */
   protected actualizarFiltros(filtros: FiltrosListadoProyectos): void {
-    if (sonFiltrosIguales(filtros, this.filtros())) return;
+    if (sonFiltrosListadoProyectosIguales(filtros, this.filtros())) return;
 
     void this.router.navigate([], {
       relativeTo: this.route,
@@ -103,20 +101,4 @@ export class PaginaListadoProyectos {
       queryParamsHandling: 'merge',
     });
   }
-
-  /** Retira todos los filtros conservados en la URL. */
-  protected limpiarFiltros(): void {
-    this.actualizarFiltros(FILTROS_LISTADO_PROYECTOS_VACIOS);
-  }
-}
-
-function sonFiltrosIguales(
-  izquierda: FiltrosListadoProyectos,
-  derecha: FiltrosListadoProyectos,
-): boolean {
-  return (
-    izquierda.nombre === derecha.nombre &&
-    izquierda.responsable === derecha.responsable &&
-    izquierda.estado === derecha.estado
-  );
 }

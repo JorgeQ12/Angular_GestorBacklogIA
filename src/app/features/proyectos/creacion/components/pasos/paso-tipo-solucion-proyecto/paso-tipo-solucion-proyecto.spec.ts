@@ -5,15 +5,12 @@ import { ClaveSeccionProyecto } from '../../../../config/secciones-proyecto.conf
 import { PlataformaSolucion } from '../../../../secciones/tipo-solucion/models/tipo-solucion-proyecto.model';
 import { EstadoCreacionProyectoService } from '../../../services/estado-creacion-proyecto.service';
 import { NotificadorErroresBorradorProyectoService } from '../../../services/notificador-errores-borrador-proyecto.service';
-import { crearBorradorProyectoPrueba } from '../../../testing/crear-borrador-proyecto-prueba';
 import { PasoTipoSolucionProyecto } from './paso-tipo-solucion-proyecto';
 
 describe('PasoTipoSolucionProyecto', () => {
   let fixture: ComponentFixture<PasoTipoSolucionProyecto>;
   let proyectoId: ReturnType<typeof signal<number | null>>;
-  const borrador = crearBorradorProyectoPrueba({
-    tipoSolucionJson: '{"tieneInterfaz":true,"plataforma":"Web"}',
-  });
+  const tipoSolucionJson = '{"tieneInterfaz":true,"plataforma":"Web"}';
   const estadoCreacion = {
     proyectoId: () => proyectoId(),
     cargar: vi.fn(),
@@ -23,8 +20,8 @@ describe('PasoTipoSolucionProyecto', () => {
   beforeEach(async () => {
     vi.clearAllMocks();
     proyectoId = signal<number | null>(42);
-    estadoCreacion.cargar.mockReturnValue(of(borrador));
-    estadoCreacion.guardarSeccion.mockReturnValue(of({ ...borrador, revision: 4 }));
+    estadoCreacion.cargar.mockReturnValue(of({ tipoSolucionJson }));
+    estadoCreacion.guardarSeccion.mockReturnValue(of({ tipoSolucionJson }));
 
     await TestBed.configureTestingModule({
       imports: [PasoTipoSolucionProyecto],

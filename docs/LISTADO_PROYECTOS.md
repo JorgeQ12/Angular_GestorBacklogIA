@@ -40,8 +40,10 @@ features/proyectos/
 ```
 
 - `PaginaListadoProyectos` compone filtros, resultados y navegación.
-- `FormularioFiltrosListadoProyectos` administra un formulario reactivo tipado, aplica una espera breve a
-  las búsquedas y emite una fotografía completa de los criterios.
+- `FormularioFiltrosListadoProyectos` administra un formulario reactivo tipado, aplica una espera
+  breve a la búsqueda y emite una fotografía completa de los criterios.
+- `filtros-listado-proyectos.mapper` centraliza la normalización y comparación de filtros para que
+  la página, el formulario y la hidratación desde URL compartan una sola regla.
 - `TablaProyectos` representa filas, acciones y paginación; no conoce HTTP ni Router.
 - `ListadoProyectosService` ejecuta `ObtenerProyectos`, valida `ResultadoApi` y adapta el DTO.
 - `EstadoListadoProyectosService` conserva únicamente el estado de la ruta, cancela consultas
@@ -67,13 +69,15 @@ en el límite HTTP. Los componentes y query params usan el nombre legible del en
 ## Presentación
 
 La página utiliza `EncabezadoPagina` para la identidad y presenta “Nuevo proyecto” como acción
-principal. El botón navega directamente a Creación. La cantidad del encabezado representa los
-resultados de la consulta vigente y no se presenta como cero antes de recibir una respuesta.
+principal. El botón navega directamente a Creación. El encabezado no repite la cantidad de
+resultados porque el listado ya comunica su contenido y paginación.
 
 Filtros, resultados, estado vacío y paginación pertenecen a una sola `ui-card`:
 
-- Nombre y responsable reutilizan `CampoBusqueda`.
-- Estado reutiliza `SelectorCampo`.
+- La búsqueda utiliza un único `CampoBusqueda`, ocupa el espacio disponible y se aplica desde tres
+  caracteres. Borrar o acortar el texto retira automáticamente el criterio.
+- Estado reutiliza `SelectorCampo` e incluye “Todos los estados” para retirar el criterio sin una
+  acción adicional.
 - Las fechas se representan mediante `FechaPipe`.
 - Los iconos se obtienen exclusivamente mediante `app-icono`.
 - La tabla conserva semántica nativa, encabezados con alcance de columna y nombres accesibles en
@@ -87,7 +91,13 @@ mismo contrato estable.
 
 El loader global representa la solicitud. Una consulta fallida presenta `EstadoError` reintentable
 y no se convierte en una colección vacía. Una respuesta exitosa sin registros presenta
-`EstadoVacio` y permite limpiar filtros o iniciar un proyecto.
+`EstadoVacio` y permite corregir los criterios o iniciar un proyecto.
+
+El contrato remoto vigente todavía recibe `nombre` y `responsable` como filtros independientes y
+los combina mediante `AND`. Por eso el control unificado se adapta temporalmente a `nombre`; no se
+envía el mismo texto a ambos parámetros porque produciría resultados incorrectos. Cuando el backend
+exponga una búsqueda transversal, el cambio quedará contenido en el adaptador HTTP y no requerirá
+volver a dividir la interfaz.
 
 ## Acciones por proyecto
 
@@ -115,7 +125,7 @@ La capacidad verifica:
 1. Mapeo del paginado, valores nulos y avance de borradores.
 2. URL, parámetros, estados y errores funcionales del servicio HTTP.
 3. Cancelación, reintento y descarte de respuestas antiguas en el estado de ruta.
-4. Hidratación, espera de búsqueda, limpieza y emisión tipada de filtros.
+4. Hidratación, espera de búsqueda, retiro automático y emisión tipada de filtros.
 5. Semántica, acciones y paginación observable de la tabla.
 6. Reacción de la página a query params y navegación hacia Creación.
 7. Integración desde Inicio y configuración de rutas.

@@ -4,16 +4,13 @@ import { of } from 'rxjs';
 import { ClaveSeccionProyecto } from '../../../../config/secciones-proyecto.config';
 import { EstadoCreacionProyectoService } from '../../../services/estado-creacion-proyecto.service';
 import { NotificadorErroresBorradorProyectoService } from '../../../services/notificador-errores-borrador-proyecto.service';
-import { crearBorradorProyectoPrueba } from '../../../testing/crear-borrador-proyecto-prueba';
 import { PasoObjetivosProyecto } from './paso-objetivos-proyecto';
 
 describe('PasoObjetivosProyecto', () => {
   let fixture: ComponentFixture<PasoObjetivosProyecto>;
   let proyectoId: ReturnType<typeof signal<number | null>>;
-  const borrador = crearBorradorProyectoPrueba({
-    objetivosJson:
-      '{"objetivoGeneral":"Reducir tiempos","objetivosEspecificos":["Automatizar tareas","Medir resultados"]}',
-  });
+  const objetivosJson =
+    '{"objetivoGeneral":"Reducir tiempos","objetivosEspecificos":["Automatizar tareas","Medir resultados"]}';
   const estadoCreacion = {
     proyectoId: () => proyectoId(),
     cargar: vi.fn(),
@@ -23,8 +20,8 @@ describe('PasoObjetivosProyecto', () => {
   beforeEach(async () => {
     vi.clearAllMocks();
     proyectoId = signal<number | null>(42);
-    estadoCreacion.cargar.mockReturnValue(of(borrador));
-    estadoCreacion.guardarSeccion.mockReturnValue(of({ ...borrador, revision: 4 }));
+    estadoCreacion.cargar.mockReturnValue(of({ objetivosJson }));
+    estadoCreacion.guardarSeccion.mockReturnValue(of({ objetivosJson }));
 
     await TestBed.configureTestingModule({
       imports: [PasoObjetivosProyecto],

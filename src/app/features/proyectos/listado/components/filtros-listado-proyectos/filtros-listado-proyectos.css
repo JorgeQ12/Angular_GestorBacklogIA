@@ -4,32 +4,13 @@
 
 .filtros-proyectos {
   display: grid;
-  grid-template-columns: minmax(16rem, 1.35fr) minmax(14rem, 1fr) minmax(11rem, 0.72fr) auto;
+  grid-template-columns: minmax(18rem, 1fr) minmax(14rem, 20rem);
   align-items: end;
   gap: var(--space-3);
-}
-
-.filtros-proyectos .ui-button {
-  min-height: var(--control-height-md);
-  white-space: nowrap;
-}
-
-@media (max-width: 1080px) {
-  .filtros-proyectos {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .filtros-proyectos .ui-button {
-    justify-self: start;
-  }
 }
 
 @media (max-width: 640px) {
   .filtros-proyectos {
     grid-template-columns: 1fr;
-  }
-
-  .filtros-proyectos .ui-button {
-    width: 100%;
   }
 }

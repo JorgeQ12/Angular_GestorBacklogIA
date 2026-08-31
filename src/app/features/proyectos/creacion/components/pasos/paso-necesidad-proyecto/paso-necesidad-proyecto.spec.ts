@@ -4,16 +4,13 @@ import { of } from 'rxjs';
 import { ClaveSeccionProyecto } from '../../../../config/secciones-proyecto.config';
 import { EstadoCreacionProyectoService } from '../../../services/estado-creacion-proyecto.service';
 import { NotificadorErroresBorradorProyectoService } from '../../../services/notificador-errores-borrador-proyecto.service';
-import { crearBorradorProyectoPrueba } from '../../../testing/crear-borrador-proyecto-prueba';
 import { PasoNecesidadProyecto } from './paso-necesidad-proyecto';
 
 describe('PasoNecesidadProyecto', () => {
   let fixture: ComponentFixture<PasoNecesidadProyecto>;
   let proyectoId: ReturnType<typeof signal<number | null>>;
-  const borrador = crearBorradorProyectoPrueba({
-    necesidadJson:
-      '{"situacionActual":"Registro manual","problemas":"No existe trazabilidad","impacto":"Aumentan los tiempos"}',
-  });
+  const necesidadJson =
+    '{"situacionActual":"Registro manual","problemas":"No existe trazabilidad","impacto":"Aumentan los tiempos"}';
   const estadoCreacion = {
     proyectoId: () => proyectoId(),
     cargar: vi.fn(),
@@ -23,8 +20,8 @@ describe('PasoNecesidadProyecto', () => {
   beforeEach(async () => {
     vi.clearAllMocks();
     proyectoId = signal<number | null>(42);
-    estadoCreacion.cargar.mockReturnValue(of(borrador));
-    estadoCreacion.guardarSeccion.mockReturnValue(of({ ...borrador, revision: 4 }));
+    estadoCreacion.cargar.mockReturnValue(of({ necesidadJson }));
+    estadoCreacion.guardarSeccion.mockReturnValue(of({ necesidadJson }));
 
     await TestBed.configureTestingModule({
       imports: [PasoNecesidadProyecto],

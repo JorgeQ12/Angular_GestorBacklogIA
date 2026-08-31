@@ -2,11 +2,8 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
 import { IconoComponent } from '../../../../../shared/components/icono/icono.component';
 import { FechaPipe } from '../../../../../shared/fechas/pipes/fecha.pipe';
 import { EstadoCatalogoProyecto } from '../../../models/estado-catalogo-proyecto.model';
+import type { CambioPaginaListadoProyectos } from '../../models/consulta-listado-proyectos.model';
 import type { ProyectoListado } from '../../models/proyecto-listado.model';
-
-export interface CambioPaginaListadoProyectos {
-  readonly pagina: number;
-}
 
 type ClaseEstadoProyecto =
   'es-borrador' | 'es-nuevo' | 'es-activo' | 'es-finalizado' | 'es-cerrado' | 'es-desconocido';

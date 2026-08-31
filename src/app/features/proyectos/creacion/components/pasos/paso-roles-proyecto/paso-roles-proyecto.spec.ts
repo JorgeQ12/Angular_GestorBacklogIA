@@ -4,15 +4,12 @@ import { of } from 'rxjs';
 import { ClaveSeccionProyecto } from '../../../../config/secciones-proyecto.config';
 import { EstadoCreacionProyectoService } from '../../../services/estado-creacion-proyecto.service';
 import { NotificadorErroresBorradorProyectoService } from '../../../services/notificador-errores-borrador-proyecto.service';
-import { crearBorradorProyectoPrueba } from '../../../testing/crear-borrador-proyecto-prueba';
 import { PasoRolesProyecto } from './paso-roles-proyecto';
 
 describe('PasoRolesProyecto', () => {
   let fixture: ComponentFixture<PasoRolesProyecto>;
   let proyectoId: ReturnType<typeof signal<number | null>>;
-  const borrador = crearBorradorProyectoPrueba({
-    rolesJson: '[{"nombre":"Administrador","descripcion":"Configura la solución."}]',
-  });
+  const rolesJson = '[{"nombre":"Administrador","descripcion":"Configura la solución."}]';
   const estadoCreacion = {
     proyectoId: () => proyectoId(),
     cargar: vi.fn(),
@@ -22,8 +19,8 @@ describe('PasoRolesProyecto', () => {
   beforeEach(async () => {
     vi.clearAllMocks();
     proyectoId = signal<number | null>(42);
-    estadoCreacion.cargar.mockReturnValue(of(borrador));
-    estadoCreacion.guardarSeccion.mockReturnValue(of({ ...borrador, revision: 4 }));
+    estadoCreacion.cargar.mockReturnValue(of({ rolesJson }));
+    estadoCreacion.guardarSeccion.mockReturnValue(of({ rolesJson }));
 
     await TestBed.configureTestingModule({
       imports: [PasoRolesProyecto],

@@ -31,4 +31,10 @@ describe('parametros-listado-proyectos.mapper', () => {
     ).toEqual({ nombre: '', responsable: '', estado: null, pagina: 1, paginaTamano: 10 });
     expect(obtenerEstadoCatalogoProyecto('Archivado')).toBeNull();
   });
+
+  it('descarta términos con menos de tres caracteres', () => {
+    expect(
+      mapearParametrosListadoProyectos(convertToParamMap({ nombre: 'IA', responsable: 'QA' })),
+    ).toMatchObject({ nombre: '', responsable: '' });
+  });
 });

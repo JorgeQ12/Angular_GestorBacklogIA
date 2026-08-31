@@ -1,21 +1,12 @@
 <form class="filtros-proyectos" [formGroup]="formulario" aria-label="Filtros de proyectos">
-  <div class="ui-field filtros-proyectos__nombre">
-    <span class="ui-label ui-label--compact">Proyecto</span>
-    <app-campo-busqueda
-      [id]="'filtro-proyecto-nombre'"
-      etiqueta="Filtrar por nombre del proyecto"
-      placeholder="Buscar por nombre"
-      formControlName="nombre"
-    />
-  </div>
-
   <div class="ui-field">
-    <span class="ui-label ui-label--compact">Responsable</span>
+    <span class="ui-label ui-label--compact">Buscar</span>
     <app-campo-busqueda
-      [id]="'filtro-proyecto-responsable'"
-      etiqueta="Filtrar por responsable"
-      placeholder="Buscar responsable"
-      formControlName="responsable"
+      [id]="'filtro-proyecto-busqueda'"
+      etiqueta="Buscar proyecto o responsable"
+      placeholder="Buscar proyecto o responsable"
+      [longitudMinima]="longitudMinimaBusqueda"
+      formControlName="busqueda"
     />
   </div>
 
@@ -24,14 +15,9 @@
     <app-selector-campo
       [id]="'filtro-proyecto-estado'"
       etiquetadoPor="etiqueta-filtro-proyecto-estado"
-      placeholder="Todos los estados"
+      placeholder="Seleccionar estado"
       [opciones]="opcionesEstado"
       formControlName="estado"
     />
   </div>
-
-  <button type="button" class="ui-button ui-button--text ui-button--md" (click)="limpiar()">
-    <app-icono class="ui-button__icon" nombre="cerrar" />
-    Limpiar filtros
-  </button>
 </form>

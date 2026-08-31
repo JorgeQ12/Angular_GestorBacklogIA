@@ -92,6 +92,13 @@ describe('PaginaListadoProyectos', () => {
     expect(router.navigateByUrl).toHaveBeenCalledWith(URL_CREACION_PROYECTO);
   });
 
+  it('evita repetir la cantidad de resultados y la limpieza en el encabezado o los filtros', () => {
+    const texto = (fixture.nativeElement as HTMLElement).textContent ?? '';
+
+    expect(texto).not.toContain('11 resultados');
+    expect(texto).not.toContain('Limpiar filtros');
+  });
+
   it('reanuda un borrador sin construir rutas internas del recorrido', () => {
     const boton = (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>(
       'app-tabla-proyectos tbody button',

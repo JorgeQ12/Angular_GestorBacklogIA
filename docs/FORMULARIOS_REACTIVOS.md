@@ -348,11 +348,11 @@ controles/
 ```
 
 - `SelectorCampo` recibe opciones neutrales con `valor`, `etiqueta`, descripción opcional y estado
-  deshabilitado. La feature adapta sus catálogos a este contrato; el control no conoce DTO ni
-  modelos de dominio.
+  deshabilitado. `valor` puede ser `null` cuando una opción neutral retira la selección vigente.
+  La feature adapta sus catálogos a este contrato; el control no conoce DTO ni modelos de dominio.
 - `CampoBusqueda` centraliza estructura, icono, foco, accesibilidad y estados visuales. La feature
-  proporciona su etiqueta, placeholder y `FormControl`, y conserva únicamente las reglas de ancho
-  o distribución propias de su layout.
+  proporciona su etiqueta, placeholder, longitud mínima opcional y `FormControl`, y conserva
+  únicamente las reglas de comportamiento, ancho o distribución propias de su layout.
 - `SelectorFecha` conserva fechas sin hora como `YYYY-MM-DD`. El formato visible pertenece a
   `FormateadorFechaService`, por lo que no se crean instancias de `Intl` en componentes.
 - El calendario de `SelectorFecha` es un popover no modal: puede usar `role="dialog"`, pero no

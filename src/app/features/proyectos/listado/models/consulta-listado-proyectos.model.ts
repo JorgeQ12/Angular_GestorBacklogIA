@@ -13,6 +13,11 @@ export interface ConsultaListadoProyectos extends FiltrosListadoProyectos {
   readonly paginaTamano: number;
 }
 
+/** Describe una solicitud de navegación entre páginas del listado. */
+export interface CambioPaginaListadoProyectos {
+  readonly pagina: number;
+}
+
 /** Proporciona los filtros iniciales del listado. */
 export const FILTROS_LISTADO_PROYECTOS_VACIOS: FiltrosListadoProyectos = {
   nombre: '',

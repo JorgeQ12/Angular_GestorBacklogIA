@@ -21,6 +21,7 @@ class ComponentePrueba {
   public readonly opciones = [
     { valor: 1, etiqueta: 'Alta', descripcion: 'Atención prioritaria' },
     { valor: 2, etiqueta: 'Media' },
+    { valor: null, etiqueta: 'Todas las prioridades' },
   ];
 }
 
@@ -50,6 +51,8 @@ describe('SelectorCampo', () => {
   });
 
   it('permite elegir una opción usando el teclado', async () => {
+    fixture.componentInstance.control.setValue(1);
+    fixture.detectChanges();
     obtenerTrigger().dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown' }));
     fixture.detectChanges();
     await fixture.whenStable();
@@ -70,6 +73,19 @@ describe('SelectorCampo', () => {
     fixture.detectChanges();
 
     expect(obtenerTrigger().disabled).toBe(true);
+  });
+
+  it('permite retirar la selección mediante una opción neutral', () => {
+    fixture.componentInstance.control.setValue(1);
+    fixture.detectChanges();
+    obtenerTrigger().click();
+    fixture.detectChanges();
+
+    overlay.querySelectorAll<HTMLButtonElement>('[role="option"]')[2]?.click();
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance.control.value).toBeNull();
+    expect(obtenerTrigger().textContent).toContain('Todas las prioridades');
   });
 
   function obtenerTrigger(): HTMLButtonElement {

@@ -8,13 +8,12 @@ import { ContenidoEncabezadoPasoCreacionService } from '../../../services/conten
 import { CreacionProyectoService } from '../../../services/creacion-proyecto.service';
 import { EstadoCreacionProyectoService } from '../../../services/estado-creacion-proyecto.service';
 import { NotificadorErroresBorradorProyectoService } from '../../../services/notificador-errores-borrador-proyecto.service';
-import { crearBorradorProyectoPrueba } from '../../../testing/crear-borrador-proyecto-prueba';
 import { PasoEquipoProyecto } from './paso-equipo-proyecto';
 
 describe('PasoEquipoProyecto', () => {
   let fixture: ComponentFixture<PasoEquipoProyecto>;
   let proyectoId: ReturnType<typeof signal<number | null>>;
-  const borrador = crearBorradorProyectoPrueba({
+  const equipoGuardado = {
     equipoAzure: {
       idEquipo: 'team-1',
       nombreEquipo: 'Producto digital',
@@ -23,7 +22,7 @@ describe('PasoEquipoProyecto', () => {
     },
     equipoJson:
       '[{"idAzure":"usuario-1","nombre":"Nombre anterior","correo":null,"esAdministradorAzure":false,"perfilTecnicoCodigo":"devops","dedicacionCodigo":"100"}]',
-  });
+  };
   const estadoCreacion = {
     proyectoId: () => proyectoId(),
     cargar: vi.fn(),
@@ -35,8 +34,8 @@ describe('PasoEquipoProyecto', () => {
   beforeEach(async () => {
     vi.clearAllMocks();
     proyectoId = signal<number | null>(42);
-    estadoCreacion.cargar.mockReturnValue(of(borrador));
-    estadoCreacion.guardarSeccion.mockReturnValue(of({ ...borrador, revision: 4 }));
+    estadoCreacion.cargar.mockReturnValue(of(equipoGuardado));
+    estadoCreacion.guardarSeccion.mockReturnValue(of(equipoGuardado));
     creacionProyecto.sincronizarEquipoAzure.mockReturnValue(of(EQUIPO_AZURE_SINCRONIZADO));
 
     await TestBed.configureTestingModule({
@@ -84,7 +83,7 @@ describe('PasoEquipoProyecto', () => {
   it('evita sincronizar automáticamente cuando el borrador ya trae la membresía', () => {
     creacionProyecto.sincronizarEquipoAzure.mockClear();
     estadoCreacion.cargar.mockReturnValueOnce(
-      of({ ...borrador, equipoAzure: EQUIPO_AZURE_SINCRONIZADO }),
+      of({ ...equipoGuardado, equipoAzure: EQUIPO_AZURE_SINCRONIZADO }),
     );
     const fixtureConMembresia = TestBed.createComponent(PasoEquipoProyecto);
     TestBed.flushEffects();
