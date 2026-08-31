@@ -1,7 +1,7 @@
 /** Identifica los estados de catálogo admitidos por la consulta de proyectos. */
 export enum EstadoCatalogoProyecto {
-  Nuevo = 'Nuevo',
-  Activo = 'Activo',
+  Borrador = 'Borrador',
+  EnProgreso = 'En Progreso',
   Finalizado = 'Finalizado',
   Cerrado = 'Cerrado',
 }

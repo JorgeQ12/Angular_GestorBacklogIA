@@ -113,13 +113,12 @@
 }
 
 .tabla-proyectos__estado.es-borrador,
-.tabla-proyectos__estado.es-nuevo,
 .tabla-proyectos__estado.es-cerrado,
 .tabla-proyectos__estado.es-desconocido {
   color: var(--text-muted);
 }
 
-.tabla-proyectos__estado.es-activo {
+.tabla-proyectos__estado.es-en-progreso {
   border-color: color-mix(in srgb, var(--color-info) 20%, transparent);
   background: var(--color-info-surface);
   color: var(--color-info);

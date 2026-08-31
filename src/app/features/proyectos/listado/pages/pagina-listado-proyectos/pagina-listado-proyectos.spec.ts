@@ -24,7 +24,7 @@ describe('PaginaListadoProyectos', () => {
   beforeEach(async () => {
     vi.clearAllMocks();
     pagina = signal<PaginaProyectos | null>(PAGINA);
-    parametros$ = new BehaviorSubject(convertToParamMap({ estado: 'Activo', pagina: '2' }));
+    parametros$ = new BehaviorSubject(convertToParamMap({ estado: 'En Progreso', pagina: '2' }));
     route.queryParamMap = parametros$;
     router.navigate.mockResolvedValue(true);
     router.navigateByUrl.mockResolvedValue(true);
@@ -46,7 +46,7 @@ describe('PaginaListadoProyectos', () => {
     expect(estadoListado.consultar).toHaveBeenCalledWith({
       nombre: '',
       responsable: '',
-      estado: 'Activo',
+      estado: 'En Progreso',
       pagina: 2,
       paginaTamano: 10,
     });

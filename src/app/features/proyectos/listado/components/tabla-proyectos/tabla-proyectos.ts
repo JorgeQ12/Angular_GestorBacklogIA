@@ -6,7 +6,7 @@ import type { CambioPaginaListadoProyectos } from '../../models/consulta-listado
 import type { ProyectoListado } from '../../models/proyecto-listado.model';
 
 type ClaseEstadoProyecto =
-  'es-borrador' | 'es-nuevo' | 'es-activo' | 'es-finalizado' | 'es-cerrado' | 'es-desconocido';
+  'es-borrador' | 'es-en-progreso' | 'es-finalizado' | 'es-cerrado' | 'es-desconocido';
 
 /** Presenta los proyectos y emite únicamente las interacciones de sus filas. */
 @Component({
@@ -37,10 +37,10 @@ export class TablaProyectos {
     if (proyecto.esBorrador) return 'es-borrador';
 
     switch (proyecto.estado) {
-      case EstadoCatalogoProyecto.Nuevo:
-        return 'es-nuevo';
-      case EstadoCatalogoProyecto.Activo:
-        return 'es-activo';
+      case EstadoCatalogoProyecto.Borrador:
+        return 'es-borrador';
+      case EstadoCatalogoProyecto.EnProgreso:
+        return 'es-en-progreso';
       case EstadoCatalogoProyecto.Finalizado:
         return 'es-finalizado';
       case EstadoCatalogoProyecto.Cerrado:

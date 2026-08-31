@@ -13,11 +13,10 @@ import {
 export function mapearResumenInicioPanel(dto: ResumenAdministrativoDto): ResumenInicioPanel {
   return {
     fechaCorte: dto.fechaCorte,
-    totalBorradores: dto.totalBorradores,
     indicadores: {
       totalProyectos: dto.totalProyectos,
-      nuevos: dto.nuevos,
-      activos: dto.activos,
+      enBorrador: dto.enBorrador,
+      enProgreso: dto.enProgreso,
       finalizados: dto.finalizados,
       cerrados: dto.cerrados,
       conBacklog: dto.conBacklog,

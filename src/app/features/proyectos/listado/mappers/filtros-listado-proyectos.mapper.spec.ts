@@ -10,12 +10,12 @@ describe('filtros-listado-proyectos.mapper', () => {
     expect(
       mapearValoresFormularioFiltrosListadoProyectos({
         busqueda: '  Portal  ',
-        estado: EstadoCatalogoProyecto.Activo,
+        estado: EstadoCatalogoProyecto.EnProgreso,
       }),
     ).toEqual({
       nombre: 'Portal',
       responsable: '',
-      estado: EstadoCatalogoProyecto.Activo,
+      estado: EstadoCatalogoProyecto.EnProgreso,
     });
   });
 
@@ -27,7 +27,7 @@ describe('filtros-listado-proyectos.mapper', () => {
     const filtros = {
       nombre: 'Portal',
       responsable: '',
-      estado: EstadoCatalogoProyecto.Nuevo,
+      estado: EstadoCatalogoProyecto.Borrador,
     } as const;
 
     expect(sonFiltrosListadoProyectosIguales(filtros, { ...filtros })).toBe(true);

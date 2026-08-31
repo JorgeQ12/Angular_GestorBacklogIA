@@ -55,7 +55,11 @@ features/inicio-panel/
 - “Ver proyectos” abre `/panel/proyectos`; seleccionar un estado agrega el query param `estado` y
   deja que el listado resuelva su consulta.
 - Los estados compartidos se consumen desde el contrato público de Proyectos y no se vuelven a
-  declarar dentro de Inicio.
+  declarar dentro de Inicio. El resumen administrativo representa `enBorrador`, `enProgreso`,
+  `finalizados` y `cerrados`, alineados con el catálogo vigente del backend.
+- `enBorrador` es la única fuente para el total de borradores; no se conserva un
+  `totalBorradores` duplicado. Todos los indicadores y colecciones se derivan de una misma
+  fotografía de proyectos activos para evitar conteos contradictorios.
 
 ## Integraciones pendientes
 

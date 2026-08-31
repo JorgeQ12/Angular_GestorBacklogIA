@@ -13,7 +13,7 @@ Los filtros y la página se conservan como query params para admitir recarga, en
 del navegador:
 
 ```text
-/panel/proyectos?estado=Activo&nombre=portal&responsable=maria&pagina=2
+/panel/proyectos?estado=En%20Progreso&nombre=portal&responsable=maria&pagina=2
 ```
 
 La página deriva la consulta desde `queryParamMap`. No captura los parámetros mediante `snapshot`:
@@ -60,8 +60,9 @@ la consulta y el modelo presentado permanecen dentro de `proyectos/listado`.
 
 Los estados aceptados por el filtro se identifican mediante `EstadoCatalogoProyecto`. El enum vive
 en el dominio `proyectos/models` y se exporta desde `proyectos/public-api.ts` porque Inicio también
-lo utiliza. El texto mostrado por una fila continúa siendo el valor entregado por el catálogo
-remoto; no se fuerza a un enum cerrado para representar datos externos.
+lo utiliza. Sus miembros vigentes son `Borrador`, `EnProgreso`, `Finalizado` y `Cerrado`; el valor
+visible de `EnProgreso` es “En Progreso”. El texto mostrado por una fila continúa siendo el valor
+entregado por el catálogo remoto; no se fuerza a un enum cerrado para representar datos externos.
 
 El filtro de estado traduce su identidad al valor numérico exigido por `ObtenerProyectos` solamente
 en el límite HTTP. Los componentes y query params usan el nombre legible del enum.

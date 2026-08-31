@@ -32,16 +32,16 @@ export class EstadoProyectos {
   /** Expone los estados con sus cantidades y proporciones normalizadas. */
   protected readonly estados = computed<readonly EstadoRepresentado[]>(() => [
     this.construirEstado(
-      EstadoCatalogoProyecto.Nuevo,
-      'Nuevos',
-      this.indicadores().nuevos,
-      'es-nuevo',
+      EstadoCatalogoProyecto.Borrador,
+      'Borradores',
+      this.indicadores().enBorrador,
+      'es-borrador',
     ),
     this.construirEstado(
-      EstadoCatalogoProyecto.Activo,
-      'Activos',
-      this.indicadores().activos,
-      'es-activo',
+      EstadoCatalogoProyecto.EnProgreso,
+      'En progreso',
+      this.indicadores().enProgreso,
+      'es-en-progreso',
     ),
     this.construirEstado(
       EstadoCatalogoProyecto.Finalizado,

@@ -18,8 +18,8 @@ export const OPCIONES_FILTRO_ESTADO_LISTADO_PROYECTOS = [
 
 /** Traduce el estado legible al enum entero expuesto por el endpoint. */
 export const VALOR_API_ESTADO_PROYECTO = {
-  [EstadoCatalogoProyecto.Nuevo]: 0,
-  [EstadoCatalogoProyecto.Activo]: 1,
+  [EstadoCatalogoProyecto.Borrador]: 0,
+  [EstadoCatalogoProyecto.EnProgreso]: 1,
   [EstadoCatalogoProyecto.Finalizado]: 2,
   [EstadoCatalogoProyecto.Cerrado]: 3,
 } as const satisfies Readonly<Record<EstadoCatalogoProyecto, number>>;

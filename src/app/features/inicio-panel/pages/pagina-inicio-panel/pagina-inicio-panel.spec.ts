@@ -14,11 +14,10 @@ import { PaginaInicioPanel } from './pagina-inicio-panel';
 
 const RESUMEN: ResumenInicioPanel = {
   fechaCorte: '2026-08-24',
-  totalBorradores: 4,
   indicadores: {
-    totalProyectos: 1,
-    nuevos: 0,
-    activos: 1,
+    totalProyectos: 5,
+    enBorrador: 4,
+    enProgreso: 1,
     finalizados: 0,
     cerrados: 0,
     conBacklog: 1,
@@ -126,13 +125,13 @@ describe('PaginaInicioPanel', () => {
   it('abre el listado y conserva el estado seleccionado como filtro', () => {
     const navegar = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
     const boton = [...(fixture.nativeElement as HTMLElement).querySelectorAll('button')].find(
-      (elemento) => elemento.textContent?.includes('Activos'),
+      (elemento) => elemento.textContent?.includes('En progreso'),
     );
 
     (boton as HTMLButtonElement).click();
 
     expect(navegar).toHaveBeenCalledWith([URL_PROYECTOS], {
-      queryParams: { [PARAMETROS_RUTA.estadoProyecto]: 'Activo' },
+      queryParams: { [PARAMETROS_RUTA.estadoProyecto]: 'En Progreso' },
     });
   });
 
@@ -140,7 +139,7 @@ describe('PaginaInicioPanel', () => {
     const navegar = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
     resumen$.next({
       ...RESUMEN,
-      totalBorradores: 1,
+      indicadores: { ...RESUMEN.indicadores, enBorrador: 1 },
       borradoresRecientes: [
         {
           id: 42,

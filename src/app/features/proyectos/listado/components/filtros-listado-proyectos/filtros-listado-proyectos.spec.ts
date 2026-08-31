@@ -22,7 +22,7 @@ describe('FormularioFiltrosListadoProyectos', () => {
     fixture.componentRef.setInput('filtrosIniciales', {
       nombre: 'Portal',
       responsable: '',
-      estado: EstadoCatalogoProyecto.Activo,
+      estado: EstadoCatalogoProyecto.EnProgreso,
     });
     TestBed.flushEffects();
     fixture.detectChanges();
@@ -31,7 +31,7 @@ describe('FormularioFiltrosListadoProyectos', () => {
     expect(obtenerBuscador(elemento).value).toBe('Portal');
     expect(obtenerBuscador(elemento).minLength).toBe(3);
     expect(elemento.querySelector('#filtro-proyecto-estado-control')?.textContent).toContain(
-      'Activo',
+      'En Progreso',
     );
     expect(elemento.querySelectorAll('input[type="search"]')).toHaveLength(1);
   });
@@ -91,7 +91,7 @@ describe('FormularioFiltrosListadoProyectos', () => {
     fixture.componentRef.setInput('filtrosIniciales', {
       nombre: '',
       responsable: '',
-      estado: EstadoCatalogoProyecto.Activo,
+      estado: EstadoCatalogoProyecto.EnProgreso,
     });
     TestBed.flushEffects();
     fixture.detectChanges();

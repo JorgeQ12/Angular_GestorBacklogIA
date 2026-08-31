@@ -5,8 +5,8 @@ import { EstadoProyectos } from './estado-proyectos';
 
 const INDICADORES: IndicadoresInicioPanel = {
   totalProyectos: 10,
-  nuevos: 2,
-  activos: 4,
+  enBorrador: 2,
+  enProgreso: 4,
   finalizados: 3,
   cerrados: 1,
   conBacklog: 5,
@@ -42,10 +42,10 @@ describe('EstadoProyectos', () => {
     );
 
     const boton = fixture.nativeElement.querySelector(
-      '.estado-proyectos__item.es-activo',
+      '.estado-proyectos__item.es-en-progreso',
     ) as HTMLButtonElement;
     boton.click();
 
-    expect(estadoSeleccionado).toBe(EstadoCatalogoProyecto.Activo);
+    expect(estadoSeleccionado).toBe(EstadoCatalogoProyecto.EnProgreso);
   });
 });

@@ -12,14 +12,14 @@ describe('parametros-listado-proyectos.mapper', () => {
         convertToParamMap({
           nombre: ' Portal ',
           responsable: ' María ',
-          estado: EstadoCatalogoProyecto.Activo,
+          estado: EstadoCatalogoProyecto.EnProgreso,
           pagina: '3',
         }),
       ),
     ).toEqual({
       nombre: 'Portal',
       responsable: 'María',
-      estado: EstadoCatalogoProyecto.Activo,
+      estado: EstadoCatalogoProyecto.EnProgreso,
       pagina: 3,
       paginaTamano: 10,
     });

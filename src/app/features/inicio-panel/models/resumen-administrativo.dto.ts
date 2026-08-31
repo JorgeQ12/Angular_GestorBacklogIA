@@ -25,8 +25,8 @@ export interface ProyectoBorradorAdministrativoDto {
 export interface ResumenAdministrativoDto {
   fechaCorte: string;
   totalProyectos: number;
-  nuevos: number;
-  activos: number;
+  enBorrador: number;
+  enProgreso: number;
   finalizados: number;
   cerrados: number;
   conBacklog: number;
@@ -34,7 +34,6 @@ export interface ResumenAdministrativoDto {
   vencidos: number;
   proximosAVencer: number;
   requierenAtencion: number;
-  totalBorradores: number;
   atencion: readonly ProyectoAdministrativoDto[];
   recientes: readonly ProyectoAdministrativoDto[];
   borradoresRecientes: readonly ProyectoBorradorAdministrativoDto[];

@@ -70,7 +70,7 @@ const PROYECTOS: readonly ProyectoListado[] = [
     id: 84,
     nombre: 'Operación logística',
     responsable: 'Jorge',
-    estado: 'Activo',
+    estado: 'En Progreso',
     prioridad: 'Alta',
     fechaObjetivo: null,
     tieneBacklog: true,
