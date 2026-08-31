@@ -3,18 +3,21 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { AutenticacionService } from '../../../../core/autenticacion/services/autenticacion.service';
-import { URL_CREACION_PROYECTO } from '../../../../core/navegacion/rutas';
+import {
+  PARAMETROS_RUTA,
+  URL_CREACION_PROYECTO,
+  URL_PROYECTOS,
+} from '../../../../core/navegacion/rutas';
 import { ResumenInicioPanel } from '../../models/resumen-inicio-panel.model';
 import { ResumenInicioPanelService } from '../../services/resumen-inicio-panel.service';
 import { PaginaInicioPanel } from './pagina-inicio-panel';
 
 const RESUMEN: ResumenInicioPanel = {
   fechaCorte: '2026-08-24',
-  totalBorradores: 4,
   indicadores: {
-    totalProyectos: 1,
-    nuevos: 0,
-    activos: 1,
+    totalProyectos: 5,
+    enBorrador: 4,
+    enProgreso: 1,
     finalizados: 0,
     cerrados: 0,
     conBacklog: 1,
@@ -119,11 +122,24 @@ describe('PaginaInicioPanel', () => {
     expect(navegar).toHaveBeenCalledWith(URL_CREACION_PROYECTO);
   });
 
+  it('abre el listado y conserva el estado seleccionado como filtro', () => {
+    const navegar = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+    const boton = [...(fixture.nativeElement as HTMLElement).querySelectorAll('button')].find(
+      (elemento) => elemento.textContent?.includes('En progreso'),
+    );
+
+    (boton as HTMLButtonElement).click();
+
+    expect(navegar).toHaveBeenCalledWith([URL_PROYECTOS], {
+      queryParams: { [PARAMETROS_RUTA.estadoProyecto]: 'En Progreso' },
+    });
+  });
+
   it('reanuda un borrador en el paso alcanzado y presenta el recorrido real', () => {
     const navegar = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
     resumen$.next({
       ...RESUMEN,
-      totalBorradores: 1,
+      indicadores: { ...RESUMEN.indicadores, enBorrador: 1 },
       borradoresRecientes: [
         {
           id: 42,

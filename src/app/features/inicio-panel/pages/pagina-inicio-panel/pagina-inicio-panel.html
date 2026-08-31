@@ -63,7 +63,7 @@
         />
         <app-borradores-recientes
           [borradores]="resumen().borradoresRecientes"
-          [total]="resumen().totalBorradores"
+          [total]="resumen().indicadores.enBorrador"
           (continuarBorrador)="continuarBorrador($event)"
         />
       </div>

@@ -1,0 +1,89 @@
+<div class="tabla-proyectos__desplazamiento" tabindex="0" role="region" aria-label="Proyectos">
+  <table class="tabla-proyectos">
+    <caption class="ui-visually-hidden">
+      Proyectos disponibles en el portafolio
+    </caption>
+    <thead>
+      <tr>
+        <th scope="col">Proyecto</th>
+        <th scope="col">Responsable</th>
+        <th scope="col">Estado</th>
+        <th scope="col">Prioridad</th>
+        <th scope="col">Fecha objetivo</th>
+        <th scope="col" class="tabla-proyectos__acciones-titulo">Acción</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (proyecto of proyectos(); track proyecto.id) {
+        <tr>
+          <td>
+            <div class="tabla-proyectos__proyecto">
+              <span class="tabla-proyectos__icono" aria-hidden="true">
+                <app-icono nombre="proyectos" />
+              </span>
+              <span class="tabla-proyectos__identidad">
+                <strong>{{ proyecto.nombre }}</strong>
+                @if (proyecto.progresoCreacion; as progreso) {
+                  <small>Paso {{ progreso.posicion }} de {{ progreso.total }}</small>
+                }
+              </span>
+            </div>
+          </td>
+          <td>{{ proyecto.responsable }}</td>
+          <td>
+            <span [class]="'tabla-proyectos__estado ' + obtenerClaseEstado(proyecto)">
+              <span aria-hidden="true"></span>
+              {{ proyecto.estado }}
+            </span>
+          </td>
+          <td>{{ proyecto.prioridad }}</td>
+          <td>
+            <span class="tabla-proyectos__fecha">
+              <app-icono nombre="calendario" aria-hidden="true" />
+              {{ proyecto.fechaObjetivo | fecha: 'breve' }}
+            </span>
+          </td>
+          <td class="tabla-proyectos__acciones">
+            @if (proyecto.esBorrador) {
+              <button
+                type="button"
+                class="ui-button ui-button--secondary ui-button--md"
+                [attr.aria-label]="'Continuar la definición de ' + proyecto.nombre"
+                (click)="continuarBorrador.emit(proyecto)"
+              >
+                Continuar
+                <app-icono class="ui-button__icon ui-button__icon--trailing" nombre="continuar" />
+              </button>
+            }
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+
+@if (totalPaginas() > 1) {
+  <footer class="tabla-proyectos__paginacion" aria-label="Paginación de proyectos">
+    <button
+      type="button"
+      class="ui-button ui-button--text ui-button--md"
+      [disabled]="paginaActual() <= 1"
+      (click)="anterior()"
+    >
+      <app-icono class="ui-button__icon" nombre="volver" />
+      Anterior
+    </button>
+    <span>
+      Página <strong>{{ paginaActual() }}</strong> de <strong>{{ totalPaginas() }}</strong>
+    </span>
+    <button
+      type="button"
+      class="ui-button ui-button--text ui-button--md"
+      [disabled]="paginaActual() >= totalPaginas()"
+      (click)="siguiente()"
+    >
+      Siguiente
+      <app-icono class="ui-button__icon ui-button__icon--trailing" nombre="continuar" />
+    </button>
+  </footer>
+}

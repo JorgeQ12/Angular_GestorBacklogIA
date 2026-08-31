@@ -1,0 +1,23 @@
+<form class="filtros-proyectos" [formGroup]="formulario" aria-label="Filtros de proyectos">
+  <div class="ui-field">
+    <span class="ui-label ui-label--compact">Buscar</span>
+    <app-campo-busqueda
+      [id]="'filtro-proyecto-busqueda'"
+      etiqueta="Buscar proyecto o responsable"
+      placeholder="Buscar proyecto o responsable"
+      [longitudMinima]="longitudMinimaBusqueda"
+      formControlName="busqueda"
+    />
+  </div>
+
+  <div class="ui-field">
+    <span id="etiqueta-filtro-proyecto-estado" class="ui-label ui-label--compact">Estado</span>
+    <app-selector-campo
+      [id]="'filtro-proyecto-estado'"
+      etiquetadoPor="etiqueta-filtro-proyecto-estado"
+      placeholder="Seleccionar estado"
+      [opciones]="opcionesEstado"
+      formControlName="estado"
+    />
+  </div>
+</form>

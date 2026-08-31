@@ -1,0 +1,16 @@
+:host {
+  display: block;
+}
+
+.filtros-proyectos {
+  display: grid;
+  grid-template-columns: minmax(18rem, 1fr) minmax(14rem, 20rem);
+  align-items: end;
+  gap: var(--space-3);
+}
+
+@media (max-width: 640px) {
+  .filtros-proyectos {
+    grid-template-columns: 1fr;
+  }
+}

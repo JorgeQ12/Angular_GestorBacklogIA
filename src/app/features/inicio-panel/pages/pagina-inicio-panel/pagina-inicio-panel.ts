@@ -10,7 +10,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { AutenticacionService } from '../../../../core/autenticacion/services/autenticacion.service';
 import {
+  PARAMETROS_RUTA,
   URL_CREACION_PROYECTO,
+  URL_PROYECTOS,
   crearUrlCreacionProyecto,
 } from '../../../../core/navegacion/rutas';
 import { EncabezadoPagina } from '../../../../shared/components/encabezado-pagina/encabezado-pagina';
@@ -22,9 +24,9 @@ import { EstadoProyectos } from '../../components/estado-proyectos/estado-proyec
 import { IndicadoresProyectos } from '../../components/indicadores-proyectos/indicadores-proyectos';
 import { ProyectosAtencion } from '../../components/proyectos-atencion/proyectos-atencion';
 import { ProyectosRecientes } from '../../components/proyectos-recientes/proyectos-recientes';
+import { EstadoCatalogoProyecto } from '../../../proyectos/public-api';
 import {
   BorradorInicioPanel,
-  EstadoProyecto,
   ProyectoInicioPanel,
   RESUMEN_INICIO_PANEL_VACIO,
 } from '../../models/resumen-inicio-panel.model';
@@ -89,13 +91,17 @@ export class PaginaInicioPanel {
   }
 
   /** Conserva el punto de entrada hacia los proyectos disponibles. */
-  protected verProyectos(_estado?: EstadoProyecto): void {
-    // TODO: Navegar a los proyectos cuando su ruta sea migrada.
+  protected verProyectos(estado?: EstadoCatalogoProyecto): void {
+    void this.router.navigate([URL_PROYECTOS], {
+      queryParams: estado ? { [PARAMETROS_RUTA.estadoProyecto]: estado } : undefined,
+    });
   }
 
-  /** Conserva el punto de entrada hacia el detalle de un proyecto. */
+  /** Abre el listado enfocado mientras se incorpora la consulta detallada. */
   protected abrirProyecto(proyecto: ProyectoInicioPanel): void {
-    void this.router.navigate(['/panel/proyectos', proyecto.id]);
+    void this.router.navigate([URL_PROYECTOS], {
+      queryParams: { [PARAMETROS_RUTA.nombreProyecto]: proyecto.nombre },
+    });
   }
 
   /** Reanuda el borrador desde el recorrido de especificación disponible. */

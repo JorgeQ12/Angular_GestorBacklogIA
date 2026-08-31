@@ -1,5 +1,5 @@
 import { InjectionToken } from '@angular/core';
-import { URL_INICIO_PANEL } from '../../../core/navegacion/rutas';
+import { URL_INICIO_PANEL, URL_PROYECTOS } from '../../../core/navegacion/rutas';
 import { ItemNavegacionPanel } from '../models/item-navegacion-panel.model';
 
 /** Reúne las opciones disponibles en la navegación principal del panel. */
@@ -11,6 +11,14 @@ export const NAVEGACION_PANEL = [
     icono: 'inicio',
     ruta: URL_INICIO_PANEL,
     coincidenciaExacta: true,
+  },
+  {
+    id: 'proyectos',
+    etiqueta: 'Proyectos',
+    descripcion: 'Consultar el portafolio de proyectos',
+    icono: 'proyectos',
+    ruta: URL_PROYECTOS,
+    coincidenciaExacta: false,
   },
 ] as const satisfies readonly ItemNavegacionPanel[];
 

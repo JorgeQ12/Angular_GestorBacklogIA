@@ -1,16 +1,8 @@
-/** Identifica los estados de proyecto representados en el inicio del panel. */
-export enum EstadoProyecto {
-  Nuevo = 'Nuevo',
-  Activo = 'Activo',
-  Finalizado = 'Finalizado',
-  Cerrado = 'Cerrado',
-}
-
 /** Reúne los indicadores agregados proporcionados para el usuario vigente. */
 export interface IndicadoresInicioPanel {
   totalProyectos: number;
-  nuevos: number;
-  activos: number;
+  enBorrador: number;
+  enProgreso: number;
   finalizados: number;
   cerrados: number;
   conBacklog: number;
@@ -43,7 +35,6 @@ export interface BorradorInicioPanel {
 /** Representa el contenido completo del inicio para el usuario vigente. */
 export interface ResumenInicioPanel {
   fechaCorte: string | null;
-  totalBorradores: number;
   indicadores: IndicadoresInicioPanel;
   proyectosAtencion: readonly ProyectoInicioPanel[];
   proyectosRecientes: readonly ProyectoInicioPanel[];
@@ -53,11 +44,10 @@ export interface ResumenInicioPanel {
 /** Proporciona un estado seguro mientras se integra el resumen real del backend. */
 export const RESUMEN_INICIO_PANEL_VACIO: ResumenInicioPanel = {
   fechaCorte: null,
-  totalBorradores: 0,
   indicadores: {
     totalProyectos: 0,
-    nuevos: 0,
-    activos: 0,
+    enBorrador: 0,
+    enProgreso: 0,
     finalizados: 0,
     cerrados: 0,
     conBacklog: 0,

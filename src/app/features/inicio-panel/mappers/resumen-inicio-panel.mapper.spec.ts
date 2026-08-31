@@ -3,9 +3,9 @@ import { mapearResumenInicioPanel } from './resumen-inicio-panel.mapper';
 
 const DTO: ResumenAdministrativoDto = {
   fechaCorte: '2026-08-24',
-  totalProyectos: 1,
-  nuevos: 0,
-  activos: 1,
+  totalProyectos: 3,
+  enBorrador: 2,
+  enProgreso: 1,
   finalizados: 0,
   cerrados: 0,
   conBacklog: 1,
@@ -13,13 +13,12 @@ const DTO: ResumenAdministrativoDto = {
   vencidos: 1,
   proximosAVencer: 0,
   requierenAtencion: 1,
-  totalBorradores: 2,
   atencion: [
     {
       id: 1,
       nombre: 'Proyecto crítico',
       responsable: 'Aleja',
-      estado: 'Activo',
+      estado: 'En Progreso',
       prioridad: 'Alta',
       fechaObjetivo: '2026-08-21',
       tieneBacklog: true,
@@ -45,8 +44,8 @@ describe('mapearResumenInicioPanel', () => {
     const resumen = mapearResumenInicioPanel(DTO);
 
     expect(resumen.fechaCorte).toBe('2026-08-24');
-    expect(resumen.totalBorradores).toBe(2);
-    expect(resumen.indicadores.totalProyectos).toBe(1);
+    expect(resumen.indicadores.enBorrador).toBe(2);
+    expect(resumen.indicadores.totalProyectos).toBe(3);
     expect(resumen.indicadores.requierenAtencion).toBe(1);
     expect(resumen.proyectosAtencion[0]?.motivoAtencion).toBe('Fecha objetivo vencida');
     expect(resumen.borradoresRecientes[0]?.pasoActual).toBe(3);

@@ -22,6 +22,7 @@ describe('PanelLayout', () => {
 
     expect(fixture.nativeElement.querySelector('app-barra-lateral-panel')).toBeTruthy();
     expect(fixture.nativeElement.querySelector('router-outlet')).toBeTruthy();
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('Proyectos');
   });
 
   it('alterna la presentación de la barra lateral', () => {

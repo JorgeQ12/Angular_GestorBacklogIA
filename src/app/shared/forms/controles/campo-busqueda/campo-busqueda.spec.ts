@@ -10,6 +10,7 @@ import { CampoBusqueda } from './campo-busqueda';
       id="busqueda-proyectos"
       etiqueta="Buscar proyecto"
       placeholder="Buscar por nombre"
+      [longitudMinima]="3"
       [formControl]="control"
     />
   `,
@@ -55,6 +56,7 @@ describe('CampoBusqueda', () => {
 
     expect(elemento.querySelector('label')?.textContent).toContain('Buscar proyecto');
     expect(obtenerCampo().placeholder).toBe('Buscar por nombre');
+    expect(obtenerCampo().minLength).toBe(3);
   });
 
   function obtenerCampo(): HTMLInputElement {

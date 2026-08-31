@@ -10,8 +10,8 @@ import { ResumenInicioPanelService } from './resumen-inicio-panel.service';
 const DATOS: ResumenAdministrativoDto = {
   fechaCorte: '2026-08-24',
   totalProyectos: 1,
-  nuevos: 0,
-  activos: 1,
+  enBorrador: 0,
+  enProgreso: 1,
   finalizados: 0,
   cerrados: 0,
   conBacklog: 1,
@@ -19,7 +19,6 @@ const DATOS: ResumenAdministrativoDto = {
   vencidos: 1,
   proximosAVencer: 0,
   requierenAtencion: 1,
-  totalBorradores: 0,
   atencion: [],
   recientes: [],
   borradoresRecientes: [],
@@ -49,7 +48,7 @@ describe('ResumenInicioPanelService', () => {
 
     await expect(respuesta).resolves.toMatchObject({
       fechaCorte: '2026-08-24',
-      indicadores: { totalProyectos: 1, activos: 1 },
+      indicadores: { totalProyectos: 1, enProgreso: 1 },
     });
   });
 

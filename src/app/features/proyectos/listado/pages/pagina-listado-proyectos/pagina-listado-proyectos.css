@@ -1,0 +1,42 @@
+:host {
+  display: block;
+}
+
+.pagina-listado-proyectos {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.pagina-listado-proyectos__filtros {
+  padding: var(--space-4) var(--space-5);
+  border-bottom: var(--border-width) solid var(--card-divider);
+  background: var(--card-header-surface);
+}
+
+.pagina-listado-proyectos__resultados {
+  min-width: 0;
+}
+
+.pagina-listado-proyectos__estado {
+  --ui-empty-state-min-height: 18rem;
+  --ui-error-state-min-height: 18rem;
+}
+
+.pagina-listado-proyectos__acciones-vacio {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+@media (max-width: 640px) {
+  .pagina-listado-proyectos__filtros {
+    padding: var(--space-4);
+  }
+
+  .pagina-listado-proyectos__acciones-vacio,
+  .pagina-listado-proyectos__acciones-vacio .ui-button {
+    width: 100%;
+  }
+}

@@ -27,6 +27,9 @@ export class CampoBusqueda implements ControlValueAccessor {
   /** Orienta sobre el contenido admitido por la búsqueda. */
   public readonly placeholder = input('Buscar');
 
+  /** Comunica al navegador la longitud mínima útil para el criterio. */
+  public readonly longitudMinima = input<number>();
+
   protected readonly valor = signal('');
   protected readonly deshabilitado = signal(false);
 

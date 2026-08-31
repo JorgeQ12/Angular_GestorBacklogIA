@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { IconoComponent } from '../../../../shared/components/icono/icono.component';
-import { EstadoProyecto, IndicadoresInicioPanel } from '../../models/resumen-inicio-panel.model';
+import { EstadoCatalogoProyecto } from '../../../proyectos/public-api';
+import { IndicadoresInicioPanel } from '../../models/resumen-inicio-panel.model';
 
 interface EstadoRepresentado {
-  estado: EstadoProyecto;
+  estado: EstadoCatalogoProyecto;
   etiqueta: string;
   cantidad: number;
   porcentaje: number;
@@ -26,20 +27,30 @@ export class EstadoProyectos {
   public readonly verProyectos = output<void>();
 
   /** Solicita consultar los proyectos asociados a un estado. */
-  public readonly seleccionarEstado = output<EstadoProyecto>();
+  public readonly seleccionarEstado = output<EstadoCatalogoProyecto>();
 
   /** Expone los estados con sus cantidades y proporciones normalizadas. */
   protected readonly estados = computed<readonly EstadoRepresentado[]>(() => [
-    this.construirEstado(EstadoProyecto.Nuevo, 'Nuevos', this.indicadores().nuevos, 'es-nuevo'),
-    this.construirEstado(EstadoProyecto.Activo, 'Activos', this.indicadores().activos, 'es-activo'),
     this.construirEstado(
-      EstadoProyecto.Finalizado,
+      EstadoCatalogoProyecto.Borrador,
+      'Borradores',
+      this.indicadores().enBorrador,
+      'es-borrador',
+    ),
+    this.construirEstado(
+      EstadoCatalogoProyecto.EnProgreso,
+      'En progreso',
+      this.indicadores().enProgreso,
+      'es-en-progreso',
+    ),
+    this.construirEstado(
+      EstadoCatalogoProyecto.Finalizado,
       'Finalizados',
       this.indicadores().finalizados,
       'es-finalizado',
     ),
     this.construirEstado(
-      EstadoProyecto.Cerrado,
+      EstadoCatalogoProyecto.Cerrado,
       'Cerrados',
       this.indicadores().cerrados,
       'es-cerrado',
@@ -52,7 +63,7 @@ export class EstadoProyectos {
   );
 
   private construirEstado(
-    estado: EstadoProyecto,
+    estado: EstadoCatalogoProyecto,
     etiqueta: string,
     cantidad: number,
     clase: string,
