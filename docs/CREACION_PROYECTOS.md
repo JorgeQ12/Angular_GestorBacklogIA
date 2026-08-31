@@ -406,17 +406,20 @@ Flujo incorpora el constructor visual anterior como la última sección reutiliz
   modelos, configuración, mapper y estado local del constructor.
 - `EditorFlujoProyecto` recibe una fotografía y emite el documento completo cuando cambia. No
   conoce rutas, HTTP, revisiones ni el borrador de creación.
-- `EstadoEditorFlujoProyectoService` se proporciona en el editor; la selección, el viewport y los
+- `EstadoEditorFlujoProyectoService` se proporciona en el editor; la selección, la vista del lienzo y los
   modales no se convierten en estado global de la aplicación.
 - `PasoFlujoProyecto` deserializa `diagramFlujoJson`, distingue un contrato inválido y guarda
   mediante `EstadoCreacionProyectoService` con la clave discriminante `Flujo`.
-- La página independiente anterior, su acceso a `ActivatedRoute`, el guardado directo y el facade
+- `PasoFlujoProyecto` incorpora al editor los perfiles canónicos de `rolesJson`. Conserva por
+  nombre normalizado los identificadores ya persistidos en el diagrama y retira de nodos y permisos
+  las referencias a roles que ya no existen en la sección Roles.
+- La página independiente anterior, su acceso a `ActivatedRoute`, el guardado directo y la fachada
   temporal en memoria no se migran. El recorrido conserva una sola página y una sola ruta.
 - La consulta de versiones históricas pertenece a la futura capacidad de Información; no se mezcla
   con la creación del borrador.
 
-El contrato persistido utiliza nombres canónicos en español. El modelo interno del editor se adapta
-exclusivamente desde `flujo-proyecto.mapper.ts`:
+El contrato persistido y el modelo interno utilizan los mismos nombres canónicos en español.
+`flujo-proyecto.mapper.ts` valida el contenido y rechaza alias o estructuras heredadas:
 
 ```json
 {
@@ -427,6 +430,9 @@ exclusivamente desde `flujo-proyecto.mapper.ts`:
   "fechaActualizacion": "2026-08-28T10:00:00.000Z"
 }
 ```
+
+Los tipos de nodo persistidos son `modulo`, `pagina`, `accion`, `decision` y `componente`; los lados
+de conexión admitidos son `izquierda`, `derecha`, `arriba` y `abajo`.
 
 Guardar Flujo lleva `pasoActual` al menos a 9 y conserva la fotografía completa de las secciones
 anteriores.

@@ -1,23 +1,26 @@
-import { ObjetoJson, deserializarObjetoJson } from '../../../../../shared/serializacion/json/lector-json';
 import {
-  FlowBlockType,
-  ModuleNodeData,
-  ProjectFlowConnection,
-  ProjectFlowConnectionSide,
-  ProjectFlowRole,
-  ProjectWorkflow,
-  ProjectWorkflowNode,
-  isModulePermissionAction,
+  ObjetoJson,
+  deserializarObjetoJson,
+} from '../../../../../shared/serializacion/json/lector-json';
+import {
+  ConexionFlujoProyecto,
+  DatosNodoModulo,
+  FlujoProyecto,
+  LadoConexionFlujo,
+  NodoFlujoProyecto,
+  RolFlujoProyecto,
+  TipoBloqueFlujo,
+  esAccionPermisoModulo,
 } from '../models/flujo-proyecto.model';
 
 /** Crea el documento mínimo requerido por el editor de Flujo. */
-export function crearFlujoProyectoVacio(proyectoId: number | string): ProjectWorkflow {
+export function crearFlujoProyectoVacio(proyectoId: number | string): FlujoProyecto {
   return {
-    projectId: String(proyectoId),
+    proyectoId: String(proyectoId),
     roles: [],
-    nodes: [],
-    connections: [],
-    updatedAt: new Date().toISOString(),
+    nodos: [],
+    conexiones: [],
+    fechaActualizacion: new Date().toISOString(),
   };
 }
 
@@ -25,77 +28,55 @@ export function crearFlujoProyectoVacio(proyectoId: number | string): ProjectWor
 export function deserializarFlujoProyecto(
   json: string,
   proyectoId: number | string,
-): ProjectWorkflow | null {
+): FlujoProyecto | null {
   const contenido = json.trim();
   if (!contenido || contenido === '{}') return crearFlujoProyectoVacio(proyectoId);
 
   const datos = deserializarObjetoJson(contenido);
   const roles = deserializarColeccion(datos['roles'], deserializarRol);
-  const nodes = deserializarColeccion(datos['nodos'], deserializarNodo);
-  const connections = deserializarColeccion(datos['conexiones'], deserializarConexion);
+  const nodos = deserializarColeccion(datos['nodos'], deserializarNodo);
+  const conexiones = deserializarColeccion(datos['conexiones'], deserializarConexion);
   if (
     typeof datos['proyectoId'] !== 'string' ||
     typeof datos['fechaActualizacion'] !== 'string' ||
     roles === null ||
-    nodes === null ||
-    connections === null
+    nodos === null ||
+    conexiones === null
   ) {
     return null;
   }
 
   return {
-    projectId: String(proyectoId),
+    proyectoId: String(proyectoId),
     roles,
-    nodes,
-    connections,
-    updatedAt: datos['fechaActualizacion'],
+    nodos,
+    conexiones,
+    fechaActualizacion: datos['fechaActualizacion'],
   };
 }
 
 /** Produce el contrato canónico en español almacenado en `diagramFlujoJson`. */
-export function serializarFlujoProyecto(flujo: ProjectWorkflow): string {
+export function serializarFlujoProyecto(flujo: FlujoProyecto): string {
   return JSON.stringify({
-    proyectoId: flujo.projectId.trim(),
-    roles: flujo.roles.map((rol) => ({
-      id: rol.id,
-      nombre: rol.name,
-      fechaCreacion: rol.createdAt,
-    })),
-    nodos: flujo.nodes.map((nodo) => ({
-      id: nodo.id,
-      tipo: nodo.type,
-      titulo: nodo.title,
-      descripcion: nodo.description,
-      criteriosAceptacion: nodo.acceptanceCriteria,
-      posicion: nodo.position,
-      idsRoles: nodo.roleIds,
-      fechaCreacion: nodo.createdAt,
-      fechaActualizacion: nodo.updatedAt,
-      datos: serializarDatosNodo(nodo),
-    })),
-    conexiones: flujo.connections.map((conexion) => ({
-      id: conexion.id,
-      idNodoOrigen: conexion.sourceBlockId,
-      idNodoDestino: conexion.targetBlockId,
-      etiqueta: conexion.label ?? null,
-      ladoDestino: conexion.targetSide ?? null,
-      fechaCreacion: conexion.createdAt,
-    })),
-    fechaActualizacion: flujo.updatedAt,
+    proyectoId: flujo.proyectoId.trim(),
+    roles: flujo.roles,
+    nodos: flujo.nodos,
+    conexiones: flujo.conexiones,
+    fechaActualizacion: flujo.fechaActualizacion,
   });
 }
 
-function deserializarRol(valor: unknown): ProjectFlowRole | null {
+function deserializarRol(valor: unknown): RolFlujoProyecto | null {
   if (!esObjeto(valor)) return null;
   const id = valor['id'];
   const nombre = valor['nombre'];
   const fechaCreacion = valor['fechaCreacion'];
   return typeof id === 'string' && typeof nombre === 'string' && typeof fechaCreacion === 'string'
-    ? { id, name: nombre, createdAt: fechaCreacion }
+    ? { id, nombre, fechaCreacion }
     : null;
 }
 
-function deserializarNodo(valor: unknown): ProjectWorkflowNode | null {
+function deserializarNodo(valor: unknown): NodoFlujoProyecto | null {
   if (!esObjeto(valor) || !esTipoBloque(valor['tipo'])) return null;
   const id = valor['id'];
   const titulo = valor['titulo'];
@@ -124,23 +105,23 @@ function deserializarNodo(valor: unknown): ProjectWorkflowNode | null {
 
   const propiedadesComunes = {
     id,
-    title: titulo,
-    description: descripcion,
-    acceptanceCriteria: criteriosAceptacion,
-    position: { x: posicion['x'], y: posicion['y'] },
-    roleIds: idsRoles,
-    createdAt: fechaCreacion,
-    updatedAt: fechaActualizacion,
+    titulo,
+    descripcion,
+    criteriosAceptacion,
+    posicion: { x: posicion['x'], y: posicion['y'] },
+    idsRoles,
+    fechaCreacion,
+    fechaActualizacion,
   };
 
   switch (valor['tipo']) {
-    case FlowBlockType.Module: {
+    case TipoBloqueFlujo.Modulo: {
       const datosModulo = deserializarDatosModulo(datos);
       return datosModulo
-        ? { ...propiedadesComunes, type: FlowBlockType.Module, data: datosModulo }
+        ? { ...propiedadesComunes, tipo: TipoBloqueFlujo.Modulo, datos: datosModulo }
         : null;
     }
-    case FlowBlockType.Form: {
+    case TipoBloqueFlujo.Componente: {
       const datosCapturados = datos['datosCapturados'];
       const camposObligatorios = datos['camposObligatorios'];
       const resultadoCompletado = datos['resultadoCompletado'];
@@ -149,33 +130,31 @@ function deserializarNodo(valor: unknown): ProjectWorkflowNode | null {
         typeof resultadoCompletado === 'string'
         ? {
             ...propiedadesComunes,
-            type: FlowBlockType.Form,
-            data: {
-              capturedData: datosCapturados,
-              requiredFields: camposObligatorios,
-              completionOutcome: resultadoCompletado,
-            },
+            tipo: TipoBloqueFlujo.Componente,
+            datos: { datosCapturados, camposObligatorios, resultadoCompletado },
           }
         : null;
     }
-    case FlowBlockType.Screen:
-      return { ...propiedadesComunes, type: FlowBlockType.Screen, data: {} };
-    case FlowBlockType.Action:
-      return { ...propiedadesComunes, type: FlowBlockType.Action, data: {} };
-    case FlowBlockType.Decision:
-      return { ...propiedadesComunes, type: FlowBlockType.Decision, data: {} };
+    case TipoBloqueFlujo.Pagina:
+      return { ...propiedadesComunes, tipo: TipoBloqueFlujo.Pagina, datos: {} };
+    case TipoBloqueFlujo.Accion:
+      return { ...propiedadesComunes, tipo: TipoBloqueFlujo.Accion, datos: {} };
+    case TipoBloqueFlujo.Decision:
+      return { ...propiedadesComunes, tipo: TipoBloqueFlujo.Decision, datos: {} };
   }
 }
 
-function deserializarDatosModulo(datos: ObjetoJson): ModuleNodeData | null {
+function deserializarDatosModulo(datos: ObjetoJson): DatosNodoModulo | null {
   const permisosRoles = deserializarColeccion(datos['permisosRoles'], (valor) => {
     if (!esObjeto(valor)) return null;
     const idRol = valor['idRol'];
     const permisos = valor['permisos'];
     return typeof idRol === 'string' &&
       Array.isArray(permisos) &&
-      permisos.every((permiso) => typeof permiso === 'string' && isModulePermissionAction(permiso))
-      ? { roleId: idRol, permissions: permisos }
+      permisos.every(
+        (permiso) => typeof permiso === 'string' && esAccionPermisoModulo(permiso),
+      )
+      ? { idRol, permisos }
       : null;
   });
   const horariosMayorActividad = deserializarColeccion(
@@ -186,7 +165,7 @@ function deserializarDatosModulo(datos: ObjetoJson): ModuleNodeData | null {
       const horaInicio = valor['horaInicio'];
       const horaFin = valor['horaFin'];
       return esListaCadenas(dias) && typeof horaInicio === 'string' && typeof horaFin === 'string'
-        ? { days: dias, startTime: horaInicio, endTime: horaFin }
+        ? { dias, horaInicio, horaFin }
         : null;
     },
   );
@@ -194,27 +173,27 @@ function deserializarDatosModulo(datos: ObjetoJson): ModuleNodeData | null {
     horariosMayorActividad !== null &&
     typeof datos['usuariosConcurrentes'] === 'string'
     ? {
-        rolePermissions: permisosRoles,
-        concurrentUsers: datos['usuariosConcurrentes'],
-        peakBusinessHours: horariosMayorActividad,
+        permisosRoles,
+        usuariosConcurrentes: datos['usuariosConcurrentes'],
+        horariosMayorActividad,
       }
     : null;
 }
 
-function deserializarConexion(valor: unknown): ProjectFlowConnection | null {
+function deserializarConexion(valor: unknown): ConexionFlujoProyecto | null {
   if (!esObjeto(valor)) return null;
   const id = valor['id'];
-  const idNodoOrigen = valor['idNodoOrigen'];
-  const idNodoDestino = valor['idNodoDestino'];
+  const idBloqueOrigen = valor['idBloqueOrigen'];
+  const idBloqueDestino = valor['idBloqueDestino'];
   const etiqueta = valor['etiqueta'];
   const ladoDestino = valor['ladoDestino'];
   const fechaCreacion = valor['fechaCreacion'];
   if (
     typeof id !== 'string' ||
-    typeof idNodoOrigen !== 'string' ||
-    typeof idNodoDestino !== 'string' ||
-    (etiqueta !== null && typeof etiqueta !== 'string') ||
-    (ladoDestino !== null && !esLadoConexion(ladoDestino)) ||
+    typeof idBloqueOrigen !== 'string' ||
+    typeof idBloqueDestino !== 'string' ||
+    (etiqueta !== null && etiqueta !== undefined && typeof etiqueta !== 'string') ||
+    (ladoDestino !== null && ladoDestino !== undefined && !esLadoConexion(ladoDestino)) ||
     typeof fechaCreacion !== 'string'
   ) {
     return null;
@@ -222,40 +201,12 @@ function deserializarConexion(valor: unknown): ProjectFlowConnection | null {
 
   return {
     id,
-    sourceBlockId: idNodoOrigen,
-    targetBlockId: idNodoDestino,
-    label: etiqueta ?? undefined,
-    targetSide: ladoDestino ?? undefined,
-    createdAt: fechaCreacion,
+    idBloqueOrigen,
+    idBloqueDestino,
+    etiqueta: etiqueta ?? undefined,
+    ladoDestino: ladoDestino ?? undefined,
+    fechaCreacion,
   };
-}
-
-function serializarDatosNodo(nodo: ProjectWorkflowNode): Record<string, unknown> {
-  switch (nodo.type) {
-    case FlowBlockType.Module:
-      return {
-        permisosRoles: nodo.data.rolePermissions.map((permiso) => ({
-          idRol: permiso.roleId,
-          permisos: permiso.permissions,
-        })),
-        usuariosConcurrentes: nodo.data.concurrentUsers,
-        horariosMayorActividad: nodo.data.peakBusinessHours.map((periodo) => ({
-          dias: periodo.days,
-          horaInicio: periodo.startTime,
-          horaFin: periodo.endTime,
-        })),
-      };
-    case FlowBlockType.Form:
-      return {
-        datosCapturados: nodo.data.capturedData,
-        camposObligatorios: nodo.data.requiredFields,
-        resultadoCompletado: nodo.data.completionOutcome,
-      };
-    case FlowBlockType.Screen:
-    case FlowBlockType.Action:
-    case FlowBlockType.Decision:
-      return {};
-  }
 }
 
 function deserializarColeccion<T>(
@@ -272,12 +223,12 @@ function deserializarColeccion<T>(
   return resultado;
 }
 
-function esTipoBloque(valor: unknown): valor is FlowBlockType {
-  return Object.values(FlowBlockType).includes(valor as FlowBlockType);
+function esTipoBloque(valor: unknown): valor is TipoBloqueFlujo {
+  return Object.values(TipoBloqueFlujo).includes(valor as TipoBloqueFlujo);
 }
 
-function esLadoConexion(valor: unknown): valor is ProjectFlowConnectionSide {
-  return ['left', 'right', 'top', 'bottom'].includes(String(valor));
+function esLadoConexion(valor: unknown): valor is LadoConexionFlujo {
+  return ['izquierda', 'derecha', 'arriba', 'abajo'].includes(String(valor));
 }
 
 function esListaCadenas(valor: unknown): valor is string[] {

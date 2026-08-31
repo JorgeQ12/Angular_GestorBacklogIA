@@ -1,326 +1,226 @@
-export enum FlowBlockType {
-  Module = 'module',
-  Screen = 'screen',
-  Action = 'action',
+/** Identifica los tipos de bloque admitidos por el editor y por el contrato persistido. */
+export enum TipoBloqueFlujo {
+  Modulo = 'modulo',
+  Pagina = 'pagina',
+  Accion = 'accion',
   Decision = 'decision',
-  Form = 'form'
+  Componente = 'componente',
 }
 
-export enum ProjectFlowViewFilter {
-  All = 'all',
-  Shared = 'shared',
-  Role = 'role'
+/** Identifica las vistas disponibles para filtrar el lienzo. */
+export enum FiltroVistaFlujoProyecto {
+  Todos = 'todos',
+  Compartidos = 'compartidos',
+  Rol = 'rol',
 }
 
-export interface CanvasViewport {
-  panX: number;
-  panY: number;
-  zoom: number;
+/** Conserva el desplazamiento y la escala aplicados al lienzo. */
+export interface VistaLienzoFlujo {
+  desplazamientoX: number;
+  desplazamientoY: number;
+  escala: number;
 }
 
-export interface ProjectFlowRole {
+/** Representa un rol funcional disponible para asignar a los bloques. */
+export interface RolFlujoProyecto {
   id: string;
-  name: string;
-  createdAt: string;
+  nombre: string;
+  fechaCreacion: string;
 }
 
-export interface ProjectFlowBlockPosition {
+/** Ubica un bloque dentro de las coordenadas del lienzo. */
+export interface PosicionBloqueFlujo {
   x: number;
   y: number;
 }
 
-export type DecisionBranchLabel = 'Si' | 'No';
-export type ModulePermissionAction = 'Ver' | 'Crear' | 'Editar' | 'Eliminar';
+/** Identifica una salida permitida para un bloque de decisión. */
+export type EtiquetaRamaDecision = 'Sí' | 'No';
 
-export interface ModuleRolePermission {
-  roleId: string;
-  permissions: ModulePermissionAction[];
+/** Identifica una operación que un rol puede realizar dentro de un módulo. */
+export type AccionPermisoModulo = 'Ver' | 'Crear' | 'Editar' | 'Eliminar';
+
+/** Relaciona un rol con las operaciones permitidas dentro de un módulo. */
+export interface PermisoRolModulo {
+  idRol: string;
+  permisos: AccionPermisoModulo[];
 }
 
-export interface ModulePeakPeriod {
-  days: string[];
-  startTime: string;
-  endTime: string;
+/** Describe una franja semanal de mayor actividad para un módulo. */
+export interface FranjaMayorActividadModulo {
+  dias: string[];
+  horaInicio: string;
+  horaFin: string;
 }
 
-export interface ModuleNodeData {
-  rolePermissions: ModuleRolePermission[];
-  concurrentUsers: string;
-  peakBusinessHours: ModulePeakPeriod[];
+/** Contiene la configuración especializada de un nodo de módulo. */
+export interface DatosNodoModulo {
+  permisosRoles: PermisoRolModulo[];
+  usuariosConcurrentes: string;
+  horariosMayorActividad: FranjaMayorActividadModulo[];
 }
 
-export interface ScreenNodeData {}
+/** Contiene la configuración especializada de un nodo de página. */
+export type DatosNodoPagina = Record<string, never>;
 
-export interface ActionNodeData {}
+/** Contiene la configuración especializada de un nodo de acción. */
+export type DatosNodoAccion = Record<string, never>;
 
-export interface DecisionNodeData {}
+/** Contiene la configuración especializada de un nodo de decisión. */
+export type DatosNodoDecision = Record<string, never>;
 
-export interface FormNodeData {
-  capturedData: string;
-  requiredFields: string;
-  completionOutcome: string;
+/** Contiene la información capturada por un nodo de componente. */
+export interface DatosNodoComponente {
+  datosCapturados: string;
+  camposObligatorios: string;
+  resultadoCompletado: string;
 }
 
-export type ProjectWorkflowNodeData =
-  | ModuleNodeData
-  | ScreenNodeData
-  | ActionNodeData
-  | DecisionNodeData
-  | FormNodeData;
+/** Agrupa las configuraciones admitidas por los nodos del flujo. */
+export type DatosNodoFlujo =
+  | DatosNodoModulo
+  | DatosNodoPagina
+  | DatosNodoAccion
+  | DatosNodoDecision
+  | DatosNodoComponente;
 
-export interface ProjectWorkflowNodeBase {
+/** Define las propiedades compartidas por todos los nodos persistidos. */
+export interface BaseNodoFlujo {
   id: string;
-  type: FlowBlockType;
-  title: string;
-  description: string;
-  acceptanceCriteria: string[];
-  position: ProjectFlowBlockPosition;
-  roleIds: string[];
-  createdAt: string;
-  updatedAt: string;
+  tipo: TipoBloqueFlujo;
+  titulo: string;
+  descripcion: string;
+  criteriosAceptacion: string[];
+  posicion: PosicionBloqueFlujo;
+  idsRoles: string[];
+  fechaCreacion: string;
+  fechaActualizacion: string;
 }
 
-export interface ProjectWorkflowNodeDraftBase {
-  type: FlowBlockType;
-  title: string;
-  description: string;
-  acceptanceCriteria: string[];
-  roleNames: string[];
+/** Define las propiedades editables compartidas antes de confirmar un nodo. */
+export interface BaseBorradorNodoFlujo {
+  tipo: TipoBloqueFlujo;
+  titulo: string;
+  descripcion: string;
+  criteriosAceptacion: string[];
+  nombresRoles: string[];
 }
 
-export interface ProjectWorkflowModuleNode extends ProjectWorkflowNodeBase {
-  type: FlowBlockType.Module;
-  data: ModuleNodeData;
+/** Representa un nodo de módulo dentro del flujo. */
+export interface NodoModuloFlujo extends BaseNodoFlujo {
+  tipo: TipoBloqueFlujo.Modulo;
+  datos: DatosNodoModulo;
 }
 
-export interface ProjectWorkflowScreenNode extends ProjectWorkflowNodeBase {
-  type: FlowBlockType.Screen;
-  data: ScreenNodeData;
+/** Representa un nodo de página dentro del flujo. */
+export interface NodoPaginaFlujo extends BaseNodoFlujo {
+  tipo: TipoBloqueFlujo.Pagina;
+  datos: DatosNodoPagina;
 }
 
-export interface ProjectWorkflowActionNode extends ProjectWorkflowNodeBase {
-  type: FlowBlockType.Action;
-  data: ActionNodeData;
+/** Representa un nodo de acción dentro del flujo. */
+export interface NodoAccionFlujo extends BaseNodoFlujo {
+  tipo: TipoBloqueFlujo.Accion;
+  datos: DatosNodoAccion;
 }
 
-export interface ProjectWorkflowDecisionNode extends ProjectWorkflowNodeBase {
-  type: FlowBlockType.Decision;
-  data: DecisionNodeData;
+/** Representa un nodo de decisión dentro del flujo. */
+export interface NodoDecisionFlujo extends BaseNodoFlujo {
+  tipo: TipoBloqueFlujo.Decision;
+  datos: DatosNodoDecision;
 }
 
-export interface ProjectWorkflowFormNode extends ProjectWorkflowNodeBase {
-  type: FlowBlockType.Form;
-  data: FormNodeData;
+/** Representa un nodo de componente dentro del flujo. */
+export interface NodoComponenteFlujo extends BaseNodoFlujo {
+  tipo: TipoBloqueFlujo.Componente;
+  datos: DatosNodoComponente;
 }
 
-export type ProjectWorkflowNode =
-  | ProjectWorkflowModuleNode
-  | ProjectWorkflowScreenNode
-  | ProjectWorkflowActionNode
-  | ProjectWorkflowDecisionNode
-  | ProjectWorkflowFormNode;
+/** Representa cualquier nodo persistido dentro del flujo del proyecto. */
+export type NodoFlujoProyecto =
+  | NodoModuloFlujo
+  | NodoPaginaFlujo
+  | NodoAccionFlujo
+  | NodoDecisionFlujo
+  | NodoComponenteFlujo;
 
-export type ProjectWorkflowNodeDraft =
-  | (ProjectWorkflowNodeDraftBase & { type: FlowBlockType.Module; data: ModuleNodeData })
-  | (ProjectWorkflowNodeDraftBase & { type: FlowBlockType.Screen; data: ScreenNodeData })
-  | (ProjectWorkflowNodeDraftBase & { type: FlowBlockType.Action; data: ActionNodeData })
-  | (ProjectWorkflowNodeDraftBase & { type: FlowBlockType.Decision; data: DecisionNodeData })
-  | (ProjectWorkflowNodeDraftBase & { type: FlowBlockType.Form; data: FormNodeData });
+/** Representa cualquier nodo editable antes de incorporarlo al flujo. */
+export type BorradorNodoFlujo =
+  | (BaseBorradorNodoFlujo & { tipo: TipoBloqueFlujo.Modulo; datos: DatosNodoModulo })
+  | (BaseBorradorNodoFlujo & { tipo: TipoBloqueFlujo.Pagina; datos: DatosNodoPagina })
+  | (BaseBorradorNodoFlujo & { tipo: TipoBloqueFlujo.Accion; datos: DatosNodoAccion })
+  | (BaseBorradorNodoFlujo & { tipo: TipoBloqueFlujo.Decision; datos: DatosNodoDecision })
+  | (BaseBorradorNodoFlujo & {
+      tipo: TipoBloqueFlujo.Componente;
+      datos: DatosNodoComponente;
+    });
 
-export type ProjectFlowConnectionSide = 'left' | 'right' | 'top' | 'bottom';
+/** Identifica el borde de un nodo utilizado como destino de una conexión. */
+export type LadoConexionFlujo = 'izquierda' | 'derecha' | 'arriba' | 'abajo';
 
-export interface ProjectFlowConnection {
+/** Relaciona dos nodos del flujo mediante una conexión dirigida. */
+export interface ConexionFlujoProyecto {
   id: string;
-  sourceBlockId: string;
-  targetBlockId: string;
-  label?: string;
-  targetSide?: ProjectFlowConnectionSide;
-  createdAt: string;
+  idBloqueOrigen: string;
+  idBloqueDestino: string;
+  etiqueta?: string;
+  ladoDestino?: LadoConexionFlujo;
+  fechaCreacion: string;
 }
 
-export interface ProjectWorkflow {
-  projectId: string;
-  roles: ProjectFlowRole[];
-  nodes: ProjectWorkflowNode[];
-  connections: ProjectFlowConnection[];
-  updatedAt: string;
+/** Representa el documento completo editado y persistido por la sección Flujo. */
+export interface FlujoProyecto {
+  proyectoId: string;
+  roles: RolFlujoProyecto[];
+  nodos: NodoFlujoProyecto[];
+  conexiones: ConexionFlujoProyecto[];
+  fechaActualizacion: string;
 }
 
-export type ProjectFlowBlock = ProjectWorkflowNode;
-export type ProjectFlowDocument = ProjectWorkflow;
-export type ProjectWorkflowConnection = ProjectFlowConnection;
-
-export interface ProjectFlowFilterState {
-  mode: ProjectFlowViewFilter;
-  roleId: string | null;
+/** Conserva el filtro aplicado a los bloques del lienzo. */
+export interface EstadoFiltroFlujo {
+  modo: FiltroVistaFlujoProyecto;
+  idRol: string | null;
 }
 
-export interface ProjectFlowCanvasSize {
-  width: number;
-  height: number;
+/** Define las dimensiones disponibles para ubicar nodos en el lienzo. */
+export interface TamanoLienzoFlujo {
+  ancho: number;
+  alto: number;
 }
 
-export const PROJECT_FLOW_CANVAS_SIZE: ProjectFlowCanvasSize = {
-  width: 2400,
-  height: 1600
-};
-
-export const PROJECT_FLOW_BLOCK_SIZE = {
-  width: 248,
-  height: 156
-} as const;
-
-// Los handles visuales sobresalen 1px respecto al borde real de la card.
-// Estas constantes alinean la conexion SVG con el centro visible de esos puntos.
-export const PROJECT_FLOW_HANDLE_CENTER_OFFSET_X = 1;
-export const PROJECT_FLOW_HANDLE_CENTER_OFFSET_Y = PROJECT_FLOW_BLOCK_SIZE.height / 2;
-export const PROJECT_FLOW_VERTICAL_ARROW_CLEARANCE = 3;
-export const PROJECT_FLOW_DECISION_HANDLE_Y: Record<DecisionBranchLabel, number> = {
-  Si: 74,
-  No: 114
-};
-
-export const FLOW_BLOCK_TYPE_LABELS: Record<FlowBlockType, string> = {
-  [FlowBlockType.Module]: 'Módulo',
-  [FlowBlockType.Screen]: 'Página',
-  [FlowBlockType.Action]: 'Acción',
-  [FlowBlockType.Decision]: 'Decisión',
-  [FlowBlockType.Form]: 'Componente'
-};
-
-export const FLOW_BLOCK_TYPE_DESCRIPTIONS: Record<FlowBlockType, string> = {
-  [FlowBlockType.Module]: 'Agrupa una capacidad funcional del proyecto.',
-  [FlowBlockType.Screen]: 'Representa una página que el usuario utiliza.',
-  [FlowBlockType.Action]: 'Describe una acción que el usuario ejecuta.',
-  [FlowBlockType.Decision]: 'Expresa una bifurcación por criterio de negocio.',
-  [FlowBlockType.Form]: 'Representa un componente que captura o presenta información dentro del flujo.'
-};
-
-export const FLOW_BLOCK_TYPE_ORDER: readonly FlowBlockType[] = [
-  FlowBlockType.Module,
-  FlowBlockType.Screen,
-  FlowBlockType.Action,
-  FlowBlockType.Decision,
-  FlowBlockType.Form
-];
-
-export const createDefaultNodeData = (type: FlowBlockType): ProjectWorkflowNodeData => {
-  switch (type) {
-    case FlowBlockType.Module:
+/** Crea la configuración inicial correspondiente a un tipo de nodo. */
+export function crearDatosNodoPredeterminados(tipo: TipoBloqueFlujo): DatosNodoFlujo {
+  switch (tipo) {
+    case TipoBloqueFlujo.Modulo:
       return {
-        rolePermissions: [],
-        concurrentUsers: '',
-        peakBusinessHours: [
-          {
-            days: [],
-            startTime: '00:00',
-            endTime: '00:00'
-          }
-        ]
+        permisosRoles: [],
+        usuariosConcurrentes: '',
+        horariosMayorActividad: [{ dias: [], horaInicio: '00:00', horaFin: '00:00' }],
       };
-    case FlowBlockType.Screen:
+    case TipoBloqueFlujo.Pagina:
+    case TipoBloqueFlujo.Accion:
+    case TipoBloqueFlujo.Decision:
       return {};
-    case FlowBlockType.Action:
-      return {};
-    case FlowBlockType.Decision:
-      return {};
-    case FlowBlockType.Form:
+    case TipoBloqueFlujo.Componente:
       return {
-        capturedData: '',
-        requiredFields: '',
-        completionOutcome: ''
+        datosCapturados: '',
+        camposObligatorios: '',
+        resultadoCompletado: '',
       };
   }
-};
+}
 
-export const isDecisionBranchLabel = (value: string | null | undefined): value is DecisionBranchLabel =>
-  value === 'Si' || value === 'No';
+/** Comprueba si un texto representa una salida válida de una decisión. */
+export function esEtiquetaRamaDecision(
+  valor: string | null | undefined,
+): valor is EtiquetaRamaDecision {
+  return valor === 'Sí' || valor === 'No';
+}
 
-export const isModulePermissionAction = (value: string | null | undefined): value is ModulePermissionAction =>
-  value === 'Ver' || value === 'Crear' || value === 'Editar' || value === 'Eliminar';
-
-export const getFlowOutputHandleOffsetY = (
-  type: FlowBlockType,
-  label?: string | null
-): number => {
-  if (type === FlowBlockType.Decision && isDecisionBranchLabel(label)) {
-    return PROJECT_FLOW_DECISION_HANDLE_Y[label];
-  }
-
-  return PROJECT_FLOW_HANDLE_CENTER_OFFSET_Y;
-};
-
-export const getFlowBlockAnchorPoint = (
-  block: Pick<ProjectWorkflowNode, 'position' | 'type'>,
-  side: ProjectFlowConnectionSide,
-  label?: string | null
-): { x: number; y: number } => {
-  const left = block.position.x - PROJECT_FLOW_HANDLE_CENTER_OFFSET_X;
-  const right = block.position.x + PROJECT_FLOW_BLOCK_SIZE.width + PROJECT_FLOW_HANDLE_CENTER_OFFSET_X;
-  const centerX = block.position.x + (PROJECT_FLOW_BLOCK_SIZE.width / 2);
-  const top = block.position.y;
-  const bottom = block.position.y + PROJECT_FLOW_BLOCK_SIZE.height;
-  const centerY = block.position.y + getFlowOutputHandleOffsetY(block.type, label);
-
-  switch (side) {
-    case 'left':
-      return { x: left, y: block.position.y + PROJECT_FLOW_HANDLE_CENTER_OFFSET_Y };
-    case 'right':
-      return { x: right, y: centerY };
-    case 'top':
-      return { x: centerX, y: top - PROJECT_FLOW_VERTICAL_ARROW_CLEARANCE };
-    case 'bottom':
-      return { x: centerX, y: bottom + PROJECT_FLOW_VERTICAL_ARROW_CLEARANCE };
-  }
-};
-
-export const resolveNearestFlowConnectionSide = (
-  block: Pick<ProjectWorkflowNode, 'position'>,
-  point: { x: number; y: number }
-): ProjectFlowConnectionSide => {
-  const distances: Record<ProjectFlowConnectionSide, number> = {
-    left: Math.abs(point.x - block.position.x),
-    right: Math.abs(point.x - (block.position.x + PROJECT_FLOW_BLOCK_SIZE.width)),
-    top: Math.abs(point.y - block.position.y),
-    bottom: Math.abs(point.y - (block.position.y + PROJECT_FLOW_BLOCK_SIZE.height))
-  };
-
-  return (Object.entries(distances).sort((a, b) => a[1] - b[1])[0]?.[0] ?? 'left') as ProjectFlowConnectionSide;
-};
-
-export const resolveNearestFlowTargetSide = (
-  block: Pick<ProjectWorkflowNode, 'position'>,
-  point: { x: number; y: number }
-): Exclude<ProjectFlowConnectionSide, 'right'> => {
-  const distances: Record<Exclude<ProjectFlowConnectionSide, 'right'>, number> = {
-    left: Math.abs(point.x - block.position.x),
-    top: Math.abs(point.y - block.position.y),
-    bottom: Math.abs(point.y - (block.position.y + PROJECT_FLOW_BLOCK_SIZE.height))
-  };
-
-  return (Object.entries(distances).sort((a, b) => a[1] - b[1])[0]?.[0] ?? 'left') as Exclude<ProjectFlowConnectionSide, 'right'>;
-};
-
-export const buildFlowConnectionPath = (
-  sourcePoint: { x: number; y: number },
-  targetPoint: { x: number; y: number },
-  targetSide: ProjectFlowConnectionSide
-): string => {
-  const horizontalOffset = Math.max(72, Math.abs(targetPoint.x - sourcePoint.x) / 2);
-  const verticalOffset = Math.max(56, Math.abs(targetPoint.y - sourcePoint.y) / 2);
-  const verticalStem = 14;
-
-  switch (targetSide) {
-    case 'top':
-      return `M ${sourcePoint.x} ${sourcePoint.y} C ${sourcePoint.x + horizontalOffset} ${sourcePoint.y}, ${targetPoint.x} ${targetPoint.y - verticalStem - verticalOffset}, ${targetPoint.x} ${targetPoint.y - verticalStem} L ${targetPoint.x} ${targetPoint.y}`;
-    case 'bottom':
-      return `M ${sourcePoint.x} ${sourcePoint.y} C ${sourcePoint.x + horizontalOffset} ${sourcePoint.y}, ${targetPoint.x} ${targetPoint.y + verticalStem + verticalOffset}, ${targetPoint.x} ${targetPoint.y + verticalStem} L ${targetPoint.x} ${targetPoint.y}`;
-    case 'right':
-      return `M ${sourcePoint.x} ${sourcePoint.y} C ${sourcePoint.x + horizontalOffset} ${sourcePoint.y}, ${targetPoint.x + horizontalOffset} ${targetPoint.y}, ${targetPoint.x} ${targetPoint.y}`;
-    case 'left':
-    default:
-      return `M ${sourcePoint.x} ${sourcePoint.y} C ${sourcePoint.x + horizontalOffset} ${sourcePoint.y}, ${targetPoint.x - horizontalOffset} ${targetPoint.y}, ${targetPoint.x} ${targetPoint.y}`;
-  }
-};
-
-
+/** Comprueba si un texto representa una operación válida de módulo. */
+export function esAccionPermisoModulo(
+  valor: string | null | undefined,
+): valor is AccionPermisoModulo {
+  return valor === 'Ver' || valor === 'Crear' || valor === 'Editar' || valor === 'Eliminar';
+}

@@ -80,11 +80,11 @@ describe('mapearCambioSeccionBorrador', () => {
 
   it('serializa Flujo dentro de diagramFlujoJson', () => {
     const flujo = {
-      projectId: '42',
+      proyectoId: '42',
       roles: [],
-      nodes: [],
-      connections: [],
-      updatedAt: '2026-08-28T10:00:00.000Z',
+      nodos: [],
+      conexiones: [],
+      fechaActualizacion: '2026-08-28T10:00:00.000Z',
     };
 
     const cambio = mapearCambioSeccionBorrador({

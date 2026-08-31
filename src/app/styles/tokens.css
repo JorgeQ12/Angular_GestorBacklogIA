@@ -279,6 +279,15 @@
   --page-header-control-border: color-mix(in srgb, var(--surface-default) 14%, transparent);
 }
 
+/* Reduce de forma coordinada el movimiento de toda regla basada en los tokens del sistema. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --transition-fast: 0.01ms;
+    --transition-base: 0.01ms;
+    --transition-slow: 0.01ms;
+  }
+}
+
 /* ============================================================================
    BREAKPOINTS (documentales — @media no admite var(); usar estos valores)
      --bp-xs: 480px · --bp-sm: 640px · --bp-md: 768px

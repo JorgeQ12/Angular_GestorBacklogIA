@@ -2,126 +2,133 @@
   display: contents;
 }
 
-.workflow-node-modal__form {
-  display: grid;
-  gap: 1rem;
-}
-
-.workflow-node-modal__fieldset {
+.modal-nodo-flujo__formulario,
+.modal-nodo-flujo__grupo-campos {
   display: grid;
   min-width: 0;
-  gap: 1rem;
+  gap: var(--space-4);
+}
+
+.modal-nodo-flujo__grupo-campos {
   margin: 0;
   padding: 0;
   border: 0;
 }
 
-.workflow-node-modal__overview {
+.modal-nodo-flujo__grupo-campos > app-formulario-modulo-flujo-proyecto,
+.modal-nodo-flujo__grupo-campos > app-formulario-pagina-flujo-proyecto,
+.modal-nodo-flujo__grupo-campos > app-formulario-accion-flujo-proyecto,
+.modal-nodo-flujo__grupo-campos > app-formulario-decision-flujo-proyecto,
+.modal-nodo-flujo__grupo-campos > app-formulario-componente-flujo-proyecto {
+  display: block;
+}
+
+.modal-nodo-flujo__resumen {
   position: relative;
   display: grid;
-  grid-template-columns: 2.7rem minmax(0, 1fr) auto;
+  grid-template-columns: var(--control-height-lg) minmax(0, 1fr) auto;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.78rem;
+  gap: var(--space-3);
+  padding: var(--space-3);
   overflow: hidden;
-  border: 1px solid var(--border-default);
-  border-radius: 0.82rem;
-  background: linear-gradient(135deg, var(--surface-default) 0%, var(--surface-subtle) 100%);
+  border: var(--border-width) solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--surface-default), var(--surface-subtle));
 }
 
-.workflow-node-modal__overview::before {
-  content: '';
+.modal-nodo-flujo__resumen::before {
   position: absolute;
-  top: 0.7rem;
-  bottom: 0.7rem;
+  top: var(--space-3);
+  bottom: var(--space-3);
   left: 0;
-  width: 3px;
-  border-radius: 0 999px 999px 0;
+  width: var(--space-1);
+  border-radius: 0 var(--radius-pill) var(--radius-pill) 0;
   background: var(--text-muted);
+  content: '';
 }
 
-.workflow-node-modal__form[data-type='module'] .workflow-node-modal__overview::before { background: var(--text-primary); }
-.workflow-node-modal__form[data-type='screen'] .workflow-node-modal__overview::before { background: var(--text-muted); }
-.workflow-node-modal__form[data-type='action'] .workflow-node-modal__overview::before { background: var(--text-secondary); }
-.workflow-node-modal__form[data-type='decision'] .workflow-node-modal__overview::before { background: var(--color-warning); }
-.workflow-node-modal__form[data-type='form'] .workflow-node-modal__overview::before { background: var(--text-muted); }
-
-.workflow-node-modal__type-icon {
-  display: grid;
-  place-items: center;
-  width: 2.7rem;
-  height: 2.7rem;
-  border-radius: 0.72rem;
+.modal-nodo-flujo__formulario[data-tipo='modulo'] .modal-nodo-flujo__resumen::before {
   background: var(--text-primary);
-  color: var(--surface-default);
-  box-shadow: 0 6px 14px rgba(31, 35, 41, 0.14);
 }
 
-.workflow-node-modal__form[data-type='decision'] .workflow-node-modal__type-icon {
-  background: var(--color-warning);
-}
-
-.workflow-node-modal__form[data-type='form'] .workflow-node-modal__type-icon {
+.modal-nodo-flujo__formulario[data-tipo='accion'] .modal-nodo-flujo__resumen::before {
   background: var(--text-secondary);
 }
 
-.workflow-node-modal__type-icon app-icono {
-  width: 1.18rem;
-  height: 1.18rem;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.75;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+.modal-nodo-flujo__formulario[data-tipo='decision'] .modal-nodo-flujo__resumen::before {
+  background: var(--color-warning);
 }
 
-.workflow-node-modal__overview-copy {
+.modal-nodo-flujo__icono-tipo {
+  display: grid;
+  width: var(--control-height-lg);
+  height: var(--control-height-lg);
+  place-items: center;
+  border-radius: var(--radius-md);
+  background: var(--action-primary-bg);
+  color: var(--action-primary-text);
+  box-shadow: var(--shadow-sm);
+}
+
+.modal-nodo-flujo__formulario[data-tipo='decision'] .modal-nodo-flujo__icono-tipo {
+  background: var(--color-warning);
+}
+
+.modal-nodo-flujo__formulario[data-tipo='componente'] .modal-nodo-flujo__icono-tipo {
+  background: var(--text-secondary);
+}
+
+.modal-nodo-flujo__icono-tipo app-icono {
+  width: var(--font-size-lg);
+  height: var(--font-size-lg);
+}
+
+.modal-nodo-flujo__descripcion-tipo {
   display: grid;
   min-width: 0;
-  gap: 0.08rem;
+  gap: var(--space-1);
 }
 
-.workflow-node-modal__overview-copy small {
+.modal-nodo-flujo__descripcion-tipo small {
   color: var(--text-muted);
-  font-size: 0.58rem;
+  font-size: var(--font-size-3xs);
   font-weight: var(--font-weight-bold);
-  letter-spacing: 0.05em;
+  letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
 }
 
-.workflow-node-modal__overview-copy strong {
+.modal-nodo-flujo__descripcion-tipo strong {
   color: var(--text-primary);
-  font-size: 0.82rem;
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-bold);
 }
 
-.workflow-node-modal__overview-copy > span {
+.modal-nodo-flujo__descripcion-tipo > span {
   color: var(--text-muted);
-  font-size: 0.66rem;
-  line-height: 1.35;
+  font-size: var(--font-size-2xs);
+  line-height: var(--line-height-snug);
 }
 
-.workflow-node-modal__mode {
+.modal-nodo-flujo__modo {
   display: inline-flex;
+  min-height: var(--control-height-sm);
   align-items: center;
-  height: 1.55rem;
-  padding: 0 0.58rem;
-  border: 1px solid var(--border-default);
-  border-radius: 999px;
+  padding-inline: var(--space-2);
+  border: var(--border-width) solid var(--border-default);
+  border-radius: var(--radius-pill);
   background: var(--surface-default);
   color: var(--text-secondary);
-  font-size: 0.59rem;
+  font-size: var(--font-size-3xs);
   font-weight: var(--font-weight-bold);
-  line-height: 1;
+  line-height: var(--line-height-none);
 }
 
 @media (max-width: 640px) {
-  .workflow-node-modal__overview {
-    grid-template-columns: 2.5rem minmax(0, 1fr);
+  .modal-nodo-flujo__resumen {
+    grid-template-columns: var(--control-height-md) minmax(0, 1fr);
   }
 
-  .workflow-node-modal__mode {
+  .modal-nodo-flujo__modo {
     display: none;
   }
 }
-

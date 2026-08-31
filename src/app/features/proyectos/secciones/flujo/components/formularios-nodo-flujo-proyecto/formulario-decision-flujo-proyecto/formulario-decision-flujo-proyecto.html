@@ -1,0 +1,35 @@
+<div [formGroup]="formulario()">
+  <div class="ui-form-grid">
+    <section class="ui-form-section">
+      <header class="ui-form-section__header">
+        <span class="ui-form-section__icon" aria-hidden="true"><app-icono nombre="flujo" /></span>
+        <div>
+          <h3 class="ui-form-section__title">Información principal</h3>
+          <p class="ui-form-section__description">Formula una condición que pueda resolverse mediante las rutas Sí y No.</p>
+        </div>
+      </header>
+      <div class="ui-form-section__body ui-form-grid">
+        <div class="ui-field">
+          <label class="ui-label" for="flujo-decision-titulo">Nombre de la decisión</label>
+          <input
+            id="flujo-decision-titulo"
+            class="ui-control"
+            type="text"
+            formControlName="titulo"
+            placeholder="Ej.: ¿Las credenciales son válidas?"
+            appErrorCampo
+          />
+          <small class="ui-hint">Conecta esta decisión usando las salidas “Sí” y “No”.</small>
+        </div>
+      </div>
+    </section>
+
+    <app-campos-comunes-nodo-flujo-proyecto
+      [formulario]="formulario()"
+      etiquetaDescripcion="Resumen de la decisión"
+      marcadorDescripcion="Explica qué validación se evalúa en este punto."
+      marcadorCriterio="Ej.: La condición deriva correctamente a cada camino posible."
+      ayudaRoles="Selecciona los roles a quienes afecta o quienes revisan esta condición."
+    />
+  </div>
+</div>

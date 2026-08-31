@@ -1,0 +1,34 @@
+<div [formGroup]="formulario()">
+  <div class="ui-form-grid">
+    <section class="ui-form-section">
+      <header class="ui-form-section__header">
+        <span class="ui-form-section__icon" aria-hidden="true"><app-icono nombre="aplicacionWeb" /></span>
+        <div>
+          <h3 class="ui-form-section__title">Información principal</h3>
+          <p class="ui-form-section__description">Asigna un nombre claro a la página que verá el usuario.</p>
+        </div>
+      </header>
+      <div class="ui-form-section__body ui-form-grid">
+        <div class="ui-field">
+          <label class="ui-label" for="flujo-pagina-titulo">Nombre de la página</label>
+          <input
+            id="flujo-pagina-titulo"
+            class="ui-control"
+            type="text"
+            formControlName="titulo"
+            placeholder="Ej.: Inicio de sesión"
+            appErrorCampo
+          />
+        </div>
+      </div>
+    </section>
+
+    <app-campos-comunes-nodo-flujo-proyecto
+      [formulario]="formulario()"
+      etiquetaDescripcion="Descripción de la página"
+      marcadorDescripcion="Explica brevemente el propósito de esta página."
+      marcadorCriterio="Ej.: La página muestra la información clave y permite ejecutar su acción principal."
+      ayudaRoles="Selecciona los roles que ven o usan esta página."
+    />
+  </div>
+</div>

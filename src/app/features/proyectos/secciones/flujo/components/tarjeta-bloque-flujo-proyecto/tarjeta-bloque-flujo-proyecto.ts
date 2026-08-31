@@ -1,160 +1,169 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, HostListener, computed, inject, input, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  HostListener,
+  computed,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
 import { MensajesService } from '../../../../../../core/mensajes/services/mensajes.service';
 import { IconoComponent } from '../../../../../../shared/components/icono/icono.component';
-import { ICONOS_TIPO_BLOQUE_FLUJO } from '../../config/flujo-proyecto.config';
-import { DecisionBranchLabel, FLOW_BLOCK_TYPE_LABELS, FlowBlockType, ProjectFlowBlock } from '../../models/flujo-proyecto.model';
+import {
+  ETIQUETAS_TIPO_BLOQUE_FLUJO,
+  ICONOS_TIPO_BLOQUE_FLUJO,
+} from '../../config/flujo-proyecto.config';
+import {
+  EtiquetaRamaDecision,
+  NodoFlujoProyecto,
+  TipoBloqueFlujo,
+} from '../../models/flujo-proyecto.model';
 import { EstadoEditorFlujoProyectoService } from '../../services/estado-editor-flujo-proyecto.service';
 
+/** Presenta un bloque y administra sus interacciones directas dentro del lienzo. */
 @Component({
   selector: 'app-tarjeta-bloque-flujo-proyecto',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [IconoComponent],
   templateUrl: './tarjeta-bloque-flujo-proyecto.html',
-  styleUrl: './tarjeta-bloque-flujo-proyecto.css'
+  styleUrl: './tarjeta-bloque-flujo-proyecto.css',
 })
 export class TarjetaBloqueFlujoProyecto {
-  private readonly destroyRef = inject(DestroyRef);
+  private readonly referenciaDestruccion = inject(DestroyRef);
   private readonly mensajes = inject(MensajesService);
-  protected readonly store = inject(EstadoEditorFlujoProyectoService);
-  public readonly block = input.required<ProjectFlowBlock>();
-  private movedDuringDrag = false;
-  protected readonly actionsOpen = signal(false);
-  protected readonly decisionBranches: readonly DecisionBranchLabel[] = ['Si', 'No'];
+  protected readonly estadoEditor = inject(EstadoEditorFlujoProyectoService);
 
-  protected readonly typeLabels = FLOW_BLOCK_TYPE_LABELS;
-  protected readonly typeIcons = ICONOS_TIPO_BLOQUE_FLUJO;
-  protected readonly roleNames = computed(() =>
-    this.block().roleIds.map((roleId) => this.store.getRoleName(roleId))
+  public readonly bloque = input.required<NodoFlujoProyecto>();
+  private seMovioDuranteArrastre = false;
+  protected readonly accionesAbiertas = signal(false);
+  protected readonly ramasDecision: readonly EtiquetaRamaDecision[] = ['Sí', 'No'];
+  protected readonly etiquetasTipo = ETIQUETAS_TIPO_BLOQUE_FLUJO;
+  protected readonly iconosTipo = ICONOS_TIPO_BLOQUE_FLUJO;
+  protected readonly nombresRoles = computed(() =>
+    this.bloque().idsRoles.map((idRol) => this.estadoEditor.obtenerNombreRol(idRol)),
   );
 
-  protected isDecisionBlock(): boolean {
-    return this.block().type === FlowBlockType.Decision;
+  protected esBloqueDecision(): boolean {
+    return this.bloque().tipo === TipoBloqueFlujo.Decision;
   }
 
-  protected openEditor(): void {
-    if (this.movedDuringDrag || this.store.isConnectionDragging()) {
-      this.movedDuringDrag = false;
+  protected abrirEditor(): void {
+    if (this.seMovioDuranteArrastre || this.estadoEditor.arrastrandoConexion()) {
+      this.seMovioDuranteArrastre = false;
       return;
     }
-
-    this.store.openNodeEditor(this.block().id);
+    this.estadoEditor.abrirEditorNodo(this.bloque().id);
   }
 
-  protected startConnectionDrag(event: PointerEvent, label?: DecisionBranchLabel): void {
-    event.preventDefault();
-    event.stopPropagation();
-    this.store.startConnectionDrag(this.block().id, label);
+  protected iniciarArrastreConexion(
+    evento: PointerEvent,
+    etiqueta?: EtiquetaRamaDecision,
+  ): void {
+    evento.preventDefault();
+    evento.stopPropagation();
+    this.estadoEditor.iniciarArrastreConexion(this.bloque().id, etiqueta);
   }
 
-  protected toggleActions(event: MouseEvent): void {
-    event.stopPropagation();
-    this.actionsOpen.update((isOpen) => !isOpen);
+  protected alternarAcciones(evento: MouseEvent): void {
+    evento.stopPropagation();
+    this.accionesAbiertas.update((abiertas) => !abiertas);
   }
 
-  protected editBlock(event: MouseEvent): void {
-    event.stopPropagation();
-    this.actionsOpen.set(false);
-    this.store.openNodeEditor(this.block().id);
+  protected editarBloque(evento: MouseEvent): void {
+    evento.stopPropagation();
+    this.accionesAbiertas.set(false);
+    this.estadoEditor.abrirEditorNodo(this.bloque().id);
   }
 
-  protected async deleteBlock(event: MouseEvent): Promise<void> {
-    event.stopPropagation();
-    this.actionsOpen.set(false);
-
-    const currentBlock = this.block();
-    const confirmed = await this.mensajes.confirmarDestructiva(
-      `Eliminar ${this.typeLabels[currentBlock.type].toLowerCase()}`,
-      `El bloque “${currentBlock.title}” y sus conexiones dejarán de formar parte del flujo.`,
-      'Eliminar bloque'
+  protected async eliminarBloque(evento: MouseEvent): Promise<void> {
+    evento.stopPropagation();
+    this.accionesAbiertas.set(false);
+    const bloque = this.bloque();
+    const confirmado = await this.mensajes.confirmarDestructiva(
+      `Eliminar ${this.etiquetasTipo[bloque.tipo].toLowerCase()}`,
+      `El bloque “${bloque.titulo}” y sus conexiones dejarán de formar parte del flujo.`,
+      'Eliminar bloque',
     );
-
-    if (confirmed) {
-      this.store.deleteBlock(currentBlock.id);
-    }
+    if (confirmado) this.estadoEditor.eliminarBloque(bloque.id);
   }
 
   @HostListener('document:click')
-  protected closeActions(): void {
-    this.actionsOpen.set(false);
+  protected cerrarAcciones(): void {
+    this.accionesAbiertas.set(false);
   }
 
-  protected onTargetPointerEnter(): void {
-    this.store.setConnectionHoverTarget(this.block().id);
+  protected enfocarDestino(): void {
+    this.estadoEditor.establecerDestinoConexionEnfocado(this.bloque().id);
   }
 
-  protected onTargetPointerLeave(): void {
-    this.store.setConnectionHoverTarget(null);
+  protected desenfocarDestino(): void {
+    this.estadoEditor.establecerDestinoConexionEnfocado(null);
   }
 
-  protected onCardPointerEnter(): void {
-    if (!this.store.isConnectionDragging() || !this.store.isConnectionTarget(this.block().id)) {
-      return;
+  protected entrarTarjeta(): void {
+    if (
+      this.estadoEditor.arrastrandoConexion() &&
+      this.estadoEditor.esDestinoConexion(this.bloque().id)
+    ) {
+      this.enfocarDestino();
     }
-
-    this.store.setConnectionHoverTarget(this.block().id);
   }
 
-  protected onCardPointerLeave(): void {
-    if (!this.store.isConnectionDragging() || !this.store.isConnectionTarget(this.block().id)) {
-      return;
+  protected salirTarjeta(): void {
+    if (
+      this.estadoEditor.arrastrandoConexion() &&
+      this.estadoEditor.esDestinoConexion(this.bloque().id)
+    ) {
+      this.desenfocarDestino();
     }
-
-    this.store.setConnectionHoverTarget(null);
   }
 
-  protected completeConnectionDrag(event: PointerEvent): void {
-    if (!this.store.isConnectionDragging()) {
-      return;
-    }
-
-    event.preventDefault();
-    event.stopPropagation();
-    this.store.setConnectionHoverTarget(this.block().id);
-    this.store.completeConnectionDrag();
+  protected completarArrastreConexion(evento: PointerEvent): void {
+    if (!this.estadoEditor.arrastrandoConexion()) return;
+    evento.preventDefault();
+    evento.stopPropagation();
+    this.enfocarDestino();
+    this.estadoEditor.completarArrastreConexion();
   }
 
-  protected onPointerDown(event: PointerEvent): void {
-    if (this.store.isReadOnly()) {
-      return;
-    }
+  protected iniciarArrastreBloque(evento: PointerEvent): void {
+    if (this.estadoEditor.soloLectura()) return;
 
-    const target = event.target as HTMLElement | null;
+    const objetivo = evento.target as HTMLElement | null;
+    if (objetivo?.closest('button')) return;
 
-    if (target?.closest('button')) {
-      return;
-    }
+    evento.preventDefault();
+    evento.stopPropagation();
+    this.estadoEditor.seleccionarBloque(this.bloque().id);
+    const clienteXInicial = evento.clientX;
+    const clienteYInicial = evento.clientY;
+    const posicionInicial = this.bloque().posicion;
 
-    event.preventDefault();
-    event.stopPropagation();
-    this.store.selectBlock(this.block().id);
+    const moverPuntero = (eventoMovimiento: PointerEvent): void => {
+      const escala = this.estadoEditor.vista().escala;
+      const desplazamientoX = (eventoMovimiento.clientX - clienteXInicial) / escala;
+      const desplazamientoY = (eventoMovimiento.clientY - clienteYInicial) / escala;
 
-    const startClientX = event.clientX;
-    const startClientY = event.clientY;
-    const initialPosition = this.block().position;
-
-    const onPointerMove = (moveEvent: PointerEvent) => {
-      const zoom = this.store.viewport().zoom;
-      const deltaX = (moveEvent.clientX - startClientX) / zoom;
-      const deltaY = (moveEvent.clientY - startClientY) / zoom;
-
-      if (Math.abs(moveEvent.clientX - startClientX) > 3 || Math.abs(moveEvent.clientY - startClientY) > 3) {
-        this.movedDuringDrag = true;
+      if (
+        Math.abs(eventoMovimiento.clientX - clienteXInicial) > 3 ||
+        Math.abs(eventoMovimiento.clientY - clienteYInicial) > 3
+      ) {
+        this.seMovioDuranteArrastre = true;
       }
 
-      this.store.moveBlock(this.block().id, {
-        x: initialPosition.x + deltaX,
-        y: initialPosition.y + deltaY
+      this.estadoEditor.moverBloque(this.bloque().id, {
+        x: posicionInicial.x + desplazamientoX,
+        y: posicionInicial.y + desplazamientoY,
       });
     };
-
-    const stopDragging = () => {
-      window.removeEventListener('pointermove', onPointerMove);
-      window.removeEventListener('pointerup', stopDragging);
+    const detenerArrastre = (): void => {
+      window.removeEventListener('pointermove', moverPuntero);
+      window.removeEventListener('pointerup', detenerArrastre);
     };
 
-    window.addEventListener('pointermove', onPointerMove);
-    window.addEventListener('pointerup', stopDragging, { once: true });
-    this.destroyRef.onDestroy(stopDragging);
+    window.addEventListener('pointermove', moverPuntero);
+    window.addEventListener('pointerup', detenerArrastre, { once: true });
+    this.referenciaDestruccion.onDestroy(detenerArrastre);
   }
 }
-

@@ -291,11 +291,11 @@ describe('EstadoCreacionProyectoService', () => {
 
   it('completa las secciones funcionales al guardar Flujo', async () => {
     const flujo = {
-      projectId: '42',
+      proyectoId: '42',
       roles: [],
-      nodes: [],
-      connections: [],
-      updatedAt: '2026-08-28T10:00:00.000Z',
+      nodos: [],
+      conexiones: [],
+      fechaActualizacion: '2026-08-28T10:00:00.000Z',
     };
     await firstValueFrom(servicio.cargar(42));
     await firstValueFrom(

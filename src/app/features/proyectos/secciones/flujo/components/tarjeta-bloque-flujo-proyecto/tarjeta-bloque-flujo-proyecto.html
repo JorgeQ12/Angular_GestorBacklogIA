@@ -1,115 +1,121 @@
-@let currentBlock = block();
+@let bloqueActual = bloque();
 
 <article
-  class="flow-block-card"
-  [attr.data-type]="currentBlock.type"
-  data-flow-card="true"
-  [class.is-selected]="store.selectedBlockId() === currentBlock.id"
-  [class.is-connecting]="store.activeConnectionSourceId() === currentBlock.id"
-  [class.is-connection-target]="store.isConnectionTarget(currentBlock.id)"
-  [class.is-connection-target-hovered]="store.isHoveredConnectionTarget(currentBlock.id)"
-  [class.is-readonly]="store.isReadOnly()"
-  [class.has-handle-visibility]="!store.isReadOnly() && (store.selectedBlockId() === currentBlock.id || store.activeConnectionSourceId() === currentBlock.id)"
-  [style.left.px]="currentBlock.position.x"
-  [style.top.px]="currentBlock.position.y"
-  (pointerdown)="onPointerDown($event)"
-  (pointerenter)="onCardPointerEnter()"
-  (pointerleave)="onCardPointerLeave()"
-  (pointerup)="completeConnectionDrag($event)"
-  (click)="openEditor()">
-  @if (!store.isReadOnly()) {
+  class="tarjeta-bloque-flujo"
+  [attr.data-tipo]="bloqueActual.tipo"
+  data-tarjeta-flujo="true"
+  role="button"
+  tabindex="0"
+  [attr.aria-label]="'Abrir ' + bloqueActual.titulo"
+  [class.esta-seleccionado]="estadoEditor.idBloqueSeleccionado() === bloqueActual.id"
+  [class.esta-conectando]="estadoEditor.idOrigenConexionActiva() === bloqueActual.id"
+  [class.es-destino-conexion]="estadoEditor.esDestinoConexion(bloqueActual.id)"
+  [class.es-destino-conexion-enfocado]="estadoEditor.esDestinoConexionEnfocado(bloqueActual.id)"
+  [class.es-solo-lectura]="estadoEditor.soloLectura()"
+  [class.muestra-conectores]="!estadoEditor.soloLectura() && (estadoEditor.idBloqueSeleccionado() === bloqueActual.id || estadoEditor.idOrigenConexionActiva() === bloqueActual.id)"
+  [style.left.px]="bloqueActual.posicion.x"
+  [style.top.px]="bloqueActual.posicion.y"
+  (pointerdown)="iniciarArrastreBloque($event)"
+  (pointerenter)="entrarTarjeta()"
+  (pointerleave)="salirTarjeta()"
+  (pointerup)="completarArrastreConexion($event)"
+  (click)="abrirEditor()"
+  (keydown.enter)="abrirEditor()"
+>
+  @if (!estadoEditor.soloLectura()) {
     <button
       type="button"
-      class="flow-block-card__handle flow-block-card__handle--input"
-      [class.is-visible]="store.isConnectionTarget(currentBlock.id)"
-      [class.is-hovered]="store.isHoveredConnectionTarget(currentBlock.id)"
-      [disabled]="!store.isConnectionTarget(currentBlock.id)"
-      [attr.aria-label]="'Conectar hacia ' + currentBlock.title"
-      (pointerenter)="onTargetPointerEnter()"
-      (pointerleave)="onTargetPointerLeave()"
-      (pointerup)="completeConnectionDrag($event)">
-    </button>
+      class="tarjeta-bloque-flujo__conector tarjeta-bloque-flujo__conector--entrada"
+      [class.esta-visible]="estadoEditor.esDestinoConexion(bloqueActual.id)"
+      [class.esta-enfocado]="estadoEditor.esDestinoConexionEnfocado(bloqueActual.id)"
+      [disabled]="!estadoEditor.esDestinoConexion(bloqueActual.id)"
+      [attr.aria-label]="'Conectar hacia ' + bloqueActual.titulo"
+      (pointerenter)="enfocarDestino()"
+      (pointerleave)="desenfocarDestino()"
+      (pointerup)="completarArrastreConexion($event)"
+    ></button>
 
-    @if (isDecisionBlock()) {
-      @for (branch of decisionBranches; track branch) {
+    @if (esBloqueDecision()) {
+      @for (rama of ramasDecision; track rama) {
         <button
           type="button"
-          class="flow-block-card__handle flow-block-card__handle--output flow-block-card__handle--decision"
-          [class.flow-block-card__handle--decision-yes]="branch === 'Si'"
-          [class.flow-block-card__handle--decision-no]="branch === 'No'"
-          [class.is-visible]="store.selectedBlockId() === currentBlock.id || store.isConnectionDragging()"
-          [attr.aria-label]="'Iniciar rama ' + branch + ' desde ' + currentBlock.title"
-          (pointerdown)="startConnectionDrag($event, branch)">
-          <span class="flow-block-card__handle-branch-text">{{ branch }}</span>
+          class="tarjeta-bloque-flujo__conector tarjeta-bloque-flujo__conector--salida tarjeta-bloque-flujo__conector--decision"
+          [class.tarjeta-bloque-flujo__conector--decision-si]="rama === 'Sí'"
+          [class.tarjeta-bloque-flujo__conector--decision-no]="rama === 'No'"
+          [class.esta-visible]="estadoEditor.idBloqueSeleccionado() === bloqueActual.id || estadoEditor.arrastrandoConexion()"
+          [attr.aria-label]="'Iniciar rama ' + rama + ' desde ' + bloqueActual.titulo"
+          (pointerdown)="iniciarArrastreConexion($event, rama)"
+        >
+          <span class="tarjeta-bloque-flujo__texto-rama">{{ rama }}</span>
         </button>
       }
     } @else {
       <button
         type="button"
-        class="flow-block-card__handle flow-block-card__handle--output"
-        [class.is-visible]="store.selectedBlockId() === currentBlock.id || store.isConnectionDragging()"
-        [attr.aria-label]="'Iniciar conexión desde ' + currentBlock.title"
-        (pointerdown)="startConnectionDrag($event)">
-      </button>
+        class="tarjeta-bloque-flujo__conector tarjeta-bloque-flujo__conector--salida"
+        [class.esta-visible]="estadoEditor.idBloqueSeleccionado() === bloqueActual.id || estadoEditor.arrastrandoConexion()"
+        [attr.aria-label]="'Iniciar conexión desde ' + bloqueActual.titulo"
+        (pointerdown)="iniciarArrastreConexion($event)"
+      ></button>
     }
   }
 
-  <header class="flow-block-card__header">
-    <span class="flow-block-card__type-icon" aria-hidden="true">
-      <app-icono [nombre]="typeIcons[currentBlock.type]" />
+  <header class="tarjeta-bloque-flujo__encabezado">
+    <span class="tarjeta-bloque-flujo__icono-tipo" aria-hidden="true">
+      <app-icono [nombre]="iconosTipo[bloqueActual.tipo]" />
     </span>
-
-    <div class="flow-block-card__title-group">
-      <span class="flow-block-card__type-label">{{ typeLabels[currentBlock.type] }}</span>
-      <h3>{{ currentBlock.title }}</h3>
+    <div class="tarjeta-bloque-flujo__grupo-titulo">
+      <span class="tarjeta-bloque-flujo__etiqueta-tipo">{{ etiquetasTipo[bloqueActual.tipo] }}</span>
+      <h3>{{ bloqueActual.titulo }}</h3>
     </div>
 
-    @if (!store.isReadOnly()) {
-      <div class="flow-block-card__actions">
-      <button
-        type="button"
-        class="flow-block-card__menu-trigger"
-        aria-label="Opciones del bloque"
-        [attr.aria-expanded]="actionsOpen()"
-        (click)="toggleActions($event)">
-        <app-icono nombre="masOpciones" />
-      </button>
-
-      @if (actionsOpen()) {
-        <div class="flow-block-card__menu" (click)="$event.stopPropagation()">
-          <button type="button" (click)="editBlock($event)">
-            <app-icono nombre="editar" />
-            Editar
-          </button>
-          <button type="button" class="is-danger" (click)="deleteBlock($event)">
-            <app-icono nombre="eliminar" />
-            Eliminar
-          </button>
-        </div>
-      }
+    @if (!estadoEditor.soloLectura()) {
+      <div class="tarjeta-bloque-flujo__acciones">
+        <button
+          type="button"
+          class="ui-button ui-button--text ui-button--md tarjeta-bloque-flujo__abrir-menu"
+          aria-label="Opciones del bloque"
+          [attr.aria-expanded]="accionesAbiertas()"
+          (click)="alternarAcciones($event)"
+        >
+          <app-icono class="ui-button__icon" nombre="masOpciones" />
+        </button>
+        @if (accionesAbiertas()) {
+          <div class="tarjeta-bloque-flujo__menu" (click)="$event.stopPropagation()">
+            <button type="button" (click)="editarBloque($event)">
+              <app-icono nombre="editar" />
+              Editar
+            </button>
+            <button type="button" class="ui-button--danger" (click)="eliminarBloque($event)">
+              <app-icono nombre="eliminar" />
+              Eliminar
+            </button>
+          </div>
+        }
       </div>
     }
   </header>
 
-  <p class="flow-block-card__summary">{{ currentBlock.description || 'Aún no se ha registrado una descripción funcional.' }}</p>
+  <p class="tarjeta-bloque-flujo__resumen">
+    {{ bloqueActual.descripcion || 'Aún no se ha registrado una descripción funcional.' }}
+  </p>
 
-  <footer class="flow-block-card__footer">
-    <div class="flow-block-card__roles">
-      @if (roleNames().length) {
-        @for (roleName of roleNames().slice(0, 2); track roleName) {
-          <span>{{ roleName }}</span>
+  <footer class="tarjeta-bloque-flujo__pie">
+    <div class="tarjeta-bloque-flujo__roles">
+      @if (nombresRoles().length) {
+        @for (nombreRol of nombresRoles().slice(0, 2); track nombreRol) {
+          <span>{{ nombreRol }}</span>
         }
-        @if (roleNames().length > 2) {
-          <span class="is-count">+{{ roleNames().length - 2 }}</span>
+        @if (nombresRoles().length > 2) {
+          <span class="es-conteo">+{{ nombresRoles().length - 2 }}</span>
         }
       } @else {
-        <span class="is-muted">Sin roles</span>
+        <span class="esta-atenuado">Sin roles</span>
       }
     </div>
-    <span class="flow-block-card__open-hint">
-      {{ store.isReadOnly() ? 'Consultar' : 'Abrir' }}
+    <span class="tarjeta-bloque-flujo__ayuda-apertura">
+      {{ estadoEditor.soloLectura() ? 'Consultar' : 'Abrir' }}
       <app-icono nombre="continuar" aria-hidden="true" />
     </span>
   </footer>
 </article>
-

@@ -44,9 +44,33 @@ describe('PasoFlujoProyecto', () => {
     expect(estadoCreacion.guardarSeccion).toHaveBeenCalledWith({
       seccion: ClaveSeccionProyecto.Flujo,
       datos: expect.objectContaining({
-        projectId: '42',
-        nodes: [],
-        connections: [],
+        proyectoId: '42',
+        nodos: [],
+        conexiones: [],
+      }),
+    });
+  });
+
+  it('carga en el editor los roles definidos previamente en el borrador', () => {
+    borrador = {
+      ...BORRADOR,
+      rolesJson: JSON.stringify([
+        { nombre: 'Administrador', descripcion: 'Configura la solución.' },
+        { nombre: 'Consulta', descripcion: 'Consulta información.' },
+      ]),
+    };
+    crearComponente();
+
+    obtenerBoton('Guardar flujo').click();
+    fixture.detectChanges();
+
+    expect(estadoCreacion.guardarSeccion).toHaveBeenCalledWith({
+      seccion: ClaveSeccionProyecto.Flujo,
+      datos: expect.objectContaining({
+        roles: [
+          expect.objectContaining({ nombre: 'Administrador' }),
+          expect.objectContaining({ nombre: 'Consulta' }),
+        ],
       }),
     });
   });
@@ -55,7 +79,7 @@ describe('PasoFlujoProyecto', () => {
     borrador = {
       ...BORRADOR,
       diagramFlujoJson:
-        '{"projectId":"42","roles":[],"blocks":[],"connections":[],"updatedAt":"2026-08-28T10:00:00.000Z"}',
+        '{"proyectoId":"42","roles":[],"bloques":[],"conexiones":[],"fechaActualizacion":"2026-08-28T10:00:00.000Z"}',
     };
     crearComponente();
 

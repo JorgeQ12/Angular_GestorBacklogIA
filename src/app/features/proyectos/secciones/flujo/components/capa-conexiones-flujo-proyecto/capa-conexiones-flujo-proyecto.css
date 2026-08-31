@@ -1,24 +1,115 @@
-:host{position:absolute;inset:0;display:block;pointer-events:none;}
-.flow-connection-layer{overflow:visible}
-.flow-connection-layer__delete-overlay{position:absolute;inset:0;pointer-events:none}
-.flow-connection-layer marker path{stroke-linecap:round;stroke-linejoin:round}
-.flow-connection-layer__halo{fill:none;stroke:rgba(255,255,255,.92);stroke-width:5.5;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke;transition:stroke-width .16s ease,opacity .16s ease}
-.flow-connection-layer__halo.is-selected{stroke-width:6.5}
-.flow-connection-layer__line{fill:none;stroke:var(--text-muted);stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke;opacity:.94;transition:stroke .16s ease,stroke-width .16s ease,opacity .16s ease}
-.flow-connection-layer__line.is-decision-branch{stroke:var(--color-warning)}
-.flow-connection-layer__line.is-selected{stroke:var(--text-primary);stroke-width:2.35;opacity:1}
-.flow-connection-layer__line--preview{stroke:var(--color-warning);stroke-width:1.9;stroke-dasharray:7 6;opacity:.72}
-.flow-connection-layer__line--preview.is-snapped{stroke:var(--color-warning);opacity:1}
-.flow-connection-layer__hit{fill:none;stroke:transparent;stroke-width:14;vector-effect:non-scaling-stroke;pointer-events:stroke;cursor:pointer}
-.flow-connection-layer__label-chip-surface{fill:var(--surface-default);stroke:var(--border-default);stroke-width:1}
-.flow-connection-layer__label-chip.is-decision-branch .flow-connection-layer__label-chip-surface{fill:var(--surface-subtle);stroke:var(--border-default)}
-.flow-connection-layer__label{fill:var(--text-secondary);font-size:12px;font-weight: var(--font-weight-bold);text-anchor:middle}
-.flow-connection-layer__label-chip.is-decision-branch .flow-connection-layer__label{fill:var(--color-danger)}
-.flow-connection-layer__delete-chip{cursor:pointer;pointer-events:auto}
-.flow-connection-layer__delete-chip-surface{fill:var(--text-primary);stroke:var(--text-primary);stroke-width:1;transition:fill .16s ease,stroke .16s ease}
-.flow-connection-layer__delete-chip:hover .flow-connection-layer__delete-chip-surface{fill:var(--color-danger);stroke:var(--color-danger)}
-.flow-connection-layer__delete-chip-label{fill:var(--surface-default);font-size:11px;font-weight: var(--font-weight-bold);text-anchor:middle;pointer-events:none}
-.flow-connection-layer__delete-chip-button{position:absolute;z-index:1;display:inline-flex;align-items:center;justify-content:center;min-width:112px;height:28px;gap:.35rem;padding:0 .72rem;border:1px solid var(--text-primary);border-radius:14px;background:var(--text-primary);color:var(--surface-default);font-size:10px;font-weight: var(--font-weight-bold);line-height:1;pointer-events:auto;box-shadow:0 8px 18px rgba(33,37,41,.18);transition:background-color .16s ease,border-color .16s ease,box-shadow .16s ease}
-.flow-connection-layer__delete-chip-button app-icono{width:.78rem;height:.78rem;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
-.flow-connection-layer__delete-chip-button:hover{border-color:var(--color-danger);background:var(--color-danger);box-shadow:0 10px 22px rgba(161,3,3,.22)}
+:host {
+  position: absolute;
+  inset: 0;
+  display: block;
+  pointer-events: none;
+}
 
+.capa-conexiones-flujo {
+  overflow: visible;
+}
+
+.capa-conexiones-flujo__superposicion-eliminacion {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.capa-conexiones-flujo marker path {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.capa-conexiones-flujo__halo {
+  fill: none;
+  stroke: color-mix(in srgb, var(--surface-default) 92%, transparent);
+  stroke-width: 5.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  transition:
+    stroke-width var(--transition-fast) var(--ease-standard),
+    opacity var(--transition-fast) var(--ease-standard);
+}
+
+.capa-conexiones-flujo__halo.esta-seleccionado {
+  stroke-width: 6.5;
+}
+
+.capa-conexiones-flujo__linea {
+  fill: none;
+  stroke: var(--text-muted);
+  stroke-width: 1.65;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  opacity: 0.94;
+  transition:
+    stroke var(--transition-fast) var(--ease-standard),
+    stroke-width var(--transition-fast) var(--ease-standard),
+    opacity var(--transition-fast) var(--ease-standard);
+}
+
+.capa-conexiones-flujo__linea.es-rama-decision,
+.capa-conexiones-flujo__linea--previsualizacion,
+.capa-conexiones-flujo__linea--previsualizacion.esta-acoplada {
+  stroke: var(--color-warning);
+}
+
+.capa-conexiones-flujo__linea.esta-seleccionado {
+  stroke: var(--text-primary);
+  stroke-width: 2.35;
+  opacity: 1;
+}
+
+.capa-conexiones-flujo__linea--previsualizacion {
+  stroke-width: 1.9;
+  stroke-dasharray: 7 6;
+  opacity: 0.72;
+}
+
+.capa-conexiones-flujo__linea--previsualizacion.esta-acoplada {
+  opacity: 1;
+}
+
+.capa-conexiones-flujo__area-interaccion {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 14;
+  vector-effect: non-scaling-stroke;
+  pointer-events: stroke;
+  cursor: pointer;
+}
+
+.capa-conexiones-flujo__superficie-etiqueta {
+  fill: var(--surface-default);
+  stroke: var(--border-default);
+  stroke-width: 1;
+}
+
+.capa-conexiones-flujo__etiqueta.es-rama-decision
+  .capa-conexiones-flujo__superficie-etiqueta {
+  fill: var(--surface-subtle);
+}
+
+.capa-conexiones-flujo__texto-etiqueta {
+  fill: var(--text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  text-anchor: middle;
+}
+
+.capa-conexiones-flujo__etiqueta.es-rama-decision
+  .capa-conexiones-flujo__texto-etiqueta {
+  fill: var(--color-danger);
+}
+
+.capa-conexiones-flujo__boton-eliminar {
+  position: absolute;
+  z-index: var(--z-raised);
+  min-width: 7rem;
+  min-height: var(--control-height-sm);
+  padding-inline: var(--space-3);
+  pointer-events: auto;
+  font-size: var(--font-size-3xs);
+}

@@ -83,6 +83,10 @@ Un valor debe convertirse en token cuando representa una decisión visual reutil
 varios componentes necesitan cambiar conjuntamente. Una medida exclusiva de un layout local no
 requiere un token nuevo.
 
+Las transiciones utilizan `--transition-fast`, `--transition-base` o `--transition-slow`. Estos
+tokens reducen coordinadamente su duración cuando el sistema informa `prefers-reduced-motion`, por
+lo que las features no repiten bloques de accesibilidad para cada componente.
+
 El acento de identidad utiliza la escala neutral gris y negra mediante `--color-brand`. No se
 introducen colores decorativos mediante valores locales. Los colores de información, éxito,
 advertencia y error se reservan para estados que necesiten comunicar esas condiciones.
@@ -151,7 +155,9 @@ profundos como `.mi-feature .ui-control` si el cambio representa una variante re
 
 - `.ui-visually-hidden` para conservar etiquetas accesibles sin alterar el layout.
 - `.ui-field` y `.ui-label`.
+- `.ui-form-grid` y `.ui-form-section` para distribuciones y secciones internas repetidas.
 - `.ui-control-wrap` y `.ui-control`.
+- `.ui-textarea`, `.ui-hint` y contenido auxiliar como `.ui-control-suffix`.
 - Tamaños y espaciado para iconos o acciones.
 - Hover, foco y estado deshabilitado.
 - Estado `.has-error`.

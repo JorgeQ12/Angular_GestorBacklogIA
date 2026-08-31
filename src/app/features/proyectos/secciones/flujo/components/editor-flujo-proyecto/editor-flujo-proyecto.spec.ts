@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FlowBlockType, ProjectWorkflow } from '../../models/flujo-proyecto.model';
+import { TipoBloqueFlujo, FlujoProyecto } from '../../models/flujo-proyecto.model';
 import { EstadoEditorFlujoProyectoService } from '../../services/estado-editor-flujo-proyecto.service';
 import { EditorFlujoProyecto } from './editor-flujo-proyecto';
 
 describe('EditorFlujoProyecto', () => {
   let fixture: ComponentFixture<EditorFlujoProyecto>;
-  let store: EstadoEditorFlujoProyectoService;
+  let estadoEditor: EstadoEditorFlujoProyectoService;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({ imports: [EditorFlujoProyecto] }).compileComponents();
     fixture = TestBed.createComponent(EditorFlujoProyecto);
     fixture.componentRef.setInput('flujo', FLUJO_VACIO);
     fixture.detectChanges();
-    store = fixture.debugElement.injector.get(EstadoEditorFlujoProyectoService);
+    estadoEditor = fixture.debugElement.injector.get(EstadoEditorFlujoProyectoService);
   });
 
   it('presenta el editor embebido sin crear una página o ruta adicional', () => {
@@ -26,22 +26,22 @@ describe('EditorFlujoProyecto', () => {
     const flujoCambiado = vi.fn();
     fixture.componentInstance.flujoCambiado.subscribe(flujoCambiado);
 
-    store.startNodeCreation(FlowBlockType.Action);
-    store.commitNodeDraft({
-      type: FlowBlockType.Action,
-      title: 'Consultar proyecto',
-      description: 'Abre la información del proyecto.',
-      acceptanceCriteria: ['El proyecto existe.'],
-      roleNames: ['Administrador'],
-      data: {},
+    estadoEditor.iniciarCreacionNodo(TipoBloqueFlujo.Accion);
+    estadoEditor.confirmarBorradorNodo({
+      tipo: TipoBloqueFlujo.Accion,
+      titulo: 'Consultar proyecto',
+      descripcion: 'Abre la información del proyecto.',
+      criteriosAceptacion: ['El proyecto existe.'],
+      nombresRoles: ['Administrador'],
+      datos: {},
     });
     fixture.detectChanges();
     await fixture.whenStable();
 
     expect(flujoCambiado).toHaveBeenCalledWith(
       expect.objectContaining({
-        projectId: '42',
-        nodes: [expect.objectContaining({ title: 'Consultar proyecto' })],
+        proyectoId: '42',
+        nodos: [expect.objectContaining({ titulo: 'Consultar proyecto' })],
       }),
     );
   });
@@ -50,14 +50,42 @@ describe('EditorFlujoProyecto', () => {
     fixture.componentRef.setInput('procesando', true);
     fixture.detectChanges();
 
-    expect(store.isReadOnly()).toBe(true);
+    expect(estadoEditor.soloLectura()).toBe(true);
   });
+
+  it.each(Object.values(TipoBloqueFlujo))(
+    'presenta los roles disponibles en el formulario de %s',
+    (tipo) => {
+      fixture.componentRef.setInput('flujo', FLUJO_CON_ROLES);
+      fixture.detectChanges();
+
+      estadoEditor.iniciarCreacionNodo(tipo);
+      fixture.detectChanges();
+
+      const modal = (fixture.nativeElement as HTMLElement).querySelector(
+        'app-modal-nodo-flujo-proyecto',
+      );
+      expect(modal?.textContent).toContain('Administrador');
+      expect(modal?.querySelector<HTMLInputElement>('#flujo-rol-rol-administrador')).not.toBeNull();
+    },
+  );
 });
 
-const FLUJO_VACIO: ProjectWorkflow = {
-  projectId: '42',
+const FLUJO_VACIO: FlujoProyecto = {
+  proyectoId: '42',
   roles: [],
-  nodes: [],
-  connections: [],
-  updatedAt: '2026-08-28T10:00:00.000Z',
+  nodos: [],
+  conexiones: [],
+  fechaActualizacion: '2026-08-28T10:00:00.000Z',
+};
+
+const FLUJO_CON_ROLES: FlujoProyecto = {
+  ...FLUJO_VACIO,
+  roles: [
+    {
+      id: 'rol-administrador',
+      nombre: 'Administrador',
+      fechaCreacion: '2026-08-28T10:00:00.000Z',
+    },
+  ],
 };

@@ -1,882 +1,797 @@
 import { Injectable, computed, signal } from '@angular/core';
 import {
-  buildFlowConnectionPath,
-  CanvasViewport,
-  createDefaultNodeData,
-  DecisionBranchLabel,
-  FLOW_BLOCK_TYPE_DESCRIPTIONS,
-  FLOW_BLOCK_TYPE_LABELS,
-  FlowBlockType,
-  getFlowOutputHandleOffsetY,
-  isDecisionBranchLabel,
-  isModulePermissionAction,
-  ModulePermissionAction,
-  ModulePeakPeriod,
-  ModuleRolePermission,
-  PROJECT_FLOW_HANDLE_CENTER_OFFSET_X,
-  PROJECT_FLOW_HANDLE_CENTER_OFFSET_Y,
-  PROJECT_FLOW_BLOCK_SIZE,
-  PROJECT_FLOW_CANVAS_SIZE,
-  ProjectFlowConnection,
-  ProjectFlowConnectionSide,
-  ProjectFlowFilterState,
-  ProjectFlowRole,
-  ProjectFlowViewFilter,
-  ProjectWorkflow,
-  ProjectWorkflowNode,
-  ProjectWorkflowNodeDraft,
-  getFlowBlockAnchorPoint,
-  resolveNearestFlowConnectionSide,
-  resolveNearestFlowTargetSide
+  DESCRIPCIONES_TIPO_BLOQUE_FLUJO,
+  ETIQUETAS_TIPO_BLOQUE_FLUJO,
+  TIPOS_BLOQUE_FLUJO_DISPONIBLES,
+} from '../config/flujo-proyecto.config';
+import {
+  construirRutaConexion,
+  TAMANO_BLOQUE_FLUJO,
+  TAMANO_LIENZO_FLUJO,
+  obtenerPuntoAnclajeBloque,
+  resolverLadoDestinoMasCercano,
+} from '../mappers/geometria-flujo-proyecto.mapper';
+import {
+  BorradorNodoFlujo,
+  ConexionFlujoProyecto,
+  EstadoFiltroFlujo,
+  EtiquetaRamaDecision,
+  FiltroVistaFlujoProyecto,
+  FlujoProyecto,
+  LadoConexionFlujo,
+  NodoFlujoProyecto,
+  RolFlujoProyecto,
+  TipoBloqueFlujo,
+  VistaLienzoFlujo,
+  crearDatosNodoPredeterminados,
+  esEtiquetaRamaDecision,
 } from '../models/flujo-proyecto.model';
 
-type SaveState = 'idle' | 'saved';
-type NodeEditorMode = 'create' | 'edit';
+type EstadoGuardado = 'sin-cambios' | 'guardado';
+type ModoEditorNodo = 'crear' | 'editar';
 
-interface NodeEditorState {
-  mode: NodeEditorMode;
-  type: FlowBlockType;
-  nodeId: string | null;
-  suggestedPosition: { x: number; y: number };
+interface EstadoEditorNodo {
+  modo: ModoEditorNodo;
+  tipo: TipoBloqueFlujo;
+  idNodo: string | null;
+  posicionSugerida: { x: number; y: number };
 }
 
-interface ConnectionPreviewPoint {
+interface PuntoPrevisualizacionConexion {
   x: number;
   y: number;
 }
 
-interface HydrateOptions {
-  preserveViewport?: boolean;
-  preserveSelection?: boolean;
+interface OpcionesHidratacion {
+  conservarVista?: boolean;
+  conservarSeleccion?: boolean;
 }
 
-const DEFAULT_VIEWPORT: CanvasViewport = {
-  panX: 0,
-  panY: 0,
-  zoom: 1
+const VISTA_PREDETERMINADA: VistaLienzoFlujo = {
+  desplazamientoX: 0,
+  desplazamientoY: 0,
+  escala: 1
 };
 
-const DEFAULT_FILTER: ProjectFlowFilterState = {
-  mode: ProjectFlowViewFilter.All,
-  roleId: null
+const FILTRO_PREDETERMINADO: EstadoFiltroFlujo = {
+  modo: FiltroVistaFlujoProyecto.Todos,
+  idRol: null
 };
 
-const AVAILABLE_PROCESS_BLOCK_TYPES: readonly FlowBlockType[] = [
-  FlowBlockType.Module,
-  FlowBlockType.Screen,
-  FlowBlockType.Form,
-  FlowBlockType.Action,
-  FlowBlockType.Decision
-] as const;
-
+/** Administra el estado local y las operaciones del editor visual del flujo. */
 @Injectable()
 export class EstadoEditorFlujoProyectoService {
-  private readonly documentSignal = signal<ProjectWorkflow>(this.createEmptyDocument(''));
-  private readonly filterSignal = signal<ProjectFlowFilterState>(DEFAULT_FILTER);
-  private readonly viewportSignal = signal<CanvasViewport>(DEFAULT_VIEWPORT);
-  private readonly selectedBlockIdSignal = signal<string | null>(null);
-  private readonly selectedConnectionIdSignal = signal<string | null>(null);
-  private readonly connectionSourceIdSignal = signal<string | null>(null);
-  private readonly connectionSourceLabelSignal = signal<string | null>(null);
-  private readonly connectionPointerSignal = signal<ConnectionPreviewPoint | null>(null);
-  private readonly connectionHoverTargetIdSignal = signal<string | null>(null);
-  private readonly connectionHoverTargetSideSignal = signal<ProjectFlowConnectionSide | null>(null);
-  private readonly blockPickerOpenSignal = signal(false);
-  private readonly nodeEditorStateSignal = signal<NodeEditorState | null>(null);
-  private readonly saveStateSignal = signal<SaveState>('idle');
-  private readonly lastSavedAtSignal = signal<string | null>(null);
-  private readonly readOnlySignal = signal(false);
+  private readonly flujoSenal = signal<FlujoProyecto>(this.crearFlujoVacio(''));
+  private readonly filtroSenal = signal<EstadoFiltroFlujo>(FILTRO_PREDETERMINADO);
+  private readonly vistaSenal = signal<VistaLienzoFlujo>(VISTA_PREDETERMINADA);
+  private readonly idBloqueSeleccionadoSenal = signal<string | null>(null);
+  private readonly idConexionSeleccionadaSenal = signal<string | null>(null);
+  private readonly idOrigenConexionSenal = signal<string | null>(null);
+  private readonly etiquetaOrigenConexionSenal = signal<string | null>(null);
+  private readonly punteroConexionSenal = signal<PuntoPrevisualizacionConexion | null>(null);
+  private readonly idDestinoConexionEnfocadoSenal = signal<string | null>(null);
+  private readonly ladoDestinoConexionEnfocadoSenal = signal<LadoConexionFlujo | null>(null);
+  private readonly paletaBloquesAbiertaSenal = signal(false);
+  private readonly estadoEditorNodoSenal = signal<EstadoEditorNodo | null>(null);
+  private readonly estadoGuardadoSenal = signal<EstadoGuardado>('sin-cambios');
+  private readonly fechaUltimoGuardadoSenal = signal<string | null>(null);
+  private readonly soloLecturaSenal = signal(false);
 
-  public readonly canvasSize = PROJECT_FLOW_CANVAS_SIZE;
-  public readonly blockSize = PROJECT_FLOW_BLOCK_SIZE;
-  public readonly blockTypeOptions = computed(() =>
-    AVAILABLE_PROCESS_BLOCK_TYPES.map((type) => ({
-      type,
-      label: FLOW_BLOCK_TYPE_LABELS[type],
-      description: FLOW_BLOCK_TYPE_DESCRIPTIONS[type]
+  public readonly tamanoLienzo = TAMANO_LIENZO_FLUJO;
+  public readonly tamanoBloque = TAMANO_BLOQUE_FLUJO;
+  public readonly opcionesTipoBloque = computed(() =>
+    TIPOS_BLOQUE_FLUJO_DISPONIBLES.map((tipo) => ({
+      tipo,
+      etiqueta: ETIQUETAS_TIPO_BLOQUE_FLUJO[tipo],
+      descripcion: DESCRIPCIONES_TIPO_BLOQUE_FLUJO[tipo]
     }))
   );
-  public readonly document = computed(() => this.documentSignal());
-  public readonly roles = computed(() => this.documentSignal().roles);
-  public readonly blocks = computed(() => this.documentSignal().nodes);
-  public readonly connections = computed(() => this.documentSignal().connections);
-  public readonly filter = computed(() => this.filterSignal());
-  public readonly viewport = computed(() => this.viewportSignal());
-  public readonly selectedBlockId = computed(() => this.selectedBlockIdSignal());
-  public readonly selectedConnectionId = computed(() => this.selectedConnectionIdSignal());
-  public readonly activeConnectionSourceId = computed(() => this.connectionSourceIdSignal());
-  public readonly activeConnectionSourceLabel = computed(() => this.connectionSourceLabelSignal());
-  public readonly activeConnectionPointer = computed(() => this.connectionPointerSignal());
-  public readonly activeConnectionTargetId = computed(() => this.connectionHoverTargetIdSignal());
-  public readonly activeConnectionTargetSide = computed(() => this.connectionHoverTargetSideSignal());
-  public readonly isBlockPickerOpen = computed(() => this.blockPickerOpenSignal());
-  public readonly nodeEditorState = computed(() => this.nodeEditorStateSignal());
-  public readonly isNodeEditorOpen = computed(() => this.nodeEditorStateSignal() !== null);
-  public readonly isConnectionDragging = computed(() => this.connectionSourceIdSignal() !== null);
-  public readonly selectedBlock = computed(() => {
-    const selectedId = this.selectedBlockIdSignal();
-    return this.documentSignal().nodes.find((block) => block.id === selectedId) ?? null;
+  public readonly flujo = computed(() => this.flujoSenal());
+  public readonly roles = computed(() => this.flujoSenal().roles);
+  public readonly bloques = computed(() => this.flujoSenal().nodos);
+  public readonly conexiones = computed(() => this.flujoSenal().conexiones);
+  public readonly filtro = computed(() => this.filtroSenal());
+  public readonly vista = computed(() => this.vistaSenal());
+  public readonly idBloqueSeleccionado = computed(() => this.idBloqueSeleccionadoSenal());
+  public readonly idConexionSeleccionada = computed(() => this.idConexionSeleccionadaSenal());
+  public readonly idOrigenConexionActiva = computed(() => this.idOrigenConexionSenal());
+  public readonly etiquetaOrigenConexionActiva = computed(() => this.etiquetaOrigenConexionSenal());
+  public readonly punteroConexionActiva = computed(() => this.punteroConexionSenal());
+  public readonly idDestinoConexionActiva = computed(() => this.idDestinoConexionEnfocadoSenal());
+  public readonly ladoDestinoConexionActiva = computed(() => this.ladoDestinoConexionEnfocadoSenal());
+  public readonly paletaBloquesAbierta = computed(() => this.paletaBloquesAbiertaSenal());
+  public readonly estadoEditorNodo = computed(() => this.estadoEditorNodoSenal());
+  public readonly editorNodoAbierto = computed(() => this.estadoEditorNodoSenal() !== null);
+  public readonly arrastrandoConexion = computed(() => this.idOrigenConexionSenal() !== null);
+  public readonly bloqueSeleccionado = computed(() => {
+    const idSeleccionado = this.idBloqueSeleccionadoSenal();
+    return this.flujoSenal().nodos.find((bloque) => bloque.id === idSeleccionado) ?? null;
   });
-  public readonly selectedConnection = computed(() => {
-    const selectedId = this.selectedConnectionIdSignal();
-    return this.documentSignal().connections.find((connection) => connection.id === selectedId) ?? null;
+  public readonly conexionSeleccionada = computed(() => {
+    const idSeleccionado = this.idConexionSeleccionadaSenal();
+    return this.flujoSenal().conexiones.find((conexion) => conexion.id === idSeleccionado) ?? null;
   });
-  public readonly editingBlock = computed(() => {
-    const editorState = this.nodeEditorStateSignal();
-    if (!editorState?.nodeId) {
+  public readonly bloqueEnEdicion = computed(() => {
+    const estadoEditor = this.estadoEditorNodoSenal();
+    if (!estadoEditor?.idNodo) {
       return null;
     }
 
-    return this.documentSignal().nodes.find((node) => node.id === editorState.nodeId) ?? null;
+    return this.flujoSenal().nodos.find((nodo) => nodo.id === estadoEditor.idNodo) ?? null;
   });
-  public readonly sharedBlocks = computed(() =>
-    this.documentSignal().nodes.filter((block) => block.roleIds.length > 1)
+  public readonly bloquesCompartidos = computed(() =>
+    this.flujoSenal().nodos.filter((bloque) => bloque.idsRoles.length > 1)
   );
-  public readonly visibleBlocks = computed(() => {
-    const document = this.documentSignal();
-    const filter = this.filterSignal();
+  public readonly bloquesVisibles = computed(() => {
+    const flujo = this.flujoSenal();
+    const filtro = this.filtroSenal();
 
-    switch (filter.mode) {
-      case ProjectFlowViewFilter.Role:
-        return document.nodes.filter((block) => block.roleIds.includes(filter.roleId ?? ''));
-      case ProjectFlowViewFilter.Shared:
-        return document.nodes.filter((block) => block.roleIds.length > 1);
+    switch (filtro.modo) {
+      case FiltroVistaFlujoProyecto.Rol:
+        return flujo.nodos.filter((bloque) => bloque.idsRoles.includes(filtro.idRol ?? ''));
+      case FiltroVistaFlujoProyecto.Compartidos:
+        return flujo.nodos.filter((bloque) => bloque.idsRoles.length > 1);
       default:
-        return document.nodes;
+        return flujo.nodos;
     }
   });
-  public readonly visibleConnections = computed(() => {
-    const visibleBlockIds = new Set(this.visibleBlocks().map((block) => block.id));
-    return this.documentSignal().connections.filter(
-      (connection) =>
-        visibleBlockIds.has(connection.sourceBlockId) && visibleBlockIds.has(connection.targetBlockId)
+  public readonly conexionesVisibles = computed(() => {
+    const idsBloquesVisibles = new Set(this.bloquesVisibles().map((bloque) => bloque.id));
+    return this.flujoSenal().conexiones.filter(
+      (conexion) =>
+        idsBloquesVisibles.has(conexion.idBloqueOrigen) && idsBloquesVisibles.has(conexion.idBloqueDestino)
     );
   });
-  public readonly lastSavedAt = computed(() => this.lastSavedAtSignal());
-  public readonly saveState = computed(() => this.saveStateSignal());
-  public readonly isReadOnly = computed(() => this.readOnlySignal());
-  public readonly hasContent = computed(() => this.documentSignal().nodes.length > 0);
-  public readonly activeConnectionPreview = computed(() => {
-    const sourceId = this.connectionSourceIdSignal();
+  public readonly fechaUltimoGuardado = computed(() => this.fechaUltimoGuardadoSenal());
+  public readonly estadoGuardado = computed(() => this.estadoGuardadoSenal());
+  public readonly soloLectura = computed(() => this.soloLecturaSenal());
+  public readonly tieneContenido = computed(() => this.flujoSenal().nodos.length > 0);
+  public readonly previsualizacionConexionActiva = computed(() => {
+    const idOrigen = this.idOrigenConexionSenal();
 
-    if (!sourceId) {
+    if (!idOrigen) {
       return null;
     }
 
-    const sourceNode = this.documentSignal().nodes.find((node) => node.id === sourceId);
+    const nodoOrigen = this.flujoSenal().nodos.find((nodo) => nodo.id === idOrigen);
 
-    if (!sourceNode) {
+    if (!nodoOrigen) {
       return null;
     }
 
-    const sourceLabel = this.connectionSourceLabelSignal();
-    const sourcePoint = getFlowBlockAnchorPoint(sourceNode, 'right', sourceLabel);
-    const targetId = this.connectionHoverTargetIdSignal();
-    const targetNode = targetId
-      ? this.documentSignal().nodes.find((node) => node.id === targetId)
+    const etiquetaOrigen = this.etiquetaOrigenConexionSenal();
+    const puntoOrigen = obtenerPuntoAnclajeBloque(nodoOrigen, 'derecha', etiquetaOrigen);
+    const idDestino = this.idDestinoConexionEnfocadoSenal();
+    const nodoDestino = idDestino
+      ? this.flujoSenal().nodos.find((nodo) => nodo.id === idDestino)
       : null;
-    const hoveredSide = this.connectionHoverTargetSideSignal();
-    const pointer = this.connectionPointerSignal();
-    const targetSide = targetNode
-      ? hoveredSide ?? (pointer ? resolveNearestFlowTargetSide(targetNode, pointer) : 'left')
+    const ladoEnfocado = this.ladoDestinoConexionEnfocadoSenal();
+    const puntero = this.punteroConexionSenal();
+    const ladoDestino = nodoDestino
+      ? ladoEnfocado ?? (puntero ? resolverLadoDestinoMasCercano(nodoDestino, puntero) : 'izquierda')
       : null;
-    const targetPoint = targetNode && targetSide
-      ? getFlowBlockAnchorPoint(targetNode, targetSide)
-      : pointer;
+    const puntoDestino = nodoDestino && ladoDestino
+      ? obtenerPuntoAnclajeBloque(nodoDestino, ladoDestino)
+      : puntero;
 
-    if (!targetPoint) {
+    if (!puntoDestino) {
       return null;
     }
 
-      return {
-        sourceId,
-        label: sourceLabel,
-        targetId,
-        targetSide,
-        path: buildFlowConnectionPath(sourcePoint, targetPoint, targetSide ?? 'left')
-      };
+    return {
+      idOrigen,
+      etiqueta: etiquetaOrigen,
+      idDestino,
+      ladoDestino,
+      trayectoria: construirRutaConexion(puntoOrigen, puntoDestino, ladoDestino ?? 'izquierda')
+    };
   });
 
-  public hydrate(document: ProjectWorkflow, projectId?: string, options?: HydrateOptions): void {
-    const nextDocument = this.normalizeDocument(document, projectId);
+  public hidratar(flujo: FlujoProyecto, proyectoId?: string, opciones?: OpcionesHidratacion): void {
+    const flujoSiguiente = this.normalizarFlujo(flujo, proyectoId);
 
-    this.setDocumentState(nextDocument, nextDocument.nodes.length ? 'saved' : 'idle', options);
+    this.establecerEstadoFlujo(
+      flujoSiguiente,
+      flujoSiguiente.nodos.length ? 'guardado' : 'sin-cambios',
+      opciones
+    );
   }
 
-  public setReadOnly(readOnly: boolean): void {
-    this.readOnlySignal.set(readOnly);
+  public establecerSoloLectura(soloLectura: boolean): void {
+    this.soloLecturaSenal.set(soloLectura);
 
-    if (readOnly) {
-      this.blockPickerOpenSignal.set(false);
-      this.nodeEditorStateSignal.set(null);
-      this.cancelConnection();
-      this.clearSelection();
+    if (soloLectura) {
+      this.paletaBloquesAbiertaSenal.set(false);
+      this.estadoEditorNodoSenal.set(null);
+      this.cancelarConexion();
+      this.limpiarSeleccion();
     }
   }
 
-  public createRole(name: string): void {
-    const normalizedName = name.trim();
+  public crearRol(nombre: string): void {
+    const nombreNormalizado = nombre.trim();
 
-    if (!normalizedName) {
+    if (!nombreNormalizado) {
       return;
     }
 
-    const role: ProjectFlowRole = {
-      id: this.createId('role'),
-      name: normalizedName,
-      createdAt: new Date().toISOString()
+    const rol: RolFlujoProyecto = {
+      id: this.crearId('rol'),
+      nombre: nombreNormalizado,
+      fechaCreacion: new Date().toISOString()
     };
 
-    this.updateDocument((document) => ({
-      ...document,
-      roles: [...document.roles, role]
+    this.actualizarFlujo((flujo) => ({
+      ...flujo,
+      roles: [...flujo.roles, rol]
     }));
   }
 
-  public updateRole(roleId: string, patch: Partial<Pick<ProjectFlowRole, 'name'>>): void {
-    const nextName = patch.name?.trim();
+  public actualizarRol(idRol: string, cambios: Partial<Pick<RolFlujoProyecto, 'nombre'>>): void {
+    const nombreSiguiente = cambios.nombre?.trim();
 
-    this.updateDocument((document) => ({
-      ...document,
-      roles: document.roles.map((role) =>
-        role.id === roleId ? { ...role, name: nextName && nextName.length ? nextName : role.name } : role
+    this.actualizarFlujo((flujo) => ({
+      ...flujo,
+      roles: flujo.roles.map((rol) =>
+        rol.id === idRol
+          ? { ...rol, nombre: nombreSiguiente && nombreSiguiente.length ? nombreSiguiente : rol.nombre }
+          : rol
       )
     }));
   }
 
-  public deleteRole(roleId: string): void {
-    this.updateDocument((document) => ({
-      ...document,
-      roles: document.roles.filter((role) => role.id !== roleId),
-      nodes: document.nodes.map((block) => ({
-        ...block,
-        roleIds: block.roleIds.filter((currentRoleId) => currentRoleId !== roleId),
-        updatedAt: new Date().toISOString()
+  public eliminarRol(idRol: string): void {
+    this.actualizarFlujo((flujo) => ({
+      ...flujo,
+      roles: flujo.roles.filter((rol) => rol.id !== idRol),
+      nodos: flujo.nodos.map((bloque) => ({
+        ...bloque,
+        idsRoles: bloque.idsRoles.filter((idRolActual) => idRolActual !== idRol),
+        fechaActualizacion: new Date().toISOString()
       }))
     }));
 
-    if (this.filterSignal().roleId === roleId) {
-      this.filterSignal.set(DEFAULT_FILTER);
+    if (this.filtroSenal().idRol === idRol) {
+      this.filtroSenal.set(FILTRO_PREDETERMINADO);
     }
   }
 
-  public startNodeCreation(type: FlowBlockType): void {
-    if (this.readOnlySignal()) {
+  public iniciarCreacionNodo(tipo: TipoBloqueFlujo): void {
+    if (this.soloLecturaSenal()) {
       return;
     }
 
-    this.blockPickerOpenSignal.set(false);
-    this.nodeEditorStateSignal.set({
-      mode: 'create',
-      type,
-      nodeId: null,
-      suggestedPosition: this.getNextSuggestedPosition()
+    this.paletaBloquesAbiertaSenal.set(false);
+    this.estadoEditorNodoSenal.set({
+      modo: 'crear',
+      tipo,
+      idNodo: null,
+      posicionSugerida: this.obtenerSiguientePosicionSugerida()
     });
   }
 
-  public openNodeEditor(blockId: string): void {
-    const block = this.documentSignal().nodes.find((node) => node.id === blockId);
+  public abrirEditorNodo(idBloque: string): void {
+    const bloque = this.flujoSenal().nodos.find((nodo) => nodo.id === idBloque);
 
-    if (!block) {
+    if (!bloque) {
       return;
     }
 
-    this.selectBlock(blockId);
-    this.blockPickerOpenSignal.set(false);
-    this.nodeEditorStateSignal.set({
-      mode: 'edit',
-      type: block.type,
-      nodeId: block.id,
-      suggestedPosition: block.position
+    this.seleccionarBloque(idBloque);
+    this.paletaBloquesAbiertaSenal.set(false);
+    this.estadoEditorNodoSenal.set({
+      modo: 'editar',
+      tipo: bloque.tipo,
+      idNodo: bloque.id,
+      posicionSugerida: bloque.posicion
     });
   }
 
-  public cancelNodeDraft(): void {
-    this.nodeEditorStateSignal.set(null);
+  public cancelarBorradorNodo(): void {
+    this.estadoEditorNodoSenal.set(null);
   }
 
-  public commitNodeDraft(draft: ProjectWorkflowNodeDraft): void {
-    if (this.readOnlySignal()) {
+  public confirmarBorradorNodo(borrador: BorradorNodoFlujo): void {
+    if (this.soloLecturaSenal()) {
       return;
     }
 
-    const { roleIds, roles } = this.resolveRoles(draft.roleNames);
-    const editorState = this.nodeEditorStateSignal();
+    const { idsRoles, roles } = this.resolverRoles(borrador.nombresRoles);
+    const estadoEditor = this.estadoEditorNodoSenal();
 
-    if (!editorState) {
+    if (!estadoEditor) {
       return;
     }
 
-    if (editorState.mode === 'create') {
-      const now = new Date().toISOString();
-      const node: ProjectWorkflowNode = {
-        id: this.createId('block'),
-        type: draft.type,
-        title: draft.title.trim(),
-        description: draft.description.trim(),
-        acceptanceCriteria: this.normalizeAcceptanceCriteria(draft.acceptanceCriteria),
-        position: editorState.suggestedPosition,
-        roleIds,
-        createdAt: now,
-        updatedAt: now,
-        data: draft.data as ProjectWorkflowNode['data']
-      } as ProjectWorkflowNode;
+    if (estadoEditor.modo === 'crear') {
+      const ahora = new Date().toISOString();
+      const nodo: NodoFlujoProyecto = {
+        id: this.crearId('bloque'),
+        tipo: borrador.tipo,
+        titulo: borrador.titulo.trim(),
+        descripcion: borrador.descripcion.trim(),
+        criteriosAceptacion: this.normalizarCriteriosAceptacion(borrador.criteriosAceptacion),
+        posicion: estadoEditor.posicionSugerida,
+        idsRoles,
+        fechaCreacion: ahora,
+        fechaActualizacion: ahora,
+        datos: borrador.datos as NodoFlujoProyecto['datos']
+      } as NodoFlujoProyecto;
 
-      this.updateDocument((document) => ({
-        ...document,
+      this.actualizarFlujo((flujo) => ({
+        ...flujo,
         roles,
-        nodes: [...document.nodes, node]
+        nodos: [...flujo.nodos, nodo]
       }));
 
-      this.selectBlock(node.id);
-      this.nodeEditorStateSignal.set(null);
+      this.seleccionarBloque(nodo.id);
+      this.estadoEditorNodoSenal.set(null);
       return;
     }
 
-    this.updateDocument((document) => ({
-      ...document,
+    this.actualizarFlujo((flujo) => ({
+      ...flujo,
       roles,
-      nodes: document.nodes.map((node) =>
-        node.id === editorState.nodeId
+      nodos: flujo.nodos.map((nodo) =>
+        nodo.id === estadoEditor.idNodo
           ? ({
-              ...node,
-              title: draft.title.trim(),
-              description: draft.description.trim(),
-              acceptanceCriteria: this.normalizeAcceptanceCriteria(draft.acceptanceCriteria),
-              roleIds,
-              data: draft.data,
-              updatedAt: new Date().toISOString()
-            } as ProjectWorkflowNode)
-          : node
-      ) as ProjectWorkflowNode[]
+              ...nodo,
+              titulo: borrador.titulo.trim(),
+              descripcion: borrador.descripcion.trim(),
+              criteriosAceptacion: this.normalizarCriteriosAceptacion(borrador.criteriosAceptacion),
+              idsRoles,
+              datos: borrador.datos,
+              fechaActualizacion: new Date().toISOString()
+            } as NodoFlujoProyecto)
+          : nodo
+      ) as NodoFlujoProyecto[]
     }));
 
-    this.selectBlock(editorState.nodeId);
-    this.nodeEditorStateSignal.set(null);
+    this.seleccionarBloque(estadoEditor.idNodo);
+    this.estadoEditorNodoSenal.set(null);
   }
 
-  public moveBlock(blockId: string, position: { x: number; y: number }): void {
-    this.updateDocument((document) => ({
-      ...document,
-      nodes: document.nodes.map((block) =>
-        block.id === blockId
+  public moverBloque(idBloque: string, posicion: { x: number; y: number }): void {
+    this.actualizarFlujo((flujo) => ({
+      ...flujo,
+      nodos: flujo.nodos.map((bloque) =>
+        bloque.id === idBloque
           ? {
-              ...block,
-              position: {
-                x: this.clamp(position.x, 0, this.canvasSize.width - this.blockSize.width),
-                y: this.clamp(position.y, 0, this.canvasSize.height - this.blockSize.height)
+              ...bloque,
+              posicion: {
+                x: this.limitar(posicion.x, 0, this.tamanoLienzo.ancho - this.tamanoBloque.ancho),
+                y: this.limitar(posicion.y, 0, this.tamanoLienzo.alto - this.tamanoBloque.alto)
               },
-              updatedAt: new Date().toISOString()
+              fechaActualizacion: new Date().toISOString()
             }
-          : block
+          : bloque
       )
     }));
   }
 
-  public deleteBlock(blockId: string): void {
-    this.updateDocument((document) => ({
-      ...document,
-      nodes: document.nodes.filter((block) => block.id !== blockId),
-      connections: document.connections.filter(
-        (connection) => connection.sourceBlockId !== blockId && connection.targetBlockId !== blockId
+  public eliminarBloque(idBloque: string): void {
+    this.actualizarFlujo((flujo) => ({
+      ...flujo,
+      nodos: flujo.nodos.filter((bloque) => bloque.id !== idBloque),
+      conexiones: flujo.conexiones.filter(
+        (conexion) => conexion.idBloqueOrigen !== idBloque && conexion.idBloqueDestino !== idBloque
       )
     }));
 
-    if (this.selectedBlockIdSignal() === blockId) {
-      this.selectedBlockIdSignal.set(null);
+    if (this.idBloqueSeleccionadoSenal() === idBloque) {
+      this.idBloqueSeleccionadoSenal.set(null);
     }
 
-    if (this.connectionSourceIdSignal() === blockId) {
-      this.cancelConnection();
+    if (this.idOrigenConexionSenal() === idBloque) {
+      this.cancelarConexion();
     }
   }
 
-  public connectBlocks(sourceBlockId: string, targetBlockId: string, label?: string, targetSide?: ProjectFlowConnectionSide): void {
-    if (sourceBlockId === targetBlockId) {
+  public conectarBloques(idBloqueOrigen: string, idBloqueDestino: string, etiqueta?: string, ladoDestino?: LadoConexionFlujo): void {
+    if (idBloqueOrigen === idBloqueDestino) {
       return;
     }
 
-    const normalizedLabel = label?.trim() || '';
-    const alreadyExists = this.documentSignal().connections.some(
-      (connection) =>
-        connection.sourceBlockId === sourceBlockId && connection.targetBlockId === targetBlockId
+    const etiquetaNormalizada = etiqueta?.trim() || '';
+    const yaExiste = this.flujoSenal().conexiones.some(
+      (conexion) =>
+        conexion.idBloqueOrigen === idBloqueOrigen && conexion.idBloqueDestino === idBloqueDestino
     );
 
-    if (alreadyExists) {
-      this.cancelConnection();
+    if (yaExiste) {
+      this.cancelarConexion();
       return;
     }
 
-    const sourceNode = this.documentSignal().nodes.find((node) => node.id === sourceBlockId);
-    const duplicatedDecisionBranch = sourceNode?.type === FlowBlockType.Decision
-      && isDecisionBranchLabel(normalizedLabel)
-      && this.documentSignal().connections.some(
-        (connection) => connection.sourceBlockId === sourceBlockId && connection.label === normalizedLabel
+    const nodoOrigen = this.flujoSenal().nodos.find((nodo) => nodo.id === idBloqueOrigen);
+    const ramaDecisionDuplicada = nodoOrigen?.tipo === TipoBloqueFlujo.Decision
+      && esEtiquetaRamaDecision(etiquetaNormalizada)
+      && this.flujoSenal().conexiones.some(
+        (conexion) => conexion.idBloqueOrigen === idBloqueOrigen && conexion.etiqueta === etiquetaNormalizada
       );
 
-    if (duplicatedDecisionBranch) {
-      this.cancelConnection();
+    if (ramaDecisionDuplicada) {
+      this.cancelarConexion();
       return;
     }
 
-    const connection: ProjectFlowConnection = {
-      id: this.createId('connection'),
-      sourceBlockId,
-      targetBlockId,
-      label: normalizedLabel,
-      targetSide,
-      createdAt: new Date().toISOString()
+    const conexion: ConexionFlujoProyecto = {
+      id: this.crearId('conexion'),
+      idBloqueOrigen,
+      idBloqueDestino,
+      etiqueta: etiquetaNormalizada,
+      ladoDestino,
+      fechaCreacion: new Date().toISOString()
     };
 
-    this.updateDocument((document) => ({
-      ...document,
-      connections: [...document.connections, connection]
+    this.actualizarFlujo((flujo) => ({
+      ...flujo,
+      conexiones: [...flujo.conexiones, conexion]
     }));
 
-    this.connectionSourceIdSignal.set(null);
-    this.connectionPointerSignal.set(null);
-    this.connectionHoverTargetIdSignal.set(null);
-    this.connectionHoverTargetSideSignal.set(null);
-    this.selectConnection(connection.id);
+    this.idOrigenConexionSenal.set(null);
+    this.punteroConexionSenal.set(null);
+    this.idDestinoConexionEnfocadoSenal.set(null);
+    this.ladoDestinoConexionEnfocadoSenal.set(null);
+    this.seleccionarConexion(conexion.id);
   }
 
-  public updateConnection(connectionId: string, patch: Partial<Pick<ProjectFlowConnection, 'label'>>): void {
-    this.updateDocument((document) => ({
-      ...document,
-      connections: document.connections.map((connection) =>
-        connection.id === connectionId ? { ...connection, label: patch.label?.trim() ?? '' } : connection
+  public actualizarConexion(idConexion: string, cambios: Partial<Pick<ConexionFlujoProyecto, 'etiqueta'>>): void {
+    this.actualizarFlujo((flujo) => ({
+      ...flujo,
+      conexiones: flujo.conexiones.map((conexion) =>
+        conexion.id === idConexion
+          ? { ...conexion, etiqueta: cambios.etiqueta?.trim() ?? '' }
+          : conexion
       )
     }));
   }
 
-  public deleteConnection(connectionId: string): void {
-    this.updateDocument((document) => ({
-      ...document,
-      connections: document.connections.filter((connection) => connection.id !== connectionId)
+  public eliminarConexion(idConexion: string): void {
+    this.actualizarFlujo((flujo) => ({
+      ...flujo,
+      conexiones: flujo.conexiones.filter((conexion) => conexion.id !== idConexion)
     }));
 
-    if (this.selectedConnectionIdSignal() === connectionId) {
-      this.selectedConnectionIdSignal.set(null);
+    if (this.idConexionSeleccionadaSenal() === idConexion) {
+      this.idConexionSeleccionadaSenal.set(null);
     }
   }
 
-  public setFilter(filter: ProjectFlowFilterState): void {
-    this.filterSignal.set(filter);
+  public establecerFiltro(filtro: EstadoFiltroFlujo): void {
+    this.filtroSenal.set(filtro);
   }
 
-  public setViewport(viewport: CanvasViewport): void {
-    this.viewportSignal.set({
-      panX: viewport.panX,
-      panY: viewport.panY,
-      zoom: this.clamp(viewport.zoom, 0.2, 1.8)
+  public establecerVista(vista: VistaLienzoFlujo): void {
+    this.vistaSenal.set({
+      desplazamientoX: vista.desplazamientoX,
+      desplazamientoY: vista.desplazamientoY,
+      escala: this.limitar(vista.escala, 0.2, 1.8)
     });
   }
 
-  public resetView(): void {
-    this.viewportSignal.set(DEFAULT_VIEWPORT);
+  public restablecerVista(): void {
+    this.vistaSenal.set(VISTA_PREDETERMINADA);
   }
 
-  public zoomBy(delta: number): void {
-    this.viewportSignal.update((viewport) => ({
-      ...viewport,
-      zoom: this.clamp(Number((viewport.zoom + delta).toFixed(2)), 0.2, 1.8)
+  public ajustarEscala(delta: number): void {
+    this.vistaSenal.update((vista) => ({
+      ...vista,
+      escala: this.limitar(Number((vista.escala + delta).toFixed(2)), 0.2, 1.8)
     }));
   }
 
-  public panBy(deltaX: number, deltaY: number): void {
-    this.viewportSignal.update((viewport) => ({
-      ...viewport,
-      panX: viewport.panX + deltaX,
-      panY: viewport.panY + deltaY
+  public desplazarVista(deltaX: number, deltaY: number): void {
+    this.vistaSenal.update((vista) => ({
+      ...vista,
+      desplazamientoX: vista.desplazamientoX + deltaX,
+      desplazamientoY: vista.desplazamientoY + deltaY
     }));
   }
 
-  public startConnectionDrag(blockId: string, label?: DecisionBranchLabel): void {
-    if (this.readOnlySignal()) {
+  public iniciarArrastreConexion(idBloque: string, etiqueta?: EtiquetaRamaDecision): void {
+    if (this.soloLecturaSenal()) {
       return;
     }
 
-    this.connectionSourceIdSignal.set(blockId);
-    this.connectionSourceLabelSignal.set(label ?? null);
-    this.connectionPointerSignal.set(this.getOutputHandlePoint(blockId, label));
-    this.connectionHoverTargetIdSignal.set(null);
-    this.connectionHoverTargetSideSignal.set(null);
-    this.selectBlock(blockId);
+    this.idOrigenConexionSenal.set(idBloque);
+    this.etiquetaOrigenConexionSenal.set(etiqueta ?? null);
+    this.punteroConexionSenal.set(this.obtenerPuntoConectorSalida(idBloque, etiqueta));
+    this.idDestinoConexionEnfocadoSenal.set(null);
+    this.ladoDestinoConexionEnfocadoSenal.set(null);
+    this.seleccionarBloque(idBloque);
   }
 
-  public updateConnectionPointer(point: ConnectionPreviewPoint): void {
-    if (!this.connectionSourceIdSignal()) {
+  public actualizarPunteroConexion(punto: PuntoPrevisualizacionConexion): void {
+    if (!this.idOrigenConexionSenal()) {
       return;
     }
 
-    this.connectionPointerSignal.set(point);
+    this.punteroConexionSenal.set(punto);
   }
 
-  public setConnectionHoverTarget(blockId: string | null): void {
-    const sourceId = this.connectionSourceIdSignal();
-    const pointer = this.connectionPointerSignal();
+  public establecerDestinoConexionEnfocado(idBloque: string | null): void {
+    const idOrigen = this.idOrigenConexionSenal();
+    const puntero = this.punteroConexionSenal();
 
-    if (!sourceId || !blockId || blockId === sourceId) {
-      this.connectionHoverTargetIdSignal.set(null);
-      this.connectionHoverTargetSideSignal.set(null);
+    if (!idOrigen || !idBloque || idBloque === idOrigen) {
+      this.idDestinoConexionEnfocadoSenal.set(null);
+      this.ladoDestinoConexionEnfocadoSenal.set(null);
       return;
     }
 
-    const targetNode = this.documentSignal().nodes.find((node) => node.id === blockId);
+    const nodoDestino = this.flujoSenal().nodos.find((nodo) => nodo.id === idBloque);
 
-    this.connectionHoverTargetIdSignal.set(blockId);
-    this.connectionHoverTargetSideSignal.set(
-      targetNode && pointer ? resolveNearestFlowTargetSide(targetNode, pointer) : 'left'
+    this.idDestinoConexionEnfocadoSenal.set(idBloque);
+    this.ladoDestinoConexionEnfocadoSenal.set(
+      nodoDestino && puntero ? resolverLadoDestinoMasCercano(nodoDestino, puntero) : 'izquierda'
     );
   }
 
-  public completeConnectionDrag(): void {
-    const sourceId = this.connectionSourceIdSignal();
-    const targetId = this.connectionHoverTargetIdSignal();
+  public completarArrastreConexion(): void {
+    const idOrigen = this.idOrigenConexionSenal();
+    const idDestino = this.idDestinoConexionEnfocadoSenal();
 
-    if (!sourceId || !targetId) {
-      this.cancelConnection();
+    if (!idOrigen || !idDestino) {
+      this.cancelarConexion();
       return;
     }
 
-    this.connectBlocks(
-      sourceId,
-      targetId,
-      this.connectionSourceLabelSignal() ?? undefined,
-      this.connectionHoverTargetSideSignal() ?? undefined
+    this.conectarBloques(
+      idOrigen,
+      idDestino,
+      this.etiquetaOrigenConexionSenal() ?? undefined,
+      this.ladoDestinoConexionEnfocadoSenal() ?? undefined
     );
   }
 
-  public cancelConnection(): void {
-    this.connectionSourceIdSignal.set(null);
-    this.connectionSourceLabelSignal.set(null);
-    this.connectionPointerSignal.set(null);
-    this.connectionHoverTargetIdSignal.set(null);
-    this.connectionHoverTargetSideSignal.set(null);
+  public cancelarConexion(): void {
+    this.idOrigenConexionSenal.set(null);
+    this.etiquetaOrigenConexionSenal.set(null);
+    this.punteroConexionSenal.set(null);
+    this.idDestinoConexionEnfocadoSenal.set(null);
+    this.ladoDestinoConexionEnfocadoSenal.set(null);
   }
 
-  public openBlockPicker(): void {
-    if (this.readOnlySignal()) {
+  public abrirPaletaBloques(): void {
+    if (this.soloLecturaSenal()) {
       return;
     }
 
-    this.blockPickerOpenSignal.set(true);
+    this.paletaBloquesAbiertaSenal.set(true);
   }
 
-  public closeBlockPicker(): void {
-    this.blockPickerOpenSignal.set(false);
+  public cerrarPaletaBloques(): void {
+    this.paletaBloquesAbiertaSenal.set(false);
   }
 
-  public selectBlock(blockId: string | null): void {
-    this.selectedBlockIdSignal.set(blockId);
-    this.selectedConnectionIdSignal.set(null);
+  public seleccionarBloque(idBloque: string | null): void {
+    this.idBloqueSeleccionadoSenal.set(idBloque);
+    this.idConexionSeleccionadaSenal.set(null);
   }
 
-  public selectConnection(connectionId: string | null): void {
-    this.selectedConnectionIdSignal.set(connectionId);
-    this.selectedBlockIdSignal.set(null);
+  public seleccionarConexion(idConexion: string | null): void {
+    this.idConexionSeleccionadaSenal.set(idConexion);
+    this.idBloqueSeleccionadoSenal.set(null);
   }
 
-  public clearSelection(): void {
-    this.selectedBlockIdSignal.set(null);
-    this.selectedConnectionIdSignal.set(null);
+  public limpiarSeleccion(): void {
+    this.idBloqueSeleccionadoSenal.set(null);
+    this.idConexionSeleccionadaSenal.set(null);
   }
 
-  public getRoleName(roleId: string): string {
-    return this.documentSignal().roles.find((role) => role.id === roleId)?.name ?? 'Rol sin nombre';
+  public obtenerNombreRol(idRol: string): string {
+    return this.flujoSenal().roles.find((rol) => rol.id === idRol)?.nombre ?? 'Rol sin nombre';
   }
 
-  public isConnectionTarget(blockId: string): boolean {
-    const sourceId = this.connectionSourceIdSignal();
-    return Boolean(sourceId && sourceId !== blockId);
+  public esDestinoConexion(idBloque: string): boolean {
+    const idOrigen = this.idOrigenConexionSenal();
+    return Boolean(idOrigen && idOrigen !== idBloque);
   }
 
-  public isHoveredConnectionTarget(blockId: string): boolean {
-    return this.connectionHoverTargetIdSignal() === blockId;
+  public esDestinoConexionEnfocado(idBloque: string): boolean {
+    return this.idDestinoConexionEnfocadoSenal() === idBloque;
   }
 
-  public getRoleNames(roleIds: string[]): string[] {
-    return roleIds.map((roleId) => this.getRoleName(roleId));
+  public obtenerNombresRoles(idsRoles: string[]): string[] {
+    return idsRoles.map((idRol) => this.obtenerNombreRol(idRol));
   }
 
-  public getDraftFromNode(node: ProjectWorkflowNode): ProjectWorkflowNodeDraft {
+  public obtenerBorradorDesdeNodo(nodo: NodoFlujoProyecto): BorradorNodoFlujo {
     return {
-      type: node.type,
-      title: node.title,
-      description: node.description,
-      acceptanceCriteria: [...node.acceptanceCriteria],
-      roleNames: this.getRoleNames(node.roleIds),
-      data: structuredClone(node.data)
-    } as ProjectWorkflowNodeDraft;
+      tipo: nodo.tipo,
+      titulo: nodo.titulo,
+      descripcion: nodo.descripcion,
+      criteriosAceptacion: [...nodo.criteriosAceptacion],
+      nombresRoles: this.obtenerNombresRoles(nodo.idsRoles),
+      datos: structuredClone(nodo.datos)
+    } as BorradorNodoFlujo;
   }
 
-  public getDefaultDraft(type: FlowBlockType): ProjectWorkflowNodeDraft {
+  public obtenerBorradorPredeterminado(tipo: TipoBloqueFlujo): BorradorNodoFlujo {
     return {
-      type,
-      title: FLOW_BLOCK_TYPE_LABELS[type],
-      description: '',
-      acceptanceCriteria: [],
-      roleNames: [],
-      data: createDefaultNodeData(type)
-    } as ProjectWorkflowNodeDraft;
+      tipo,
+      titulo: ETIQUETAS_TIPO_BLOQUE_FLUJO[tipo],
+      descripcion: '',
+      criteriosAceptacion: [],
+      nombresRoles: [],
+      datos: crearDatosNodoPredeterminados(tipo)
+    } as BorradorNodoFlujo;
   }
 
-  private updateDocument(projector: (document: ProjectWorkflow) => ProjectWorkflow): void {
-    if (this.readOnlySignal()) {
+  private actualizarFlujo(proyectar: (flujo: FlujoProyecto) => FlujoProyecto): void {
+    if (this.soloLecturaSenal()) {
       return;
     }
 
-    const nextDocument = projector(this.documentSignal());
-    const stampedDocument: ProjectWorkflow = {
-      ...nextDocument,
-      updatedAt: new Date().toISOString()
+    const flujoSiguiente = proyectar(this.flujoSenal());
+    const flujoFechado: FlujoProyecto = {
+      ...flujoSiguiente,
+      fechaActualizacion: new Date().toISOString()
     };
 
-    this.documentSignal.set(stampedDocument);
-    this.lastSavedAtSignal.set(stampedDocument.updatedAt);
-    this.saveStateSignal.set('saved');
+    this.flujoSenal.set(flujoFechado);
+    this.fechaUltimoGuardadoSenal.set(flujoFechado.fechaActualizacion);
+    this.estadoGuardadoSenal.set('guardado');
   }
 
-  private setDocumentState(document: ProjectWorkflow, saveState: SaveState, options?: HydrateOptions): void {
-    const preserveViewport = options?.preserveViewport ?? false;
-    const preserveSelection = options?.preserveSelection ?? false;
-    const selectedBlockId = preserveSelection ? this.selectedBlockIdSignal() : null;
-    const selectedConnectionId = preserveSelection ? this.selectedConnectionIdSignal() : null;
+  private establecerEstadoFlujo(flujo: FlujoProyecto, estadoGuardado: EstadoGuardado, opciones?: OpcionesHidratacion): void {
+    const conservarVista = opciones?.conservarVista ?? false;
+    const conservarSeleccion = opciones?.conservarSeleccion ?? false;
+    const idBloqueSeleccionado = conservarSeleccion ? this.idBloqueSeleccionadoSenal() : null;
+    const idConexionSeleccionada = conservarSeleccion ? this.idConexionSeleccionadaSenal() : null;
 
-    this.documentSignal.set(document);
-    this.filterSignal.set(DEFAULT_FILTER);
-    if (!preserveViewport) {
-      this.viewportSignal.set(DEFAULT_VIEWPORT);
+    this.flujoSenal.set(flujo);
+    this.filtroSenal.set(FILTRO_PREDETERMINADO);
+    if (!conservarVista) {
+      this.vistaSenal.set(VISTA_PREDETERMINADA);
     }
-    this.selectedBlockIdSignal.set(
-      selectedBlockId && document.nodes.some((node) => node.id === selectedBlockId) ? selectedBlockId : null
-    );
-    this.selectedConnectionIdSignal.set(
-      selectedConnectionId && document.connections.some((connection) => connection.id === selectedConnectionId)
-        ? selectedConnectionId
+    this.idBloqueSeleccionadoSenal.set(
+      idBloqueSeleccionado && flujo.nodos.some((nodo) => nodo.id === idBloqueSeleccionado)
+        ? idBloqueSeleccionado
         : null
     );
-    this.connectionSourceIdSignal.set(null);
-    this.connectionSourceLabelSignal.set(null);
-    this.connectionPointerSignal.set(null);
-    this.connectionHoverTargetIdSignal.set(null);
-    this.connectionHoverTargetSideSignal.set(null);
-    this.blockPickerOpenSignal.set(false);
-    this.nodeEditorStateSignal.set(null);
-    this.lastSavedAtSignal.set(document.updatedAt || null);
-    this.saveStateSignal.set(saveState);
+    this.idConexionSeleccionadaSenal.set(
+      idConexionSeleccionada && flujo.conexiones.some((conexion) => conexion.id === idConexionSeleccionada)
+        ? idConexionSeleccionada
+        : null
+    );
+    this.idOrigenConexionSenal.set(null);
+    this.etiquetaOrigenConexionSenal.set(null);
+    this.punteroConexionSenal.set(null);
+    this.idDestinoConexionEnfocadoSenal.set(null);
+    this.ladoDestinoConexionEnfocadoSenal.set(null);
+    this.paletaBloquesAbiertaSenal.set(false);
+    this.estadoEditorNodoSenal.set(null);
+    this.fechaUltimoGuardadoSenal.set(flujo.fechaActualizacion || null);
+    this.estadoGuardadoSenal.set(estadoGuardado);
   }
 
-  private createEmptyDocument(projectId: string): ProjectWorkflow {
+  private crearFlujoVacio(proyectoId: string): FlujoProyecto {
     return {
-      projectId,
+      proyectoId,
       roles: [],
-      nodes: [],
-      connections: [],
-      updatedAt: new Date().toISOString()
+      nodos: [],
+      conexiones: [],
+      fechaActualizacion: new Date().toISOString()
     };
   }
 
-  private normalizeDocument(document: Partial<ProjectWorkflow> & { blocks?: ProjectWorkflowNode[] }, projectId?: string): ProjectWorkflow {
-    const legacyNodes = Array.isArray(document.blocks) ? document.blocks : [];
-    const incomingNodes = Array.isArray(document.nodes) ? document.nodes : legacyNodes;
-
+  private normalizarFlujo(flujo: FlujoProyecto, proyectoId?: string): FlujoProyecto {
     return {
-      projectId: projectId ?? document.projectId ?? '',
-      roles: Array.isArray(document.roles) ? [...document.roles] : [],
-      nodes: incomingNodes.map((node) => {
-        const roleIds = Array.isArray(node.roleIds) ? [...node.roleIds] : [];
-        const mergedData = {
-          ...createDefaultNodeData(node.type),
-          ...(node.data ?? {})
-        } as ProjectWorkflowNode['data'];
-
-        if (node.type === FlowBlockType.Module) {
-          const moduleData = mergedData as ProjectWorkflowNode['data'] & {
-            rolePermissions: ModuleRolePermission[];
-            concurrentUsers: string;
-            peakBusinessHours: ModulePeakPeriod[];
-          };
-          const rawPermissions =
-            node.data && typeof node.data === 'object' && Array.isArray((node.data as { rolePermissions?: ModuleRolePermission[] }).rolePermissions)
-              ? (node.data as { rolePermissions: ModuleRolePermission[] }).rolePermissions
-              : [];
-          const rawPeakBusinessHours =
-            node.data && typeof node.data === 'object' && Array.isArray((node.data as { peakBusinessHours?: ModulePeakPeriod[] }).peakBusinessHours)
-              ? (node.data as { peakBusinessHours: ModulePeakPeriod[] }).peakBusinessHours
-              : [];
-
-          moduleData.rolePermissions = rawPermissions.length > 0
-            ? rawPermissions
-                .map((permission) => ({
-                  roleId: String(permission.roleId ?? '').trim(),
-                  permissions: Array.isArray(permission.permissions)
-                    ? permission.permissions.filter(isModulePermissionAction)
-                    : []
-                }))
-                .filter((permission) => permission.roleId.length > 0)
-            : roleIds.map((roleId) => ({
-                roleId,
-                permissions: ['Ver'] as ModulePermissionAction[]
-              }));
-          moduleData.concurrentUsers = String(
-            node.data && typeof node.data === 'object'
-              ? (node.data as { concurrentUsers?: string }).concurrentUsers ?? ''
-              : ''
-          ).trim();
-          moduleData.peakBusinessHours = rawPeakBusinessHours.length > 0
-            ? rawPeakBusinessHours.map((period) => ({
-                days: Array.isArray(period.days)
-                  ? period.days.map((day) => String(day ?? '').trim()).filter(Boolean)
-                  : [],
-                startTime: String(period.startTime ?? '').trim(),
-                endTime: String(period.endTime ?? '').trim()
-              }))
-            : [{
-                days: [],
-                startTime: '00:00',
-                endTime: '00:00'
-              }];
-        }
-
-        return {
-          ...node,
-          acceptanceCriteria: this.normalizeAcceptanceCriteria(
-            Array.isArray((node as ProjectWorkflowNode & { acceptanceCriteria?: string[] }).acceptanceCriteria)
-              ? (node as ProjectWorkflowNode & { acceptanceCriteria: string[] }).acceptanceCriteria
-              : typeof (node as ProjectWorkflowNode & { acceptanceCriteria?: string }).acceptanceCriteria === 'string'
-                ? (node as ProjectWorkflowNode & { acceptanceCriteria: string }).acceptanceCriteria
-                : (
-                  node.type === FlowBlockType.Module
-                    && node.data
-                    && typeof node.data === 'object'
-                    && typeof (node.data as { acceptanceCriteria?: string }).acceptanceCriteria === 'string'
-                )
-                  ? String((node.data as { acceptanceCriteria?: string }).acceptanceCriteria ?? '')
-                  : []
-          ),
-          data: mergedData,
-          roleIds,
-          updatedAt: node.updatedAt || new Date().toISOString(),
-          createdAt: node.createdAt || new Date().toISOString()
-        };
-      }) as ProjectWorkflowNode[],
-      connections: Array.isArray(document.connections)
-        ? document.connections.map((connection) => ({
-            ...connection,
-            targetSide:
-              connection.targetSide === 'left'
-              || connection.targetSide === 'top'
-              || connection.targetSide === 'bottom'
-                ? connection.targetSide
-                : connection.targetSide === 'right'
-                  ? 'left'
-                  : undefined
-          }))
-        : [],
-      updatedAt: document.updatedAt || new Date().toISOString()
+      ...structuredClone(flujo),
+      proyectoId: proyectoId ?? flujo.proyectoId,
+      roles: flujo.roles.map((rol) => ({ ...rol })),
+      nodos: flujo.nodos.map((nodo) => ({
+        ...structuredClone(nodo),
+        idsRoles: [...nodo.idsRoles],
+        criteriosAceptacion: this.normalizarCriteriosAceptacion(nodo.criteriosAceptacion),
+      })) as NodoFlujoProyecto[],
+      conexiones: flujo.conexiones.map((conexion) => ({ ...conexion })),
     };
   }
 
-  private getOutputHandlePoint(blockId: string, label?: string | null): ConnectionPreviewPoint | null {
-    const block = this.documentSignal().nodes.find((node) => node.id === blockId);
+  private obtenerPuntoConectorSalida(idBloque: string, etiqueta?: string | null): PuntoPrevisualizacionConexion | null {
+    const bloque = this.flujoSenal().nodos.find((nodo) => nodo.id === idBloque);
 
-    if (!block) {
+    if (!bloque) {
       return null;
     }
 
-    return getFlowBlockAnchorPoint(block, 'right', label);
+    return obtenerPuntoAnclajeBloque(bloque, 'derecha', etiqueta);
   }
 
-  private getNextSuggestedPosition(): { x: number; y: number } {
-    const nodes = this.documentSignal().nodes;
-    const anchorBlock =
-      this.selectedBlock() ??
-      nodes[nodes.length - 1];
+  private obtenerSiguientePosicionSugerida(): { x: number; y: number } {
+    const nodos = this.flujoSenal().nodos;
+    const bloqueAncla =
+      this.bloqueSeleccionado() ??
+      nodos[nodos.length - 1];
 
-    if (anchorBlock) {
-      const horizontalSpacing = 296;
-      const verticalSpacing = 176;
-      let nextX = anchorBlock.position.x + horizontalSpacing;
-      let nextY = anchorBlock.position.y;
+    if (bloqueAncla) {
+      const separacionHorizontal = 296;
+      const separacionVertical = 176;
+      let xSiguiente = bloqueAncla.posicion.x + separacionHorizontal;
+      let ySiguiente = bloqueAncla.posicion.y;
 
-      if (nextX > this.canvasSize.width - this.blockSize.width - 40) {
-        nextX = Math.max(40, anchorBlock.position.x - horizontalSpacing);
-        nextY = Math.min(
-          this.canvasSize.height - this.blockSize.height - 40,
-          anchorBlock.position.y + verticalSpacing
+      if (xSiguiente > this.tamanoLienzo.ancho - this.tamanoBloque.ancho - 40) {
+        xSiguiente = Math.max(40, bloqueAncla.posicion.x - separacionHorizontal);
+        ySiguiente = Math.min(
+          this.tamanoLienzo.alto - this.tamanoBloque.alto - 40,
+          bloqueAncla.posicion.y + separacionVertical
         );
       }
 
-      return { x: nextX, y: nextY };
+      return { x: xSiguiente, y: ySiguiente };
     }
 
-    const viewport = this.viewportSignal();
-    const visibleViewportWidth = 960;
-    const visibleViewportHeight = 640;
-    const anchorX = 120;
-    const anchorY = 96;
+    const vista = this.vistaSenal();
+    const anchoVisible = 960;
+    const altoVisible = 640;
+    const anclaX = 120;
+    const anclaY = 96;
     const x = Math.max(
       0,
-      (anchorX - viewport.panX + visibleViewportWidth * 0.5) / viewport.zoom - this.blockSize.width / 2
+      (anclaX - vista.desplazamientoX + anchoVisible * 0.5) / vista.escala - this.tamanoBloque.ancho / 2
     );
     const y = Math.max(
       0,
-      (anchorY - viewport.panY + visibleViewportHeight * 0.4) / viewport.zoom - this.blockSize.height / 2
+      (anclaY - vista.desplazamientoY + altoVisible * 0.4) / vista.escala - this.tamanoBloque.alto / 2
     );
 
     return { x, y };
   }
 
-  private resolveRoles(roleNames: string[]): { roleIds: string[]; roles: ProjectFlowRole[] } {
-    const uniqueRoleNames = [...new Set(roleNames.map((name) => name.trim()).filter(Boolean))];
-    const document = this.documentSignal();
-    const knownRoles = [...document.roles];
-    const resolvedRoleIds: string[] = [];
+  private resolverRoles(nombresRoles: string[]): { idsRoles: string[]; roles: RolFlujoProyecto[] } {
+    const nombresRolesUnicos = [...new Set(nombresRoles.map((nombre) => nombre.trim()).filter(Boolean))];
+    const flujo = this.flujoSenal();
+    const rolesConocidos = [...flujo.roles];
+    const idsRolesResueltos: string[] = [];
 
-    for (const roleName of uniqueRoleNames) {
-      const existingRole = knownRoles.find((role) => role.name.toLowerCase() === roleName.toLowerCase());
+    for (const nombreRol of nombresRolesUnicos) {
+      const rolExistente = rolesConocidos.find(
+        (rol) => rol.nombre.toLowerCase() === nombreRol.toLowerCase()
+      );
 
-      if (existingRole) {
-        resolvedRoleIds.push(existingRole.id);
+      if (rolExistente) {
+        idsRolesResueltos.push(rolExistente.id);
         continue;
       }
 
-      const newRole: ProjectFlowRole = {
-        id: this.createId('role'),
-        name: roleName,
-        createdAt: new Date().toISOString()
+      const rolNuevo: RolFlujoProyecto = {
+        id: this.crearId('rol'),
+        nombre: nombreRol,
+        fechaCreacion: new Date().toISOString()
       };
 
-      knownRoles.push(newRole);
-      resolvedRoleIds.push(newRole.id);
+      rolesConocidos.push(rolNuevo);
+      idsRolesResueltos.push(rolNuevo.id);
     }
 
     return {
-      roleIds: resolvedRoleIds,
-      roles: knownRoles
+      idsRoles: idsRolesResueltos,
+      roles: rolesConocidos
     };
   }
 
-  private createId(prefix: string): string {
-    return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  private crearId(prefijo: string): string {
+    return `${prefijo}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
   }
 
-  private normalizeAcceptanceCriteria(value: string[] | string | null | undefined): string[] {
-    if (Array.isArray(value)) {
-      return value
-        .map((criterion) => String(criterion ?? '').trim())
+  private normalizarCriteriosAceptacion(valor: string[] | string | null | undefined): string[] {
+    if (Array.isArray(valor)) {
+      return valor
+        .map((criterio) => String(criterio ?? '').trim())
         .filter(Boolean);
     }
 
-    return String(value ?? '')
+    return String(valor ?? '')
       .split('\n')
-      .map((criterion) => criterion.trim())
+      .map((criterio) => criterio.trim())
       .filter(Boolean);
   }
 
-  private clamp(value: number, min: number, max: number): number {
-    return Math.min(max, Math.max(min, value));
+  private limitar(valor: number, minimo: number, maximo: number): number {
+    return Math.min(maximo, Math.max(minimo, valor));
   }
 }
 

@@ -4,7 +4,9 @@ import { IconoComponent } from '../../../../../../shared/components/icono/icono.
 import { ClaveSeccionProyecto } from '../../../../config/secciones-proyecto.config';
 import { EditorFlujoProyecto } from '../../../../secciones/flujo/components/editor-flujo-proyecto/editor-flujo-proyecto';
 import { deserializarFlujoProyecto } from '../../../../secciones/flujo/mappers/flujo-proyecto.mapper';
-import { ProjectWorkflow } from '../../../../secciones/flujo/models/flujo-proyecto.model';
+import { FlujoProyecto } from '../../../../secciones/flujo/models/flujo-proyecto.model';
+import { deserializarRolesProyecto } from '../../../../secciones/roles/mappers/roles-proyecto.mapper';
+import { sincronizarRolesDelFlujo } from '../../../mappers/flujo-creacion-proyecto.mapper';
 import { CoordinadorPasoCreacionProyectoService } from '../../../services/coordinador-paso-creacion-proyecto.service';
 
 /** Integra el editor de Flujo con el borrador del recorrido de creación. */
@@ -18,16 +20,21 @@ import { CoordinadorPasoCreacionProyectoService } from '../../../services/coordi
 })
 export class PasoFlujoProyecto {
   protected readonly paso = inject(CoordinadorPasoCreacionProyectoService);
-  private readonly flujoEditado = signal<ProjectWorkflow | null>(null);
+  private readonly flujoEditado = signal<FlujoProyecto | null>(null);
   private proyectoAnterior: number | null = null;
 
-  protected readonly flujo = computed<ProjectWorkflow | null>(() => {
+  protected readonly flujo = computed<FlujoProyecto | null>(() => {
     const borrador = this.paso.borrador();
     if (!borrador) return null;
 
-    return (
-      this.flujoEditado() ?? deserializarFlujoProyecto(borrador.diagramFlujoJson, borrador.id)
-    );
+    const flujoEditado = this.flujoEditado();
+    if (flujoEditado) return flujoEditado;
+
+    const flujo = deserializarFlujoProyecto(borrador.diagramFlujoJson, borrador.id);
+    const roles = deserializarRolesProyecto(borrador.rolesJson);
+    if (!flujo || !roles) return null;
+
+    return sincronizarRolesDelFlujo(flujo, roles, borrador.fechaUltimoGuardado);
   });
   protected readonly errorContenido = computed(
     () => this.paso.contenidoListo() && this.flujo() === null,
@@ -45,7 +52,7 @@ export class PasoFlujoProyecto {
   }
 
   /** Conserva la fotografía vigente emitida por el editor. */
-  protected actualizarFlujo(flujo: ProjectWorkflow): void {
+  protected actualizarFlujo(flujo: FlujoProyecto): void {
     this.flujoEditado.set(flujo);
   }
 

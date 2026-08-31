@@ -1,54 +1,59 @@
-@if (editorState(); as state) {
+@if (estadoModal(); as estado) {
   <app-modal
-    [etiqueta]="modalEyebrow()"
-    [titulo]="modalTitle()"
-    [descripcion]="modalDescription()"
+    [etiqueta]="encabezadoModal()"
+    [titulo]="tituloModal()"
+    [descripcion]="descripcionModal()"
     icono="flujo"
     tamano="lg"
-    [idFormulario]="formId"
-    [textoCancelar]="store.isReadOnly() ? 'Cerrar' : 'Cancelar'"
-    [textoConfirmar]="primaryActionText()"
-    [confirmacionDeshabilitada]="form().invalid"
-    [mostrarConfirmar]="!store.isReadOnly()"
-    (cerrar)="close()">
+    [idFormulario]="idFormulario"
+    [textoCancelar]="estadoEditor.soloLectura() ? 'Cerrar' : 'Cancelar'"
+    [textoConfirmar]="textoAccionPrincipal()"
+    [confirmacionDeshabilitada]="formulario().invalid"
+    [mostrarConfirmar]="!estadoEditor.soloLectura()"
+    (cerrar)="cerrar()"
+  >
     <form
-      class="workflow-node-modal__form"
-      [attr.data-type]="state.type"
-      [id]="formId"
-      [formGroup]="form()"
-      (ngSubmit)="save()">
-      <fieldset class="workflow-node-modal__fieldset" [disabled]="store.isReadOnly()">
-        <div class="workflow-node-modal__overview">
-        <span class="workflow-node-modal__type-icon" aria-hidden="true">
-          <app-icono [nombre]="typeIcons[state.type]" />
-        </span>
-        <span class="workflow-node-modal__overview-copy">
-          <small>Tipo de bloque</small>
-          <strong>{{ typeLabel() }}</strong>
-          <span>{{ typeDescription() }}</span>
-        </span>
-          <span class="workflow-node-modal__mode">{{ store.isReadOnly() ? 'Solo lectura' : state.mode === 'create' ? 'Nuevo' : 'Existente' }}</span>
+      class="modal-nodo-flujo__formulario"
+      [attr.data-tipo]="estado.tipo"
+      [id]="idFormulario"
+      [formGroup]="formulario()"
+      [appMensajesFormulario]="mensajesFormulario"
+      appEnfocarPrimerControlInvalido
+      (ngSubmit)="guardar()"
+    >
+      <fieldset class="modal-nodo-flujo__grupo-campos" [disabled]="estadoEditor.soloLectura()">
+        <div class="modal-nodo-flujo__resumen">
+          <span class="modal-nodo-flujo__icono-tipo" aria-hidden="true">
+            <app-icono [nombre]="iconosTipo[estado.tipo]" />
+          </span>
+          <span class="modal-nodo-flujo__descripcion-tipo">
+            <small>Tipo de bloque</small>
+            <strong>{{ etiquetaTipo() }}</strong>
+            <span>{{ descripcionTipo() }}</span>
+          </span>
+          <span class="modal-nodo-flujo__modo">
+            {{ estadoEditor.soloLectura() ? 'Solo lectura' : estado.modo === 'crear' ? 'Nuevo' : 'Existente' }}
+          </span>
         </div>
 
-        @switch (state.type) {
-          @case ('module') {
-            <project-flow-module-form [form]="form()"></project-flow-module-form>
+        @switch (estado.tipo) {
+          @case ('modulo') {
+            <app-formulario-modulo-flujo-proyecto [formulario]="formulario()" />
           }
-          @case ('screen') {
-            <project-flow-screen-form [form]="form()"></project-flow-screen-form>
+          @case ('pagina') {
+            <app-formulario-pagina-flujo-proyecto [formulario]="formulario()" />
           }
-          @case ('action') {
-            <project-flow-action-form [form]="form()"></project-flow-action-form>
+          @case ('accion') {
+            <app-formulario-accion-flujo-proyecto [formulario]="formulario()" />
           }
           @case ('decision') {
-            <project-flow-decision-form [form]="form()"></project-flow-decision-form>
+            <app-formulario-decision-flujo-proyecto [formulario]="formulario()" />
           }
-          @case ('form') {
-            <project-flow-form-node-form [form]="form()"></project-flow-form-node-form>
+          @case ('componente') {
+            <app-formulario-componente-flujo-proyecto [formulario]="formulario()" />
           }
         }
       </fieldset>
     </form>
   </app-modal>
 }
-

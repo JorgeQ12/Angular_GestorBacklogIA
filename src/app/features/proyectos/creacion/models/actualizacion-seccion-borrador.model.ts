@@ -6,7 +6,7 @@ import { NecesidadProyecto } from '../../secciones/necesidad/models/necesidad-pr
 import { ObjetivosProyecto } from '../../secciones/objetivos/models/objetivos-proyecto.model';
 import { RolesProyecto } from '../../secciones/roles/models/roles-proyecto.model';
 import { TipoSolucionProyecto } from '../../secciones/tipo-solucion/models/tipo-solucion-proyecto.model';
-import { ProjectWorkflow } from '../../secciones/flujo/models/flujo-proyecto.model';
+import { FlujoProyecto } from '../../secciones/flujo/models/flujo-proyecto.model';
 
 /** Relaciona cada sección disponible con el modelo que permite actualizarla. */
 export interface DatosSeccionActualizableBorrador {
@@ -17,7 +17,7 @@ export interface DatosSeccionActualizableBorrador {
   [ClaveSeccionProyecto.Alcance]: AlcanceProyecto;
   [ClaveSeccionProyecto.Roles]: RolesProyecto;
   [ClaveSeccionProyecto.Equipo]: EquipoProyecto;
-  [ClaveSeccionProyecto.Flujo]: ProjectWorkflow;
+  [ClaveSeccionProyecto.Flujo]: FlujoProyecto;
 }
 
 /** Limita las secciones que ya cuentan con persistencia dentro del recorrido. */

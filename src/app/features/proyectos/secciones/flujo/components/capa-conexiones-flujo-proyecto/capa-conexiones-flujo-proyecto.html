@@ -1,124 +1,99 @@
-@if (mode() === 'lines') {
+@if (modo() === 'lineas') {
   <svg
-    class="flow-connection-layer"
-    [attr.viewBox]="'0 0 ' + store.canvasSize.width + ' ' + store.canvasSize.height"
-    [attr.width]="store.canvasSize.width"
-    [attr.height]="store.canvasSize.height"
-    aria-hidden="true">
+    class="capa-conexiones-flujo"
+    [attr.viewBox]="'0 0 ' + estadoEditor.tamanoLienzo.ancho + ' ' + estadoEditor.tamanoLienzo.alto"
+    [attr.width]="estadoEditor.tamanoLienzo.ancho"
+    [attr.height]="estadoEditor.tamanoLienzo.alto"
+    aria-hidden="true"
+  >
     <defs>
-      <marker
-        id="flow-arrow"
-        markerWidth="8"
-        markerHeight="8"
-        refX="7"
-        refY="4"
-        orient="auto"
-        markerUnits="userSpaceOnUse">
-        <path d="M1 1 L7 4 L1 7" fill="none" stroke="var(--text-muted)" stroke-width="1.6"></path>
+      <marker id="flecha-flujo" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+        <path d="M1 1 L7 4 L1 7" fill="none" stroke="var(--text-muted)" stroke-width="1.6" />
       </marker>
-      <marker
-        id="flow-arrow-decision"
-        markerWidth="8"
-        markerHeight="8"
-        refX="7"
-        refY="4"
-        orient="auto"
-        markerUnits="userSpaceOnUse">
-        <path d="M1 1 L7 4 L1 7" fill="none" stroke="var(--color-warning)" stroke-width="1.6"></path>
+      <marker id="flecha-decision" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+        <path d="M1 1 L7 4 L1 7" fill="none" stroke="var(--color-warning)" stroke-width="1.6" />
       </marker>
-      <marker
-        id="flow-arrow-selected"
-        markerWidth="8"
-        markerHeight="8"
-        refX="7"
-        refY="4"
-        orient="auto"
-        markerUnits="userSpaceOnUse">
-        <path d="M1 1 L7 4 L1 7" fill="none" stroke="var(--text-primary)" stroke-width="1.8"></path>
+      <marker id="flecha-seleccionada" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+        <path d="M1 1 L7 4 L1 7" fill="none" stroke="var(--text-primary)" stroke-width="1.8" />
       </marker>
-      <marker
-        id="flow-arrow-preview"
-        markerWidth="8"
-        markerHeight="8"
-        refX="7"
-        refY="4"
-        orient="auto"
-        markerUnits="userSpaceOnUse">
-        <path d="M1 1 L7 4 L1 7" fill="none" stroke="var(--color-warning)" stroke-width="1.7"></path>
+      <marker id="flecha-previsualizacion" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+        <path d="M1 1 L7 4 L1 7" fill="none" stroke="var(--color-warning)" stroke-width="1.7" />
       </marker>
     </defs>
 
-    @for (connection of renderedConnections(); track connection.id) {
+    @for (conexion of conexionesRepresentadas(); track conexion.id) {
       <g>
         <path
-          class="flow-connection-layer__halo"
-          [class.is-selected]="store.selectedConnectionId() === connection.id"
-          [attr.d]="connection.path">
-        </path>
-
+          class="capa-conexiones-flujo__halo"
+          [class.esta-seleccionado]="estadoEditor.idConexionSeleccionada() === conexion.id"
+          [attr.d]="conexion.trayectoria"
+        />
         <path
-          class="flow-connection-layer__line"
-          [class.is-selected]="store.selectedConnectionId() === connection.id"
-          [class.is-decision-branch]="connection.isDecisionBranch"
-          [attr.d]="connection.path"
-          [attr.marker-end]="store.selectedConnectionId() === connection.id
-            ? 'url(#flow-arrow-selected)'
-            : connection.isDecisionBranch
-              ? 'url(#flow-arrow-decision)'
-              : 'url(#flow-arrow)'">
-        </path>
-
+          class="capa-conexiones-flujo__linea"
+          [class.esta-seleccionado]="estadoEditor.idConexionSeleccionada() === conexion.id"
+          [class.es-rama-decision]="conexion.esRamaDecision"
+          [attr.d]="conexion.trayectoria"
+          [attr.marker-end]="estadoEditor.idConexionSeleccionada() === conexion.id
+            ? 'url(#flecha-seleccionada)'
+            : conexion.esRamaDecision
+              ? 'url(#flecha-decision)'
+              : 'url(#flecha-flujo)'"
+        />
         <path
-          class="flow-connection-layer__hit"
-          data-connection-hit="true"
-          [attr.d]="connection.path"
-          (click)="selectConnection(connection.id)">
-        </path>
+          class="capa-conexiones-flujo__area-interaccion"
+          data-interaccion-conexion="true"
+          [attr.d]="conexion.trayectoria"
+          (click)="seleccionarConexion(conexion.id)"
+        />
 
-        @if (connection.label && !connection.isDecisionBranch) {
-          <g class="flow-connection-layer__label-chip" [class.is-decision-branch]="connection.isDecisionBranch">
+        @if (conexion.etiqueta && !conexion.esRamaDecision) {
+          <g class="capa-conexiones-flujo__etiqueta">
             <rect
-              class="flow-connection-layer__label-chip-surface"
+              class="capa-conexiones-flujo__superficie-etiqueta"
               rx="10"
               ry="10"
-              [attr.x]="connection.labelRectX"
-              [attr.y]="connection.labelRectY"
-              [attr.width]="connection.labelWidth"
-              height="20">
-            </rect>
-            <text class="flow-connection-layer__label" [attr.x]="connection.labelCenterX" [attr.y]="connection.labelTextY">
-              {{ connection.label }}
+              [attr.x]="conexion.rectanguloEtiquetaX"
+              [attr.y]="conexion.rectanguloEtiquetaY"
+              [attr.width]="conexion.anchoEtiqueta"
+              height="20"
+            />
+            <text
+              class="capa-conexiones-flujo__texto-etiqueta"
+              [attr.x]="conexion.centroEtiquetaX"
+              [attr.y]="conexion.textoEtiquetaY"
+            >
+              {{ conexion.etiqueta }}
             </text>
           </g>
         }
       </g>
     }
 
-    @if (previewConnection(); as preview) {
+    @if (previsualizacionConexion(); as previsualizacion) {
       <path
-        class="flow-connection-layer__line flow-connection-layer__line--preview"
-        [class.is-snapped]="preview.targetId"
-        [class.is-decision-branch]="preview.label === 'Si' || preview.label === 'No'"
-        [attr.d]="preview.path"
-        marker-end="url(#flow-arrow-preview)">
-      </path>
+        class="capa-conexiones-flujo__linea capa-conexiones-flujo__linea--previsualizacion"
+        [class.esta-acoplada]="previsualizacion.idDestino"
+        [class.es-rama-decision]="previsualizacion.etiqueta === 'Sí' || previsualizacion.etiqueta === 'No'"
+        [attr.d]="previsualizacion.trayectoria"
+        marker-end="url(#flecha-previsualizacion)"
+      />
     }
   </svg>
 } @else {
-  <div class="flow-connection-layer__delete-overlay">
-    @for (connection of renderedConnections(); track connection.id) {
-      @if (!store.isReadOnly() && store.selectedConnectionId() === connection.id) {
+  <div class="capa-conexiones-flujo__superposicion-eliminacion">
+    @for (conexion of conexionesRepresentadas(); track conexion.id) {
+      @if (!estadoEditor.soloLectura() && estadoEditor.idConexionSeleccionada() === conexion.id) {
         <button
           type="button"
-          class="flow-connection-layer__delete-chip-button"
-          [style.left.px]="connection.deleteChipX"
-          [style.top.px]="connection.deleteChipY"
-          (click)="deleteConnection(connection.id)">
-          <app-icono nombre="eliminar" />
+          class="ui-button ui-button--danger capa-conexiones-flujo__boton-eliminar"
+          [style.left.px]="conexion.eliminarX"
+          [style.top.px]="conexion.eliminarY"
+          (click)="eliminarConexion(conexion.id)"
+        >
+          <app-icono class="ui-button__icon" nombre="eliminar" />
           Eliminar conexión
         </button>
       }
     }
   </div>
 }
-

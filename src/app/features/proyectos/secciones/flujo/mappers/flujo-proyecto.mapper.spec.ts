@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { FlowBlockType, ProjectWorkflow } from '../models/flujo-proyecto.model';
+import { TipoBloqueFlujo, FlujoProyecto } from '../models/flujo-proyecto.model';
 import {
   crearFlujoProyectoVacio,
   deserializarFlujoProyecto,
@@ -9,10 +9,10 @@ import {
 describe('flujo-proyecto.mapper', () => {
   it('crea un flujo vacío para un borrador sin diagrama', () => {
     expect(deserializarFlujoProyecto('{}', 42)).toMatchObject({
-      projectId: '42',
+      proyectoId: '42',
       roles: [],
-      nodes: [],
-      connections: [],
+      nodos: [],
+      conexiones: [],
     });
   });
 
@@ -22,38 +22,45 @@ describe('flujo-proyecto.mapper', () => {
     expect(deserializarFlujoProyecto(serializarFlujoProyecto(flujo), 42)).toEqual(flujo);
   });
 
-  it('rechaza estructuras anteriores con blocks en lugar de nodes', () => {
+  it('rechaza estructuras no canónicas con bloques en lugar de nodos', () => {
     const json = JSON.stringify({
-      projectId: '42',
+      proyectoId: '42',
       roles: [],
-      blocks: [],
-      connections: [],
-      updatedAt: '2026-08-28T10:00:00.000Z',
+      bloques: [],
+      conexiones: [],
+      fechaActualizacion: '2026-08-28T10:00:00.000Z',
     });
 
     expect(deserializarFlujoProyecto(json, 42)).toBeNull();
   });
 });
 
-function crearFlujoValido(): ProjectWorkflow {
+function crearFlujoValido(): FlujoProyecto {
   return {
-    projectId: '42',
-    roles: [{ id: 'rol-1', name: 'Administrador', createdAt: '2026-08-28T10:00:00.000Z' }],
-    nodes: [
+    proyectoId: '42',
+    roles: [{ id: 'rol-1', nombre: 'Administrador', fechaCreacion: '2026-08-28T10:00:00.000Z' }],
+    nodos: [
       {
         id: 'nodo-1',
-        type: FlowBlockType.Action,
-        title: 'Consultar proyecto',
-        description: 'Abre la información del proyecto.',
-        acceptanceCriteria: ['El proyecto está disponible.'],
-        position: { x: 120, y: 80 },
-        roleIds: ['rol-1'],
-        createdAt: '2026-08-28T10:00:00.000Z',
-        updatedAt: '2026-08-28T10:00:00.000Z',
-        data: {},
+        tipo: TipoBloqueFlujo.Accion,
+        titulo: 'Consultar proyecto',
+        descripcion: 'Abre la información del proyecto.',
+        criteriosAceptacion: ['El proyecto está disponible.'],
+        posicion: { x: 120, y: 80 },
+        idsRoles: ['rol-1'],
+        fechaCreacion: '2026-08-28T10:00:00.000Z',
+        fechaActualizacion: '2026-08-28T10:00:00.000Z',
+        datos: {},
       },
     ],
-    connections: [],
-    updatedAt: '2026-08-28T10:00:00.000Z',
+    conexiones: [
+      {
+        id: 'conexion-1',
+        idBloqueOrigen: 'nodo-1',
+        idBloqueDestino: 'nodo-2',
+        fechaCreacion: '2026-08-28T10:00:00.000Z',
+      },
+    ],
+    fechaActualizacion: '2026-08-28T10:00:00.000Z',
   };
 }

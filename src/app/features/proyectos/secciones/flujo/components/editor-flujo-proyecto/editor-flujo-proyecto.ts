@@ -9,7 +9,7 @@ import {
 import { LienzoFlujoProyecto } from '../lienzo-flujo-proyecto/lienzo-flujo-proyecto';
 import { ModalNodoFlujoProyecto } from '../modal-nodo-flujo-proyecto/modal-nodo-flujo-proyecto';
 import { PanelLateralFlujoProyecto } from '../panel-lateral-flujo-proyecto/panel-lateral-flujo-proyecto';
-import { ProjectWorkflow } from '../../models/flujo-proyecto.model';
+import { FlujoProyecto } from '../../models/flujo-proyecto.model';
 import { EstadoEditorFlujoProyectoService } from '../../services/estado-editor-flujo-proyecto.service';
 
 /** Presenta y edita el flujo sin conocer rutas, HTTP ni el borrador de creación. */
@@ -26,16 +26,16 @@ import { EstadoEditorFlujoProyectoService } from '../../services/estado-editor-f
   styleUrl: './editor-flujo-proyecto.css',
 })
 export class EditorFlujoProyecto {
-  protected readonly store = inject(EstadoEditorFlujoProyectoService);
+  protected readonly estadoEditor = inject(EstadoEditorFlujoProyectoService);
 
   /** Proporciona la fotografía canónica que debe presentar el editor. */
-  public readonly flujo = input.required<ProjectWorkflow>();
+  public readonly flujo = input.required<FlujoProyecto>();
 
   /** Bloquea temporalmente la edición durante el guardado remoto. */
   public readonly procesando = input(false);
 
   /** Comunica una nueva fotografía cada vez que cambia el diagrama. */
-  public readonly flujoCambiado = output<ProjectWorkflow>();
+  public readonly flujoCambiado = output<FlujoProyecto>();
 
   private fotografiaHidratada = '';
   private fotografiaEmitida = '';
@@ -47,20 +47,20 @@ export class EditorFlujoProyecto {
       const fotografiaEntrante = JSON.stringify(flujo);
       if (fotografiaEntrante === this.fotografiaHidratada) return;
 
-      this.store.hydrate(structuredClone(flujo), flujo.projectId, {
-        preserveSelection: true,
-        preserveViewport: true,
+      this.estadoEditor.hidratar(structuredClone(flujo), flujo.proyectoId, {
+        conservarSeleccion: true,
+        conservarVista: true,
       });
-      const fotografiaNormalizada = JSON.stringify(this.store.document());
+      const fotografiaNormalizada = JSON.stringify(this.estadoEditor.flujo());
       this.fotografiaHidratada = fotografiaNormalizada;
       this.fotografiaEmitida = fotografiaNormalizada;
       this.editorHidratado = true;
     });
 
-    effect(() => this.store.setReadOnly(this.procesando()));
+    effect(() => this.estadoEditor.establecerSoloLectura(this.procesando()));
 
     effect(() => {
-      const flujo = this.store.document();
+      const flujo = this.estadoEditor.flujo();
       const fotografia = JSON.stringify(flujo);
       if (
         !this.editorHidratado ||

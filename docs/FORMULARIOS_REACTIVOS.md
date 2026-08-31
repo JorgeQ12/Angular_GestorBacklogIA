@@ -386,6 +386,10 @@ reducidos. Los tokens proporcionan el espaciado; la primitiva administra el comp
 layout. Una feature solo debe crear una distribución propia cuando su composición sea realmente
 particular del dominio.
 
+Las secciones internas repetidas utilizan `ui-form-section` y sus elementos de encabezado, icono,
+descripción, cuerpo y acción. La feature conserva únicamente la distribución o interacción que sea
+propia de su dominio.
+
 Los pies repetidos de formularios dentro de tarjetas utilizan `ui-form-footer` y
 `ui-form-footer__note`. La página proyecta las acciones y conserva los textos del flujo, mientras la
 primitiva administra distribución, superficie y adaptación móvil.

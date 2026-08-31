@@ -10,6 +10,6 @@ import { EstadoEditorFlujoProyectoService } from '../../services/estado-editor-f
   styleUrl: './panel-lateral-flujo-proyecto.css'
 })
 export class PanelLateralFlujoProyecto {
-  protected readonly store = inject(EstadoEditorFlujoProyectoService);
+  protected readonly estadoEditor = inject(EstadoEditorFlujoProyectoService);
 }
 

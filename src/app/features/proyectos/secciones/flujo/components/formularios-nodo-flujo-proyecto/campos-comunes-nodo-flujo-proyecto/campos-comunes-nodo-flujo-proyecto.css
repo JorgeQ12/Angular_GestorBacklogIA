@@ -1,0 +1,231 @@
+:host,
+.campos-comunes-nodo-flujo {
+  display: contents;
+}
+
+.campos-comunes-nodo-flujo__lista-criterios {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.campos-comunes-nodo-flujo__criterio {
+  display: grid;
+  grid-template-columns: var(--control-height-md) minmax(0, 1fr) var(--control-height-md);
+  align-items: start;
+  gap: var(--space-2);
+}
+
+.campos-comunes-nodo-flujo__marca-criterio {
+  display: grid;
+  width: var(--control-height-md);
+  height: var(--control-height-md);
+  margin-top: var(--space-1);
+  place-items: center;
+  border: var(--border-width) solid var(--border-default);
+  border-radius: var(--radius-sm);
+  background: var(--surface-subtle);
+  color: var(--text-secondary);
+}
+
+.campos-comunes-nodo-flujo__marca-criterio app-icono {
+  width: var(--font-size-sm);
+  height: var(--font-size-sm);
+}
+
+.campos-comunes-nodo-flujo__criterio:has(.ui-field.has-error)
+  .campos-comunes-nodo-flujo__marca-criterio {
+  border-color: var(--field-error-color);
+  background: var(--field-error-surface);
+  color: var(--field-error-color);
+}
+
+.campos-comunes-nodo-flujo__eliminar-criterio {
+  width: var(--control-height-md);
+  height: var(--control-height-md);
+  margin-top: var(--space-1);
+  padding: 0;
+}
+
+.campos-comunes-nodo-flujo__roles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr));
+  align-items: start;
+  gap: var(--space-3);
+}
+
+.campos-comunes-nodo-flujo__roles-vacios {
+  display: flex;
+  grid-column: 1 / -1;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: var(--border-width) dashed var(--border-default);
+  border-radius: var(--radius-lg);
+  background: var(--surface-canvas);
+}
+
+.campos-comunes-nodo-flujo__roles-vacios > span {
+  display: grid;
+  width: var(--control-height-md);
+  height: var(--control-height-md);
+  flex: 0 0 var(--control-height-md);
+  place-items: center;
+  border-radius: var(--radius-md);
+  background: var(--surface-subtle);
+  color: var(--text-secondary);
+}
+
+.campos-comunes-nodo-flujo__roles-vacios > span app-icono {
+  width: var(--font-size-lg);
+  height: var(--font-size-lg);
+}
+
+.campos-comunes-nodo-flujo__roles-vacios strong {
+  display: block;
+  margin-bottom: var(--space-1);
+  color: var(--text-primary);
+  font-size: var(--font-size-md);
+}
+
+.campos-comunes-nodo-flujo__roles-vacios p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+}
+
+.campos-comunes-nodo-flujo__tarjeta-rol {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: var(--border-width) solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--surface-default);
+  transition:
+    border-color var(--transition-base) var(--ease-standard),
+    background-color var(--transition-base) var(--ease-standard),
+    box-shadow var(--transition-base) var(--ease-standard),
+    transform var(--transition-base) var(--ease-standard);
+}
+
+.campos-comunes-nodo-flujo__tarjeta-rol:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-subtle);
+}
+
+.campos-comunes-nodo-flujo__tarjeta-rol.esta-seleccionado {
+  border-color: var(--border-strong);
+  background: color-mix(in srgb, var(--surface-subtle) 70%, var(--surface-default));
+  box-shadow: var(--shadow-sm);
+}
+
+.campos-comunes-nodo-flujo__encabezado-rol {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  cursor: pointer;
+}
+
+.campos-comunes-nodo-flujo__metadatos-rol {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.campos-comunes-nodo-flujo__metadatos-rol strong {
+  color: var(--text-primary);
+  font-size: var(--font-size-xs);
+}
+
+.campos-comunes-nodo-flujo__metadatos-rol small {
+  color: var(--text-muted);
+  font-size: var(--font-size-3xs);
+  line-height: var(--line-height-snug);
+}
+
+.campos-comunes-nodo-flujo__seccion-permisos {
+  display: grid;
+  gap: var(--space-2);
+  padding-top: var(--space-3);
+  border-top: var(--border-width) solid var(--border-divider);
+}
+
+.campos-comunes-nodo-flujo__etiqueta-permisos {
+  color: var(--text-muted);
+  font-size: var(--font-size-3xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+}
+
+.campos-comunes-nodo-flujo__rejilla-permisos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.campos-comunes-nodo-flujo__permiso {
+  display: inline-flex;
+  min-height: var(--control-height-sm);
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  padding: 0 var(--space-2);
+  border: var(--border-width) solid var(--border-default);
+  border-radius: var(--radius-pill);
+  background: var(--surface-default);
+  color: var(--text-primary);
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition:
+    border-color var(--transition-fast) var(--ease-standard),
+    background-color var(--transition-fast) var(--ease-standard),
+    color var(--transition-fast) var(--ease-standard),
+    box-shadow var(--transition-fast) var(--ease-standard);
+}
+
+.campos-comunes-nodo-flujo__permiso:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-subtle);
+}
+
+.campos-comunes-nodo-flujo__permiso:focus-visible {
+  outline: 0;
+  box-shadow: var(--shadow-focus);
+}
+
+.campos-comunes-nodo-flujo__permiso.esta-activo {
+  border-color: var(--action-primary-bg);
+  background: var(--action-primary-bg);
+  color: var(--action-primary-text);
+  box-shadow: var(--shadow-xs);
+}
+
+.campos-comunes-nodo-flujo__marca-permiso {
+  display: grid;
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 1rem;
+  place-items: center;
+  border: var(--border-width) solid var(--border-default);
+  border-radius: var(--radius-circle);
+  color: transparent;
+}
+
+.campos-comunes-nodo-flujo__marca-permiso app-icono {
+  width: var(--font-size-3xs);
+  height: var(--font-size-3xs);
+}
+
+.campos-comunes-nodo-flujo__permiso.esta-activo
+  .campos-comunes-nodo-flujo__marca-permiso {
+  border-color: color-mix(in srgb, var(--surface-default) 34%, transparent);
+  background: color-mix(in srgb, var(--surface-default) 12%, transparent);
+  color: var(--surface-default);
+}
+
+@media (max-width: 640px) {
+  .campos-comunes-nodo-flujo__roles {
+    grid-template-columns: 1fr;
+  }
+}

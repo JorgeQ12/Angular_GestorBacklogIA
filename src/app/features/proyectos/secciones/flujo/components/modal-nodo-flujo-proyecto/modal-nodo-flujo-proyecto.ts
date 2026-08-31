@@ -1,337 +1,268 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
-import { FormArray, FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Modal } from '../../../../../../shared/components/modal/modal';
-import { IconoComponent } from '../../../../../../shared/components/icono/icono.component';
-import { ICONOS_TIPO_BLOQUE_FLUJO } from '../../config/flujo-proyecto.config';
 import {
-  FLOW_BLOCK_TYPE_LABELS,
-  FLOW_BLOCK_TYPE_DESCRIPTIONS,
-  FlowBlockType,
-  isModulePermissionAction,
-  ModulePeakPeriod,
-  ModuleRolePermission,
-  ProjectWorkflowNodeDraft
+  FormArray,
+  FormControl,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { IconoComponent } from '../../../../../../shared/components/icono/icono.component';
+import { Modal } from '../../../../../../shared/components/modal/modal';
+import {
+  EnfocarPrimerControlInvalidoDirective,
+  MensajesFormularioDirective,
+} from '../../../../../../shared/forms/errores-validacion';
+import {
+  DESCRIPCIONES_TIPO_BLOQUE_FLUJO,
+  ETIQUETAS_TIPO_BLOQUE_FLUJO,
+  ICONOS_TIPO_BLOQUE_FLUJO,
+  MENSAJES_FORMULARIO_NODO_FLUJO,
+} from '../../config/flujo-proyecto.config';
+import {
+  FormularioFranjaActividadModulo,
+  FormularioNodoFlujoProyecto,
+} from '../../models/formulario-nodo-flujo-proyecto.model';
+import {
+  BorradorNodoFlujo,
+  FranjaMayorActividadModulo,
+  TipoBloqueFlujo,
 } from '../../models/flujo-proyecto.model';
 import { EstadoEditorFlujoProyectoService } from '../../services/estado-editor-flujo-proyecto.service';
-import { FormularioAccionFlujoProyecto } from '../formularios-nodo-flujo-proyecto/formulario-accion-flujo-proyecto';
-import { FormularioDecisionFlujoProyecto } from '../formularios-nodo-flujo-proyecto/formulario-decision-flujo-proyecto';
-import { FormularioComponenteFlujoProyecto } from '../formularios-nodo-flujo-proyecto/formulario-componente-flujo-proyecto';
-import { FormularioModuloFlujoProyecto } from '../formularios-nodo-flujo-proyecto/formulario-modulo-flujo-proyecto';
-import { FormularioPaginaFlujoProyecto } from '../formularios-nodo-flujo-proyecto/formulario-pagina-flujo-proyecto';
+import { FormularioAccionFlujoProyecto } from '../formularios-nodo-flujo-proyecto/formulario-accion-flujo-proyecto/formulario-accion-flujo-proyecto';
+import { FormularioComponenteFlujoProyecto } from '../formularios-nodo-flujo-proyecto/formulario-componente-flujo-proyecto/formulario-componente-flujo-proyecto';
+import { FormularioDecisionFlujoProyecto } from '../formularios-nodo-flujo-proyecto/formulario-decision-flujo-proyecto/formulario-decision-flujo-proyecto';
+import { FormularioModuloFlujoProyecto } from '../formularios-nodo-flujo-proyecto/formulario-modulo-flujo-proyecto/formulario-modulo-flujo-proyecto';
+import { FormularioPaginaFlujoProyecto } from '../formularios-nodo-flujo-proyecto/formulario-pagina-flujo-proyecto/formulario-pagina-flujo-proyecto';
 
+/** Coordina el formulario especializado utilizado para crear o editar un nodo. */
 @Component({
   selector: 'app-modal-nodo-flujo-proyecto',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ReactiveFormsModule,
+    EnfocarPrimerControlInvalidoDirective,
+    MensajesFormularioDirective,
     Modal,
     IconoComponent,
     FormularioModuloFlujoProyecto,
     FormularioPaginaFlujoProyecto,
     FormularioAccionFlujoProyecto,
     FormularioDecisionFlujoProyecto,
-    FormularioComponenteFlujoProyecto
+    FormularioComponenteFlujoProyecto,
   ],
   templateUrl: './modal-nodo-flujo-proyecto.html',
-  styleUrl: './modal-nodo-flujo-proyecto.css'
+  styleUrl: './modal-nodo-flujo-proyecto.css',
 })
 export class ModalNodoFlujoProyecto {
-  private readonly formBuilder = inject(NonNullableFormBuilder);
-  protected readonly store = inject(EstadoEditorFlujoProyectoService);
-  private readonly formSignal = signal<FormGroup>(this.formBuilder.group({}));
+  private readonly constructorFormulario = inject(NonNullableFormBuilder);
+  protected readonly estadoEditor = inject(EstadoEditorFlujoProyectoService);
+  private readonly formularioSenal = signal<FormularioNodoFlujoProyecto>(
+    this.construirFormulario(
+      this.estadoEditor.obtenerBorradorPredeterminado(TipoBloqueFlujo.Accion),
+    ),
+  );
 
-  protected readonly editorState = this.store.nodeEditorState;
-  protected readonly form = computed(() => this.formSignal());
-  protected readonly formId = 'app-modal-nodo-flujo-proyecto-form';
-  protected readonly typeIcons = ICONOS_TIPO_BLOQUE_FLUJO;
-  protected readonly modalEyebrow = computed(() =>
-    this.store.isReadOnly()
+  protected readonly estadoModal = this.estadoEditor.estadoEditorNodo;
+  protected readonly formulario = computed(() => this.formularioSenal());
+  protected readonly idFormulario = 'formulario-nodo-flujo-proyecto';
+  protected readonly iconosTipo = ICONOS_TIPO_BLOQUE_FLUJO;
+  protected readonly mensajesFormulario = MENSAJES_FORMULARIO_NODO_FLUJO;
+  protected readonly encabezadoModal = computed(() =>
+    this.estadoEditor.soloLectura()
       ? 'Versión histórica'
-      : this.editorState()?.mode === 'create' ? 'Nuevo bloque del flujo' : 'Edición del bloque'
+      : this.estadoModal()?.modo === 'crear'
+        ? 'Nuevo bloque del flujo'
+        : 'Edición del bloque',
   );
-  protected readonly primaryActionText = computed(() =>
-    this.editorState()?.mode === 'create' ? 'Crear bloque' : 'Guardar cambios'
+  protected readonly textoAccionPrincipal = computed(() =>
+    this.estadoModal()?.modo === 'crear' ? 'Crear bloque' : 'Guardar cambios',
   );
-  protected readonly typeLabel = computed(() => {
-    const type = this.editorState()?.type;
-    return type ? FLOW_BLOCK_TYPE_LABELS[type] : '';
+  protected readonly etiquetaTipo = computed(() => {
+    const tipo = this.estadoModal()?.tipo;
+    return tipo ? ETIQUETAS_TIPO_BLOQUE_FLUJO[tipo] : '';
   });
-  protected readonly typeDescription = computed(() => {
-    const type = this.editorState()?.type;
-    return type ? FLOW_BLOCK_TYPE_DESCRIPTIONS[type] : '';
+  protected readonly descripcionTipo = computed(() => {
+    const tipo = this.estadoModal()?.tipo;
+    return tipo ? DESCRIPCIONES_TIPO_BLOQUE_FLUJO[tipo] : '';
   });
-  protected readonly modalTitle = computed(() => {
-    const editorState = this.editorState();
+  protected readonly tituloModal = computed(() => {
+    const estado = this.estadoModal();
+    if (!estado) return '';
 
-    if (!editorState) {
-      return '';
+    if (this.estadoEditor.soloLectura()) {
+      return `Detalle de ${this.obtenerEtiquetaTipo(estado.tipo)}`;
     }
 
-    if (this.store.isReadOnly()) {
-      return `Detalle de ${this.getTypeLabel(editorState.type)}`;
-    }
-
-    return editorState.mode === 'create'
-      ? `Configurar ${this.getTypeLabel(editorState.type)}`
-      : `Editar ${this.getTypeLabel(editorState.type)}`;
+    return estado.modo === 'crear'
+      ? `Configurar ${this.obtenerEtiquetaTipo(estado.tipo)}`
+      : `Editar ${this.obtenerEtiquetaTipo(estado.tipo)}`;
   });
-  protected readonly modalDescription = computed(() => {
-    const editorState = this.editorState();
-    if (!editorState) {
-      return '';
-    }
+  protected readonly descripcionModal = computed(() => {
+    const estado = this.estadoModal();
+    if (!estado) return '';
 
-    if (this.store.isReadOnly()) {
+    if (this.estadoEditor.soloLectura()) {
       return 'Consulta la información que tenía este bloque en la versión seleccionada.';
     }
 
-    return editorState.mode === 'create'
+    return estado.modo === 'crear'
       ? 'Completa la información necesaria antes de incorporar este bloque al recorrido.'
       : 'Actualiza la información del bloque sin perder sus conexiones actuales.';
   });
 
   public constructor() {
     effect(() => {
-      const editorState = this.store.nodeEditorState();
+      const estado = this.estadoEditor.estadoEditorNodo();
+      if (!estado) return;
 
-      if (!editorState) {
-        return;
+      const bloque = this.estadoEditor.bloqueEnEdicion();
+      const borrador =
+        estado.modo === 'editar' && bloque
+          ? this.estadoEditor.obtenerBorradorDesdeNodo(bloque)
+          : this.estadoEditor.obtenerBorradorPredeterminado(estado.tipo);
+      const formulario = this.construirFormulario(borrador);
+
+      if (this.estadoEditor.soloLectura()) {
+        formulario.disable({ emitEvent: false });
       }
 
-      const readOnly = this.store.isReadOnly();
-      const draft = editorState.mode === 'edit' && this.store.editingBlock()
-        ? this.store.getDraftFromNode(this.store.editingBlock()!)
-        : this.store.getDefaultDraft(editorState.type);
-
-      const form = this.buildForm(draft);
-      if (readOnly) {
-        form.disable({ emitEvent: false });
-      }
-      this.formSignal.set(form);
+      this.formularioSenal.set(formulario);
     });
   }
 
-  protected close(): void {
-    this.store.cancelNodeDraft();
+  protected cerrar(): void {
+    this.estadoEditor.cancelarBorradorNodo();
   }
 
-  protected save(): void {
-    if (this.store.isReadOnly()) {
+  protected guardar(): void {
+    if (this.estadoEditor.soloLectura()) return;
+
+    const formulario = this.formulario();
+    if (formulario.invalid) {
+      formulario.markAllAsTouched();
       return;
     }
 
-    const form = this.form();
-
-    if (form.invalid) {
-      form.markAllAsTouched();
-      return;
-    }
-
-    this.store.commitNodeDraft(this.mapFormToDraft(form.getRawValue() as Record<string, unknown>));
+    this.estadoEditor.confirmarBorradorNodo(this.convertirFormularioEnBorrador(formulario));
   }
 
-  private buildForm(draft: ProjectWorkflowNodeDraft): FormGroup {
-    const commonControls = {
-      title: this.formBuilder.control(draft.title, Validators.required),
-      description: this.formBuilder.control(draft.description, Validators.required),
-      acceptanceCriteria: this.createAcceptanceCriteriaArray(draft.acceptanceCriteria),
-      roleNames: this.formBuilder.control(draft.roleNames.join(', '), Validators.required)
-    };
+  private construirFormulario(borrador: BorradorNodoFlujo): FormularioNodoFlujoProyecto {
+    const esModulo = borrador.tipo === TipoBloqueFlujo.Modulo;
+    const esComponente = borrador.tipo === TipoBloqueFlujo.Componente;
 
-    switch (draft.type) {
-      case FlowBlockType.Module:
-        return this.formBuilder.group({
-          ...commonControls,
-          rolePermissions: this.formBuilder.control<ModuleRolePermission[]>(draft.data.rolePermissions ?? []),
-          concurrentUsers: this.formBuilder.control(draft.data.concurrentUsers, Validators.required),
-          peakBusinessHours: this.createPeakBusinessHoursArray(draft.data.peakBusinessHours)
-        });
-      case FlowBlockType.Screen:
-        return this.formBuilder.group(commonControls);
-      case FlowBlockType.Action:
-        return this.formBuilder.group(commonControls);
-      case FlowBlockType.Decision:
-        return this.formBuilder.group(commonControls);
-      case FlowBlockType.Form:
-        return this.formBuilder.group({
-          ...commonControls,
-          capturedData: this.formBuilder.control(draft.data.capturedData, Validators.required),
-          requiredFields: this.formBuilder.control(draft.data.requiredFields, Validators.required),
-          completionOutcome: this.formBuilder.control(draft.data.completionOutcome, Validators.required)
-        });
-    }
+    return this.constructorFormulario.group({
+      titulo: this.constructorFormulario.control(borrador.titulo, Validators.required),
+      descripcion: this.constructorFormulario.control(borrador.descripcion, Validators.required),
+      criteriosAceptacion: this.crearCriteriosAceptacion(borrador.criteriosAceptacion),
+      nombresRoles: this.constructorFormulario.control(
+        borrador.nombresRoles.join(', '),
+        Validators.required,
+      ),
+      permisosRoles: this.constructorFormulario.control(
+        esModulo ? borrador.datos.permisosRoles : [],
+      ),
+      usuariosConcurrentes: this.constructorFormulario.control(
+        esModulo ? borrador.datos.usuariosConcurrentes : '',
+        esModulo ? Validators.required : [],
+      ),
+      horariosMayorActividad: this.crearHorariosMayorActividad(
+        esModulo ? borrador.datos.horariosMayorActividad : [],
+      ),
+      datosCapturados: this.constructorFormulario.control(
+        esComponente ? borrador.datos.datosCapturados : '',
+        esComponente ? Validators.required : [],
+      ),
+      camposObligatorios: this.constructorFormulario.control(
+        esComponente ? borrador.datos.camposObligatorios : '',
+        esComponente ? Validators.required : [],
+      ),
+      resultadoCompletado: this.constructorFormulario.control(
+        esComponente ? borrador.datos.resultadoCompletado : '',
+        esComponente ? Validators.required : [],
+      ),
+    });
   }
 
-  private mapFormToDraft(rawValue: Record<string, unknown>): ProjectWorkflowNodeDraft {
-    const editorState = this.store.nodeEditorState();
+  private convertirFormularioEnBorrador(
+    formulario: FormularioNodoFlujoProyecto,
+  ): BorradorNodoFlujo {
+    const estado = this.estadoEditor.estadoEditorNodo();
+    if (!estado) throw new Error('No hay un editor de nodo activo.');
 
-    if (!editorState) {
-      throw new Error('No hay editor de nodo activo.');
-    }
-
-    const read = (key: string): string => String(rawValue[key] ?? '');
-    const readRolePermissions = (): ModuleRolePermission[] => {
-      const rawPermissions = rawValue['rolePermissions'];
-
-      if (!Array.isArray(rawPermissions)) {
-        return [];
-      }
-
-      return rawPermissions
-        .map((item) => {
-          if (!item || typeof item !== 'object') {
-            return null;
-          }
-
-          const roleId = String((item as { roleId?: string }).roleId ?? '').trim();
-          const permissions = Array.isArray((item as { permissions?: string[] }).permissions)
-            ? (item as { permissions: string[] }).permissions.filter(isModulePermissionAction)
-            : [];
-
-          if (!roleId) {
-            return null;
-          }
-
-          return {
-            roleId,
-            permissions
-          };
-        })
-        .filter((item): item is ModuleRolePermission => Boolean(item));
-    };
-    const readPeakBusinessHours = (): ModulePeakPeriod[] => {
-      const rawPeakBusinessHours = rawValue['peakBusinessHours'];
-
-      if (!Array.isArray(rawPeakBusinessHours)) {
-        return [{
-          days: [],
-          startTime: '00:00',
-          endTime: '00:00'
-        }];
-      }
-
-      const periods = rawPeakBusinessHours
-        .map((item) => {
-          if (!item || typeof item !== 'object') {
-            return null;
-          }
-
-          const candidate = item as {
-            days?: unknown;
-            startTime?: unknown;
-            endTime?: unknown;
-          };
-
-          return {
-            days: Array.isArray(candidate.days)
-              ? candidate.days.map((day) => String(day ?? '').trim()).filter(Boolean)
-              : [],
-            startTime: String(candidate.startTime ?? '').trim(),
-            endTime: String(candidate.endTime ?? '').trim()
-          };
-        })
-        .filter((item): item is ModulePeakPeriod => Boolean(item));
-
-      return periods.length > 0
-        ? periods
-        : [{
-            days: [],
-            startTime: '00:00',
-            endTime: '00:00'
-          }];
-    };
-    const commonDraft = {
-      type: editorState.type,
-      title: read('title').trim(),
-      description: read('description').trim(),
-      acceptanceCriteria: this.readStringArray(rawValue['acceptanceCriteria']),
-      roleNames: this.parseList(read('roleNames'))
+    const valores = formulario.getRawValue();
+    const datosComunes = {
+      tipo: estado.tipo,
+      titulo: valores.titulo.trim(),
+      descripcion: valores.descripcion.trim(),
+      criteriosAceptacion: valores.criteriosAceptacion
+        .map((criterio) => criterio.trim())
+        .filter(Boolean),
+      nombresRoles: this.separarLista(valores.nombresRoles),
     };
 
-    switch (editorState.type) {
-      case FlowBlockType.Module:
+    switch (estado.tipo) {
+      case TipoBloqueFlujo.Modulo:
         return {
-          ...commonDraft,
-          type: FlowBlockType.Module,
-          data: {
-            rolePermissions: readRolePermissions(),
-            concurrentUsers: read('concurrentUsers').trim(),
-            peakBusinessHours: readPeakBusinessHours()
-          }
+          ...datosComunes,
+          tipo: TipoBloqueFlujo.Modulo,
+          datos: {
+            permisosRoles: valores.permisosRoles,
+            usuariosConcurrentes: valores.usuariosConcurrentes.trim(),
+            horariosMayorActividad: valores.horariosMayorActividad,
+          },
         };
-      case FlowBlockType.Screen:
+      case TipoBloqueFlujo.Pagina:
+        return { ...datosComunes, tipo: TipoBloqueFlujo.Pagina, datos: {} };
+      case TipoBloqueFlujo.Accion:
+        return { ...datosComunes, tipo: TipoBloqueFlujo.Accion, datos: {} };
+      case TipoBloqueFlujo.Decision:
+        return { ...datosComunes, tipo: TipoBloqueFlujo.Decision, datos: {} };
+      case TipoBloqueFlujo.Componente:
         return {
-          ...commonDraft,
-          type: FlowBlockType.Screen,
-          data: {}
-        };
-      case FlowBlockType.Action:
-        return {
-          ...commonDraft,
-          type: FlowBlockType.Action,
-          data: {}
-        };
-      case FlowBlockType.Decision:
-        return {
-          ...commonDraft,
-          type: FlowBlockType.Decision,
-          data: {}
-        };
-      case FlowBlockType.Form:
-        return {
-          ...commonDraft,
-          type: FlowBlockType.Form,
-          data: {
-            capturedData: read('capturedData').trim(),
-            requiredFields: read('requiredFields').trim(),
-            completionOutcome: read('completionOutcome').trim()
-          }
+          ...datosComunes,
+          tipo: TipoBloqueFlujo.Componente,
+          datos: {
+            datosCapturados: valores.datosCapturados.trim(),
+            camposObligatorios: valores.camposObligatorios.trim(),
+            resultadoCompletado: valores.resultadoCompletado.trim(),
+          },
         };
     }
   }
 
-  private parseList(value: string): string[] {
-    return value
+  private separarLista(valor: string): string[] {
+    return valor
       .split(/[\n,]/)
-      .map((item) => item.trim())
+      .map((elemento) => elemento.trim())
       .filter(Boolean);
   }
 
-  private createAcceptanceCriteriaArray(criteria: string[]): FormArray<FormControl<string>> {
-    const controls = (criteria.length ? criteria : [''])
-      .map((criterion) => this.formBuilder.control(criterion, Validators.required));
-
-    return this.formBuilder.array<FormControl<string>>(controls);
+  private crearCriteriosAceptacion(criterios: string[]): FormArray<FormControl<string>> {
+    const controles = (criterios.length ? criterios : ['']).map((criterio) =>
+      this.constructorFormulario.control(criterio, Validators.required),
+    );
+    return this.constructorFormulario.array(controles);
   }
 
-  private createPeakBusinessHoursArray(periods: ModulePeakPeriod[]): FormArray<FormGroup> {
-    const controls = (periods.length ? periods : [{
-      days: [],
-      startTime: '00:00',
-      endTime: '00:00'
-    }]).map((period) => this.formBuilder.group({
-      days: this.formBuilder.control<string[]>(period.days ?? []),
-      startTime: this.formBuilder.control(period.startTime ?? ''),
-      endTime: this.formBuilder.control(period.endTime ?? '')
-    }));
-
-    return this.formBuilder.array<FormGroup>(controls);
+  private crearHorariosMayorActividad(
+    franjas: FranjaMayorActividadModulo[],
+  ): FormArray<FormularioFranjaActividadModulo> {
+    const valores = franjas.length
+      ? franjas
+      : [{ dias: [], horaInicio: '00:00', horaFin: '00:00' }];
+    return this.constructorFormulario.array(
+      valores.map((franja) =>
+        this.constructorFormulario.group({
+          dias: this.constructorFormulario.control<string[]>(franja.dias),
+          horaInicio: this.constructorFormulario.control(franja.horaInicio),
+          horaFin: this.constructorFormulario.control(franja.horaFin),
+        }),
+      ),
+    );
   }
 
-  private readStringArray(value: unknown): string[] {
-    if (!Array.isArray(value)) {
-      return [];
-    }
-
-    return value
-      .map((item) => String(item ?? '').trim())
-      .filter(Boolean);
+  private obtenerEtiquetaTipo(tipo: TipoBloqueFlujo): string {
+    return ETIQUETAS_TIPO_BLOQUE_FLUJO[tipo].toLowerCase();
   }
-
-  private getTypeLabel(type: FlowBlockType): string {
-    return FLOW_BLOCK_TYPE_LABELS[type].toLowerCase();
-  }
-
 }
-

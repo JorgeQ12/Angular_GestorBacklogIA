@@ -1,135 +1,142 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, HostListener, ViewChild, computed, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  ElementRef,
+  HostListener,
+  ViewChild,
+  computed,
+  inject,
+} from '@angular/core';
+import { EstadoVacio } from '../../../../../../shared/components/estado-vacio/estado-vacio';
 import { IconoComponent } from '../../../../../../shared/components/icono/icono.component';
-import { TarjetaBloqueFlujoProyecto } from '../tarjeta-bloque-flujo-proyecto/tarjeta-bloque-flujo-proyecto';
-import { CapaConexionesFlujoProyecto } from '../capa-conexiones-flujo-proyecto/capa-conexiones-flujo-proyecto';
 import { EstadoEditorFlujoProyectoService } from '../../services/estado-editor-flujo-proyecto.service';
+import { CapaConexionesFlujoProyecto } from '../capa-conexiones-flujo-proyecto/capa-conexiones-flujo-proyecto';
+import { TarjetaBloqueFlujoProyecto } from '../tarjeta-bloque-flujo-proyecto/tarjeta-bloque-flujo-proyecto';
 
+/** Presenta el área interactiva en la que se organizan y conectan los bloques. */
 @Component({
   selector: 'app-lienzo-flujo-proyecto',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IconoComponent, CapaConexionesFlujoProyecto, TarjetaBloqueFlujoProyecto],
+  imports: [EstadoVacio, IconoComponent, CapaConexionesFlujoProyecto, TarjetaBloqueFlujoProyecto],
   templateUrl: './lienzo-flujo-proyecto.html',
-  styleUrl: './lienzo-flujo-proyecto.css'
+  styleUrl: './lienzo-flujo-proyecto.css',
 })
 export class LienzoFlujoProyecto {
-  private readonly destroyRef = inject(DestroyRef);
-  protected readonly store = inject(EstadoEditorFlujoProyectoService);
-  @ViewChild('viewportElement', { static: true }) private readonly viewportElement?: ElementRef<HTMLDivElement>;
+  private readonly referenciaDestruccion = inject(DestroyRef);
+  protected readonly estadoEditor = inject(EstadoEditorFlujoProyectoService);
+  @ViewChild('elementoVista', { static: true })
+  private readonly elementoVista?: ElementRef<HTMLDivElement>;
 
-  protected readonly sceneTransform = computed(() => {
-    const viewport = this.store.viewport();
-    return `translate(${viewport.panX}px, ${viewport.panY}px) scale(${viewport.zoom})`;
+  protected readonly transformacionEscena = computed(() => {
+    const vista = this.estadoEditor.vista();
+    return `translate(${vista.desplazamientoX}px, ${vista.desplazamientoY}px) scale(${vista.escala})`;
   });
-
-  protected readonly canvasSizeStyle = computed(() => ({
-    width: `${this.store.canvasSize.width}px`,
-    height: `${this.store.canvasSize.height}px`,
-    transform: this.sceneTransform()
+  protected readonly estiloTamanoLienzo = computed(() => ({
+    width: `${this.estadoEditor.tamanoLienzo.ancho}px`,
+    height: `${this.estadoEditor.tamanoLienzo.alto}px`,
+    transform: this.transformacionEscena(),
   }));
-  protected readonly viewportGridStyle = computed(() => {
-    const viewport = this.store.viewport();
-    const gridSize = 40 * viewport.zoom;
-
+  protected readonly estiloCuadriculaVista = computed(() => {
+    const vista = this.estadoEditor.vista();
+    const tamanoCuadricula = 40 * vista.escala;
     return {
-      backgroundSize: `${gridSize}px ${gridSize}px`,
-      backgroundPosition: `${viewport.panX}px ${viewport.panY}px`
+      backgroundSize: `${tamanoCuadricula}px ${tamanoCuadricula}px`,
+      backgroundPosition: `${vista.desplazamientoX}px ${vista.desplazamientoY}px`,
     };
   });
-  protected readonly zoomLabel = computed(() => `${Math.round(this.store.viewport().zoom * 100)}%`);
+  protected readonly etiquetaEscala = computed(
+    () => `${Math.round(this.estadoEditor.vista().escala * 100)}%`,
+  );
 
-  protected zoomIn(): void {
-    this.store.zoomBy(0.1);
+  protected acercar(): void {
+    this.estadoEditor.ajustarEscala(0.1);
   }
 
-  protected zoomOut(): void {
-    this.store.zoomBy(-0.1);
+  protected alejar(): void {
+    this.estadoEditor.ajustarEscala(-0.1);
   }
 
-  protected resetView(): void {
-    this.store.resetView();
+  protected restablecerVista(): void {
+    this.estadoEditor.restablecerVista();
   }
 
-  protected openBlockPicker(): void {
-    this.store.openBlockPicker();
+  protected abrirPaletaBloques(): void {
+    this.estadoEditor.abrirPaletaBloques();
   }
 
-  protected onSurfaceClick(event: MouseEvent): void {
-    const target = event.target as HTMLElement | null;
-
-    if (target?.closest('[data-flow-card], [data-connection-hit="true"], button, input, textarea, label')) {
+  protected seleccionarSuperficie(evento: MouseEvent): void {
+    const objetivo = evento.target as HTMLElement | null;
+    if (
+      objetivo?.closest(
+        '[data-tarjeta-flujo], [data-interaccion-conexion="true"], button, input, textarea, label',
+      )
+    ) {
       return;
     }
 
-    this.store.clearSelection();
-    this.store.cancelConnection();
+    this.estadoEditor.limpiarSeleccion();
+    this.estadoEditor.cancelarConexion();
   }
 
-  protected onSurfacePointerDown(event: PointerEvent): void {
-    if (this.store.isConnectionDragging()) {
+  protected iniciarDesplazamiento(evento: PointerEvent): void {
+    if (this.estadoEditor.arrastrandoConexion()) return;
+
+    const objetivo = evento.target as HTMLElement | null;
+    if (
+      objetivo?.closest(
+        '[data-tarjeta-flujo], [data-interaccion-conexion="true"], button, input, textarea, label',
+      )
+    ) {
       return;
     }
 
-    const target = event.target as HTMLElement | null;
-
-    if (target?.closest('[data-flow-card], [data-connection-hit="true"], button, input, textarea, label')) {
-      return;
-    }
-
-    let startClientX = event.clientX;
-    let startClientY = event.clientY;
-
-    const moveHandler = (moveEvent: PointerEvent) => {
-      this.store.panBy(moveEvent.clientX - startClientX, moveEvent.clientY - startClientY);
-      startClientX = moveEvent.clientX;
-      startClientY = moveEvent.clientY;
+    let clienteXInicial = evento.clientX;
+    let clienteYInicial = evento.clientY;
+    const moverPuntero = (eventoMovimiento: PointerEvent): void => {
+      this.estadoEditor.desplazarVista(
+        eventoMovimiento.clientX - clienteXInicial,
+        eventoMovimiento.clientY - clienteYInicial,
+      );
+      clienteXInicial = eventoMovimiento.clientX;
+      clienteYInicial = eventoMovimiento.clientY;
+    };
+    const detenerDesplazamiento = (): void => {
+      window.removeEventListener('pointermove', moverPuntero);
+      window.removeEventListener('pointerup', detenerDesplazamiento);
     };
 
-    const stopPanning = () => {
-      window.removeEventListener('pointermove', moveHandler);
-      window.removeEventListener('pointerup', stopPanning);
-    };
-
-    window.addEventListener('pointermove', moveHandler);
-    window.addEventListener('pointerup', stopPanning, { once: true });
-    this.destroyRef.onDestroy(stopPanning);
+    window.addEventListener('pointermove', moverPuntero);
+    window.addEventListener('pointerup', detenerDesplazamiento, { once: true });
+    this.referenciaDestruccion.onDestroy(detenerDesplazamiento);
   }
 
   @HostListener('document:pointermove', ['$event'])
-  protected onDocumentPointerMove(event: PointerEvent): void {
-    if (!this.store.isConnectionDragging()) {
-      return;
-    }
-
-    this.store.updateConnectionPointer(this.toCanvasPoint(event.clientX, event.clientY));
+  protected moverPunteroDocumento(evento: PointerEvent): void {
+    if (!this.estadoEditor.arrastrandoConexion()) return;
+    this.estadoEditor.actualizarPunteroConexion(
+      this.convertirEnPuntoLienzo(evento.clientX, evento.clientY),
+    );
   }
 
   @HostListener('document:pointerup')
-  protected onDocumentPointerUp(): void {
-    if (!this.store.isConnectionDragging()) {
-      return;
-    }
-
-    this.store.completeConnectionDrag();
+  protected soltarPunteroDocumento(): void {
+    if (this.estadoEditor.arrastrandoConexion()) this.estadoEditor.completarArrastreConexion();
   }
 
   @HostListener('document:keydown.escape')
-  protected onEscapeKey(): void {
-    if (this.store.isConnectionDragging()) {
-      this.store.cancelConnection();
-    }
+  protected pulsarEscape(): void {
+    if (this.estadoEditor.arrastrandoConexion()) this.estadoEditor.cancelarConexion();
   }
 
-  private toCanvasPoint(clientX: number, clientY: number): { x: number; y: number } {
-    const viewportRect = this.viewportElement?.nativeElement.getBoundingClientRect();
-    const viewport = this.store.viewport();
-
-    if (!viewportRect) {
-      return { x: 0, y: 0 };
-    }
+  private convertirEnPuntoLienzo(clienteX: number, clienteY: number): { x: number; y: number } {
+    const rectanguloVista = this.elementoVista?.nativeElement.getBoundingClientRect();
+    const vista = this.estadoEditor.vista();
+    if (!rectanguloVista) return { x: 0, y: 0 };
 
     return {
-      x: (clientX - viewportRect.left - viewport.panX) / viewport.zoom,
-      y: (clientY - viewportRect.top - viewport.panY) / viewport.zoom
+      x: (clienteX - rectanguloVista.left - vista.desplazamientoX) / vista.escala,
+      y: (clienteY - rectanguloVista.top - vista.desplazamientoY) / vista.escala,
     };
   }
 }
