@@ -4,6 +4,8 @@ import {
   Component,
   computed,
   effect,
+  ElementRef,
+  HostListener,
   inject,
   input,
   output,
