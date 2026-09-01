@@ -25,11 +25,11 @@
     }
 
     <button
-      [attr.type]="idFormulario() ? 'submit' : 'button'"
+      type="button"
       [attr.form]="idFormulario()"
       class="ui-button ui-button--primary ui-button--md"
       [disabled]="procesando()"
-      (click)="!idFormulario() && confirmar.emit()"
+      (click)="ejecutarAccionPrincipal()"
     >
       {{ configuracion().textoPrincipal }}
       <app-icono

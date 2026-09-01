@@ -1,8 +1,17 @@
-import { ChangeDetectionStrategy, Component, computed, effect, input, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  output,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { SelectorCampo } from '../../../../shared/forms/controles/selector-campo/selector-campo';
 import type { OpcionSelector } from '../../../../shared/forms/controles/selector-campo/models/opcion-selector.model';
+import { FormateadorFechaService } from '../../../../shared/fechas/services/formateador-fecha.service';
 import type { VersionProyectoResumen } from '../../models/versionamiento-proyecto.model';
 
 /** Permite cambiar la versión aplicada transversalmente a los pasos del proyecto. */
@@ -14,6 +23,8 @@ import type { VersionProyectoResumen } from '../../models/versionamiento-proyect
   styleUrl: './selector-version-proyecto.css',
 })
 export class SelectorVersionProyecto {
+  private readonly formateadorFecha = inject(FormateadorFechaService);
+
   /** Proporciona el historial ordenado disponible. */
   public readonly versiones = input.required<readonly VersionProyectoResumen[]>();
   /** Identifica la fotografía presentada actualmente. */
@@ -29,7 +40,9 @@ export class SelectorVersionProyecto {
     this.versiones().map((version) => ({
       valor: version.id,
       etiqueta: `Versión ${version.numero}${version.esActual ? ' · Actual' : ''}`,
-      descripcion: version.esActual ? 'Vigente · Editable' : 'Histórica · Solo lectura',
+      descripcion: version.esActual
+        ? 'Vigente · Editable'
+        : this.formateadorFecha.formatear(version.fechaCreacion, 'breve'),
     })),
   );
 

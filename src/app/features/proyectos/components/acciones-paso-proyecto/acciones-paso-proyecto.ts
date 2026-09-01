@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { ChangeDetectionStrategy, Component, inject, input, output } from '@angular/core';
 import { IconoComponent } from '../../../../shared/components/icono/icono.component';
 import {
   AlineacionAccionesPasoProyecto,
@@ -13,6 +14,7 @@ import {
   templateUrl: './acciones-paso-proyecto.html',
 })
 export class AccionesPasoProyecto {
+  private readonly documento = inject(DOCUMENT);
   protected readonly alineaciones = AlineacionAccionesPasoProyecto;
 
   /** Define textos e iconos de las acciones vigentes. */
@@ -29,4 +31,16 @@ export class AccionesPasoProyecto {
 
   /** Confirma desde editores cuyo contenido no utiliza un formulario nativo. */
   public readonly confirmar = output<void>();
+
+  /** Envía explícitamente el formulario proyectado o delega la confirmación al editor. */
+  protected ejecutarAccionPrincipal(): void {
+    const formularioId = this.idFormulario();
+    if (!formularioId) {
+      this.confirmar.emit();
+      return;
+    }
+
+    const formulario = this.documento.getElementById(formularioId);
+    if (formulario instanceof HTMLFormElement) formulario.requestSubmit();
+  }
 }

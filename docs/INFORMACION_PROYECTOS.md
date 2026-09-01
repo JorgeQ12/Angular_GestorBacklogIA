@@ -36,6 +36,9 @@ adaptadores visuales paralelos.
 - Creación proporciona al mismo recorrido únicamente los pasos alcanzados por el borrador.
 - Cada paso compartido compone su tarjeta y su formulario. La tarjeta es el único componente que
   presenta `AccionesPasoProyecto` y asocia el botón principal mediante `id`/`form`.
+- `AccionesPasoProyecto` ejecuta `requestSubmit()` sobre el formulario identificado. De esta forma,
+  el footer externo conserva validación nativa y `ngSubmit` sin depender del envío implícito entre
+  componentes; los editores sin formulario delegan la confirmación mediante su evento.
 - La página conserva la ruta, el descarte de cambios y la persistencia; los pasos no conocen HTTP,
   borradores ni navegación. Solo reenvían a la tarjeta la configuración opcional de versionamiento.
 

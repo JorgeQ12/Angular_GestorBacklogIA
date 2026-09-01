@@ -152,7 +152,7 @@ describe('PaginaInformacionProyecto', () => {
     const guardar = elemento.querySelector<HTMLButtonElement>(
       '.ui-form-footer .ui-button--primary',
     );
-    expect(guardar?.type).toBe('submit');
+    expect(guardar?.type).toBe('button');
     expect(guardar?.form).toBe(formulario);
     guardar?.click();
     fixture.detectChanges();

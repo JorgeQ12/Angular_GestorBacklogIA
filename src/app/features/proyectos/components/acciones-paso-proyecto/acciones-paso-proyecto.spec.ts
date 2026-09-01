@@ -29,7 +29,7 @@ describe('AccionesPasoProyecto', () => {
       '.ui-button--primary',
     ) as HTMLButtonElement;
 
-    expect(botonPrincipal.type).toBe('submit');
+    expect(botonPrincipal.type).toBe('button');
     expect(botonPrincipal.getAttribute('form')).toBe('formulario-contexto');
   });
 
@@ -38,5 +38,17 @@ describe('AccionesPasoProyecto', () => {
     fixture.detectChanges();
 
     expect(fixture.nativeElement.querySelector('.ui-form-footer--acciones-al-final')).toBeNull();
+  });
+
+  it('delega la confirmación cuando el editor no utiliza un formulario nativo', () => {
+    let confirmado = false;
+    fixture.componentInstance.confirmar.subscribe(() => (confirmado = true));
+    fixture.detectChanges();
+
+    (fixture.nativeElement as HTMLElement)
+      .querySelector<HTMLButtonElement>('.ui-button--primary')
+      ?.click();
+
+    expect(confirmado).toBe(true);
   });
 });

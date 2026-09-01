@@ -1,4 +1,7 @@
+import { OverlayContainer } from '@angular/cdk/overlay';
+import { LOCALE_ID } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { LOCALE_APLICACION } from '../../../../core/localizacion/config/localizacion.config';
 import { SelectorVersionProyecto } from './selector-version-proyecto';
 
 describe('SelectorVersionProyecto', () => {
@@ -7,6 +10,7 @@ describe('SelectorVersionProyecto', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [SelectorVersionProyecto],
+      providers: [{ provide: LOCALE_ID, useValue: LOCALE_APLICACION }],
     }).compileComponents();
     fixture = TestBed.createComponent(SelectorVersionProyecto);
     fixture.componentRef.setInput('versiones', [
@@ -21,5 +25,17 @@ describe('SelectorVersionProyecto', () => {
     const elemento = fixture.nativeElement as HTMLElement;
     expect(elemento.textContent).toContain('Versión 2 · Actual');
     expect(elemento.querySelector('section')).toBeNull();
+  });
+
+  it('presenta la fecha de creación en las versiones históricas', () => {
+    const overlay = TestBed.inject(OverlayContainer).getContainerElement();
+    (fixture.nativeElement as HTMLElement)
+      .querySelector<HTMLButtonElement>('[role="combobox"]')
+      ?.click();
+    fixture.detectChanges();
+
+    expect(overlay.textContent).toContain('Versión 1');
+    expect(overlay.textContent).toContain('20 de ago de 2026');
+    expect(overlay.textContent).not.toContain('Histórica · Solo lectura');
   });
 });
