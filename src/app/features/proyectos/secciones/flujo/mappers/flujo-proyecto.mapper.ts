@@ -5,12 +5,14 @@ import {
 import {
   ConexionFlujoProyecto,
   DatosNodoModulo,
+  DiaSemanaFlujo,
   FlujoProyecto,
-  LadoConexionFlujo,
   NodoFlujoProyecto,
   RolFlujoProyecto,
   TipoBloqueFlujo,
   esAccionPermisoModulo,
+  esDiaSemanaFlujo,
+  esLadoConexionFlujo,
 } from '../models/flujo-proyecto.model';
 
 /** Crea el documento mínimo requerido por el editor de Flujo. */
@@ -164,7 +166,9 @@ function deserializarDatosModulo(datos: ObjetoJson): DatosNodoModulo | null {
       const dias = valor['dias'];
       const horaInicio = valor['horaInicio'];
       const horaFin = valor['horaFin'];
-      return esListaCadenas(dias) && typeof horaInicio === 'string' && typeof horaFin === 'string'
+      return esListaDiasSemana(dias) &&
+        typeof horaInicio === 'string' &&
+        typeof horaFin === 'string'
         ? { dias, horaInicio, horaFin }
         : null;
     },
@@ -193,7 +197,7 @@ function deserializarConexion(valor: unknown): ConexionFlujoProyecto | null {
     typeof idBloqueOrigen !== 'string' ||
     typeof idBloqueDestino !== 'string' ||
     (etiqueta !== null && etiqueta !== undefined && typeof etiqueta !== 'string') ||
-    (ladoDestino !== null && ladoDestino !== undefined && !esLadoConexion(ladoDestino)) ||
+    (ladoDestino !== null && ladoDestino !== undefined && !esLadoConexionFlujo(ladoDestino)) ||
     typeof fechaCreacion !== 'string'
   ) {
     return null;
@@ -227,12 +231,15 @@ function esTipoBloque(valor: unknown): valor is TipoBloqueFlujo {
   return Object.values(TipoBloqueFlujo).includes(valor as TipoBloqueFlujo);
 }
 
-function esLadoConexion(valor: unknown): valor is LadoConexionFlujo {
-  return ['izquierda', 'derecha', 'arriba', 'abajo'].includes(String(valor));
-}
-
 function esListaCadenas(valor: unknown): valor is string[] {
   return Array.isArray(valor) && valor.every((elemento) => typeof elemento === 'string');
+}
+
+function esListaDiasSemana(valor: unknown): valor is DiaSemanaFlujo[] {
+  return (
+    Array.isArray(valor) &&
+    valor.every((elemento) => typeof elemento === 'string' && esDiaSemanaFlujo(elemento))
+  );
 }
 
 function esObjeto(valor: unknown): valor is ObjetoJson {

@@ -14,6 +14,7 @@ import {
   ACENTOS_TIPO_BLOQUE_FLUJO,
   ETIQUETAS_TIPO_BLOQUE_FLUJO,
   ICONOS_TIPO_BLOQUE_FLUJO,
+  RAMAS_DECISION_FLUJO,
 } from '../../config/flujo-proyecto.config';
 import {
   EtiquetaRamaDecision,
@@ -38,7 +39,8 @@ export class TarjetaBloqueFlujoProyecto {
   public readonly bloque = input.required<NodoFlujoProyecto>();
   private seMovioDuranteArrastre = false;
   protected readonly accionesAbiertas = signal(false);
-  protected readonly ramasDecision: readonly EtiquetaRamaDecision[] = ['Sí', 'No'];
+  protected readonly ramasDecision = RAMAS_DECISION_FLUJO;
+  protected readonly etiquetasRamaDecision = EtiquetaRamaDecision;
   protected readonly etiquetasTipo = ETIQUETAS_TIPO_BLOQUE_FLUJO;
   protected readonly iconosTipo = ICONOS_TIPO_BLOQUE_FLUJO;
   protected readonly acentosTipo = ACENTOS_TIPO_BLOQUE_FLUJO;

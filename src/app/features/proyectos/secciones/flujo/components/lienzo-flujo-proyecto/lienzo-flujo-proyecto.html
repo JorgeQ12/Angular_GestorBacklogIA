@@ -17,13 +17,23 @@
       @if (!estadoEditor.soloLectura()) {
         <button
           type="button"
-          class="ui-button ui-button--primary lienzo-flujo__boton-agregar"
+          class="ui-button ui-button--primary ui-button--md lienzo-flujo__boton-agregar"
           (click)="abrirPaletaBloques()"
         >
           <app-icono class="ui-button__icon" nombre="agregar" />
           Agregar bloque
         </button>
       }
+      <button
+        type="button"
+        class="ui-button ui-button--secondary ui-button--md lienzo-flujo__boton-guardar"
+        aria-label="Guardar cambios del flujo"
+        title="Guardar cambios del flujo"
+        [disabled]="!cambiosPendientes() || estadoEditor.soloLectura()"
+        (click)="guardarSolicitado.emit()"
+      >
+        <app-icono class="ui-button__icon" nombre="guardar" aria-hidden="true" />
+      </button>
     </div>
 
     <div class="lienzo-flujo__escala" aria-label="Controles de escala">
@@ -40,6 +50,15 @@
       </button>
       <button type="button" aria-label="Acercar" (click)="acercar()">
         <app-icono nombre="acercar" />
+      </button>
+      <button
+        type="button"
+        class="lienzo-flujo__pantalla-completa"
+        [attr.aria-label]="pantallaCompleta() ? 'Reducir canvas' : 'Ampliar canvas a pantalla completa'"
+        [title]="pantallaCompleta() ? 'Reducir canvas' : 'Ampliar canvas a pantalla completa'"
+        (click)="alternarPantallaCompletaSolicitado.emit()"
+      >
+        <app-icono [nombre]="pantallaCompleta() ? 'reducir' : 'ampliar'" />
       </button>
     </div>
 
@@ -68,7 +87,7 @@
           <button
             estadoVacioAcciones
             type="button"
-            class="ui-button ui-button--primary"
+            class="ui-button ui-button--primary ui-button--md"
             (click)="abrirPaletaBloques()"
           >
             <app-icono class="ui-button__icon" nombre="agregar" />
@@ -84,11 +103,13 @@
       [style.height]="estiloTamanoLienzo().height"
       [style.transform]="estiloTamanoLienzo().transform"
     >
-      <app-capa-conexiones-flujo-proyecto modo="lineas" />
+      <app-capa-conexiones-flujo-proyecto [modo]="modosCapaConexiones.Lineas" />
       @for (bloque of estadoEditor.bloquesVisibles(); track bloque.id) {
         <app-tarjeta-bloque-flujo-proyecto [bloque]="bloque" />
       }
-      <app-capa-conexiones-flujo-proyecto modo="superposicionEliminacion" />
+      <app-capa-conexiones-flujo-proyecto
+        [modo]="modosCapaConexiones.SuperposicionEliminacion"
+      />
     </div>
 
     @if (estadoEditor.tieneContenido()) {

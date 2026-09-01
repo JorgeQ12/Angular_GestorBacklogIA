@@ -14,6 +14,52 @@ export enum FiltroVistaFlujoProyecto {
   Rol = 'rol',
 }
 
+/** Identifica si el modal incorpora un nodo nuevo o modifica uno existente. */
+export enum ModoEditorNodoFlujo {
+  Crear = 'crear',
+  Editar = 'editar',
+}
+
+/** Define si un tipo de bloque admite o exige asignaciones de roles. */
+export enum PoliticaRolesBloqueFlujo {
+  NoAplica = 'no-aplica',
+  Opcional = 'opcional',
+  Obligatoria = 'obligatoria',
+}
+
+/** Identifica una salida permitida para un bloque de decisión. */
+export enum EtiquetaRamaDecision {
+  Si = 'Sí',
+  No = 'No',
+}
+
+/** Identifica una operación que un rol puede realizar dentro de un módulo. */
+export enum AccionPermisoModulo {
+  Ver = 'Ver',
+  Crear = 'Crear',
+  Editar = 'Editar',
+  Eliminar = 'Eliminar',
+}
+
+/** Identifica los días admitidos en una franja semanal de actividad. */
+export enum DiaSemanaFlujo {
+  Lunes = 'Lunes',
+  Martes = 'Martes',
+  Miercoles = 'Miércoles',
+  Jueves = 'Jueves',
+  Viernes = 'Viernes',
+  Sabado = 'Sábado',
+  Domingo = 'Domingo',
+}
+
+/** Identifica el borde de un nodo utilizado por una conexión. */
+export enum LadoConexionFlujo {
+  Izquierda = 'izquierda',
+  Derecha = 'derecha',
+  Arriba = 'arriba',
+  Abajo = 'abajo',
+}
+
 /** Conserva el desplazamiento y la escala aplicados al lienzo. */
 export interface VistaLienzoFlujo {
   desplazamientoX: number;
@@ -34,12 +80,6 @@ export interface PosicionBloqueFlujo {
   y: number;
 }
 
-/** Identifica una salida permitida para un bloque de decisión. */
-export type EtiquetaRamaDecision = 'Sí' | 'No';
-
-/** Identifica una operación que un rol puede realizar dentro de un módulo. */
-export type AccionPermisoModulo = 'Ver' | 'Crear' | 'Editar' | 'Eliminar';
-
 /** Relaciona un rol con las operaciones permitidas dentro de un módulo. */
 export interface PermisoRolModulo {
   idRol: string;
@@ -48,7 +88,7 @@ export interface PermisoRolModulo {
 
 /** Describe una franja semanal de mayor actividad para un módulo. */
 export interface FranjaMayorActividadModulo {
-  dias: string[];
+  dias: DiaSemanaFlujo[];
   horaInicio: string;
   horaFin: string;
 }
@@ -155,9 +195,6 @@ export type BorradorNodoFlujo =
       datos: DatosNodoComponente;
     });
 
-/** Identifica el borde de un nodo utilizado como destino de una conexión. */
-export type LadoConexionFlujo = 'izquierda' | 'derecha' | 'arriba' | 'abajo';
-
 /** Relaciona dos nodos del flujo mediante una conexión dirigida. */
 export interface ConexionFlujoProyecto {
   id: string;
@@ -213,14 +250,24 @@ export function crearDatosNodoPredeterminados(tipo: TipoBloqueFlujo): DatosNodoF
 
 /** Comprueba si un texto representa una salida válida de una decisión. */
 export function esEtiquetaRamaDecision(
-  valor: string | null | undefined,
+  valor: unknown,
 ): valor is EtiquetaRamaDecision {
-  return valor === 'Sí' || valor === 'No';
+  return Object.values(EtiquetaRamaDecision).includes(valor as EtiquetaRamaDecision);
 }
 
 /** Comprueba si un texto representa una operación válida de módulo. */
 export function esAccionPermisoModulo(
-  valor: string | null | undefined,
+  valor: unknown,
 ): valor is AccionPermisoModulo {
-  return valor === 'Ver' || valor === 'Crear' || valor === 'Editar' || valor === 'Eliminar';
+  return Object.values(AccionPermisoModulo).includes(valor as AccionPermisoModulo);
+}
+
+/** Comprueba si un texto representa un día admitido por las franjas de actividad. */
+export function esDiaSemanaFlujo(valor: unknown): valor is DiaSemanaFlujo {
+  return Object.values(DiaSemanaFlujo).includes(valor as DiaSemanaFlujo);
+}
+
+/** Comprueba si un texto representa un lado admitido por una conexión. */
+export function esLadoConexionFlujo(valor: unknown): valor is LadoConexionFlujo {
+  return Object.values(LadoConexionFlujo).includes(valor as LadoConexionFlujo);
 }

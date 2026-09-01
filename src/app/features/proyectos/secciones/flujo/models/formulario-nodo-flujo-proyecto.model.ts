@@ -1,12 +1,12 @@
 import { FormArray, FormControl, FormGroup } from '@angular/forms';
-import { PermisoRolModulo } from './flujo-proyecto.model';
+import { DiaSemanaFlujo, PermisoRolModulo } from './flujo-proyecto.model';
 
 /** Identifica los controles del editor de nodos para asociar mensajes de validación. */
 export type CampoFormularioNodoFlujo = keyof ControlesFormularioNodoFlujo;
 
 /** Define los controles de una franja semanal de mayor actividad. */
 export interface ControlesFranjaActividadModulo {
-  dias: FormControl<string[]>;
+  dias: FormControl<DiaSemanaFlujo[]>;
   horaInicio: FormControl<string>;
   horaFin: FormControl<string>;
 }

@@ -41,8 +41,8 @@
         <button
           type="button"
           class="tarjeta-bloque-flujo__conector tarjeta-bloque-flujo__conector--salida tarjeta-bloque-flujo__conector--decision"
-          [class.tarjeta-bloque-flujo__conector--decision-si]="rama === 'Sí'"
-          [class.tarjeta-bloque-flujo__conector--decision-no]="rama === 'No'"
+          [class.tarjeta-bloque-flujo__conector--decision-si]="rama === etiquetasRamaDecision.Si"
+          [class.tarjeta-bloque-flujo__conector--decision-no]="rama === etiquetasRamaDecision.No"
           [class.esta-visible]="estadoEditor.idBloqueSeleccionado() === bloqueActual.id || estadoEditor.arrastrandoConexion()"
           [attr.aria-label]="'Iniciar rama ' + rama + ' desde ' + bloqueActual.titulo"
           (pointerdown)="iniciarArrastreConexion($event, rama)"
