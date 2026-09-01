@@ -28,6 +28,16 @@ export function obtenerProyectoIdRuta(parametros: ParamMap): number | null {
   return Number.isInteger(proyectoId) && proyectoId > 0 ? proyectoId : null;
 }
 
+/** Obtiene el proyecto contextual desde una URL interna del dominio. */
+export function obtenerProyectoIdUrl(url: string): number | null {
+  const ruta = url.split(/[?#]/, 1)[0];
+  const prefijoProyecto = `${URL_PROYECTOS}/`;
+  if (!ruta.startsWith(prefijoProyecto)) return null;
+
+  const proyectoId = Number(ruta.slice(prefijoProyecto.length).split('/', 1)[0]);
+  return Number.isInteger(proyectoId) && proyectoId > 0 ? proyectoId : null;
+}
+
 /** Identifica la ruta relativa del inicio de sesión. */
 export const RUTA_INICIO_SESION =
   `${SEGMENTOS_RUTA.autenticacion}/${SEGMENTOS_RUTA.iniciarSesion}` as const;

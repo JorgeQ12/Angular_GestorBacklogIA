@@ -23,6 +23,12 @@ valores devueltos por el API.
 - Cambiar de paso no vuelve a consultar el proyecto.
 - Cambiar de versión recupera una sola fotografía histórica y la aplica a todas las secciones.
 - La ruta deriva `proyectoId` desde `paramMap`; no captura parámetros mediante `snapshot`.
+- Cuando la URL identifica el proyecto, la barra lateral presenta “Información” como subitem
+  contextual de “Proyectos” y enlaza a la misma ruta canónica. El subitem no aparece en el listado
+  ni en Creación, porque esos contextos no proporcionan una identidad de proyecto en el path.
+- El subitem se conecta visualmente con “Proyectos” mediante una guía jerárquica compacta y
+  permanece activo cuando cambian `paso` o `version`, porque esos parámetros solo representan
+  estado interno de Información.
 
 ## Recorrido y pasos compartidos
 
