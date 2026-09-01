@@ -1,8 +1,10 @@
 import { TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { provideRouter, Router, Routes } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { of } from 'rxjs';
-import { SEGMENTOS_RUTA } from '../../../../../core/navegacion/rutas';
+import { SEGMENTOS_RUTA, URL_INICIO_PANEL } from '../../../../../core/navegacion/rutas';
+import { PasoFlujoProyecto } from '../../components/pasos/paso-flujo-proyecto/paso-flujo-proyecto';
 import { BorradorProyecto } from '../../models/borrador-proyecto.model';
 import { DatosVinculacionAzure } from '../../models/vinculacion-azure.model';
 import { ContenidoEncabezadoPasoCreacionService } from '../../services/contenido-encabezado-paso-creacion.service';
@@ -105,6 +107,19 @@ describe('PaginaCreacionProyecto', () => {
     });
   });
 
+  it('regresa al inicio cuando el último paso confirma el guardado', async () => {
+    creacionProyecto.obtenerBorrador.mockReturnValue(of(BORRADOR_FLUJO));
+    const harness = await RouterTestingHarness.create('/proyectos/creacion?proyectoId=42');
+    const router = TestBed.inject(Router);
+    const navegar = vi.spyOn(router, 'navigateByUrl').mockResolvedValue(true);
+    const pasoFlujo = harness.routeDebugElement?.query(By.directive(PasoFlujoProyecto))
+      .componentInstance as PasoFlujoProyecto;
+
+    pasoFlujo.completado.emit();
+
+    expect(navegar).toHaveBeenCalledWith(URL_INICIO_PANEL);
+  });
+
   function obtenerPosicionRecorrido(elemento: HTMLElement): string {
     return elemento.querySelector('.recorrido-creacion__posicion')?.textContent?.trim() ?? '';
   }
@@ -138,4 +153,10 @@ const BORRADOR_AVANZADO: BorradorProyecto = {
   equipoJson: '[]',
   diagramFlujoJson: '{}',
   fechaUltimoGuardado: '2026-08-25T12:00:00Z',
+};
+
+const BORRADOR_FLUJO: BorradorProyecto = {
+  ...BORRADOR_AVANZADO,
+  pasoActual: 8,
+  diagramFlujoJson: '{}',
 };

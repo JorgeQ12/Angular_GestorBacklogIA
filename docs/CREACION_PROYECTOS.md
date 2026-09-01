@@ -446,6 +446,13 @@ no aplica a decisión y es opcional en componente. El editor elimina cualquier a
 de un nodo de decisión al hidratar o guardar el flujo, mientras que un componente puede conservar
 una selección explícita o persistirse con `idsRoles` vacío.
 
+El lienzo utiliza esquinas rectas y se une sin separación al pie de guardado del paso. Sus mandos
+agrupan zoom, restablecimiento y pantalla completa; al ampliar se conserva dentro del área activa
+el lienzo, la paleta de bloques y los formularios modales, y el mismo control permite reducirlo.
+La barra superior ofrece un guardado contextual que solo se habilita cuando el diagrama cambia y
+persiste sin abandonar el editor. La acción final “Guardar flujo” persiste la misma fotografía y,
+después de la confirmación del backend, solicita a la página regresar a `/panel/inicio`.
+
 Guardar Flujo lleva `pasoActual` al menos a 9 y conserva la fotografía completa de las secciones
 anteriores.
 

@@ -23,6 +23,8 @@ import {
   LucideListTodo,
   LucideLockKeyhole,
   LucideLogOut,
+  LucideMaximize2,
+  LucideMinimize2,
   LucideMonitorCog,
   LucideMonitor,
   LucideEllipsis,
@@ -31,6 +33,7 @@ import {
   LucidePencilLine,
   LucidePlus,
   LucideRefreshCw,
+  LucideSave,
   LucideSearch,
   LucideScanText,
   LucideServerCog,
@@ -98,6 +101,7 @@ export const ICONOS_APLICACION = {
   panel: LucideLayoutDashboard.icon,
   proyectos: LucideFolderKanban.icon,
   reintentar: LucideRefreshCw.icon,
+  guardar: LucideSave.icon,
   buscar: LucideSearch.icon,
   resumen: LucideChartColumn.icon,
   alcance: LucideScanText.icon,
@@ -112,6 +116,8 @@ export const ICONOS_APLICACION = {
   volver: LucideArrowLeft.icon,
   acercar: LucideZoomIn.icon,
   alejar: LucideZoomOut.icon,
+  ampliar: LucideMaximize2.icon,
+  reducir: LucideMinimize2.icon,
 } as const satisfies Record<string, LucideIconData>;
 
 /** Limita los nombres permitidos a los iconos registrados. */

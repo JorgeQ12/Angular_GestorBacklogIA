@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  output,
+  signal,
+} from '@angular/core';
 import { EstadoError } from '../../../../../../shared/components/estado-error/estado-error';
 import { IconoComponent } from '../../../../../../shared/components/icono/icono.component';
 import { ClaveSeccionProyecto } from '../../../../config/secciones-proyecto.config';
@@ -21,7 +29,11 @@ import { CoordinadorPasoCreacionProyectoService } from '../../../services/coordi
 export class PasoFlujoProyecto {
   protected readonly paso = inject(CoordinadorPasoCreacionProyectoService);
   private readonly flujoEditado = signal<FlujoProyecto | null>(null);
+  protected readonly cambiosPendientes = signal(false);
   private proyectoAnterior: number | null = null;
+
+  /** Comunica que el flujo final fue guardado y el recorrido puede cerrarse. */
+  public readonly completado = output<void>();
 
   protected readonly flujo = computed<FlujoProyecto | null>(() => {
     const borrador = this.paso.borrador();
@@ -47,6 +59,7 @@ export class PasoFlujoProyecto {
 
       this.proyectoAnterior = proyectoId;
       this.flujoEditado.set(null);
+      this.cambiosPendientes.set(false);
     });
     this.paso.cargar();
   }
@@ -54,13 +67,26 @@ export class PasoFlujoProyecto {
   /** Conserva la fotografía vigente emitida por el editor. */
   protected actualizarFlujo(flujo: FlujoProyecto): void {
     this.flujoEditado.set(flujo);
+    this.cambiosPendientes.set(true);
   }
 
-  /** Guarda el diagrama completo como la última sección del borrador. */
-  protected guardarFlujo(): void {
+  /** Guarda cambios desde el canvas y conserva visible el editor. */
+  protected guardarCambiosFlujo(): void {
+    this.guardarFlujo(() => this.cambiosPendientes.set(false));
+  }
+
+  /** Guarda la última sección y solicita cerrar el recorrido. */
+  protected guardarYFinalizar(): void {
+    this.guardarFlujo(() => {
+      this.cambiosPendientes.set(false);
+      this.completado.emit();
+    });
+  }
+
+  private guardarFlujo(alCompletar: () => void): void {
     const flujo = this.flujo();
     if (!flujo) return;
 
-    this.paso.guardar({ seccion: ClaveSeccionProyecto.Flujo, datos: flujo }, () => undefined);
+    this.paso.guardar({ seccion: ClaveSeccionProyecto.Flujo, datos: flujo }, alCompletar);
   }
 }

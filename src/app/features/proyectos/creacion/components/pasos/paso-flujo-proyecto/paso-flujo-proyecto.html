@@ -18,7 +18,9 @@
       <app-editor-flujo-proyecto
         [flujo]="flujoProyecto"
         [procesando]="paso.procesando()"
+        [cambiosPendientes]="cambiosPendientes()"
         (flujoCambiado)="actualizarFlujo($event)"
+        (guardarSolicitado)="guardarCambiosFlujo()"
       />
 
       <footer class="ui-form-footer paso-flujo__acciones">
@@ -30,10 +32,10 @@
           type="button"
           class="ui-button ui-button--primary"
           [disabled]="paso.procesando()"
-          (click)="guardarFlujo()"
+          (click)="guardarYFinalizar()"
         >
-          <app-icono class="ui-button__icon" nombre="confirmar" />
-          Guardar flujo
+          <app-icono class="ui-button__icon" nombre="guardar" />
+          Guardar proyecto
         </button>
       </footer>
     </div>

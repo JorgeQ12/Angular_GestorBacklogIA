@@ -7,6 +7,8 @@ import {
   ViewChild,
   computed,
   inject,
+  input,
+  output,
 } from '@angular/core';
 import { EstadoVacio } from '../../../../../../shared/components/estado-vacio/estado-vacio';
 import { IconoComponent } from '../../../../../../shared/components/icono/icono.component';
@@ -29,6 +31,19 @@ export class LienzoFlujoProyecto {
   private readonly referenciaDestruccion = inject(DestroyRef);
   protected readonly estadoEditor = inject(EstadoEditorFlujoProyectoService);
   protected readonly modosCapaConexiones = ModoCapaConexionesFlujo;
+
+  /** Indica si el editor que contiene el lienzo ocupa la pantalla completa. */
+  public readonly pantallaCompleta = input(false);
+
+  /** Indica si el flujo contiene cambios que todavía no se han persistido. */
+  public readonly cambiosPendientes = input(false);
+
+  /** Solicita al editor alternar el modo de pantalla completa. */
+  public readonly alternarPantallaCompletaSolicitado = output<void>();
+
+  /** Solicita persistir la fotografía vigente sin abandonar el editor. */
+  public readonly guardarSolicitado = output<void>();
+
   @ViewChild('elementoVista', { static: true })
   private readonly elementoVista?: ElementRef<HTMLDivElement>;
 

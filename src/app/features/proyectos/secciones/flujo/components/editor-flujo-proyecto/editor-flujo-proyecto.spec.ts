@@ -116,6 +116,63 @@ describe('EditorFlujoProyecto', () => {
     ).toBeNull();
   });
 
+  it('alterna el editor entre el canvas integrado y la pantalla completa', async () => {
+    const documento = (fixture.nativeElement as HTMLElement).ownerDocument;
+    const contenedorEditor = (fixture.nativeElement as HTMLElement).querySelector<HTMLElement>(
+      '.editor-flujo',
+    )!;
+    let elementoPantallaCompleta: Element | null = null;
+    const solicitarPantallaCompleta = vi.fn(async () => {
+      elementoPantallaCompleta = contenedorEditor;
+      documento.dispatchEvent(new Event('fullscreenchange'));
+    });
+    const salirPantallaCompleta = vi.fn(async () => {
+      elementoPantallaCompleta = null;
+      documento.dispatchEvent(new Event('fullscreenchange'));
+    });
+
+    Object.defineProperty(documento, 'fullscreenElement', {
+      configurable: true,
+      get: () => elementoPantallaCompleta,
+    });
+    Object.defineProperty(documento, 'exitFullscreen', {
+      configurable: true,
+      value: salirPantallaCompleta,
+    });
+    Object.defineProperty(contenedorEditor, 'requestFullscreen', {
+      configurable: true,
+      value: solicitarPantallaCompleta,
+    });
+
+    try {
+      const ampliar = (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>(
+        '[aria-label="Ampliar canvas a pantalla completa"]',
+      )!;
+      ampliar.click();
+      await fixture.whenStable();
+      fixture.detectChanges();
+
+      expect(solicitarPantallaCompleta).toHaveBeenCalledOnce();
+      const reducir = (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>(
+        '[aria-label="Reducir canvas"]',
+      )!;
+      reducir.click();
+      await fixture.whenStable();
+      fixture.detectChanges();
+
+      expect(salirPantallaCompleta).toHaveBeenCalledOnce();
+      expect(
+        (fixture.nativeElement as HTMLElement).querySelector(
+          '[aria-label="Ampliar canvas a pantalla completa"]',
+        ),
+      ).not.toBeNull();
+    } finally {
+      Reflect.deleteProperty(documento, 'fullscreenElement');
+      Reflect.deleteProperty(documento, 'exitFullscreen');
+      Reflect.deleteProperty(contenedorEditor, 'requestFullscreen');
+    }
+  });
+
   it.each([
     TipoBloqueFlujo.Modulo,
     TipoBloqueFlujo.Pagina,
@@ -184,6 +241,38 @@ describe('EditorFlujoProyecto', () => {
       tipo: TipoBloqueFlujo.Componente,
       idsRoles: [],
     });
+  });
+
+  it('conserva el último criterio requerido y permite eliminar filas adicionales', () => {
+    estadoEditor.iniciarCreacionNodo(TipoBloqueFlujo.Accion);
+    fixture.detectChanges();
+
+    const elemento = fixture.nativeElement as HTMLElement;
+    const eliminarPrimero = elemento.querySelector<HTMLButtonElement>(
+      '[aria-label="Eliminar criterio de aceptación 1"]',
+    );
+
+    expect(elemento.querySelectorAll('[id^="flujo-criterio-"]')).toHaveLength(1);
+    expect(eliminarPrimero?.disabled).toBe(true);
+
+    elemento.querySelector<HTMLButtonElement>('button.ui-form-section__action')?.click();
+    fixture.detectChanges();
+
+    expect(elemento.querySelectorAll('[id^="flujo-criterio-"]')).toHaveLength(2);
+    const eliminarSegundo = elemento.querySelector<HTMLButtonElement>(
+      '[aria-label="Eliminar criterio de aceptación 2"]',
+    );
+    expect(eliminarSegundo?.disabled).toBe(false);
+
+    eliminarSegundo?.click();
+    fixture.detectChanges();
+
+    expect(elemento.querySelectorAll('[id^="flujo-criterio-"]')).toHaveLength(1);
+    expect(
+      elemento.querySelector<HTMLButtonElement>(
+        '[aria-label="Eliminar criterio de aceptación 1"]',
+      )?.disabled,
+    ).toBe(true);
   });
 
   function crearNodo(tipo: TipoBloqueFlujo): void {

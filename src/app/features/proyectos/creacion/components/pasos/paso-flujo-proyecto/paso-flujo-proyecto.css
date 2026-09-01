@@ -4,7 +4,7 @@
 
 .paso-flujo__contenido {
   display: grid;
-  gap: var(--space-5);
+  gap: 0;
 }
 
 .paso-flujo__error {

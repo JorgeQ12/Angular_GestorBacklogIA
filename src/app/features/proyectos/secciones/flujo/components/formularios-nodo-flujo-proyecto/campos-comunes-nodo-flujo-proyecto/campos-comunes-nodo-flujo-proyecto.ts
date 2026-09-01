@@ -2,6 +2,9 @@ import { ChangeDetectionStrategy, Component, computed, inject, input } from '@an
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IconoComponent } from '../../../../../../../shared/components/icono/icono.component';
 import {
+  FilaFormulario,
+} from '../../../../../../../shared/forms/components/fila-formulario/fila-formulario';
+import {
   ErrorCampoDirective,
   MensajesError,
 } from '../../../../../../../shared/forms/errores-validacion';
@@ -19,7 +22,7 @@ import { EstadoEditorFlujoProyectoService } from '../../../services/estado-edito
   selector: 'app-campos-comunes-nodo-flujo-proyecto',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IconoComponent, ReactiveFormsModule, ErrorCampoDirective],
+  imports: [IconoComponent, ReactiveFormsModule, ErrorCampoDirective, FilaFormulario],
   templateUrl: './campos-comunes-nodo-flujo-proyecto.html',
   styleUrl: './campos-comunes-nodo-flujo-proyecto.css',
 })
@@ -59,12 +62,9 @@ export class CamposComunesNodoFlujoProyecto {
 
   protected eliminarCriterioAceptacion(indice: number): void {
     const criterios = this.formulario().controls.criteriosAceptacion;
-    if (criterios.length <= 1) {
-      criterios.at(0).setValue('');
-      criterios.at(0).markAsTouched();
-    } else {
-      criterios.removeAt(indice);
-    }
+    if (criterios.length <= 1) return;
+
+    criterios.removeAt(indice);
     criterios.markAsDirty();
     criterios.updateValueAndValidity();
   }
