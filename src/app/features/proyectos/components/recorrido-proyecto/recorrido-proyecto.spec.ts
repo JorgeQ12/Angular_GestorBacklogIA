@@ -25,4 +25,12 @@ describe('RecorridoProyecto', () => {
     fixture.nativeElement.querySelectorAll('button')[1].click();
     expect(emitido).toBe(siguiente);
   });
+
+  it('compacta el encabezado cuando no se representa progreso', () => {
+    fixture.componentRef.setInput('mostrarProgreso', false);
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.recorrido-proyecto--sin-progreso')).not.toBeNull();
+    expect(fixture.nativeElement.querySelector('.recorrido-proyecto__progreso')).toBeNull();
+  });
 });

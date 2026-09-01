@@ -1,11 +1,24 @@
-import { ChangeDetectionStrategy, Component, computed, effect, input, output, signal, viewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  input,
+  output,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { IconoComponent } from '../../../../../shared/components/icono/icono.component';
 import { construirIdFormularioPasoProyecto } from '../../../config/pasos-proyecto.config';
 import { ClaveSeccionProyecto } from '../../../config/secciones-proyecto.config';
 import type { AccionesPasoProyecto as ConfiguracionAccionesPasoProyecto } from '../../../models/acciones-paso-proyecto.model';
 import { ModoFormularioProyecto } from '../../../models/modo-formulario-proyecto.model';
+import type { VersionamientoPasoProyecto } from '../../../models/versionamiento-proyecto.model';
 import { FormularioEquipoProyecto } from '../../../secciones/equipo/components/formulario-equipo-proyecto/formulario-equipo-proyecto';
-import type { EquipoProyecto, ProgresoEquipoProyecto } from '../../../secciones/equipo/models/equipo-proyecto.model';
+import type {
+  EquipoProyecto,
+  ProgresoEquipoProyecto,
+} from '../../../secciones/equipo/models/equipo-proyecto.model';
 import { TarjetaPasoProyecto } from '../../tarjeta-paso-proyecto/tarjeta-paso-proyecto';
 
 /** Presenta Equipo y expone la sincronización como una capacidad opcional del consumidor. */
@@ -24,10 +37,12 @@ export class PasoEquipoProyecto {
   public readonly sincronizando = input(false);
   public readonly sincronizable = input(false);
   public readonly acciones = input<ConfiguracionAccionesPasoProyecto | null>(null);
+  public readonly versionamiento = input<VersionamientoPasoProyecto | null>(null);
   public readonly editar = output<void>();
   public readonly cancelar = output<void>();
   public readonly guardar = output<EquipoProyecto>();
   public readonly sincronizar = output<EquipoProyecto>();
+  public readonly versionCambiada = output<number>();
 
   private readonly formulario = viewChild(FormularioEquipoProyecto);
   private readonly progresoTemporal = signal<ProgresoEquipoProyecto | null>(null);

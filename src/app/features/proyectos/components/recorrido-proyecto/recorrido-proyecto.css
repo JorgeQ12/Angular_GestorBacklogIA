@@ -62,6 +62,14 @@
   list-style: none;
 }
 
+.recorrido-proyecto--sin-progreso .recorrido-proyecto__encabezado {
+  padding-block: var(--space-5);
+}
+
+.recorrido-proyecto--sin-progreso .recorrido-proyecto__lista {
+  margin-top: 0;
+}
+
 .recorrido-proyecto__item {
   min-width: 0;
 }

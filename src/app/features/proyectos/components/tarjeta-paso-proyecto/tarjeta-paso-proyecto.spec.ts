@@ -37,4 +37,20 @@ describe('TarjetaPasoProyecto', () => {
 
     expect(accion.getAttribute('form')).toBe('formulario-contexto');
   });
+
+  it('integra opcionalmente el selector de versión en el encabezado', () => {
+    fixture.componentRef.setInput('versionamiento', {
+      versiones: [{ id: 7, numero: 3, fechaCreacion: '2026-09-01', esActual: true }],
+      versionSeleccionadaId: 7,
+      deshabilitado: false,
+    });
+    fixture.detectChanges();
+
+    const encabezado = (fixture.nativeElement as HTMLElement).querySelector(
+      '.tarjeta-paso__encabezado',
+    );
+
+    expect(encabezado?.querySelector('app-selector-version-proyecto')).not.toBeNull();
+    expect(encabezado?.textContent).toContain('Versión 3 · Actual');
+  });
 });

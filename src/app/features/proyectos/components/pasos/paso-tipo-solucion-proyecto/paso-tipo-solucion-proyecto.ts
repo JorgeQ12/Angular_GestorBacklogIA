@@ -3,6 +3,7 @@ import { construirIdFormularioPasoProyecto } from '../../../config/pasos-proyect
 import { ClaveSeccionProyecto } from '../../../config/secciones-proyecto.config';
 import type { AccionesPasoProyecto as ConfiguracionAccionesPasoProyecto } from '../../../models/acciones-paso-proyecto.model';
 import { ModoFormularioProyecto } from '../../../models/modo-formulario-proyecto.model';
+import type { VersionamientoPasoProyecto } from '../../../models/versionamiento-proyecto.model';
 import { FormularioTipoSolucionProyecto } from '../../../secciones/tipo-solucion/components/formulario-tipo-solucion-proyecto/formulario-tipo-solucion-proyecto';
 import type { TipoSolucionProyecto } from '../../../secciones/tipo-solucion/models/tipo-solucion-proyecto.model';
 import { TarjetaPasoProyecto } from '../../tarjeta-paso-proyecto/tarjeta-paso-proyecto';
@@ -20,9 +21,11 @@ export class PasoTipoSolucionProyecto {
   public readonly editable = input(false);
   public readonly procesando = input(false);
   public readonly acciones = input<ConfiguracionAccionesPasoProyecto | null>(null);
+  public readonly versionamiento = input<VersionamientoPasoProyecto | null>(null);
   public readonly editar = output<void>();
   public readonly cancelar = output<void>();
   public readonly guardar = output<TipoSolucionProyecto>();
+  public readonly versionCambiada = output<number>();
   protected readonly paso = ClaveSeccionProyecto.TipoSolucion;
   protected readonly idFormulario = construirIdFormularioPasoProyecto(this.paso);
 }

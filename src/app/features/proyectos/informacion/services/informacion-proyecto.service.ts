@@ -17,10 +17,8 @@ import type {
   VersionProyectoResumenDto,
 } from '../models/informacion-proyecto.dto';
 import type { VinculacionAzureProyectoResumen } from '../../models/vinculacion-azure-proyecto.model';
-import type {
-  InformacionProyecto,
-  VersionProyectoResumen,
-} from '../models/informacion-proyecto.model';
+import type { VersionProyectoResumen } from '../../models/versionamiento-proyecto.model';
+import type { InformacionProyecto } from '../models/informacion-proyecto.model';
 import type { ActualizacionSeccionProyecto } from '../../models/actualizacion-seccion-proyecto.model';
 
 /** Ejecuta y adapta las operaciones remotas de consulta y versionamiento. */

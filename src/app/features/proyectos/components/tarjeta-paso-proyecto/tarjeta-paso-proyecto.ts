@@ -1,13 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { IconoComponent } from '../../../../shared/components/icono/icono.component';
 import type { NombreIconoAplicacion } from '../../../../shared/components/icono/iconos-aplicacion';
-import {
-  type ClavePasoProyecto,
-  obtenerPasoProyecto,
-} from '../../config/pasos-proyecto.config';
+import { type ClavePasoProyecto, obtenerPasoProyecto } from '../../config/pasos-proyecto.config';
 import type { AccionesPasoProyecto as ConfiguracionAccionesPasoProyecto } from '../../models/acciones-paso-proyecto.model';
 import { ModoFormularioProyecto } from '../../models/modo-formulario-proyecto.model';
+import type { VersionamientoPasoProyecto } from '../../models/versionamiento-proyecto.model';
 import { AccionesPasoProyecto } from '../acciones-paso-proyecto/acciones-paso-proyecto';
+import { SelectorVersionProyecto } from '../selector-version-proyecto/selector-version-proyecto';
 
 /** Describe un contexto dinámico que reemplaza la descripción estática del paso. */
 export interface DetalleEncabezadoPasoProyecto {
@@ -20,7 +19,7 @@ export interface DetalleEncabezadoPasoProyecto {
 @Component({
   selector: 'app-tarjeta-paso-proyecto',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [AccionesPasoProyecto, IconoComponent],
+  imports: [AccionesPasoProyecto, IconoComponent, SelectorVersionProyecto],
   templateUrl: './tarjeta-paso-proyecto.html',
   styleUrl: './tarjeta-paso-proyecto.css',
 })
@@ -46,6 +45,9 @@ export class TarjetaPasoProyecto {
   /** Bloquea las acciones del footer durante una operación coordinada. */
   public readonly procesando = input(false);
 
+  /** Habilita la selección transversal de versión en el encabezado. */
+  public readonly versionamiento = input<VersionamientoPasoProyecto | null>(null);
+
   /** Solicita al caso de uso habilitar la edición. */
   public readonly editar = output<void>();
 
@@ -54,6 +56,9 @@ export class TarjetaPasoProyecto {
 
   /** Confirma pasos que no utilizan un formulario nativo. */
   public readonly confirmar = output<void>();
+
+  /** Solicita presentar otra versión desde el encabezado. */
+  public readonly versionCambiada = output<number>();
 
   protected readonly modos = ModoFormularioProyecto;
   protected readonly definicion = computed(() => obtenerPasoProyecto(this.paso()));

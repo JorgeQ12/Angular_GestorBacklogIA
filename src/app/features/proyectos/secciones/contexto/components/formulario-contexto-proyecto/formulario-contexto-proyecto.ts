@@ -63,8 +63,8 @@ export class FormularioContextoProyecto {
   /** Entrega un Contexto válido y normalizado al flujo consumidor. */
   public readonly guardar = output<ContextoProyecto>();
 
-  /** Comunica el nombre usado para identificar el proyecto fuera del formulario. */
-  public readonly nombreCambiado = output<string>();
+  /** Comunica la fotografía vigente para previsualizar datos fuera del formulario. */
+  public readonly contextoCambiado = output<ContextoProyecto>();
 
   protected readonly limites = LIMITES_CONTEXTO_PROYECTO;
   protected readonly mensajesFormulario = MENSAJES_CONTEXTO_PROYECTO;
@@ -88,9 +88,9 @@ export class FormularioContextoProyecto {
     });
 
   public constructor() {
-    this.formulario.controls.nombre.valueChanges
+    this.formulario.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((nombre) => this.nombreCambiado.emit(nombre.trim()));
+      .subscribe(() => this.contextoCambiado.emit(this.obtenerContextoVigente()));
 
     effect(() => {
       this.modo();
@@ -118,13 +118,17 @@ export class FormularioContextoProyecto {
       return;
     }
 
+    this.guardar.emit(this.obtenerContextoVigente());
+  }
+
+  private obtenerContextoVigente(): ContextoProyecto {
     const valores = this.formulario.getRawValue();
-    this.guardar.emit({
+    return {
       nombre: valores.nombre.trim(),
       responsable: valores.responsable.trim(),
       fechaObjetivo: valores.fechaObjetivo,
-      prioridadCatalogoId: valores.prioridadCatalogoId!,
+      prioridadCatalogoId: valores.prioridadCatalogoId,
       descripcion: valores.descripcion.trim(),
-    });
+    };
   }
 }

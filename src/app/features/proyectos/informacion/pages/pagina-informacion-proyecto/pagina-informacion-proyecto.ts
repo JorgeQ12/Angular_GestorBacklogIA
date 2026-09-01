@@ -1,10 +1,21 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import type { OpcionCatalogo } from '../../../../../core/catalogos/models/opcion-catalogo.model';
 import { CatalogosService } from '../../../../../core/catalogos/services/catalogos.service';
 import { MensajesService } from '../../../../../core/mensajes/services/mensajes.service';
-import { PARAMETROS_RUTA, URL_PROYECTOS, obtenerProyectoIdRuta } from '../../../../../core/navegacion/rutas';
+import {
+  PARAMETROS_RUTA,
+  URL_PROYECTOS,
+  obtenerProyectoIdRuta,
+} from '../../../../../core/navegacion/rutas';
 import { EncabezadoPagina } from '../../../../../shared/components/encabezado-pagina/encabezado-pagina';
 import { EstadoError } from '../../../../../shared/components/estado-error/estado-error';
 import { IconoComponent } from '../../../../../shared/components/icono/icono.component';
@@ -28,8 +39,9 @@ import { ClaveSeccionProyecto } from '../../../config/secciones-proyecto.config'
 import type { ActualizacionSeccionProyecto } from '../../../models/actualizacion-seccion-proyecto.model';
 import { ACCIONES_INFORMACION_PASO_PROYECTO } from '../../../models/acciones-paso-proyecto.model';
 import { ModoFormularioProyecto } from '../../../models/modo-formulario-proyecto.model';
+import type { VersionamientoPasoProyecto } from '../../../models/versionamiento-proyecto.model';
 import { CATALOGO_PRIORIDADES_PROYECTO } from '../../../secciones/contexto/config/contexto-proyecto.config';
-import { SelectorVersionProyecto } from '../../components/selector-version-proyecto/selector-version-proyecto';
+import type { ContextoProyecto } from '../../../secciones/contexto/models/contexto-proyecto.model';
 import { MENSAJE_ERROR_CARGA_INFORMACION_PROYECTO } from '../../config/mensajes-informacion-proyecto.config';
 import {
   obtenerPasoInformacionProyecto,
@@ -46,7 +58,6 @@ import { EstadoInformacionProyectoService } from '../../services/estado-informac
     EstadoError,
     FechaPipe,
     IconoComponent,
-    SelectorVersionProyecto,
     RecorridoProyecto,
     PasoVinculacionAzureProyecto,
     PasoContextoProyecto,
@@ -84,12 +95,45 @@ export class PaginaInformacionProyecto {
     ),
   );
   protected readonly seccionEditando = signal<ClaveSeccionProyecto | null>(null);
+  private readonly contextoTemporal = signal<ContextoProyecto | null>(null);
   protected readonly modoFormulario = computed(() =>
     this.seccionEditando() === this.pasoActivo()
       ? ModoFormularioProyecto.Edicion
       : ModoFormularioProyecto.Lectura,
   );
   protected readonly prioridades = signal<readonly OpcionCatalogo[]>([]);
+  protected readonly datosEncabezado = computed(() => {
+    const proyecto = this.estado.proyectoPresentado();
+    const temporal = this.contextoTemporal();
+    const contexto = temporal ?? proyecto?.contexto;
+    const prioridadTemporal = temporal
+      ? this.prioridades().find((prioridad) => prioridad.id === temporal.prioridadCatalogoId)
+          ?.nombre
+      : null;
+    const prioridadPersistidaCoincide =
+      temporal?.prioridadCatalogoId === proyecto?.contexto.prioridadCatalogoId;
+
+    return {
+      nombre: contexto?.nombre || 'Proyecto sin nombre',
+      responsable: contexto?.responsable || 'Sin responsable',
+      prioridad:
+        prioridadTemporal ??
+        (temporal && !prioridadPersistidaCoincide
+          ? 'Sin prioridad'
+          : (proyecto?.prioridad ?? 'Sin prioridad')),
+      fechaObjetivo: contexto?.fechaObjetivo ?? '',
+    };
+  });
+  protected readonly versionamientoPaso = computed<VersionamientoPasoProyecto | null>(() => {
+    const proyecto = this.estado.proyectoPresentado();
+    if (!proyecto || this.seccionEditando() !== null) return null;
+
+    return {
+      versiones: this.estado.versiones(),
+      versionSeleccionadaId: proyecto.versionId,
+      deshabilitado: this.estado.guardando(),
+    };
+  });
   protected readonly mensajeError = MENSAJE_ERROR_CARGA_INFORMACION_PROYECTO;
 
   public constructor() {
@@ -100,6 +144,7 @@ export class PaginaInformacionProyecto {
     effect(() => {
       const proyectoId = obtenerProyectoIdRuta(this.parametrosRuta());
       if (proyectoId === null) return;
+      this.contextoTemporal.set(null);
       this.seccionEditando.set(null);
       if (this.proyectoCargadoId !== proyectoId) {
         this.proyectoCargadoId = proyectoId;
@@ -110,6 +155,8 @@ export class PaginaInformacionProyecto {
       const proyectoId = obtenerProyectoIdRuta(this.parametrosRuta());
       const actual = this.estado.proyectoActual();
       if (proyectoId !== null && actual?.id === proyectoId) {
+        this.contextoTemporal.set(null);
+        this.seccionEditando.set(null);
         this.estado.presentarVersion(this.versionSolicitadaId());
       }
     });
@@ -150,11 +197,20 @@ export class PaginaInformacionProyecto {
 
   protected editar(seccion: ClaveSeccionProyecto): void {
     if (!this.estado.proyectoPresentado()?.esVersionActual) return;
+    this.contextoTemporal.set(null);
     this.seccionEditando.set(seccion);
   }
 
   protected cancelarEdicion(): void {
+    this.contextoTemporal.set(null);
     this.seccionEditando.set(null);
+  }
+
+  /** Refleja los cambios de Contexto sin alterar aún la fotografía persistida. */
+  protected actualizarContextoTemporal(contexto: ContextoProyecto): void {
+    if (this.seccionEditando() === ClaveSeccionProyecto.Contexto) {
+      this.contextoTemporal.set(contexto);
+    }
   }
 
   protected guardar(actualizacion: ActualizacionSeccionProyecto): void {

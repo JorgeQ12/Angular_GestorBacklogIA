@@ -1,6 +1,9 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { IconoComponent } from '../../../../shared/components/icono/icono.component';
-import type { AccionesPasoProyecto as ConfiguracionAccionesPasoProyecto } from '../../models/acciones-paso-proyecto.model';
+import {
+  AlineacionAccionesPasoProyecto,
+  type AccionesPasoProyecto as ConfiguracionAccionesPasoProyecto,
+} from '../../models/acciones-paso-proyecto.model';
 
 /** Presenta el footer configurado por el caso de uso sin conocer su persistencia. */
 @Component({
@@ -10,6 +13,8 @@ import type { AccionesPasoProyecto as ConfiguracionAccionesPasoProyecto } from '
   templateUrl: './acciones-paso-proyecto.html',
 })
 export class AccionesPasoProyecto {
+  protected readonly alineaciones = AlineacionAccionesPasoProyecto;
+
   /** Define textos e iconos de las acciones vigentes. */
   public readonly configuracion = input.required<ConfiguracionAccionesPasoProyecto>();
 

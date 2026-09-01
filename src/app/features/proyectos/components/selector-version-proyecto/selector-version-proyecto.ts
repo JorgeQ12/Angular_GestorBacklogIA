@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, computed, effect, input, output } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { SelectorCampo } from '../../../../../shared/forms/controles/selector-campo/selector-campo';
-import type { OpcionSelector } from '../../../../../shared/forms/controles/selector-campo/models/opcion-selector.model';
-import type { VersionProyectoResumen } from '../../models/informacion-proyecto.model';
+import { SelectorCampo } from '../../../../shared/forms/controles/selector-campo/selector-campo';
+import type { OpcionSelector } from '../../../../shared/forms/controles/selector-campo/models/opcion-selector.model';
+import type { VersionProyectoResumen } from '../../models/versionamiento-proyecto.model';
 
-/** Presenta una única selección de versión para todas las secciones del proyecto. */
+/** Permite cambiar la versión aplicada transversalmente a los pasos del proyecto. */
 @Component({
   selector: 'app-selector-version-proyecto',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -29,7 +29,7 @@ export class SelectorVersionProyecto {
     this.versiones().map((version) => ({
       valor: version.id,
       etiqueta: `Versión ${version.numero}${version.esActual ? ' · Actual' : ''}`,
-      descripcion: version.esActual ? 'Versión vigente y editable' : 'Histórica · Solo lectura',
+      descripcion: version.esActual ? 'Vigente · Editable' : 'Histórica · Solo lectura',
     })),
   );
 

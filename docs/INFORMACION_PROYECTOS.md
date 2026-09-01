@@ -6,12 +6,16 @@ hermano de Creación dentro del dominio `features/proyectos`.
 ## Composición y navegación
 
 `PaginaInformacionProyecto` es la única página enrutada. Conserva montados el encabezado y el
-selector global de versión; un `@switch` reemplaza únicamente el paso activo. No existen páginas
-ni rutas hijas por paso.
+recorrido; un `@switch` reemplaza únicamente el paso activo. No existen páginas ni rutas hijas por
+paso. El selector global de versión se presenta en el encabezado de la tarjeta activa, pero su
+estado y su navegación continúan coordinados por la página.
 
 El encabezado presenta Responsable, Prioridad y Fecha objetivo desde la fotografía
 `proyectoPresentado`. No duplica esos valores en estado local: al guardar Contexto o cambiar de
 versión, los metadatos se rehidratan con la misma información que alimenta el formulario.
+Durante la edición de Contexto, Nombre, Responsable, Prioridad y Fecha objetivo se reflejan
+inmediatamente mediante una fotografía temporal; cancelar la descarta y guardar deja visibles los
+valores devueltos por el API.
 
 - `?paso=<clave>` identifica el paso consultado. Azure es la entrada predeterminada y se omite de
   la URL.
@@ -33,13 +37,20 @@ adaptadores visuales paralelos.
 - Cada paso compartido compone su tarjeta y su formulario. La tarjeta es el único componente que
   presenta `AccionesPasoProyecto` y asocia el botón principal mediante `id`/`form`.
 - La página conserva la ruta, el descarte de cambios y la persistencia; los pasos no conocen HTTP,
-  versiones, borradores ni navegación.
+  borradores ni navegación. Solo reenvían a la tarjeta la configuración opcional de versionamiento.
 
 ## Selector de versión
 
-El selector se presenta una sola vez debajo del encabezado de página. No forma parte del encabezado
-de Azure, Contexto, Objetivos, Equipo ni de ningún otro paso, porque una versión representa una
-fotografía integral del agregado Proyecto.
+El selector se presenta una sola vez dentro del encabezado del paso activo. Aunque su ubicación sea
+contextual, la selección sigue representando una fotografía integral del agregado Proyecto y se
+aplica a todos los pasos, no únicamente al que está visible.
+
+`TarjetaPasoProyecto` es el único componente que renderiza `SelectorVersionProyecto`. Los nueve
+pasos solo aceptan y reenvían `VersionamientoPasoProyecto`; Creación no proporciona esa capacidad y,
+por lo tanto, no muestra el selector.
+
+Al entrar en edición, Información retira temporalmente el selector. La versión actual queda fijada
+como base de concurrencia del guardado y el selector reaparece al cancelar o completar la edición.
 
 - La versión actual permite editar las ocho secciones funcionales.
 - Las versiones históricas muestran todas las secciones en lectura.
@@ -90,6 +101,7 @@ features/proyectos/
 ├── components/
 │   ├── acciones-paso-proyecto/
 │   ├── recorrido-proyecto/
+│   ├── selector-version-proyecto/
 │   ├── tarjeta-paso-proyecto/
 │   └── pasos/
 │       ├── paso-vinculacion-azure-proyecto/
@@ -103,7 +115,6 @@ features/proyectos/
 ├── creacion/
 ├── listado/
 └── informacion/
-    ├── components/selector-version-proyecto/
     ├── config/
     ├── mappers/
     ├── models/

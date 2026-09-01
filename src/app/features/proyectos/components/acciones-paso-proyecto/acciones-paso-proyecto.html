@@ -1,4 +1,7 @@
-<footer class="ui-form-footer">
+<footer
+  class="ui-form-footer"
+  [class.ui-form-footer--acciones-al-final]="configuracion().alineacion === alineaciones.Fin"
+>
   @if (configuracion().nota; as nota) {
     <div class="ui-form-footer__note">
       <app-icono nombre="informacion" aria-hidden="true" />

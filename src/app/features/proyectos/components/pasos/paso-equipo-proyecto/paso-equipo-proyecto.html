@@ -6,8 +6,10 @@
   [acciones]="acciones()"
   [idFormulario]="idFormulario"
   [procesando]="procesando() || sincronizando()"
+  [versionamiento]="versionamiento()"
   (editar)="editar.emit()"
   (cancelar)="cancelar.emit()"
+  (versionCambiada)="versionCambiada.emit($event)"
 >
   @if (sincronizable() && modo() === modos.Edicion) {
     <button

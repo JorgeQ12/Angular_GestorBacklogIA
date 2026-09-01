@@ -8,6 +8,7 @@ import {
 import { validarTextoRequerido } from '../../../../../shared/forms/validadores';
 import { ClavePasoEspecialProyecto } from '../../../config/pasos-proyecto.config';
 import { ModoFormularioProyecto } from '../../../models/modo-formulario-proyecto.model';
+import type { VersionamientoPasoProyecto } from '../../../models/versionamiento-proyecto.model';
 import type {
   DatosVinculacionAzure,
   ResultadoVinculacionAzure,
@@ -52,6 +53,9 @@ export class PasoVinculacionAzureProyecto {
   /** Bloquea temporalmente las acciones durante una operación remota. */
   public readonly procesando = input(false);
 
+  /** Habilita la selección de versión cuando el paso se consulta. */
+  public readonly versionamiento = input<VersionamientoPasoProyecto | null>(null);
+
   /** Solicita validar en Azure los valores capturados. */
   public readonly validar = output<DatosVinculacionAzure>();
 
@@ -60,6 +64,9 @@ export class PasoVinculacionAzureProyecto {
 
   /** Solicita crear el borrador con la vinculación confirmada. */
   public readonly confirmar = output<void>();
+
+  /** Solicita presentar otra versión desde el encabezado. */
+  public readonly versionCambiada = output<number>();
 
   protected readonly paso = ClavePasoEspecialProyecto.VinculacionAzure;
   protected readonly modos = ModoFormularioProyecto;

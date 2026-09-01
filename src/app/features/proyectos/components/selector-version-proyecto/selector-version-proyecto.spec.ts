@@ -17,9 +17,9 @@ describe('SelectorVersionProyecto', () => {
     fixture.detectChanges();
   });
 
-  it('presenta el selector global con la versión vigente', () => {
+  it('presenta de forma compacta la versión vigente', () => {
     const elemento = fixture.nativeElement as HTMLElement;
-    expect(elemento.textContent).toContain('Versión consultada');
     expect(elemento.textContent).toContain('Versión 2 · Actual');
+    expect(elemento.querySelector('section')).toBeNull();
   });
 });

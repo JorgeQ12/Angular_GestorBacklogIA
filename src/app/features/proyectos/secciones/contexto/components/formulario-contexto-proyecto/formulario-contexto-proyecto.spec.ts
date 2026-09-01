@@ -75,13 +75,22 @@ describe('FormularioContextoProyecto', () => {
     ).toBe('El nombre del proyecto es obligatorio.');
   });
 
-  it('comunica el nombre escrito para identificar el proyecto', () => {
-    const nombreCambiado = vi.fn();
-    fixture.componentInstance.nombreCambiado.subscribe(nombreCambiado);
+  it('comunica la fotografía vigente para previsualizar Contexto', () => {
+    const contextoCambiado = vi.fn();
+    fixture.componentInstance.contextoCambiado.subscribe(contextoCambiado);
 
     escribir('#contexto-nombre', '  Portal de clientes  ');
+    escribir('#contexto-responsable', '  Jorge Quintero  ');
+    establecerControl(SelectorFecha, '2026-08-30');
+    establecerControl(SelectorCampo, 14);
 
-    expect(nombreCambiado).toHaveBeenLastCalledWith('Portal de clientes');
+    expect(contextoCambiado).toHaveBeenLastCalledWith({
+      nombre: 'Portal de clientes',
+      responsable: 'Jorge Quintero',
+      fechaObjetivo: '2026-08-30',
+      prioridadCatalogoId: 14,
+      descripcion: '',
+    });
   });
 
   it('restaura la fotografía confirmada y bloquea el envío al volver a lectura', () => {

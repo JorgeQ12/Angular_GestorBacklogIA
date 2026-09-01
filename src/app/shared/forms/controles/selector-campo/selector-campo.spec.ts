@@ -13,12 +13,14 @@ import { SelectorCampo } from './selector-campo';
       etiquetadoPor="prioridad-label"
       [opciones]="opciones"
       [soloLectura]="soloLectura()"
+      [compacto]="compacto()"
       [formControl]="control"
     />
   `,
 })
 class ComponentePrueba {
   public readonly soloLectura = signal(false);
+  public readonly compacto = signal(false);
   public readonly control = new FormControl<number | null>(null);
   public readonly opciones = [
     { valor: 1, etiqueta: 'Alta', descripcion: 'Atención prioritaria' },
@@ -101,6 +103,16 @@ describe('SelectorCampo', () => {
     expect(obtenerTrigger().getAttribute('aria-readonly')).toBe('true');
     expect(overlay.querySelector('[role="listbox"]')).toBeNull();
     expect(fixture.componentInstance.control.value).toBe(1);
+  });
+
+  it('aplica la variante compacta también al panel renderizado en el overlay', () => {
+    fixture.componentInstance.compacto.set(true);
+    fixture.detectChanges();
+    obtenerTrigger().click();
+    fixture.detectChanges();
+
+    expect(obtenerTrigger().classList).toContain('selector-campo__trigger--compacto');
+    expect(overlay.querySelector('.selector-campo__lista--compacta')).not.toBeNull();
   });
 
   function obtenerTrigger(): HTMLButtonElement {

@@ -16,7 +16,7 @@
   background: var(--field-surface);
   color: var(--text-primary);
   font: inherit;
-  font-size: var(--font-size-sm);
+  font-size: var(--selector-campo-font-size, var(--font-size-sm));
   text-align: left;
   transition:
     border-color var(--transition-base) var(--ease-standard),
@@ -53,6 +53,12 @@
 .selector-campo__trigger--error {
   border-color: var(--field-error-color);
   background: var(--field-error-surface);
+}
+
+.selector-campo__trigger--compacto {
+  min-height: var(--control-height-md);
+  padding-inline: var(--space-3);
+  font-size: var(--font-size-xs);
 }
 
 .selector-campo__placeholder {
@@ -123,14 +129,37 @@
 }
 
 .selector-campo__texto strong {
-  font-size: var(--font-size-sm);
+  font-size: var(--selector-campo-font-size, var(--font-size-sm));
   font-weight: var(--font-weight-semibold);
 }
 
 .selector-campo__texto small,
 .selector-campo__vacio {
   color: var(--text-muted);
+  font-size: var(--selector-campo-description-font-size, var(--font-size-xs));
+}
+
+.selector-campo__lista--compacta {
+  padding: var(--space-1);
+}
+
+.selector-campo__lista--compacta .selector-campo__opcion {
+  min-height: var(--control-height-md);
+  padding: var(--space-2);
+}
+
+.selector-campo__lista--compacta .selector-campo__texto {
+  gap: 2px;
+}
+
+.selector-campo__lista--compacta .selector-campo__texto strong {
   font-size: var(--font-size-xs);
+  white-space: nowrap;
+}
+
+.selector-campo__lista--compacta .selector-campo__texto small {
+  font-size: var(--font-size-2xs);
+  white-space: nowrap;
 }
 
 .selector-campo__vacio {

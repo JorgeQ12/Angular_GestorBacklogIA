@@ -43,6 +43,9 @@ export class SelectorCampo implements ControlValueAccessor, ControlCampoPersonal
   public readonly placeholder = input('Selecciona una opción');
   public readonly etiquetadoPor = input<string>();
 
+  /** Reduce altura y tipografía para controles ubicados en encabezados compactos. */
+  public readonly compacto = input(false);
+
   /** Conserva el valor visible e impide abrir o modificar la selección. */
   public readonly soloLectura = input(false);
 

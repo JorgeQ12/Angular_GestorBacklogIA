@@ -3,11 +3,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Subscription, finalize, forkJoin } from 'rxjs';
 import { NotificadorErroresApiService } from '../../../../core/mensajes/services/notificador-errores-api.service';
 import type { ActualizacionSeccionProyecto } from '../../models/actualizacion-seccion-proyecto.model';
+import type { VersionProyectoResumen } from '../../models/versionamiento-proyecto.model';
 import { CONTEXTO_ERROR_ACTUALIZACION_PROYECTO } from '../config/mensajes-informacion-proyecto.config';
-import type {
-  InformacionProyecto,
-  VersionProyectoResumen,
-} from '../models/informacion-proyecto.model';
+import type { InformacionProyecto } from '../models/informacion-proyecto.model';
 import { InformacionProyectoService } from './informacion-proyecto.service';
 
 /** Coordina la fotografía vigente, la versión presentada y las actualizaciones de la página. */

@@ -44,6 +44,7 @@ import type {
 } from '../../../models/vinculacion-azure-proyecto.model';
 import { deserializarAlcanceProyecto } from '../../../secciones/alcance/mappers/alcance-proyecto.mapper';
 import { CATALOGO_PRIORIDADES_PROYECTO } from '../../../secciones/contexto/config/contexto-proyecto.config';
+import type { ContextoProyecto } from '../../../secciones/contexto/models/contexto-proyecto.model';
 import {
   combinarEquipoConAzure,
   deserializarEquipoProyecto,
@@ -296,8 +297,8 @@ export class PaginaCreacionProyecto {
       });
   }
 
-  protected actualizarNombreProyecto(nombre: string): void {
-    this.estadoCreacion.actualizarNombreProyecto(nombre);
+  protected actualizarContextoTemporal(contexto: ContextoProyecto): void {
+    this.estadoCreacion.actualizarNombreProyecto(contexto.nombre);
   }
 
   protected sincronizarEquipo(equipoVigente: EquipoProyecto): void {

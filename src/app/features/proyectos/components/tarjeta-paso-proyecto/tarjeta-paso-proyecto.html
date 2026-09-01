@@ -20,6 +20,14 @@
     </div>
 
     <div class="tarjeta-paso__acciones-encabezado">
+      @if (versionamiento(); as configuracionVersionamiento) {
+        <app-selector-version-proyecto
+          [versiones]="configuracionVersionamiento.versiones"
+          [versionSeleccionadaId]="configuracionVersionamiento.versionSeleccionadaId"
+          [deshabilitado]="configuracionVersionamiento.deshabilitado"
+          (versionCambiada)="versionCambiada.emit($event)"
+        />
+      }
       <ng-content select="[accionesEncabezadoPasoProyecto]" />
       @if (editable() && modo() === modos.Lectura) {
         <button

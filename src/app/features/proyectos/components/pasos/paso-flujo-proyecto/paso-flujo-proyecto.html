@@ -4,8 +4,10 @@
   [editable]="editable()"
   [acciones]="acciones()"
   [procesando]="procesando()"
+  [versionamiento]="versionamiento()"
   (editar)="editar.emit()"
   (cancelar)="cancelar.emit()"
+  (versionCambiada)="versionCambiada.emit($event)"
   (confirmar)="confirmar()"
 >
   <app-editor-flujo-proyecto

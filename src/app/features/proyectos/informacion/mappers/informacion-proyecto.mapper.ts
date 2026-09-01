@@ -14,10 +14,8 @@ import type {
   VersionProyectoResumenDto,
 } from '../models/informacion-proyecto.dto';
 import type { VinculacionAzureProyectoResumen } from '../../models/vinculacion-azure-proyecto.model';
-import type {
-  InformacionProyecto,
-  VersionProyectoResumen,
-} from '../models/informacion-proyecto.model';
+import type { VersionProyectoResumen } from '../../models/versionamiento-proyecto.model';
+import type { InformacionProyecto } from '../models/informacion-proyecto.model';
 
 /** Convierte la respuesta vigente en una fotografía íntegra del dominio. */
 export function mapearInformacionProyecto(dto: ProyectoInformacionDto): InformacionProyecto {

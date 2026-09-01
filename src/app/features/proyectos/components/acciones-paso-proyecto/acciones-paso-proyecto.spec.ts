@@ -1,5 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ACCIONES_INFORMACION_PASO_PROYECTO } from '../../models/acciones-paso-proyecto.model';
+import {
+  ACCIONES_CREACION_PASO_PROYECTO,
+  ACCIONES_INFORMACION_PASO_PROYECTO,
+} from '../../models/acciones-paso-proyecto.model';
 import { AccionesPasoProyecto } from './acciones-paso-proyecto';
 
 describe('AccionesPasoProyecto', () => {
@@ -15,6 +18,7 @@ describe('AccionesPasoProyecto', () => {
     fixture.detectChanges();
     expect(fixture.nativeElement.textContent).toContain('Cancelar');
     expect(fixture.nativeElement.textContent).toContain('Guardar versión');
+    expect(fixture.nativeElement.querySelector('.ui-form-footer--acciones-al-final')).not.toBeNull();
   });
 
   it('vincula la acción principal con el formulario indicado', () => {
@@ -27,5 +31,12 @@ describe('AccionesPasoProyecto', () => {
 
     expect(botonPrincipal.type).toBe('submit');
     expect(botonPrincipal.getAttribute('form')).toBe('formulario-contexto');
+  });
+
+  it('conserva la alineación original para las acciones de Creación', () => {
+    fixture.componentRef.setInput('configuracion', ACCIONES_CREACION_PASO_PROYECTO);
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.ui-form-footer--acciones-al-final')).toBeNull();
   });
 });

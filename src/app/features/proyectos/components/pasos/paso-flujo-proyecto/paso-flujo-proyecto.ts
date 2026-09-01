@@ -1,7 +1,16 @@
-import { ChangeDetectionStrategy, Component, computed, effect, input, output, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 import { ClaveSeccionProyecto } from '../../../config/secciones-proyecto.config';
 import type { AccionesPasoProyecto as ConfiguracionAccionesPasoProyecto } from '../../../models/acciones-paso-proyecto.model';
 import { ModoFormularioProyecto } from '../../../models/modo-formulario-proyecto.model';
+import type { VersionamientoPasoProyecto } from '../../../models/versionamiento-proyecto.model';
 import { EditorFlujoProyecto } from '../../../secciones/flujo/components/editor-flujo-proyecto/editor-flujo-proyecto';
 import type { FlujoProyecto } from '../../../secciones/flujo/models/flujo-proyecto.model';
 import { TarjetaPasoProyecto } from '../../tarjeta-paso-proyecto/tarjeta-paso-proyecto';
@@ -19,9 +28,11 @@ export class PasoFlujoProyecto {
   public readonly editable = input(false);
   public readonly procesando = input(false);
   public readonly acciones = input<ConfiguracionAccionesPasoProyecto | null>(null);
+  public readonly versionamiento = input<VersionamientoPasoProyecto | null>(null);
   public readonly editar = output<void>();
   public readonly cancelar = output<void>();
   public readonly guardar = output<FlujoProyecto>();
+  public readonly versionCambiada = output<number>();
   protected readonly flujoTemporal = signal<FlujoProyecto | null>(null);
   protected readonly paso = ClaveSeccionProyecto.Flujo;
   protected readonly modos = ModoFormularioProyecto;

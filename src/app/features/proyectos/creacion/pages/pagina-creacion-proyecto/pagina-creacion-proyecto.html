@@ -54,7 +54,7 @@
               [modo]="modoEdicion"
               [acciones]="accionesCreacion"
               [procesando]="guardandoSeccion()"
-              (nombreCambiado)="actualizarNombreProyecto($event)"
+              (contextoCambiado)="actualizarContextoTemporal($event)"
               (guardar)="guardarSeccion({ seccion: secciones.Contexto, datos: $event }, secciones.TipoSolucion)"
             />
           }

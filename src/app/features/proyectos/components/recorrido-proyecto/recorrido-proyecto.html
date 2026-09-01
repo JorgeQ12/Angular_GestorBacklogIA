@@ -1,4 +1,8 @@
-<nav class="recorrido-proyecto" aria-labelledby="titulo-recorrido-proyecto">
+<nav
+  class="recorrido-proyecto"
+  [class.recorrido-proyecto--sin-progreso]="!mostrarProgreso()"
+  aria-labelledby="titulo-recorrido-proyecto"
+>
   <header class="recorrido-proyecto__encabezado">
     <strong id="titulo-recorrido-proyecto" class="recorrido-proyecto__titulo">
       {{ titulo() }}
