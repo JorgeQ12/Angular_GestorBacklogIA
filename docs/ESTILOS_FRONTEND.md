@@ -83,9 +83,16 @@ Un valor debe convertirse en token cuando representa una decisión visual reutil
 varios componentes necesitan cambiar conjuntamente. Una medida exclusiva de un layout local no
 requiere un token nuevo.
 
+Las transiciones utilizan `--transition-fast`, `--transition-base` o `--transition-slow`. Estos
+tokens reducen coordinadamente su duración cuando el sistema informa `prefers-reduced-motion`, por
+lo que las features no repiten bloques de accesibilidad para cada componente.
+
 El acento de identidad utiliza la escala neutral gris y negra mediante `--color-brand`. No se
 introducen colores decorativos mediante valores locales. Los colores de información, éxito,
 advertencia y error se reservan para estados que necesiten comunicar esas condiciones.
+
+La escala `--color-category-*` distingue categorías coexistentes en visualizaciones. No comunica
+éxito, error o advertencia y cada dominio centraliza la correspondencia entre categoría y acento.
 
 ## Tipografía oficial
 
@@ -151,7 +158,9 @@ profundos como `.mi-feature .ui-control` si el cambio representa una variante re
 
 - `.ui-visually-hidden` para conservar etiquetas accesibles sin alterar el layout.
 - `.ui-field` y `.ui-label`.
+- `.ui-form-grid` y `.ui-form-section` para distribuciones y secciones internas repetidas.
 - `.ui-control-wrap` y `.ui-control`.
+- `.ui-textarea`, `.ui-hint` y contenido auxiliar como `.ui-control-suffix`.
 - Tamaños y espaciado para iconos o acciones.
 - Hover, foco y estado deshabilitado.
 - Estado `.has-error`.
@@ -337,8 +346,10 @@ dominio sin conocer las reglas de cada feature:
 
 - La feature controla si el componente existe y atiende sus salidas; el modal no mantiene estado
   de negocio ni consume servicios.
-- `descartable` controla únicamente Escape, backdrop y el botón superior. La acción de cancelar
-  permanece disponible cuando `mostrarCancelar` está habilitado.
+- `descartable` habilita Escape, backdrop y el botón superior. La acción de cancelar permanece
+  disponible cuando `mostrarCancelar` está habilitado.
+- `cierreExteriorHabilitado` permite bloquear Escape y backdrop sin ocultar el botón superior. Se
+  deshabilita en formularios donde un cierre accidental pueda descartar una edición extensa.
 - `idFormulario` permite que el botón del pie envíe un formulario proyectado sin duplicar las
   acciones dentro del contenido.
 - El componente administra `role`, relaciones ARIA, foco inicial, confinamiento del foco,

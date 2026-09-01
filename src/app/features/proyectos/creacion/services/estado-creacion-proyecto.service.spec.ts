@@ -288,6 +288,26 @@ describe('EstadoCreacionProyectoService', () => {
       8,
     );
   });
+
+  it('completa las secciones funcionales al guardar Flujo', async () => {
+    const flujo = {
+      proyectoId: '42',
+      roles: [],
+      nodos: [],
+      conexiones: [],
+      fechaActualizacion: '2026-08-28T10:00:00.000Z',
+    };
+    await firstValueFrom(servicio.cargar(42));
+    await firstValueFrom(
+      servicio.guardarSeccion({ seccion: ClaveSeccionProyecto.Flujo, datos: flujo }),
+    );
+
+    expect(creacionProyecto.actualizarBorrador).toHaveBeenCalledWith(
+      BORRADOR,
+      { seccion: ClaveSeccionProyecto.Flujo, datos: flujo },
+      9,
+    );
+  });
 });
 
 const BORRADOR: BorradorProyecto = {

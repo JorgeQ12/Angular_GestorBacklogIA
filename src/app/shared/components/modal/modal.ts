@@ -68,6 +68,9 @@ export class Modal implements AfterViewInit, OnDestroy {
   /** Permite descartar el diálogo mediante Escape, backdrop o el botón superior. */
   public readonly descartable = input(true);
 
+  /** Permite que Escape o un clic directo en el backdrop soliciten el cierre. */
+  public readonly cierreExteriorHabilitado = input(true);
+
   /** Vincula la acción principal con un formulario proyectado. */
   public readonly idFormulario = input<string | null>(null);
 
@@ -125,7 +128,12 @@ export class Modal implements AfterViewInit, OnDestroy {
 
   /** Cierra el diálogo cuando el usuario selecciona directamente el backdrop. */
   protected gestionarBackdrop(evento: MouseEvent): void {
-    if (this.descartable() && evento.target === evento.currentTarget && this.esModalSuperior()) {
+    if (
+      this.descartable() &&
+      this.cierreExteriorHabilitado() &&
+      evento.target === evento.currentTarget &&
+      this.esModalSuperior()
+    ) {
       this.cerrar.emit();
     }
   }
@@ -136,7 +144,7 @@ export class Modal implements AfterViewInit, OnDestroy {
       return;
     }
 
-    if (evento.key === 'Escape' && this.descartable()) {
+    if (evento.key === 'Escape' && this.descartable() && this.cierreExteriorHabilitado()) {
       evento.preventDefault();
       this.cerrar.emit();
       return;

@@ -1,0 +1,76 @@
+<div [formGroup]="formulario()">
+  <div class="ui-form-grid">
+    <section class="ui-form-section">
+      <header class="ui-form-section__header">
+        <span class="ui-form-section__icon" aria-hidden="true"><app-icono nombre="contextoProyecto" /></span>
+        <div>
+          <h3 class="ui-form-section__title">Información principal</h3>
+          <p class="ui-form-section__description">Identifica el componente que captura o presenta información.</p>
+        </div>
+      </header>
+      <div class="ui-form-section__body ui-form-grid">
+        <div class="ui-field">
+          <label class="ui-label" for="flujo-componente-titulo">Nombre del componente</label>
+          <input
+            id="flujo-componente-titulo"
+            class="ui-control"
+            type="text"
+            formControlName="titulo"
+            placeholder="Ej.: Información del proyecto"
+            appErrorCampo
+          />
+        </div>
+      </div>
+    </section>
+
+    <app-campos-comunes-nodo-flujo-proyecto
+      [formulario]="formulario()"
+      etiquetaDescripcion="Objetivo del componente"
+      marcadorDescripcion="Explica para qué sirve este componente dentro del flujo."
+      marcadorCriterio="Ej.: El componente deja lista la información requerida para continuar."
+      ayudaRoles="Selecciona los roles que usan o validan este componente."
+    />
+
+    <section class="ui-form-section">
+      <header class="ui-form-section__header">
+        <span class="ui-form-section__icon" aria-hidden="true"><app-icono nombre="contextoProyecto" /></span>
+        <div>
+          <h3 class="ui-form-section__title">Datos del componente</h3>
+          <p class="ui-form-section__description">Detalla qué información maneja y cuál es el resultado esperado.</p>
+        </div>
+      </header>
+      <div class="ui-form-section__body ui-form-grid ui-form-grid--2">
+        <div class="ui-field">
+          <label class="ui-label" for="flujo-datos-capturados">Información que captura</label>
+          <textarea
+            id="flujo-datos-capturados"
+            class="ui-control ui-textarea"
+            formControlName="datosCapturados"
+            placeholder="Ej.: Nombre, responsable y descripción del proyecto"
+            appErrorCampo
+          ></textarea>
+        </div>
+        <div class="ui-field">
+          <label class="ui-label" for="flujo-campos-obligatorios">Campos obligatorios</label>
+          <textarea
+            id="flujo-campos-obligatorios"
+            class="ui-control ui-textarea"
+            formControlName="camposObligatorios"
+            placeholder="Ej.: Nombre del proyecto, responsable y fecha objetivo"
+            appErrorCampo
+          ></textarea>
+        </div>
+        <div class="ui-field ui-form-grid__full">
+          <label class="ui-label" for="flujo-resultado-completado">Resultado al completarse</label>
+          <textarea
+            id="flujo-resultado-completado"
+            class="ui-control ui-textarea"
+            formControlName="resultadoCompletado"
+            placeholder="Ej.: La información queda disponible para validar el siguiente paso"
+            appErrorCampo
+          ></textarea>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

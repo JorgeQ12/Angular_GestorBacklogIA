@@ -1,0 +1,101 @@
+<section
+  class="lienzo-flujo"
+  [class.es-solo-lectura]="estadoEditor.soloLectura()"
+  aria-label="Diagrama funcional del proyecto"
+>
+  <div
+    #elementoVista
+    class="lienzo-flujo__vista"
+    [attr.aria-label]="estadoEditor.idOrigenConexionActiva() ? 'Lienzo en modo conexión' : 'Lienzo funcional del proyecto'"
+    [style.background-size]="estiloCuadriculaVista().backgroundSize"
+    [style.background-position]="estiloCuadriculaVista().backgroundPosition"
+    (click)="seleccionarSuperficie($event)"
+    (pointerdown)="iniciarDesplazamiento($event)"
+  >
+    <div class="lienzo-flujo__acciones-flotantes" aria-label="Acciones del diagrama">
+      <ng-content select="[navegacionLienzoFlujo]" />
+      @if (!estadoEditor.soloLectura()) {
+        <button
+          type="button"
+          class="ui-button ui-button--primary lienzo-flujo__boton-agregar"
+          (click)="abrirPaletaBloques()"
+        >
+          <app-icono class="ui-button__icon" nombre="agregar" />
+          Agregar bloque
+        </button>
+      }
+    </div>
+
+    <div class="lienzo-flujo__escala" aria-label="Controles de escala">
+      <button type="button" aria-label="Alejar" (click)="alejar()">
+        <app-icono nombre="alejar" />
+      </button>
+      <button
+        type="button"
+        class="lienzo-flujo__valor-escala"
+        aria-label="Restablecer vista"
+        (click)="restablecerVista()"
+      >
+        {{ etiquetaEscala() }}
+      </button>
+      <button type="button" aria-label="Acercar" (click)="acercar()">
+        <app-icono nombre="acercar" />
+      </button>
+    </div>
+
+    @if (estadoEditor.idOrigenConexionActiva()) {
+      <button
+        type="button"
+        class="lienzo-flujo__estado-conexion"
+        (click)="estadoEditor.cancelarConexion()"
+      >
+        <span aria-hidden="true"><app-icono nombre="enlace" /></span>
+        <span>
+          <strong>Conectando bloques</strong>
+          <small>Selecciona un punto de entrada o pulsa aquí para cancelar.</small>
+        </span>
+      </button>
+    }
+
+    @if (!estadoEditor.tieneContenido()) {
+      <app-estado-vacio
+        class="lienzo-flujo__estado-vacio"
+        icono="flujo"
+        titulo="Construye el recorrido del proyecto"
+        descripcion="Agrega el primer bloque y conecta módulos, páginas, acciones, decisiones y componentes."
+      >
+        @if (!estadoEditor.soloLectura()) {
+          <button
+            estadoVacioAcciones
+            type="button"
+            class="ui-button ui-button--primary"
+            (click)="abrirPaletaBloques()"
+          >
+            <app-icono class="ui-button__icon" nombre="agregar" />
+            Crear primer bloque
+          </button>
+        }
+      </app-estado-vacio>
+    }
+
+    <div
+      class="lienzo-flujo__escena"
+      [style.width]="estiloTamanoLienzo().width"
+      [style.height]="estiloTamanoLienzo().height"
+      [style.transform]="estiloTamanoLienzo().transform"
+    >
+      <app-capa-conexiones-flujo-proyecto modo="lineas" />
+      @for (bloque of estadoEditor.bloquesVisibles(); track bloque.id) {
+        <app-tarjeta-bloque-flujo-proyecto [bloque]="bloque" />
+      }
+      <app-capa-conexiones-flujo-proyecto modo="superposicionEliminacion" />
+    </div>
+
+    @if (estadoEditor.tieneContenido()) {
+      <div class="lienzo-flujo__ayuda" aria-hidden="true">
+        <app-icono nombre="contextoProyecto" />
+        {{ estadoEditor.soloLectura() ? 'Selecciona un bloque para consultar su información' : 'Selecciona un bloque para editarlo' }}
+      </div>
+    }
+  </div>
+</section>

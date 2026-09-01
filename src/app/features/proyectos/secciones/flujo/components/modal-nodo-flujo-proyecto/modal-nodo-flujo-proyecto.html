@@ -1,0 +1,60 @@
+@if (estadoModal(); as estado) {
+  <app-modal
+    [etiqueta]="encabezadoModal()"
+    [titulo]="tituloModal()"
+    [descripcion]="descripcionModal()"
+    icono="flujo"
+    tamano="lg"
+    [cierreExteriorHabilitado]="false"
+    [idFormulario]="idFormulario"
+    [textoCancelar]="estadoEditor.soloLectura() ? 'Cerrar' : 'Cancelar'"
+    [textoConfirmar]="textoAccionPrincipal()"
+    [confirmacionDeshabilitada]="formulario().invalid"
+    [mostrarConfirmar]="!estadoEditor.soloLectura()"
+    (cerrar)="cerrar()"
+  >
+    <form
+      class="modal-nodo-flujo__formulario"
+      [attr.data-tipo]="estado.tipo"
+      [id]="idFormulario"
+      [formGroup]="formulario()"
+      [appMensajesFormulario]="mensajesFormulario"
+      appEnfocarPrimerControlInvalido
+      (ngSubmit)="guardar()"
+    >
+      <fieldset class="modal-nodo-flujo__grupo-campos" [disabled]="estadoEditor.soloLectura()">
+        <div class="modal-nodo-flujo__resumen">
+          <span class="modal-nodo-flujo__icono-tipo" aria-hidden="true">
+            <app-icono [nombre]="iconosTipo[estado.tipo]" />
+          </span>
+          <span class="modal-nodo-flujo__descripcion-tipo">
+            <small>Tipo de bloque</small>
+            <strong>{{ etiquetaTipo() }}</strong>
+            <span>{{ descripcionTipo() }}</span>
+          </span>
+          <span class="modal-nodo-flujo__modo">
+            {{ estadoEditor.soloLectura() ? 'Solo lectura' : estado.modo === 'crear' ? 'Nuevo' : 'Existente' }}
+          </span>
+        </div>
+
+        @switch (estado.tipo) {
+          @case ('modulo') {
+            <app-formulario-modulo-flujo-proyecto [formulario]="formulario()" />
+          }
+          @case ('pagina') {
+            <app-formulario-pagina-flujo-proyecto [formulario]="formulario()" />
+          }
+          @case ('accion') {
+            <app-formulario-accion-flujo-proyecto [formulario]="formulario()" />
+          }
+          @case ('decision') {
+            <app-formulario-decision-flujo-proyecto [formulario]="formulario()" />
+          }
+          @case ('componente') {
+            <app-formulario-componente-flujo-proyecto [formulario]="formulario()" />
+          }
+        }
+      </fieldset>
+    </form>
+  </app-modal>
+}

@@ -1,0 +1,34 @@
+<div [formGroup]="formulario()">
+  <div class="ui-form-grid">
+    <section class="ui-form-section">
+      <header class="ui-form-section__header">
+        <span class="ui-form-section__icon" aria-hidden="true"><app-icono nombre="continuar" /></span>
+        <div>
+          <h3 class="ui-form-section__title">Información principal</h3>
+          <p class="ui-form-section__description">Describe la interacción que una persona o el sistema ejecutará.</p>
+        </div>
+      </header>
+      <div class="ui-form-section__body ui-form-grid">
+        <div class="ui-field">
+          <label class="ui-label" for="flujo-accion-titulo">Nombre de la acción</label>
+          <input
+            id="flujo-accion-titulo"
+            class="ui-control"
+            type="text"
+            formControlName="titulo"
+            placeholder="Ej.: Iniciar sesión"
+            appErrorCampo
+          />
+        </div>
+      </div>
+    </section>
+
+    <app-campos-comunes-nodo-flujo-proyecto
+      [formulario]="formulario()"
+      etiquetaDescripcion="Resumen de la acción"
+      marcadorDescripcion="Describe qué inicia la acción, qué resultado produce y para qué sirve."
+      marcadorCriterio="Ej.: La acción genera el resultado esperado y deja listo el siguiente paso."
+      ayudaRoles="Selecciona los roles que ejecutan o supervisan esta acción."
+    />
+  </div>
+</div>

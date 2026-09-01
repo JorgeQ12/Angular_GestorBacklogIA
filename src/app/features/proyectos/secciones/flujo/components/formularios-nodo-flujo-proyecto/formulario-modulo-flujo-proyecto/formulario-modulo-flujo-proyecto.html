@@ -1,0 +1,154 @@
+<div [formGroup]="formulario()">
+  <div class="ui-form-grid">
+    <section class="ui-form-section">
+      <header class="ui-form-section__header">
+        <span class="ui-form-section__icon" aria-hidden="true"><app-icono nombre="proyectos" /></span>
+        <div>
+          <h3 class="ui-form-section__title">Información principal</h3>
+          <p class="ui-form-section__description">Identifica el módulo y estima su concurrencia esperada.</p>
+        </div>
+      </header>
+      <div class="ui-form-section__body ui-form-grid ui-form-grid--2">
+        <div class="ui-field">
+          <label class="ui-label" for="flujo-modulo-titulo">Nombre del módulo</label>
+          <input
+            id="flujo-modulo-titulo"
+            class="ui-control"
+            type="text"
+            formControlName="titulo"
+            placeholder="Ej.: Gestión de proyectos"
+            appErrorCampo
+          />
+        </div>
+        <div class="ui-field">
+          <label class="ui-label" for="flujo-usuarios-concurrentes">
+            Usuarios concurrentes proyectados
+          </label>
+          <div class="ui-control-wrap">
+            <input
+              id="flujo-usuarios-concurrentes"
+              class="ui-control ui-control--with-trailing-content"
+              type="number"
+              min="1"
+              max="100"
+              formControlName="usuariosConcurrentes"
+              placeholder="Ej.: 50"
+              appErrorCampo
+            />
+            <span class="ui-control-suffix">%</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <app-campos-comunes-nodo-flujo-proyecto
+      [formulario]="formulario()"
+      etiquetaDescripcion="Descripción del módulo"
+      marcadorDescripcion="Describe brevemente para qué sirve este módulo dentro del sistema."
+      marcadorCriterio="Ej.: El usuario consulta los proyectos que tiene permitidos."
+      etiquetaRoles="Roles y permisos del módulo"
+      ayudaRoles="Selecciona cada rol y define las acciones que puede ejecutar."
+      [usarPermisosRoles]="true"
+    />
+
+    <section
+      class="ui-form-section"
+      formArrayName="horariosMayorActividad"
+    >
+      <div class="ui-form-section__header ui-form-section__header--with-action">
+        <span class="ui-form-section__icon" aria-hidden="true">
+          <app-icono nombre="calendario" />
+        </span>
+        <div>
+          <h5 class="ui-form-section__title">Horarios de mayor actividad</h5>
+          <p class="ui-form-section__description">
+            Selecciona los días y rangos donde este módulo tendrá mayor carga.
+          </p>
+        </div>
+        <button
+          type="button"
+          class="ui-button ui-button--primary ui-form-section__action"
+          (click)="agregarFranjaActividad()"
+        >
+          <app-icono class="ui-button__icon" nombre="agregar" />
+          Agregar franja
+        </button>
+      </div>
+
+      <div class="formulario-modulo-flujo__lista-franjas">
+        @for (franja of horariosMayorActividad().controls; track franja; let indiceFranja = $index) {
+          <div class="formulario-modulo-flujo__tarjeta-franja" [formGroupName]="indiceFranja">
+            <div class="formulario-modulo-flujo__encabezado-franja">
+              <div class="formulario-modulo-flujo__titulo-franja">
+                <span aria-hidden="true"><app-icono nombre="calendario" /></span>
+                <div>
+                  <h6>Horario {{ indiceFranja + 1 }}</h6>
+                  <small>Selecciona los días y el intervalo de actividad.</small>
+                </div>
+              </div>
+              <button
+                type="button"
+                class="ui-button ui-button--text ui-button--md formulario-modulo-flujo__eliminar-franja"
+                [attr.aria-label]="'Eliminar horario ' + (indiceFranja + 1)"
+                (click)="eliminarFranjaActividad(indiceFranja)"
+                [disabled]="horariosMayorActividad().length === 1"
+              >
+                <app-icono class="ui-button__icon" nombre="eliminar" />
+              </button>
+            </div>
+
+            <div class="formulario-modulo-flujo__contenido-franja">
+              <div class="formulario-modulo-flujo__selector-dias">
+                <span class="ui-label">Días de la semana</span>
+                <div class="formulario-modulo-flujo__botones-dias">
+                  @for (dia of diasSemana; track dia) {
+                    <button
+                      type="button"
+                      class="formulario-modulo-flujo__boton-dia"
+                      [attr.aria-label]="dia"
+                      [attr.aria-pressed]="estaSeleccionadoDia(indiceFranja, dia)"
+                      [class.esta-seleccionado]="estaSeleccionadoDia(indiceFranja, dia)"
+                      (click)="alternarDia(indiceFranja, dia)"
+                    >
+                      {{ dia.substring(0, 2) }}
+                    </button>
+                  }
+                </div>
+              </div>
+
+              <div class="formulario-modulo-flujo__configuracion-horas">
+                <div class="ui-field">
+                  <span [id]="'flujo-hora-inicio-etiqueta-' + indiceFranja" class="ui-label">
+                    Desde
+                  </span>
+                  <app-selector-campo
+                    [id]="'flujo-hora-inicio-' + indiceFranja"
+                    formControlName="horaInicio"
+                    [opciones]="opcionesHora"
+                    placeholder="Selecciona una hora"
+                    [etiquetadoPor]="'flujo-hora-inicio-etiqueta-' + indiceFranja"
+                  />
+                </div>
+                <span class="formulario-modulo-flujo__separador-horas" aria-hidden="true">
+                  <app-icono nombre="continuar" />
+                </span>
+                <div class="ui-field">
+                  <span [id]="'flujo-hora-fin-etiqueta-' + indiceFranja" class="ui-label">
+                    Hasta
+                  </span>
+                  <app-selector-campo
+                    [id]="'flujo-hora-fin-' + indiceFranja"
+                    formControlName="horaFin"
+                    [opciones]="opcionesHora"
+                    placeholder="Selecciona una hora"
+                    [etiquetadoPor]="'flujo-hora-fin-etiqueta-' + indiceFranja"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+  </div>
+</div>

@@ -1,0 +1,15 @@
+<section
+  class="editor-flujo"
+  aria-label="Editor del flujo de usuario"
+>
+  <div class="editor-flujo__espacio-trabajo">
+    <app-lienzo-flujo-proyecto />
+    @if (estadoEditor.paletaBloquesAbierta()) {
+      <app-panel-lateral-flujo-proyecto />
+    }
+  </div>
+
+  @if (estadoEditor.editorNodoAbierto()) {
+    <app-modal-nodo-flujo-proyecto />
+  }
+</section>

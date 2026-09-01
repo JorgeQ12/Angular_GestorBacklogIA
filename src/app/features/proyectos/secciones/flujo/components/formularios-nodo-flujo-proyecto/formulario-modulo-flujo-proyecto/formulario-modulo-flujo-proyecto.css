@@ -1,0 +1,173 @@
+:host {
+  display: block;
+}
+
+.formulario-modulo-flujo__lista-franjas {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.formulario-modulo-flujo__tarjeta-franja {
+  overflow: hidden;
+  border: var(--border-width) solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--surface-default);
+}
+
+.formulario-modulo-flujo__encabezado-franja {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-bottom: var(--border-width) solid var(--border-divider);
+  background: var(--surface-subtle);
+}
+
+.formulario-modulo-flujo__titulo-franja {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.formulario-modulo-flujo__titulo-franja > span {
+  display: grid;
+  width: var(--control-height-md);
+  height: var(--control-height-md);
+  flex: 0 0 var(--control-height-md);
+  place-items: center;
+  border: var(--border-width) solid var(--border-default);
+  border-radius: var(--radius-sm);
+  background: var(--surface-default);
+  color: var(--text-secondary);
+}
+
+.formulario-modulo-flujo__titulo-franja > span app-icono {
+  width: var(--font-size-base);
+  height: var(--font-size-base);
+}
+
+.formulario-modulo-flujo__titulo-franja > div {
+  display: grid;
+  min-width: 0;
+  gap: var(--space-1);
+}
+
+.formulario-modulo-flujo__encabezado-franja h6 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+}
+
+.formulario-modulo-flujo__titulo-franja small {
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: var(--font-size-3xs);
+  line-height: var(--line-height-snug);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.formulario-modulo-flujo__eliminar-franja {
+  width: var(--control-height-md);
+  height: var(--control-height-md);
+  padding: 0;
+}
+
+.formulario-modulo-flujo__contenido-franja {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(18rem, 1fr);
+  align-items: end;
+  gap: var(--space-4);
+  padding: var(--space-4);
+}
+
+.formulario-modulo-flujo__selector-dias {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.formulario-modulo-flujo__botones-dias {
+  display: grid;
+  max-width: 21rem;
+  grid-template-columns: repeat(7, minmax(2rem, 1fr));
+  gap: var(--space-1);
+}
+
+.formulario-modulo-flujo__boton-dia {
+  display: inline-flex;
+  width: 100%;
+  min-width: 2rem;
+  height: var(--control-height-sm);
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  overflow: hidden;
+  border: var(--border-width) solid var(--border-default);
+  border-radius: var(--radius-pill);
+  background: var(--surface-default);
+  color: var(--text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-none);
+  text-overflow: clip;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    border-color var(--transition-base) var(--ease-standard),
+    background-color var(--transition-base) var(--ease-standard),
+    color var(--transition-base) var(--ease-standard),
+    box-shadow var(--transition-base) var(--ease-standard),
+    transform var(--transition-base) var(--ease-standard);
+}
+
+.formulario-modulo-flujo__boton-dia:hover {
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+  transform: translateY(-1px);
+}
+
+.formulario-modulo-flujo__boton-dia:focus-visible {
+  outline: 0;
+  box-shadow: var(--shadow-focus);
+}
+
+.formulario-modulo-flujo__boton-dia.esta-seleccionado {
+  border-color: var(--action-primary-bg);
+  background: var(--action-primary-bg);
+  color: var(--action-primary-text);
+  box-shadow: var(--shadow-focus);
+}
+
+.formulario-modulo-flujo__configuracion-horas {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 1.8rem minmax(0, 1fr);
+  align-items: end;
+  gap: var(--space-2);
+}
+
+.formulario-modulo-flujo__separador-horas {
+  display: grid;
+  width: 1.8rem;
+  height: var(--control-height-lg);
+  place-items: center;
+  color: var(--text-muted);
+}
+
+.formulario-modulo-flujo__separador-horas app-icono {
+  width: var(--font-size-sm);
+  height: var(--font-size-sm);
+}
+
+@media (max-width: 768px) {
+  .formulario-modulo-flujo__contenido-franja,
+  .formulario-modulo-flujo__configuracion-horas {
+    grid-template-columns: 1fr;
+  }
+
+  .formulario-modulo-flujo__separador-horas {
+    display: none;
+  }
+}

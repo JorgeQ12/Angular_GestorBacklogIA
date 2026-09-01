@@ -1,0 +1,8 @@
+@if (estadoEditor.paletaBloquesAbierta()) {
+  <button type="button" class="panel-lateral-flujo__fondo" aria-label="Cerrar selector de bloques" (click)="estadoEditor.cerrarPaletaBloques()"></button>
+  <aside class="panel-lateral-flujo" aria-label="Selector de bloques">
+    <app-paleta-bloques-flujo-proyecto></app-paleta-bloques-flujo-proyecto>
+  </aside>
+}
+
+

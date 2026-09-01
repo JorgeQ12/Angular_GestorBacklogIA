@@ -1,0 +1,43 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.editor-flujo {
+  position: relative;
+  display: flex;
+  min-height: 34rem;
+  height: clamp(34rem, calc(100dvh - 18rem), 48rem);
+  flex-direction: column;
+  overflow: hidden;
+  border: var(--border-width) solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--surface-subtle);
+}
+
+.editor-flujo__espacio-trabajo {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.editor-flujo app-lienzo-flujo-proyecto,
+.editor-flujo app-panel-lateral-flujo-proyecto {
+  display: block;
+  height: 100%;
+  min-height: 0;
+}
+
+@media (max-width: 960px) {
+  .editor-flujo {
+    height: auto;
+    min-height: 38rem;
+  }
+
+  .editor-flujo__espacio-trabajo,
+  .editor-flujo app-lienzo-flujo-proyecto,
+  .editor-flujo app-panel-lateral-flujo-proyecto {
+    height: auto;
+  }
+}

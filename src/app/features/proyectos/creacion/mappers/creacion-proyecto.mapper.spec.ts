@@ -215,6 +215,19 @@ describe('mapeadores de creación de proyecto', () => {
       diagramFlujoJson: '{}',
     });
   });
+
+  it('reemplaza únicamente el JSON de Flujo', () => {
+    const borrador = mapearBorradorProyecto(crearBorradorDto());
+    const diagramFlujoJson =
+      '{"projectId":"42","roles":[],"nodes":[],"connections":[],"updatedAt":"2026-08-28T10:00:00.000Z"}';
+    const solicitud = mapearActualizacionBorrador(borrador, { diagramFlujoJson }, 9);
+
+    expect(solicitud).toMatchObject({
+      pasoActual: 9,
+      equipoJson: '[]',
+      diagramFlujoJson,
+    });
+  });
 });
 
 function crearBorradorDto(): CrearBorradorProyectoRespuestaDto {

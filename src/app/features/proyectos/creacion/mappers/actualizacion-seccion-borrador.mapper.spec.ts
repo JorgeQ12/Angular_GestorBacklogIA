@@ -77,4 +77,27 @@ describe('mapearCambioSeccionBorrador', () => {
   ] as const)('serializa la sección $seccion con su mapper canónico', (caso) => {
     expect(mapearCambioSeccionBorrador(caso)).toEqual(caso.cambio);
   });
+
+  it('serializa Flujo dentro de diagramFlujoJson', () => {
+    const flujo = {
+      proyectoId: '42',
+      roles: [],
+      nodos: [],
+      conexiones: [],
+      fechaActualizacion: '2026-08-28T10:00:00.000Z',
+    };
+
+    const cambio = mapearCambioSeccionBorrador({
+      seccion: ClaveSeccionProyecto.Flujo,
+      datos: flujo,
+    });
+
+    expect(JSON.parse(cambio.diagramFlujoJson!)).toEqual({
+      proyectoId: '42',
+      roles: [],
+      nodos: [],
+      conexiones: [],
+      fechaActualizacion: '2026-08-28T10:00:00.000Z',
+    });
+  });
 });

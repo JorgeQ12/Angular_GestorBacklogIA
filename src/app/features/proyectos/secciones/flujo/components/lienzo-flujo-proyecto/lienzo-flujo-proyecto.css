@@ -1,0 +1,253 @@
+:host {
+  display: block;
+  height: 100%;
+  min-height: 0;
+}
+
+.lienzo-flujo {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
+  border: var(--border-width) solid var(--border-default);
+  border-radius: var(--radius-lg);
+  background: var(--surface-default);
+  box-shadow: var(--shadow-md);
+}
+
+.lienzo-flujo__acciones-flotantes {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  z-index: var(--z-sticky);
+  display: flex;
+  max-width: calc(100% - var(--space-6));
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1);
+  border: var(--border-width) solid var(--border-default);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--surface-default) 97%, transparent);
+  box-shadow: var(--shadow-md);
+}
+
+.lienzo-flujo__boton-agregar {
+  order: 3;
+}
+
+.lienzo-flujo__escala {
+  position: absolute;
+  right: var(--space-4);
+  bottom: var(--space-4);
+  z-index: var(--z-sticky);
+  display: inline-flex;
+  height: var(--control-height-lg);
+  align-items: center;
+  overflow: hidden;
+  border: var(--border-width) solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface-default) 94%, transparent);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(var(--overlay-blur));
+}
+
+.lienzo-flujo__escala button {
+  display: grid;
+  height: 100%;
+  min-width: var(--control-height-md);
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast) var(--ease-standard),
+    color var(--transition-fast) var(--ease-standard);
+}
+
+.lienzo-flujo__escala button:hover {
+  background: var(--surface-subtle);
+  color: var(--text-primary);
+}
+
+.lienzo-flujo__escala button:focus-visible {
+  position: relative;
+  z-index: var(--z-sticky);
+  outline: 0;
+  box-shadow: var(--shadow-focus);
+}
+
+.lienzo-flujo__escala app-icono {
+  width: var(--font-size-base);
+  height: var(--font-size-base);
+}
+
+.lienzo-flujo__escala .lienzo-flujo__valor-escala {
+  min-width: 3.7rem;
+  border-right: var(--border-width) solid var(--border-default);
+  border-left: var(--border-width) solid var(--border-default);
+  color: var(--text-primary);
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-bold);
+}
+
+.lienzo-flujo__vista {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  background-color: var(--surface-subtle);
+  background-image: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--text-muted) 28%, transparent) 1px,
+    transparent 1.2px
+  );
+  cursor: grab;
+}
+
+.lienzo-flujo__vista:active {
+  cursor: grabbing;
+}
+
+.lienzo-flujo__escena {
+  position: relative;
+  transform-origin: 0 0;
+}
+
+.lienzo-flujo__estado-conexion {
+  position: absolute;
+  top: 4.8rem;
+  left: 50%;
+  z-index: var(--z-sticky);
+  display: flex;
+  max-width: min(27rem, calc(100% - var(--space-6)));
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3) var(--space-2) var(--space-2);
+  border: var(--border-width) solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface-default) 96%, transparent);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-md);
+  text-align: left;
+  transform: translateX(-50%);
+  cursor: pointer;
+  transition:
+    border-color var(--transition-fast) var(--ease-standard),
+    box-shadow var(--transition-fast) var(--ease-standard);
+}
+
+.lienzo-flujo__estado-conexion:focus-visible {
+  outline: 0;
+  box-shadow: var(--shadow-focus), var(--shadow-md);
+}
+
+.lienzo-flujo__estado-conexion > span:first-child {
+  display: grid;
+  width: var(--control-height-md);
+  height: var(--control-height-md);
+  flex: 0 0 var(--control-height-md);
+  place-items: center;
+  border-radius: var(--radius-sm);
+  background: var(--action-primary-bg);
+  color: var(--action-primary-text);
+}
+
+.lienzo-flujo__estado-conexion > span:last-child {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.lienzo-flujo__estado-conexion strong {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+}
+
+.lienzo-flujo__estado-conexion small {
+  color: var(--text-muted);
+  font-size: var(--font-size-3xs);
+  line-height: var(--line-height-tight);
+}
+
+.lienzo-flujo__estado-vacio {
+  --ui-empty-state-min-height: 15rem;
+  --ui-card-accent: var(--text-inverse);
+  --ui-card-accent-surface: var(--surface-inverse);
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: var(--z-raised);
+  width: min(25rem, calc(100% - var(--space-6)));
+  overflow: hidden;
+  border: var(--border-width) solid var(--border-default);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--surface-default) 96%, transparent);
+  box-shadow: var(--shadow-lg);
+  transform: translate(-50%, -50%);
+}
+
+.lienzo-flujo__ayuda {
+  position: absolute;
+  left: var(--space-4);
+  bottom: var(--space-4);
+  z-index: var(--z-raised);
+  display: inline-flex;
+  min-height: var(--control-height-sm);
+  align-items: center;
+  gap: var(--space-2);
+  padding-inline: var(--space-3);
+  border: var(--border-width) solid var(--border-default);
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--surface-default) 90%, transparent);
+  color: var(--text-muted);
+  font-size: var(--font-size-3xs);
+  font-weight: var(--font-weight-semibold);
+  box-shadow: var(--shadow-sm);
+  pointer-events: none;
+}
+
+.lienzo-flujo__ayuda app-icono {
+  width: var(--font-size-sm);
+  height: var(--font-size-sm);
+}
+
+@media (max-width: 960px) {
+  .lienzo-flujo {
+    min-height: 34rem;
+  }
+
+  .lienzo-flujo__vista {
+    min-height: 28rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .lienzo-flujo__acciones-flotantes {
+    top: var(--space-3);
+    right: var(--space-3);
+    left: var(--space-3);
+    max-width: none;
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .lienzo-flujo__boton-agregar {
+    width: 100%;
+  }
+
+  .lienzo-flujo__escala {
+    right: var(--space-3);
+    bottom: var(--space-3);
+  }
+
+  .lienzo-flujo__escala button {
+    flex: 1;
+  }
+
+  .lienzo-flujo__ayuda {
+    display: none;
+  }
+}

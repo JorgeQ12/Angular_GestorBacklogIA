@@ -1,0 +1,46 @@
+<section class="paleta-bloques-flujo" aria-labelledby="titulo-paleta-bloques-flujo">
+  <header class="paleta-bloques-flujo__encabezado">
+    <div class="paleta-bloques-flujo__titulo">
+      <span class="paleta-bloques-flujo__icono-titulo" aria-hidden="true">
+        <app-icono nombre="agregar" />
+      </span>
+      <div>
+        <span>Nuevo bloque</span>
+        <h2 id="titulo-paleta-bloques-flujo">¿Qué quieres agregar?</h2>
+        <p>Selecciona el elemento que mejor representa el siguiente punto del recorrido.</p>
+      </div>
+    </div>
+
+    <button type="button" class="ui-button ui-button--secondary ui-button--md paleta-bloques-flujo__cerrar" aria-label="Cerrar selector" (click)="estadoEditor.cerrarPaletaBloques()">
+      <app-icono class="ui-button__icon" nombre="cerrar" />
+    </button>
+  </header>
+
+  <div class="paleta-bloques-flujo__guia">
+    <app-icono nombre="informacion" aria-hidden="true" />
+    <span>Después de completar su información podrás ubicarlo y conectarlo en el lienzo.</span>
+  </div>
+
+  <div class="paleta-bloques-flujo__lista">
+    @for (opcion of opciones(); track opcion.tipo) {
+      <button
+        type="button"
+        class="paleta-bloques-flujo__elemento"
+        [attr.data-tipo]="opcion.tipo"
+        [style.--acento-bloque-flujo]="acentosTipo[opcion.tipo]"
+        (click)="crearBloque(opcion.tipo)">
+        <span class="paleta-bloques-flujo__icono-elemento" aria-hidden="true">
+          <app-icono [nombre]="iconosTipo[opcion.tipo]" />
+        </span>
+        <span class="paleta-bloques-flujo__descripcion-elemento">
+          <strong>{{ opcion.etiqueta }}</strong>
+          <small>{{ opcion.descripcion }}</small>
+        </span>
+        <span class="paleta-bloques-flujo__flecha-elemento" aria-hidden="true">
+          <app-icono nombre="continuar" />
+        </span>
+      </button>
+    }
+  </div>
+</section>
+

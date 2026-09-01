@@ -13,6 +13,7 @@ import { Modal } from './modal';
         descripcion="Revisa los datos antes de continuar."
         icono="proyectos"
         [descartable]="descartable"
+        [cierreExteriorHabilitado]="cierreExteriorHabilitado"
         [idFormulario]="idFormulario"
         textoConfirmar="Continuar"
         (cerrar)="cerrarModal()"
@@ -27,6 +28,7 @@ import { Modal } from './modal';
 class AnfitrionModal {
   public abierto = false;
   public descartable = true;
+  public cierreExteriorHabilitado = true;
   public idFormulario: string | null = null;
   public confirmaciones = 0;
 
@@ -106,6 +108,24 @@ describe('Modal', () => {
 
     expect(fixture.componentInstance.abierto).toBe(false);
     expect(document.activeElement).toBe(fixture.nativeElement.querySelector('.accion-abrir'));
+  });
+
+  it('ignora backdrop y Escape cuando el cierre exterior está deshabilitado', () => {
+    fixture.componentInstance.cierreExteriorHabilitado = false;
+    abrirModal();
+    const overlay = fixture.nativeElement.querySelector('.ui-modal-overlay') as HTMLElement;
+
+    overlay.click();
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance.abierto).toBe(true);
+    const cerrar = fixture.nativeElement.querySelector('.ui-modal__close') as HTMLButtonElement;
+    expect(cerrar).not.toBeNull();
+
+    cerrar.click();
+    fixture.detectChanges();
+    expect(fixture.componentInstance.abierto).toBe(false);
   });
 
   it('impide descartar por Escape cuando el flujo requiere una decisión explícita', () => {
