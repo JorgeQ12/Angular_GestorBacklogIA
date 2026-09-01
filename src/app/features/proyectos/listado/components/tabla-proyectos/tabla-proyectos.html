@@ -54,6 +54,16 @@
                 Continuar
                 <app-icono class="ui-button__icon ui-button__icon--trailing" nombre="continuar" />
               </button>
+            } @else {
+              <button
+                type="button"
+                class="ui-button ui-button--secondary ui-button--md"
+                [attr.aria-label]="'Consultar la información de ' + proyecto.nombre"
+                (click)="consultarProyecto.emit(proyecto)"
+              >
+                Ver información
+                <app-icono class="ui-button__icon ui-button__icon--trailing" nombre="continuar" />
+              </button>
             }
           </td>
         </tr>

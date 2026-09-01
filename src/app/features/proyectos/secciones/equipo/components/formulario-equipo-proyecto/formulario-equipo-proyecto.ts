@@ -35,6 +35,7 @@ import {
   IntegranteEquipoProyecto,
   ProgresoEquipoProyecto,
 } from '../../models/equipo-proyecto.model';
+import { ModoFormularioProyecto } from '../../../../models/modo-formulario-proyecto.model';
 
 const EQUIPO_VACIO: EquipoProyecto = { integrantes: [] };
 
@@ -59,11 +60,17 @@ export class FormularioEquipoProyecto {
   private readonly destroyRef = inject(DestroyRef);
   private readonly versionFormulario = signal(0);
 
+  /** Identifica el formulario para permitir acciones externas mediante el atributo form. */
+  public readonly idFormulario = input<string | null>(null);
+
   /** Proporciona los integrantes y asignaciones que deben presentarse. */
   public readonly datosIniciales = input<EquipoProyecto>(EQUIPO_VACIO);
 
   /** Bloquea temporalmente el formulario durante el guardado. */
   public readonly procesando = input(false);
+
+  /** Define si las asignaciones se editan o se presentan como información confirmada. */
+  public readonly modo = input(ModoFormularioProyecto.Edicion);
 
   /** Indica si se está renovando la membresía desde Azure. */
   public readonly sincronizando = input(false);
@@ -83,6 +90,7 @@ export class FormularioEquipoProyecto {
   public readonly progresoCambiado = output<ProgresoEquipoProyecto>();
 
   protected readonly mensajesAsignacion = MENSAJES_ASIGNACION_EQUIPO;
+  protected readonly esSoloLectura = computed(() => this.modo() === ModoFormularioProyecto.Lectura);
   protected readonly filtros = FiltroEquipoProyecto;
   protected readonly controlBusqueda = this.constructorFormulario.control('');
   protected readonly filtro = signal(FiltroEquipoProyecto.Todos);
@@ -154,7 +162,10 @@ export class FormularioEquipoProyecto {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.versionFormulario.update((version) => version + 1));
 
-    effect(() => this.presentarDatos(this.datosIniciales()));
+    effect(() => {
+      this.modo();
+      this.presentarDatos(this.datosIniciales());
+    });
     effect(() => {
       const bloquear = this.procesando() || this.sincronizando();
       if (bloquear) {
@@ -176,11 +187,13 @@ export class FormularioEquipoProyecto {
 
   /** Cambia el subconjunto presentado sin alterar la configuración. */
   protected cambiarFiltro(filtro: FiltroEquipoProyecto): void {
+    if (this.esSoloLectura()) return;
     this.filtro.set(filtro);
   }
 
   /** Alterna la selección de un integrante para la edición masiva. */
   protected alternarSeleccion(idAzure: string, seleccionado: boolean): void {
+    if (this.esSoloLectura()) return;
     this.seleccionados.update((vigentes) => {
       const nuevos = new Set(vigentes);
       seleccionado ? nuevos.add(idAzure) : nuevos.delete(idAzure);
@@ -195,6 +208,7 @@ export class FormularioEquipoProyecto {
 
   /** Selecciona o libera únicamente los integrantes visibles. */
   protected alternarSeleccionVisible(seleccionar: boolean): void {
+    if (this.esSoloLectura()) return;
     const ids = this.controlesVisibles().map((grupo) => grupo.controls.idAzure.value);
     this.seleccionados.update((vigentes) => {
       const nuevos = new Set(vigentes);
@@ -210,7 +224,7 @@ export class FormularioEquipoProyecto {
 
   /** Aplica los valores indicados a todos los integrantes seleccionados. */
   protected aplicarAsignacionMasiva(): void {
-    if (!this.puedeAplicarAsignacion()) return;
+    if (this.esSoloLectura() || !this.puedeAplicarAsignacion()) return;
 
     const seleccionados = this.seleccionados();
     const asignacion = this.asignacionMasiva.getRawValue();
@@ -235,6 +249,7 @@ export class FormularioEquipoProyecto {
 
   /** Solicita persistir el equipo cuando todos sus integrantes están configurados. */
   protected enviar(): void {
+    if (this.esSoloLectura()) return;
     if (this.formulario.invalid || this.controlesIntegrantes().length === 0) {
       this.formulario.markAllAsTouched();
       this.filtro.set(FiltroEquipoProyecto.Pendientes);

@@ -1,4 +1,5 @@
 <form
+  [attr.id]="idFormulario()"
   class="formulario-contexto"
   [formGroup]="formulario"
   [appMensajesFormulario]="mensajesFormulario"
@@ -9,7 +10,9 @@
       <div class="ui-field">
         <div class="formulario-contexto__label">
           <label class="ui-label" for="contexto-nombre">Nombre del proyecto</label>
-          <span>{{ formulario.controls.nombre.value.length }}/{{ limites.nombre }}</span>
+          @if (!esSoloLectura()) {
+            <span>{{ formulario.controls.nombre.value.length }}/{{ limites.nombre }}</span>
+          }
         </div>
         <input
           id="contexto-nombre"
@@ -19,6 +22,7 @@
           [maxlength]="limites.nombre"
           placeholder="Ej. Portal de autoservicio para clientes"
           autocomplete="off"
+          [readOnly]="esSoloLectura()"
           appErrorCampo
         />
       </div>
@@ -26,7 +30,9 @@
       <div class="ui-field">
         <div class="formulario-contexto__label">
           <label class="ui-label" for="contexto-responsable">Responsable</label>
-          <span>{{ formulario.controls.responsable.value.length }}/{{ limites.responsable }}</span>
+          @if (!esSoloLectura()) {
+            <span>{{ formulario.controls.responsable.value.length }}/{{ limites.responsable }}</span>
+          }
         </div>
         <input
           id="contexto-responsable"
@@ -36,6 +42,7 @@
           [maxlength]="limites.responsable"
           placeholder="Ej. María Gómez, líder de producto"
           autocomplete="name"
+          [readOnly]="esSoloLectura()"
           appErrorCampo
         />
       </div>
@@ -53,6 +60,7 @@
         <app-selector-fecha
           id="contexto-fecha-objetivo"
           etiquetadoPor="contexto-fecha-objetivo-label"
+          [soloLectura]="esSoloLectura()"
           formControlName="fechaObjetivo"
           appErrorCampo
         />
@@ -67,6 +75,7 @@
           etiquetadoPor="contexto-prioridad-label"
           placeholder="Selecciona una prioridad"
           [opciones]="opcionesPrioridad()"
+          [soloLectura]="esSoloLectura()"
           formControlName="prioridadCatalogoId"
           appErrorCampo
         />
@@ -76,7 +85,9 @@
     <div class="ui-field formulario-contexto__descripcion">
       <div class="formulario-contexto__label">
         <label class="ui-label" for="contexto-descripcion">Descripción del proyecto</label>
-        <span>{{ formulario.controls.descripcion.value.length }}/{{ limites.descripcion }}</span>
+        @if (!esSoloLectura()) {
+          <span>{{ formulario.controls.descripcion.value.length }}/{{ limites.descripcion }}</span>
+        }
       </div>
       <textarea
         id="contexto-descripcion"
@@ -85,10 +96,9 @@
         [maxlength]="limites.descripcion"
         placeholder="Describe brevemente el propósito, el contexto actual y el valor esperado."
         rows="6"
+        [readOnly]="esSoloLectura()"
         appErrorCampo
       ></textarea>
     </div>
   </div>
-
-  <ng-content select="[accionesFormularioContexto]" />
 </form>

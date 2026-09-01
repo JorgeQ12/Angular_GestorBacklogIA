@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ModoFormularioProyecto } from '../../../../models/modo-formulario-proyecto.model';
 import { PlataformaSolucion } from '../../models/tipo-solucion-proyecto.model';
 import { FormularioTipoSolucionProyecto } from './formulario-tipo-solucion-proyecto';
 
@@ -61,6 +62,24 @@ describe('FormularioTipoSolucionProyecto', () => {
     expect(
       (fixture.nativeElement as HTMLElement).querySelector('#tipo-solucion-plataforma'),
     ).toBeNull();
+  });
+
+  it('presenta la selección sin admitir cambios ni envío en modo lectura', () => {
+    const guardar = vi.fn();
+    fixture.componentInstance.guardar.subscribe(guardar);
+    fixture.componentRef.setInput('datosIniciales', {
+      tieneInterfaz: true,
+      plataforma: PlataformaSolucion.Web,
+    });
+    fixture.componentRef.setInput('modo', ModoFormularioProyecto.Lectura);
+    fixture.detectChanges();
+
+    seleccionarOpcion('tipo-solucion-interfaz', 1);
+    enviarFormulario();
+
+    const grupo = (fixture.nativeElement as HTMLElement).querySelector('[role="radiogroup"]');
+    expect(grupo?.getAttribute('aria-readonly')).toBe('true');
+    expect(guardar).not.toHaveBeenCalled();
   });
 
   function seleccionarOpcion(id: string, indice: number): void {

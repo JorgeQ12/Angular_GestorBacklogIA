@@ -13,6 +13,8 @@ específicas se mantienen en documentos separados para evitar un archivo único 
 - [Formularios reactivos](FORMULARIOS_REACTIVOS.md): tipado, validación, mensajes y accesibilidad.
 - [Estilos del frontend](ESTILOS_FRONTEND.md): tokens, tipografía, primitivas y CSS encapsulado.
 - [Inicio único del panel](INICIO_PANEL.md): composición del resumen y evolución mediante permisos.
+- [Información y versiones de proyectos](INFORMACION_PROYECTOS.md): consulta integral, pasos,
+  modos de formulario y versionamiento.
 - [Integración con el backend](INTEGRACION_BACKEND.md): environments, DTO, mappers, servicios y
   errores.
 - [Listado de proyectos](LISTADO_PROYECTOS.md): portafolio, filtros, paginación y acciones por

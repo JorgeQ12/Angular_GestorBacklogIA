@@ -1,10 +1,19 @@
-import { ChangeDetectionStrategy, Component, effect, inject, input, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  output,
+} from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
   ErrorCampoDirective,
   MensajesFormularioDirective,
 } from '../../../../../../shared/forms/errores-validacion';
 import { validarTextoRequerido } from '../../../../../../shared/forms/validadores';
+import { ModoFormularioProyecto } from '../../../../models/modo-formulario-proyecto.model';
 import {
   LIMITES_ALCANCE_PROYECTO,
   MENSAJES_ALCANCE_PROYECTO,
@@ -23,17 +32,24 @@ import { FormularioAlcanceProyectoTipado } from '../../models/formulario-alcance
 export class FormularioAlcanceProyecto {
   private readonly constructorFormulario = inject(NonNullableFormBuilder);
 
+  /** Identifica el formulario para permitir acciones externas mediante el atributo form. */
+  public readonly idFormulario = input<string | null>(null);
+
   /** Proporciona los valores que deben presentarse en el formulario. */
   public readonly datosIniciales = input<AlcanceProyecto | null>(null);
 
   /** Bloquea temporalmente los controles durante la operación coordinada por la página. */
   public readonly procesando = input(false);
 
+  /** Define si la sección permite modificar sus valores o únicamente consultarlos. */
+  public readonly modo = input(ModoFormularioProyecto.Edicion);
+
   /** Entrega un Alcance válido y normalizado al flujo consumidor. */
   public readonly guardar = output<AlcanceProyecto>();
 
   protected readonly limites = LIMITES_ALCANCE_PROYECTO;
   protected readonly mensajesFormulario = MENSAJES_ALCANCE_PROYECTO;
+  protected readonly esSoloLectura = computed(() => this.modo() === ModoFormularioProyecto.Lectura);
   protected readonly formulario: FormularioAlcanceProyectoTipado = this.constructorFormulario.group(
     {
       incluido: ['', [validarTextoRequerido, Validators.maxLength(this.limites.incluido)]],
@@ -43,6 +59,7 @@ export class FormularioAlcanceProyecto {
 
   public constructor() {
     effect(() => {
+      this.modo();
       const datos = this.datosIniciales();
       if (datos) this.formulario.reset(datos, { emitEvent: false });
     });
@@ -58,6 +75,7 @@ export class FormularioAlcanceProyecto {
 
   /** Solicita persistir los valores cuando los límites están definidos. */
   protected enviar(): void {
+    if (this.esSoloLectura()) return;
     if (this.formulario.invalid) {
       this.formulario.markAllAsTouched();
       return;

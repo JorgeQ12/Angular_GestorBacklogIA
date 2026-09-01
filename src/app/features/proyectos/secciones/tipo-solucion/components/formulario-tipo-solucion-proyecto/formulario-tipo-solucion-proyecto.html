@@ -1,4 +1,5 @@
 <form
+  [attr.id]="idFormulario()"
   class="formulario-tipo-solucion"
   [formGroup]="formulario"
   [appMensajesFormulario]="mensajesFormulario"
@@ -14,6 +15,7 @@
         id="tipo-solucion-interfaz"
         etiquetadoPor="tipo-solucion-interfaz-label"
         [opciones]="opcionesInterfaz"
+        [soloLectura]="esSoloLectura()"
         formControlName="tieneInterfaz"
         appErrorCampo
       />
@@ -32,12 +34,11 @@
           etiquetadoPor="tipo-solucion-plataforma-label"
           [columnas]="3"
           [opciones]="opcionesPlataforma"
+          [soloLectura]="esSoloLectura()"
           formControlName="plataforma"
           appErrorCampo
         />
       </section>
     }
   </div>
-
-  <ng-content select="[accionesFormularioTipoSolucion]" />
 </form>

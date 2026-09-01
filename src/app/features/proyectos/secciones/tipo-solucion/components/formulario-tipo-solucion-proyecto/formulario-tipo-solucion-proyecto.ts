@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  computed,
   effect,
   inject,
   input,
@@ -17,6 +18,7 @@ import {
 } from '@angular/forms';
 import { startWith } from 'rxjs';
 import { SelectorTarjetas } from '../../../../../../shared/forms/controles/selector-tarjetas/selector-tarjetas';
+import { ModoFormularioProyecto } from '../../../../models/modo-formulario-proyecto.model';
 import {
   ErrorCampoDirective,
   MensajesFormularioDirective,
@@ -46,11 +48,17 @@ export class FormularioTipoSolucionProyecto {
   private readonly constructorFormulario = inject(NonNullableFormBuilder);
   private readonly destroyRef = inject(DestroyRef);
 
+  /** Identifica el formulario para permitir acciones externas mediante el atributo form. */
+  public readonly idFormulario = input<string | null>(null);
+
   /** Proporciona los valores que deben presentarse en el formulario. */
   public readonly datosIniciales = input<TipoSolucionProyecto | null>(null);
 
   /** Bloquea temporalmente los controles durante la operación coordinada por la página. */
   public readonly procesando = input(false);
+
+  /** Define si la sección permite modificar sus valores o únicamente consultarlos. */
+  public readonly modo = input(ModoFormularioProyecto.Edicion);
 
   /** Entrega un Tipo de solución válido al flujo consumidor. */
   public readonly guardar = output<TipoSolucionProyecto>();
@@ -58,6 +66,7 @@ export class FormularioTipoSolucionProyecto {
   protected readonly opcionesInterfaz = OPCIONES_INTERFAZ_SOLUCION;
   protected readonly opcionesPlataforma = OPCIONES_PLATAFORMA_SOLUCION;
   protected readonly mensajesFormulario = MENSAJES_TIPO_SOLUCION_PROYECTO;
+  protected readonly esSoloLectura = computed(() => this.modo() === ModoFormularioProyecto.Lectura);
   protected readonly formulario: FormularioTipoSolucionProyectoTipado =
     this.constructorFormulario.group({
       tieneInterfaz: this.constructorFormulario.control<boolean | null>(null, [seleccionRequerida]),
@@ -73,6 +82,7 @@ export class FormularioTipoSolucionProyecto {
       .subscribe((tieneInterfaz) => this.actualizarPlataforma(tieneInterfaz));
 
     effect(() => {
+      this.modo();
       const datos = this.datosIniciales();
       if (!datos) return;
 
@@ -91,6 +101,7 @@ export class FormularioTipoSolucionProyecto {
 
   /** Solicita persistir los valores cuando la definición está completa. */
   protected enviar(): void {
+    if (this.esSoloLectura()) return;
     if (this.formulario.invalid) {
       this.formulario.markAllAsTouched();
       return;

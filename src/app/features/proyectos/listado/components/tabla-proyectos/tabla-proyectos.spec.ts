@@ -34,11 +34,23 @@ describe('TablaProyectos', () => {
     const botones = [...elemento.querySelectorAll<HTMLButtonElement>('tbody button')];
 
     expect(elemento.textContent).toContain('Paso 5 de 9');
-    expect(botones).toHaveLength(1);
+    expect(botones).toHaveLength(2);
     botones[0].click();
 
     expect(seleccionado).toEqual(PROYECTOS[0]);
     expect(botones[0].getAttribute('aria-label')).toContain('Portal de clientes');
+  });
+
+  it('emite la consulta únicamente para proyectos publicados', () => {
+    const consultar = vi.fn();
+    fixture.componentInstance.consultarProyecto.subscribe(consultar);
+    const boton = [...(fixture.nativeElement as HTMLElement).querySelectorAll('tbody button')].find(
+      (elemento) => elemento.textContent?.includes('Ver información'),
+    ) as HTMLButtonElement;
+
+    boton.click();
+
+    expect(consultar).toHaveBeenCalledWith(PROYECTOS[1]);
   });
 
   it('emite una página válida desde la paginación', () => {

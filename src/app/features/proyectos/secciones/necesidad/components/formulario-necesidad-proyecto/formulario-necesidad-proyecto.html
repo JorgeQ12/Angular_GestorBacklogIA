@@ -1,4 +1,5 @@
 <form
+  [attr.id]="idFormulario()"
   class="formulario-necesidad"
   [formGroup]="formulario"
   [appMensajesFormulario]="mensajesFormulario"
@@ -8,9 +9,11 @@
     <div class="ui-field">
       <div class="formulario-necesidad__label">
         <label class="ui-label" for="necesidad-situacion-actual">Proceso actual</label>
-        <span>
-          {{ formulario.controls.situacionActual.value.length }}/{{ limites.situacionActual }}
-        </span>
+        @if (!esSoloLectura()) {
+          <span>
+            {{ formulario.controls.situacionActual.value.length }}/{{ limites.situacionActual }}
+          </span>
+        }
       </div>
       <textarea
         id="necesidad-situacion-actual"
@@ -19,6 +22,7 @@
         [maxlength]="limites.situacionActual"
         placeholder="Describe cómo se trabaja hoy, las herramientas utilizadas y las principales limitaciones."
         rows="5"
+        [readOnly]="esSoloLectura()"
         required
         appErrorCampo
       ></textarea>
@@ -27,7 +31,9 @@
     <div class="ui-field">
       <div class="formulario-necesidad__label">
         <label class="ui-label" for="necesidad-problemas">Problemas principales</label>
-        <span>{{ formulario.controls.problemas.value.length }}/{{ limites.problemas }}</span>
+        @if (!esSoloLectura()) {
+          <span>{{ formulario.controls.problemas.value.length }}/{{ limites.problemas }}</span>
+        }
       </div>
       <textarea
         id="necesidad-problemas"
@@ -36,6 +42,7 @@
         [maxlength]="limites.problemas"
         placeholder="Explica los problemas que generan mayor fricción, retrasos, riesgos o reprocesos."
         rows="5"
+        [readOnly]="esSoloLectura()"
         required
         appErrorCampo
       ></textarea>
@@ -44,7 +51,9 @@
     <div class="ui-field">
       <div class="formulario-necesidad__label">
         <label class="ui-label" for="necesidad-impacto">Impacto en el negocio</label>
-        <span>{{ formulario.controls.impacto.value.length }}/{{ limites.impacto }}</span>
+        @if (!esSoloLectura()) {
+          <span>{{ formulario.controls.impacto.value.length }}/{{ limites.impacto }}</span>
+        }
       </div>
       <textarea
         id="necesidad-impacto"
@@ -53,11 +62,10 @@
         [maxlength]="limites.impacto"
         placeholder="Describe el efecto en costos, tiempos, calidad o experiencia si la necesidad no se resuelve."
         rows="5"
+        [readOnly]="esSoloLectura()"
         required
         appErrorCampo
       ></textarea>
     </div>
   </div>
-
-  <ng-content select="[accionesFormularioNecesidad]" />
 </form>

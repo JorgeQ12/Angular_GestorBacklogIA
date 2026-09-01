@@ -1,11 +1,10 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router, Routes } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { SEGMENTOS_RUTA } from '../../../../../core/navegacion/rutas';
 import { BorradorProyecto } from '../../models/borrador-proyecto.model';
-import { DatosVinculacionAzure } from '../../models/vinculacion-azure.model';
-import { ContenidoEncabezadoPasoCreacionService } from '../../services/contenido-encabezado-paso-creacion.service';
+import type { DatosVinculacionAzure } from '../../../models/vinculacion-azure-proyecto.model';
 import { CreacionProyectoService } from '../../services/creacion-proyecto.service';
 import { EstadoCreacionProyectoService } from '../../services/estado-creacion-proyecto.service';
 import { PaginaCreacionProyecto } from './pagina-creacion-proyecto';
@@ -14,7 +13,7 @@ const RUTAS: Routes = [
   {
     path: `${SEGMENTOS_RUTA.proyectos}/${SEGMENTOS_RUTA.creacion}`,
     component: PaginaCreacionProyecto,
-    providers: [EstadoCreacionProyectoService, ContenidoEncabezadoPasoCreacionService],
+    providers: [EstadoCreacionProyectoService],
   },
 ];
 
@@ -46,7 +45,7 @@ describe('PaginaCreacionProyecto', () => {
 
     expect(obtenerPosicionRecorrido(elemento)).toBe('Paso 1 de 9');
     expect(elemento.querySelector('[aria-current="step"]')?.textContent).toContain('Azure DevOps');
-    expect(elemento.querySelector('app-vinculacion-azure')).not.toBeNull();
+    expect(elemento.querySelector('app-paso-vinculacion-azure-proyecto')).not.toBeNull();
     expect(elemento.querySelector('router-outlet')).toBeNull();
   });
 
@@ -60,12 +59,25 @@ describe('PaginaCreacionProyecto', () => {
     expect(elemento.querySelector('app-paso-objetivos-proyecto')).not.toBeNull();
   });
 
+  it('oculta el encabezado y el recorrido cuando falla la carga del borrador', async () => {
+    creacionProyecto.obtenerBorrador.mockReturnValueOnce(
+      throwError(() => new Error('Error de carga')),
+    );
+
+    const harness = await RouterTestingHarness.create('/proyectos/creacion?proyectoId=42');
+    const elemento = harness.routeNativeElement as HTMLElement;
+
+    expect(elemento.querySelector('app-estado-error')).not.toBeNull();
+    expect(elemento.querySelector('app-encabezado-pagina')).toBeNull();
+    expect(elemento.querySelector('app-recorrido-proyecto')).toBeNull();
+  });
+
   it('cambia solo el componente del paso y conserva la URL', async () => {
     const harness = await RouterTestingHarness.create('/proyectos/creacion?proyectoId=42');
     const elemento = harness.routeNativeElement as HTMLElement;
     const router = TestBed.inject(Router);
     const botonContexto = Array.from(
-      elemento.querySelectorAll<HTMLButtonElement>('.recorrido-creacion__boton'),
+      elemento.querySelectorAll<HTMLButtonElement>('.recorrido-proyecto__boton'),
     ).find((boton) => boton.textContent?.includes('Contexto del proyecto'));
 
     botonContexto?.click();
@@ -78,7 +90,7 @@ describe('PaginaCreacionProyecto', () => {
   it('habilita solo los pasos alcanzados por el borrador', async () => {
     const harness = await RouterTestingHarness.create('/proyectos/creacion?proyectoId=42');
     const botones = (harness.routeNativeElement as HTMLElement).querySelectorAll<HTMLButtonElement>(
-      '.recorrido-creacion__boton',
+      '.recorrido-proyecto__boton',
     );
 
     expect(botones[1].disabled).toBe(false);
@@ -106,7 +118,7 @@ describe('PaginaCreacionProyecto', () => {
   });
 
   function obtenerPosicionRecorrido(elemento: HTMLElement): string {
-    return elemento.querySelector('.recorrido-creacion__posicion')?.textContent?.trim() ?? '';
+    return elemento.querySelector('.recorrido-proyecto__posicion')?.textContent?.trim() ?? '';
   }
 });
 

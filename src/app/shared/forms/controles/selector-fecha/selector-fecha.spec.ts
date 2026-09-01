@@ -1,5 +1,5 @@
 import { OverlayContainer } from '@angular/cdk/overlay';
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { SelectorFecha } from './selector-fecha';
@@ -13,11 +13,13 @@ import { SelectorFecha } from './selector-fecha';
       etiquetadoPor="fecha-label"
       fechaMinima="2026-08-01"
       fechaMaxima="2026-08-31"
+      [soloLectura]="soloLectura()"
       [formControl]="control"
     />
   `,
 })
 class ComponentePrueba {
+  public readonly soloLectura = signal(false);
   public readonly control = new FormControl('2026-08-24', { nonNullable: true });
 }
 
@@ -76,6 +78,18 @@ describe('SelectorFecha', () => {
     const calendario = overlay.querySelector('[role="dialog"]');
 
     expect(calendario?.hasAttribute('aria-modal')).toBe(false);
+  });
+
+  it('conserva la fecha y no abre el calendario en solo lectura', () => {
+    fixture.componentInstance.soloLectura.set(true);
+    fixture.detectChanges();
+
+    obtenerTrigger().click();
+    fixture.detectChanges();
+
+    expect(obtenerTrigger().getAttribute('aria-readonly')).toBe('true');
+    expect(overlay.querySelector('[role="dialog"]')).toBeNull();
+    expect(fixture.componentInstance.control.value).toBe('2026-08-24');
   });
 
   function obtenerTrigger(): HTMLButtonElement {

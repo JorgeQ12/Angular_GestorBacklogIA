@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, effect, inject, input, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  output,
+} from '@angular/core';
 import {
   FormControl,
   NonNullableFormBuilder,
@@ -12,6 +20,7 @@ import {
   MensajesFormularioDirective,
 } from '../../../../../../shared/forms/errores-validacion';
 import { validarTextoRequerido } from '../../../../../../shared/forms/validadores';
+import { ModoFormularioProyecto } from '../../../../models/modo-formulario-proyecto.model';
 import {
   LIMITES_OBJETIVOS_PROYECTO,
   MENSAJES_OBJETIVO_ESPECIFICO,
@@ -37,11 +46,17 @@ import { ObjetivosProyecto } from '../../models/objetivos-proyecto.model';
 export class FormularioObjetivosProyecto {
   private readonly constructorFormulario = inject(NonNullableFormBuilder);
 
+  /** Identifica el formulario para permitir acciones externas mediante el atributo form. */
+  public readonly idFormulario = input<string | null>(null);
+
   /** Proporciona los valores que deben presentarse en el formulario. */
   public readonly datosIniciales = input<ObjetivosProyecto | null>(null);
 
   /** Bloquea temporalmente los controles durante la operación coordinada por la página. */
   public readonly procesando = input(false);
+
+  /** Define si la sección permite modificar sus valores o únicamente consultarlos. */
+  public readonly modo = input(ModoFormularioProyecto.Edicion);
 
   /** Entrega Objetivos válidos y normalizados al flujo consumidor. */
   public readonly guardar = output<ObjetivosProyecto>();
@@ -49,6 +64,7 @@ export class FormularioObjetivosProyecto {
   protected readonly limites = LIMITES_OBJETIVOS_PROYECTO;
   protected readonly mensajesFormulario = MENSAJES_OBJETIVOS_PROYECTO;
   protected readonly mensajesObjetivoEspecifico = MENSAJES_OBJETIVO_ESPECIFICO;
+  protected readonly esSoloLectura = computed(() => this.modo() === ModoFormularioProyecto.Lectura);
   protected readonly formulario: FormularioObjetivosProyectoTipado =
     this.constructorFormulario.group({
       objetivoGeneral: [
@@ -67,6 +83,7 @@ export class FormularioObjetivosProyecto {
 
   public constructor() {
     effect(() => {
+      this.modo();
       const datos = this.datosIniciales();
       if (datos) this.presentarDatos(datos);
     });
@@ -82,6 +99,7 @@ export class FormularioObjetivosProyecto {
 
   /** Incorpora otro resultado concreto a la definición del proyecto. */
   protected agregarObjetivoEspecifico(): void {
+    if (this.esSoloLectura()) return;
     const objetivos = this.formulario.controls.objetivosEspecificos;
     if (objetivos.length >= this.limites.objetivosEspecificos) return;
 
@@ -91,6 +109,7 @@ export class FormularioObjetivosProyecto {
 
   /** Retira un resultado específico conservando el mínimo requerido. */
   protected eliminarObjetivoEspecifico(indice: number): void {
+    if (this.esSoloLectura()) return;
     const objetivos = this.formulario.controls.objetivosEspecificos;
     if (objetivos.length <= 1) return;
 
@@ -100,6 +119,7 @@ export class FormularioObjetivosProyecto {
 
   /** Solicita persistir los valores cuando los objetivos están completos. */
   protected enviar(): void {
+    if (this.esSoloLectura()) return;
     if (this.formulario.invalid) {
       this.formulario.markAllAsTouched();
       return;

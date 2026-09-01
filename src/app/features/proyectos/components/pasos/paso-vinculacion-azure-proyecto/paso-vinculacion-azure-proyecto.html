@@ -1,0 +1,180 @@
+<app-tarjeta-paso-proyecto [paso]="paso" [modo]="modo()">
+@if (modo() === modos.Lectura) {
+  @if (vinculacion(); as azure) {
+    <section class="vinculacion-azure__resultado" aria-label="Datos vinculados de Azure">
+      <article class="vinculacion-azure__resultado-item">
+        <span class="vinculacion-azure__resultado-icono" aria-hidden="true">
+          <app-icono nombre="azureDevOps" />
+        </span>
+        <div>
+          <span>Proyecto Azure</span>
+          <strong>{{ azure.proyectoAzureNombre }}</strong>
+          <small>{{ azure.organizacion }}</small>
+        </div>
+      </article>
+      <article class="vinculacion-azure__resultado-item">
+        <span class="vinculacion-azure__resultado-icono" aria-hidden="true">
+          <app-icono nombre="backlog" />
+        </span>
+        <div>
+          <span>Épica principal</span>
+          <strong>#{{ azure.epicaAzureId }} · {{ azure.tituloEpica }}</strong>
+          <small>Referencia asociada al proyecto</small>
+        </div>
+      </article>
+      <article class="vinculacion-azure__resultado-item">
+        <span class="vinculacion-azure__resultado-icono" aria-hidden="true">
+          <app-icono nombre="usuario" />
+        </span>
+        <div>
+          <span>Equipo</span>
+          <strong>{{ azure.teamNombre }}</strong>
+          <small>Team de Azure DevOps</small>
+        </div>
+      </article>
+    </section>
+  } @else {
+    <p class="vinculacion-azure__sin-datos">No hay una vinculación de Azure disponible.</p>
+  }
+} @else if (resultadoValidacion(); as resultado) {
+  <div class="vinculacion-azure vinculacion-azure--confirmacion">
+    <section class="vinculacion-azure__resultado" aria-label="Datos vinculados de Azure">
+      <article class="vinculacion-azure__resultado-item">
+        <span class="vinculacion-azure__resultado-icono" aria-hidden="true">
+          <app-icono nombre="azureDevOps" />
+        </span>
+        <div>
+          <span>Proyecto Azure</span>
+          <strong>{{ resultado.nombreProyecto }}</strong>
+          <small>{{ resultado.organizacion }}</small>
+        </div>
+      </article>
+
+      <article class="vinculacion-azure__resultado-item">
+        <span class="vinculacion-azure__resultado-icono" aria-hidden="true">
+          <app-icono nombre="backlog" />
+        </span>
+        <div>
+          <span>Épica principal</span>
+          <strong>#{{ resultado.idEpica }} · {{ resultado.tituloEpica }}</strong>
+          <small>{{ resultado.cantidadRevisiones }} revisiones encontradas</small>
+        </div>
+      </article>
+
+      <article class="vinculacion-azure__resultado-item">
+        <span class="vinculacion-azure__resultado-icono" aria-hidden="true">
+          <app-icono nombre="usuario" />
+        </span>
+        <div>
+          <span>Equipo</span>
+          <strong>{{ resultado.nombreEquipo }}</strong>
+          <small>{{ resultado.cantidadMiembros }} integrantes encontrados</small>
+        </div>
+      </article>
+    </section>
+
+    <footer class="vinculacion-azure__acciones vinculacion-azure__acciones--confirmacion">
+      <div class="vinculacion-azure__guardado">
+        <app-icono nombre="informacion" aria-hidden="true" />
+        <p>Los datos se guardarán como borrador.</p>
+      </div>
+      <div class="vinculacion-azure__grupo-acciones">
+        <button
+          type="button"
+          class="ui-button ui-button--secondary"
+          [disabled]="procesando()"
+          (click)="editar.emit()"
+        >
+          <app-icono class="ui-button__icon" nombre="editar" />
+          Editar datos
+        </button>
+        <button
+          type="button"
+          class="ui-button ui-button--primary"
+          [disabled]="procesando()"
+          (click)="confirmar.emit()"
+        >
+          Confirmar y continuar
+          <app-icono class="ui-button__icon ui-button__icon--trailing" nombre="continuar" />
+        </button>
+      </div>
+    </footer>
+  </div>
+} @else {
+  <form
+    class="vinculacion-azure"
+    [formGroup]="formulario"
+    [appMensajesFormulario]="mensajesFormulario"
+    (ngSubmit)="enviar()"
+  >
+    <div class="vinculacion-azure__contenido">
+      <div class="vinculacion-azure__campos-principales">
+        <div class="ui-field">
+          <label class="ui-label" for="vinculacion-url-board">Enlace del proyecto o board</label>
+          <input
+            id="vinculacion-url-board"
+            class="ui-control"
+            type="url"
+            formControlName="urlBoard"
+            placeholder="https://dev.azure.com/organizacion/proyecto/..."
+            autocomplete="url"
+            aria-describedby="vinculacion-url-board-ayuda"
+            appErrorCampo
+          />
+          <span id="vinculacion-url-board-ayuda" class="vinculacion-azure__ayuda">
+            Copia el enlace desde el proyecto o el board de Azure DevOps.
+          </span>
+        </div>
+
+        <div class="ui-field">
+          <label class="ui-label" for="vinculacion-id-epica">ID de la épica principal</label>
+          <input
+            id="vinculacion-id-epica"
+            class="ui-control"
+            type="number"
+            min="1"
+            formControlName="idEpica"
+            placeholder="Ej. 368999"
+            aria-describedby="vinculacion-id-epica-ayuda"
+            appErrorCampo
+          />
+          <span id="vinculacion-id-epica-ayuda" class="vinculacion-azure__ayuda">
+            Es el número visible en el encabezado de la épica.
+          </span>
+        </div>
+      </div>
+
+      <div class="ui-field vinculacion-azure__equipo">
+        <label class="ui-label" for="vinculacion-id-equipo">
+          ID del Team de Azure
+          <span class="vinculacion-azure__opcional">Opcional</span>
+        </label>
+        <input
+          id="vinculacion-id-equipo"
+          class="ui-control"
+          type="text"
+          formControlName="idEquipo"
+          placeholder="GUID del Team"
+          aria-describedby="vinculacion-id-equipo-ayuda"
+          appErrorCampo
+        />
+        <span id="vinculacion-id-equipo-ayuda" class="vinculacion-azure__ayuda">
+          Déjalo vacío para detectarlo automáticamente o ingresa el GUID cuando necesites indicar un
+          Team específico.
+        </span>
+      </div>
+    </div>
+
+    <footer class="vinculacion-azure__acciones">
+      <div class="vinculacion-azure__aviso">
+        <app-icono nombre="informacion" />
+        <p>Podrás revisar el proyecto, la épica y el equipo encontrados antes de continuar.</p>
+      </div>
+      <button type="submit" class="ui-button ui-button--primary" [disabled]="procesando()">
+        Comprobar datos
+        <app-icono class="ui-button__icon ui-button__icon--trailing" nombre="continuar" />
+      </button>
+    </footer>
+  </form>
+}
+</app-tarjeta-paso-proyecto>

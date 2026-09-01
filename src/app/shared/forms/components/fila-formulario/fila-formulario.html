@@ -2,12 +2,14 @@
 <div class="fila-formulario__contenido">
   <ng-content />
 </div>
-<button
-  type="button"
-  class="fila-formulario__eliminar"
-  [disabled]="procesando() || !eliminable()"
-  [attr.aria-label]="etiquetaEliminar()"
-  (click)="eliminar.emit()"
->
-  <app-icono nombre="eliminar" aria-hidden="true" />
-</button>
+@if (!soloLectura()) {
+  <button
+    type="button"
+    class="fila-formulario__eliminar"
+    [disabled]="procesando() || !eliminable()"
+    [attr.aria-label]="etiquetaEliminar()"
+    (click)="eliminar.emit()"
+  >
+    <app-icono nombre="eliminar" aria-hidden="true" />
+  </button>
+}

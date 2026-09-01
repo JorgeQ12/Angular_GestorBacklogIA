@@ -4,12 +4,12 @@
 >
   <div class="editor-flujo__espacio-trabajo">
     <app-lienzo-flujo-proyecto />
-    @if (estadoEditor.paletaBloquesAbierta()) {
+    @if (!esSoloLectura() && estadoEditor.paletaBloquesAbierta()) {
       <app-panel-lateral-flujo-proyecto />
     }
   </div>
 
-  @if (estadoEditor.editorNodoAbierto()) {
+  @if (!esSoloLectura() && estadoEditor.editorNodoAbierto()) {
     <app-modal-nodo-flujo-proyecto />
   }
 </section>

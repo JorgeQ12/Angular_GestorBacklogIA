@@ -93,7 +93,7 @@
 .ui-form-footer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: end;
   gap: var(--space-4);
   padding: var(--space-4) var(--space-6);
   border-top: var(--border-width) solid var(--card-divider);
@@ -117,6 +117,12 @@
   width: var(--font-size-base);
   height: var(--font-size-base);
   flex: 0 0 auto;
+}
+
+.ui-form-footer__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
 }
 
 .ui-label {
@@ -209,6 +215,17 @@
   background: var(--field-surface-disabled);
   color: var(--text-disabled);
   opacity: 0.75;
+}
+
+.ui-control[readonly] {
+  border-color: var(--field-border);
+  background: var(--surface-default);
+  cursor: default;
+}
+
+.ui-control[readonly]:hover {
+  border-color: var(--field-border);
+  background: var(--surface-default);
 }
 
 .ui-control-icon {
@@ -409,5 +426,9 @@
 
   .ui-form-footer .ui-button {
     width: 100%;
+  }
+
+  .ui-form-footer__actions {
+    flex-direction: column-reverse;
   }
 }

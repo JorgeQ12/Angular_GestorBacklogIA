@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   effect,
   inject,
   input,
@@ -11,6 +12,7 @@ import { ModalNodoFlujoProyecto } from '../modal-nodo-flujo-proyecto/modal-nodo-
 import { PanelLateralFlujoProyecto } from '../panel-lateral-flujo-proyecto/panel-lateral-flujo-proyecto';
 import { FlujoProyecto } from '../../models/flujo-proyecto.model';
 import { EstadoEditorFlujoProyectoService } from '../../services/estado-editor-flujo-proyecto.service';
+import { ModoFormularioProyecto } from '../../../../models/modo-formulario-proyecto.model';
 
 /** Presenta y edita el flujo sin conocer rutas, HTTP ni el borrador de creación. */
 @Component({
@@ -34,8 +36,13 @@ export class EditorFlujoProyecto {
   /** Bloquea temporalmente la edición durante el guardado remoto. */
   public readonly procesando = input(false);
 
+  /** Define si el diagrama admite cambios o se presenta como fotografía confirmada. */
+  public readonly modo = input(ModoFormularioProyecto.Edicion);
+
   /** Comunica una nueva fotografía cada vez que cambia el diagrama. */
   public readonly flujoCambiado = output<FlujoProyecto>();
+
+  protected readonly esSoloLectura = computed(() => this.modo() === ModoFormularioProyecto.Lectura);
 
   private fotografiaHidratada = '';
   private fotografiaEmitida = '';
@@ -57,7 +64,9 @@ export class EditorFlujoProyecto {
       this.editorHidratado = true;
     });
 
-    effect(() => this.estadoEditor.establecerSoloLectura(this.procesando()));
+    effect(() =>
+      this.estadoEditor.establecerSoloLectura(this.procesando() || this.esSoloLectura()),
+    );
 
     effect(() => {
       const flujo = this.estadoEditor.flujo();

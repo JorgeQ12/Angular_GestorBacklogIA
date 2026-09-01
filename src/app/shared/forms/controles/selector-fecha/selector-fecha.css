@@ -43,6 +43,13 @@
   cursor: not-allowed;
 }
 
+.selector-fecha__trigger--readonly,
+.selector-fecha__trigger--readonly:hover:not(:disabled) {
+  border-color: var(--field-border);
+  background: var(--surface-default);
+  cursor: default;
+}
+
 .selector-fecha__trigger--error {
   border-color: var(--field-error-color);
   background: var(--field-error-surface);

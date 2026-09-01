@@ -1,5 +1,5 @@
 import { ClaveSeccionProyecto } from '../../config/secciones-proyecto.config';
-import { CLAVE_PASO_VINCULACION_AZURE } from '../config/pasos-creacion-proyecto.config';
+import { ClavePasoEspecialProyecto } from '../../config/pasos-proyecto.config';
 import {
   construirEstadoRecorridoCreacion,
   obtenerUltimoPasoCreacion,
@@ -9,8 +9,10 @@ import {
 
 describe('estado del recorrido de creación', () => {
   it('mantiene el recorrido inicial sin pasos persistidos', () => {
-    expect(construirEstadoRecorridoCreacion(CLAVE_PASO_VINCULACION_AZURE, null)).toEqual({
-      pasoActual: CLAVE_PASO_VINCULACION_AZURE,
+    expect(
+      construirEstadoRecorridoCreacion(ClavePasoEspecialProyecto.VinculacionAzure, null),
+    ).toEqual({
+      pasoActual: ClavePasoEspecialProyecto.VinculacionAzure,
       pasosCompletados: [],
       pasosNavegables: [],
     });
@@ -20,7 +22,7 @@ describe('estado del recorrido de creación', () => {
     expect(construirEstadoRecorridoCreacion(ClaveSeccionProyecto.Contexto, 4)).toEqual({
       pasoActual: ClaveSeccionProyecto.Contexto,
       pasosCompletados: [
-        CLAVE_PASO_VINCULACION_AZURE,
+        ClavePasoEspecialProyecto.VinculacionAzure,
         ClaveSeccionProyecto.Contexto,
         ClaveSeccionProyecto.TipoSolucion,
         ClaveSeccionProyecto.Necesidad,
@@ -37,7 +39,7 @@ describe('estado del recorrido de creación', () => {
     expect(construirEstadoRecorridoCreacion(ClaveSeccionProyecto.Objetivos, 4)).toEqual({
       pasoActual: ClaveSeccionProyecto.Objetivos,
       pasosCompletados: [
-        CLAVE_PASO_VINCULACION_AZURE,
+        ClavePasoEspecialProyecto.VinculacionAzure,
         ClaveSeccionProyecto.Contexto,
         ClaveSeccionProyecto.TipoSolucion,
         ClaveSeccionProyecto.Necesidad,

@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ModoFormularioProyecto } from '../../../../models/modo-formulario-proyecto.model';
 import { FormularioNecesidadProyecto } from './formulario-necesidad-proyecto';
 
 describe('FormularioNecesidadProyecto', () => {
@@ -81,6 +82,24 @@ describe('FormularioNecesidadProyecto', () => {
     expect(obtenerTextarea('#necesidad-situacion-actual').disabled).toBe(true);
     expect(obtenerTextarea('#necesidad-problemas').disabled).toBe(true);
     expect(obtenerTextarea('#necesidad-impacto').disabled).toBe(true);
+  });
+
+  it('presenta los campos como lectura y no emite al enviar', () => {
+    const guardar = vi.fn();
+    fixture.componentInstance.guardar.subscribe(guardar);
+    fixture.componentRef.setInput('datosIniciales', {
+      situacionActual: 'Registro manual',
+      problemas: 'Sin trazabilidad',
+      impacto: 'Aumentan los tiempos',
+    });
+    fixture.componentRef.setInput('modo', ModoFormularioProyecto.Lectura);
+    fixture.detectChanges();
+
+    enviarFormulario();
+
+    expect(obtenerTextarea('#necesidad-situacion-actual').readOnly).toBe(true);
+    expect((fixture.nativeElement as HTMLElement).textContent).not.toContain('/900');
+    expect(guardar).not.toHaveBeenCalled();
   });
 
   function escribir(selector: string, valor: string): void {

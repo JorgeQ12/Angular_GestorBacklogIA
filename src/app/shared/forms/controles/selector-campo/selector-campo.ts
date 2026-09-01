@@ -5,6 +5,7 @@ import {
   ElementRef,
   ViewEncapsulation,
   computed,
+  effect,
   forwardRef,
   input,
   signal,
@@ -42,6 +43,9 @@ export class SelectorCampo implements ControlValueAccessor, ControlCampoPersonal
   public readonly placeholder = input('Selecciona una opción');
   public readonly etiquetadoPor = input<string>();
 
+  /** Conserva el valor visible e impide abrir o modificar la selección. */
+  public readonly soloLectura = input(false);
+
   protected readonly abierto = signal(false);
   protected readonly deshabilitado = signal(false);
   protected readonly conError = signal(false);
@@ -72,6 +76,12 @@ export class SelectorCampo implements ControlValueAccessor, ControlCampoPersonal
   private readonly elementosOpcion = viewChildren<ElementRef<HTMLButtonElement>>('opcionElemento');
   private notificarCambio: (valor: string | number | null) => void = () => undefined;
   private notificarTocado: () => void = () => undefined;
+
+  public constructor() {
+    effect(() => {
+      if (this.soloLectura()) this.abierto.set(false);
+    });
+  }
 
   /** Sincroniza el valor recibido desde el formulario. */
   public writeValue(valor: string | number | null): void {
@@ -106,13 +116,13 @@ export class SelectorCampo implements ControlValueAccessor, ControlCampoPersonal
 
   /** Alterna la lista de opciones desde el disparador. */
   protected alternar(): void {
-    if (this.deshabilitado()) return;
+    if (this.deshabilitado() || this.soloLectura()) return;
     this.abierto() ? this.cerrar() : this.abrir();
   }
 
   /** Abre la lista desde el teclado y prepara su opción activa. */
   protected manejarTeclaTrigger(evento: KeyboardEvent): void {
-    if (this.deshabilitado()) return;
+    if (this.deshabilitado() || this.soloLectura()) return;
 
     if (['Enter', ' ', 'ArrowDown', 'ArrowUp'].includes(evento.key)) {
       evento.preventDefault();
@@ -156,7 +166,7 @@ export class SelectorCampo implements ControlValueAccessor, ControlCampoPersonal
 
   /** Confirma una opción habilitada y comunica el cambio al formulario. */
   protected seleccionar(opcion: OpcionSelector): void {
-    if (opcion.deshabilitada) return;
+    if (this.soloLectura() || opcion.deshabilitada) return;
     this.valor.set(opcion.valor);
     this.notificarCambio(opcion.valor);
     this.notificarTocado();

@@ -1,11 +1,19 @@
 import { Routes } from '@angular/router';
-import { SEGMENTOS_RUTA } from '../../core/navegacion/rutas';
+import { PARAMETROS_RUTA, SEGMENTOS_RUTA } from '../../core/navegacion/rutas';
 import { EstadoCreacionProyectoService } from './creacion/services/estado-creacion-proyecto.service';
-import { ContenidoEncabezadoPasoCreacionService } from './creacion/services/contenido-encabezado-paso-creacion.service';
 import { EstadoListadoProyectosService } from './listado/services/estado-listado-proyectos.service';
+import { EstadoInformacionProyectoService } from './informacion/services/estado-informacion-proyecto.service';
 
 /** Define las rutas internas del dominio de Proyectos. */
 export const RUTAS_PROYECTOS: Routes = [
+  {
+    path: `:${PARAMETROS_RUTA.proyectoId}/${SEGMENTOS_RUTA.informacion}`,
+    providers: [EstadoInformacionProyectoService],
+    loadComponent: () =>
+      import('./informacion/pages/pagina-informacion-proyecto/pagina-informacion-proyecto').then(
+        (modulo) => modulo.PaginaInformacionProyecto,
+      ),
+  },
   {
     path: '',
     pathMatch: 'full',
@@ -17,7 +25,7 @@ export const RUTAS_PROYECTOS: Routes = [
   },
   {
     path: SEGMENTOS_RUTA.creacion,
-    providers: [EstadoCreacionProyectoService, ContenidoEncabezadoPasoCreacionService],
+    providers: [EstadoCreacionProyectoService],
     loadComponent: () =>
       import('./creacion/pages/pagina-creacion-proyecto/pagina-creacion-proyecto').then(
         (modulo) => modulo.PaginaCreacionProyecto,

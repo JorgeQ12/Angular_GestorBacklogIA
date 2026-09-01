@@ -8,9 +8,11 @@
   role="combobox"
   aria-haspopup="listbox"
   [class.selector-campo__trigger--error]="conError()"
+  [class.selector-campo__trigger--readonly]="soloLectura()"
   [attr.aria-controls]="id() + '-lista'"
   [attr.aria-expanded]="abierto()"
   [attr.aria-labelledby]="etiquetadoPor()"
+  [attr.aria-readonly]="soloLectura()"
   [disabled]="deshabilitado()"
   (click)="alternar()"
   (keydown)="manejarTeclaTrigger($event)"
@@ -18,7 +20,9 @@
   <span [class.selector-campo__placeholder]="!opcionSeleccionada()">
     {{ opcionSeleccionada()?.etiqueta ?? placeholder() }}
   </span>
-  <app-icono class="selector-campo__icono" nombre="desplegar" />
+  @if (!soloLectura()) {
+    <app-icono class="selector-campo__icono" nombre="desplegar" />
+  }
 </button>
 
 <ng-template

@@ -12,22 +12,22 @@ import {
   mapearResultadoVinculacionAzure,
   mapearSolicitudVinculacionAzure,
 } from '../mappers/creacion-proyecto.mapper';
-import { mapearCambioSeccionBorrador } from '../mappers/actualizacion-seccion-borrador.mapper';
+import { mapearCambioSeccionProyecto } from '../../mappers/actualizacion-seccion-proyecto.mapper';
 import {
   CrearBorradorProyectoRespuestaDto,
   CrearBorradorProyectoSolicitudDto,
   BorradorProyectoDto,
 } from '../models/borrador-proyecto.dto';
 import { BorradorProyecto, BorradorProyectoCreado } from '../models/borrador-proyecto.model';
-import { ActualizacionSeccionBorrador } from '../models/actualizacion-seccion-borrador.model';
+import { ActualizacionSeccionProyecto } from '../../models/actualizacion-seccion-proyecto.model';
 import {
   SincronizarEquipoAzureRespuestaDto,
   ValidarVinculacionAzureRespuestaDto,
 } from '../models/vinculacion-azure.dto';
-import {
+import type {
   DatosVinculacionAzure,
   ResultadoVinculacionAzure,
-} from '../models/vinculacion-azure.model';
+} from '../../models/vinculacion-azure-proyecto.model';
 import { OrigenEquipoAzureProyecto } from '../../secciones/equipo/models/equipo-proyecto.model';
 
 /** Ejecuta y adapta las operaciones remotas del recorrido de creación. */
@@ -99,7 +99,7 @@ export class CreacionProyectoService {
   /** Persiste una sección sin perder la información de las demás secciones. */
   public actualizarBorrador(
     borrador: BorradorProyecto,
-    actualizacion: ActualizacionSeccionBorrador,
+    actualizacion: ActualizacionSeccionProyecto,
     pasoActual: number,
   ): Observable<BorradorProyecto> {
     return this.http
@@ -107,7 +107,7 @@ export class CreacionProyectoService {
         ENDPOINTS_CREACION_PROYECTO.actualizarBorrador,
         mapearActualizacionBorrador(
           borrador,
-          mapearCambioSeccionBorrador(actualizacion),
+          mapearCambioSeccionProyecto(actualizacion),
           pasoActual,
         ),
       )

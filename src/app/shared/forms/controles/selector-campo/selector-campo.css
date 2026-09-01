@@ -43,6 +43,13 @@
   cursor: not-allowed;
 }
 
+.selector-campo__trigger--readonly,
+.selector-campo__trigger--readonly:hover:not(:disabled) {
+  border-color: var(--field-border);
+  background: var(--surface-default);
+  cursor: default;
+}
+
 .selector-campo__trigger--error {
   border-color: var(--field-error-color);
   background: var(--field-error-surface);

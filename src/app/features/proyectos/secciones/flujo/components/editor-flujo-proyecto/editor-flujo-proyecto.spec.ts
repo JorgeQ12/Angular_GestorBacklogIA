@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ModoFormularioProyecto } from '../../../../models/modo-formulario-proyecto.model';
 import {
   BorradorNodoFlujo,
   FlujoProyecto,
@@ -56,6 +57,17 @@ describe('EditorFlujoProyecto', () => {
     fixture.detectChanges();
 
     expect(estadoEditor.soloLectura()).toBe(true);
+  });
+
+  it('bloquea el editor y retira sus superficies de edición en modo lectura', () => {
+    fixture.componentRef.setInput('modo', ModoFormularioProyecto.Lectura);
+    estadoEditor.abrirPaletaBloques();
+    fixture.detectChanges();
+
+    expect(estadoEditor.soloLectura()).toBe(true);
+    expect(
+      (fixture.nativeElement as HTMLElement).querySelector('app-panel-lateral-flujo-proyecto'),
+    ).toBeNull();
   });
 
   it('aplica cinco acentos distintos en la selección y en los bloques del lienzo', () => {

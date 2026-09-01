@@ -1,8 +1,8 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { Observable, finalize, of, shareReplay, tap, throwError } from 'rxjs';
 import { ClaveSeccionProyecto } from '../../config/secciones-proyecto.config';
-import { AVANCE_BORRADOR_POR_PASO } from '../config/pasos-creacion-proyecto.config';
-import { ActualizacionSeccionBorrador } from '../models/actualizacion-seccion-borrador.model';
+import { AVANCE_BORRADOR_POR_PASO } from '../config/avance-borrador-proyecto.config';
+import { ActualizacionSeccionProyecto } from '../../models/actualizacion-seccion-proyecto.model';
 import { BorradorProyecto } from '../models/borrador-proyecto.model';
 import { CreacionProyectoService } from './creacion-proyecto.service';
 
@@ -65,7 +65,7 @@ export class EstadoCreacionProyectoService {
   }
 
   /** Guarda una sección y conserva la revisión devuelta para el recorrido. */
-  public guardarSeccion(actualizacion: ActualizacionSeccionBorrador): Observable<BorradorProyecto> {
+  public guardarSeccion(actualizacion: ActualizacionSeccionProyecto): Observable<BorradorProyecto> {
     const vigente = this.estadoBorrador();
     if (!vigente) return throwError(() => new Error('El borrador todavía no está disponible.'));
 

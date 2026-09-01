@@ -5,6 +5,7 @@ import {
   ElementRef,
   ViewEncapsulation,
   computed,
+  effect,
   forwardRef,
   inject,
   input,
@@ -48,6 +49,9 @@ export class SelectorFecha implements ControlValueAccessor, ControlCampoPersonal
   public readonly fechaMinima = input<string>();
   public readonly fechaMaxima = input<string>();
 
+  /** Conserva la fecha visible e impide abrir o modificar el calendario. */
+  public readonly soloLectura = input(false);
+
   protected readonly diasSemana = DIAS_SEMANA;
   protected readonly abierto = signal(false);
   protected readonly deshabilitado = signal(false);
@@ -88,6 +92,12 @@ export class SelectorFecha implements ControlValueAccessor, ControlCampoPersonal
   private notificarCambio: (valor: string) => void = () => undefined;
   private notificarTocado: () => void = () => undefined;
 
+  public constructor() {
+    effect(() => {
+      if (this.soloLectura()) this.abierto.set(false);
+    });
+  }
+
   /** Sincroniza la fecha ISO recibida desde el formulario. */
   public writeValue(valor: string | null): void {
     const fecha = this.normalizarFecha(valor);
@@ -123,13 +133,17 @@ export class SelectorFecha implements ControlValueAccessor, ControlCampoPersonal
 
   /** Alterna el calendario desde el control visible. */
   protected alternar(): void {
-    if (this.deshabilitado()) return;
+    if (this.deshabilitado() || this.soloLectura()) return;
     this.abierto() ? this.cerrar() : this.abrir();
   }
 
   /** Abre el calendario desde teclas de activación estándar. */
   protected manejarTeclaTrigger(evento: KeyboardEvent): void {
-    if (['Enter', ' ', 'ArrowDown'].includes(evento.key) && !this.deshabilitado()) {
+    if (
+      ['Enter', ' ', 'ArrowDown'].includes(evento.key) &&
+      !this.deshabilitado() &&
+      !this.soloLectura()
+    ) {
       evento.preventDefault();
       this.abrir();
     }
@@ -146,7 +160,7 @@ export class SelectorFecha implements ControlValueAccessor, ControlCampoPersonal
 
   /** Confirma una fecha permitida y la comunica en formato ISO. */
   protected seleccionarDia(dia: DiaCalendario): void {
-    if (dia.deshabilitado) return;
+    if (this.soloLectura() || dia.deshabilitado) return;
     this.valor.set(dia.fecha);
     this.notificarCambio(dia.fecha);
     this.notificarTocado();

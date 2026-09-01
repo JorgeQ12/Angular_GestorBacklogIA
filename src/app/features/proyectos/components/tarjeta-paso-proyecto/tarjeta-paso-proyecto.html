@@ -1,0 +1,50 @@
+<article class="ui-card tarjeta-paso" [attr.aria-labelledby]="'titulo-' + paso()">
+  <header class="ui-card__header tarjeta-paso__encabezado">
+    <div class="ui-card__heading">
+      <span class="ui-card__icon" aria-hidden="true">
+        <app-icono [nombre]="definicion().icono" />
+      </span>
+      <div>
+        <h2 class="ui-card__title" [id]="'titulo-' + paso()">{{ definicion().titulo }}</h2>
+        @if (detalle(); as contenido) {
+          <div class="tarjeta-paso__detalle">
+            <app-icono [nombre]="contenido.icono" aria-hidden="true" />
+            <strong>{{ contenido.principal }}</strong>
+            <span aria-hidden="true">·</span>
+            <span>{{ contenido.secundario }}</span>
+          </div>
+        } @else {
+          <p class="tarjeta-paso__descripcion">{{ definicion().descripcion }}</p>
+        }
+      </div>
+    </div>
+
+    <div class="tarjeta-paso__acciones-encabezado">
+      <ng-content select="[accionesEncabezadoPasoProyecto]" />
+      @if (editable() && modo() === modos.Lectura) {
+        <button
+          type="button"
+          class="ui-button ui-button--secondary ui-button--md"
+          (click)="editar.emit()"
+        >
+          <app-icono class="ui-button__icon" nombre="editar" />
+          Editar
+        </button>
+      }
+    </div>
+  </header>
+
+  <div class="ui-card__body tarjeta-paso__contenido">
+    <ng-content />
+  </div>
+
+  @if (modo() === modos.Edicion && acciones(); as configuracionAcciones) {
+    <app-acciones-paso-proyecto
+      [configuracion]="configuracionAcciones"
+      [idFormulario]="idFormulario()"
+      [procesando]="procesando()"
+      (cancelar)="cancelar.emit()"
+      (confirmar)="confirmar.emit()"
+    />
+  }
+</article>

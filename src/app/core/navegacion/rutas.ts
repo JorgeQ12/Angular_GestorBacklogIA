@@ -6,6 +6,7 @@ export const SEGMENTOS_RUTA = {
   creacion: 'creacion',
   iniciarSesion: 'iniciar-sesion',
   inicio: 'inicio',
+  informacion: 'informacion',
   panel: 'panel',
   proyectos: 'proyectos',
 } as const;
@@ -16,6 +17,8 @@ export const PARAMETROS_RUTA = {
   nombreProyecto: 'nombre',
   pagina: 'pagina',
   proyectoId: 'proyectoId',
+  pasoProyecto: 'paso',
+  versionProyectoId: 'version',
   responsableProyecto: 'responsable',
 } as const;
 
@@ -61,4 +64,9 @@ export function crearUrlCreacionProyecto(proyectoId: number | string): string {
   return `${URL_CREACION_PROYECTO}?${PARAMETROS_RUTA.proyectoId}=${encodeURIComponent(
     String(proyectoId),
   )}`;
+}
+
+/** Construye la URL canónica de información de un proyecto publicado. */
+export function crearUrlInformacionProyecto(proyectoId: number | string): string {
+  return `${URL_PROYECTOS}/${encodeURIComponent(String(proyectoId))}/${SEGMENTOS_RUTA.informacion}`;
 }

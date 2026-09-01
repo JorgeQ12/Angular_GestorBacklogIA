@@ -13,7 +13,7 @@ Al crear o reanudar un borrador, su identidad se conserva como query param:
 `/panel/proyectos/creacion?proyectoId=42`. El paso visible no forma parte de la URL; cambiar de
 paso reemplaza únicamente el componente presentado dentro de la página.
 
-- `VinculacionAzure` captura los valores y presenta el resultado de la validación; no conoce HTTP,
+- `PasoVinculacionAzureProyecto` captura los valores y presenta el resultado de la validación; no conoce HTTP,
   mensajes ni navegación.
 - La página coordina las operaciones, evita envíos duplicados y muestra fallos mediante el sistema
   global de mensajes.
@@ -64,7 +64,15 @@ es el punto de entrada de la ruta y compone el recorrido completo.
 ```text
 features/proyectos/
 ├── proyectos.routes.ts
+├── components/
+│   ├── acciones-paso-proyecto/
+│   ├── recorrido-proyecto/
+│   ├── tarjeta-paso-proyecto/
+│   └── pasos/
+│       ├── paso-vinculacion-azure-proyecto/
+│       └── paso-[seccion]-proyecto/
 ├── config/
+│   ├── pasos-proyecto.config.ts
 │   └── secciones-proyecto.config.ts
 ├── secciones/
 │   ├── contexto/
@@ -74,28 +82,25 @@ features/proyectos/
 │   │   └── models/
 │   └── alcance/ ...
 ├── creacion/
-│   ├── components/
-│   │   ├── recorrido-creacion-proyecto/
-│   │   ├── vinculacion-azure/
-│   │   └── pasos/
-│   │       ├── paso-contexto-proyecto/
-│   │       ├── paso-alcance-proyecto/
-│   │       └── paso-[seccion]-proyecto/
 │   ├── config/
-│   │   └── pasos-creacion-proyecto.config.ts
+│   │   └── avance-borrador-proyecto.config.ts
 │   ├── mappers/
 │   ├── models/
 │   ├── pages/
 │   │   └── pagina-creacion-proyecto/
 │   └── services/
 └── informacion/
+    ├── components/
+    │   └── selector-version-proyecto/
+    ├── config/
     ├── mappers/
+    ├── models/
     ├── pages/
     └── services/
 ```
 
-La capacidad `informacion` se incorporará cuando se migre su experiencia real; no se crean
-carpetas o componentes vacíos como anticipación.
+La capacidad `informacion` implementa la consulta y el versionamiento según la decisión registrada
+en `INFORMACION_PROYECTOS.md`; sus carpetas contienen consumidores reales.
 
 `app.routes.ts` carga el segmento `proyectos` mediante `loadChildren`. La feature declara en
 `proyectos.routes.ts` una única ruta `creacion`, sus providers de recorrido y el `loadComponent`
@@ -106,44 +111,51 @@ de `PaginaCreacionProyecto`. No hay rutas hijas, guards de paso ni un `router-ou
 `secciones` y `pasos` no son nombres intercambiables:
 
 - Una **sección** representa contenido reutilizable del dominio del proyecto. Conserva modelos,
-  configuración, mappers, formularios y futuras vistas de detalle.
-- Un **paso** representa un componente contenedor interno del recorrido de creación. Adapta un
-  formulario de sección al borrador y emite `completado`; no conoce `Router` ni construye URLs.
+  configuración, mappers y formularios independientes de un caso de uso.
+- Un **paso** representa la composición visual reutilizable de tarjeta, encabezado, formulario y
+  footer. Creación e Información consumen exactamente el mismo componente y proporcionan datos,
+  modo y acciones. Ningún paso conoce `Router`, HTTP, borradores ni versiones.
 
 Por esta razón no se crean páginas dentro de `proyectos/secciones` ni se alojan modelos de dominio
-en `creacion/components/pasos`. La separación permite reutilizar una sección posteriormente desde
-Información sin trasladar reglas del recorrido de creación.
+en `proyectos/components/pasos`. La separación permite
+reutilizar una sección desde ambos casos de uso sin trasladar sus reglas de coordinación.
 
 ## Reutilización entre creación e información
 
 Los pasos de creación y las secciones de información representan los mismos datos del proyecto,
 pero no el mismo flujo. Se comparte el contenido del dominio; no se comparte una página completa
-ni se crea un componente condicionado por modos generales como `creacion` e `informacion`.
+ni se condiciona el formulario por nombres de casos de uso como `creacion` e `informacion`.
 
 ```text
-Formulario o detalle de una sección
-                │
-       modelo común del dominio
+          paso compartido
+ tarjeta + formulario + footer
           ┌─────┴─────┐
           │           │
  página de creación   página de información
- borrador y avance    consulta o actualización
+ borrador y avance    consulta o nueva versión
 ```
 
 - `secciones/<seccion>/models` define el dato independiente de HTTP y de la ruta.
-- `secciones/<seccion>/components` contiene el formulario reutilizable y, cuando haga falta, su
-  representación de solo lectura.
+- `secciones/<seccion>/components` contiene formularios y componentes neutrales que tienen más de
+  un caso de uso real.
 - `secciones/<seccion>/config` contiene validaciones, opciones y mensajes propios de esa sección.
-- `creacion/components/pasos` integra el contenido con el borrador y la revisión optimista; cada
-  adaptador emite la finalización y la página decide cuál componente presentar después.
-- `informacion/pages/secciones` integra el mismo dominio con la consulta del proyecto y, si la
-  regla funcional lo permite, con su operación de actualización.
+- `proyectos/components/pasos` contiene los nueve pasos utilizados por ambas páginas.
+- Creación conecta sus salidas con el borrador y el avance; Información las conecta con la edición
+  versionada y el descarte.
+- `ModoFormularioProyecto` expresa únicamente la capacidad de interacción `Lectura` o `Edicion`;
+  no identifica el caso de uso consumidor.
+- Información reutiliza el mismo formulario en lectura y edición. No mantiene componentes
+  `detalle-*` paralelos ni duplica el marcado de cada sección.
 - Los mappers de cada capacidad traducen sus DTO al modelo común sin exponer contratos del backend
   a los componentes.
 - Los servicios de creación e información permanecen separados porque usan operaciones y reglas
   de persistencia diferentes.
-- La tarjeta, el encabezado, el footer y los botones del recorrido pertenecen al shell de creación;
-  no forman parte del formulario compartido.
+- `TarjetaPasoProyecto` centraliza encabezado, contenido y superficie del footer. Las acciones se
+  configuran por el consumidor y `AccionesPasoProyecto` se declara únicamente dentro de esa
+  tarjeta. El botón principal se asocia al formulario del paso mediante `id`/`form`, conservando el
+  envío nativo sin slots `accionesFormulario*`.
+- `RecorridoProyecto` presenta el mismo catálogo en ambos casos de uso; cada página decide qué
+  pasos son navegables y si existe progreso secuencial.
 
 El formulario recibe datos iniciales y catálogos mediante entradas y emite un valor válido y
 normalizado. No conoce el identificador del proyecto, la revisión del borrador, HTTP, mensajes
@@ -151,20 +163,14 @@ globales ni rutas. La página que lo consume decide cómo guardar y qué ocurre 
 
 ### Regla especial para Azure
 
-Azure es el origen del proyecto y no una sección editable después de crear el borrador.
+Azure es un paso compartido, pero no una sección versionada.
 
-- Durante el primer paso, `VinculacionAzure` captura, valida y permite corregir los datos antes de
-  confirmarlos.
-- Al confirmar, la asociación queda cerrada para el recorrido de creación y se avanza a Contexto.
-- En información del proyecto se reutiliza su modelo de presentación, pero se muestra mediante un
-  componente de detalle sin controles de edición.
-- No se reutiliza el formulario de vinculación dentro de información ni se ofrece una acción para
-  cambiar la asociación.
-- El componente de detalle de Azure se extraerá cuando exista el segundo consumidor; no se crean
-  archivos o carpetas vacíos de forma anticipada.
-
-Esta misma separación se evalúa para cada paso. Una sección editable puede compartir formulario y
-detalle; una sección inmutable comparte únicamente el contrato y su representación de lectura.
+- `PasoVinculacionAzureProyecto` vive en `proyectos/components/pasos`.
+- En Creación captura, valida y permite corregir los datos antes de confirmarlos.
+- En Información presenta la asociación confirmada mediante el mismo componente en lectura.
+- Al confirmar, la asociación queda cerrada y se avanza a Contexto.
+- No existe un resumen ni un formulario alternativo para Información.
+- Azure no se agrega a `SECCIONES_PROYECTO` ni a `ActualizacionSeccionProyecto`.
 
 ## Implementación de Contexto
 
@@ -179,28 +185,19 @@ creación.
 - Los límites de 200, 150 y 2000 caracteres reflejan el contrato vigente del backend.
 - La prioridad se obtiene del catálogo remoto `Prioridad` y el formulario conserva su ID; no se
   queman IDs, códigos u opciones como Alta, Media o Baja.
-- El componente de paso carga en conjunto el borrador y las prioridades, presenta un estado de error
-  reintentable cuando alguno falla y deja el loader en la infraestructura global.
-- El footer y “Guardar y continuar” pertenecen al contenedor de creación y se proyectan dentro del
-  formulario; no quedan fijados en el componente reutilizable.
-- La futura consulta utilizará `DetalleContextoProyecto`. Si habilita edición, podrá reutilizar
-  `FormularioContextoProyecto`, pero guardará mediante la operación propia de Información.
+- La página carga el borrador y las prioridades y los proporciona al paso compartido.
+- El footer utiliza la configuración “Guardar y continuar” de Creación sobre la tarjeta común.
+- Información utiliza `FormularioContextoProyecto` en lectura y edición, pero guarda mediante su
+  operación versionada y no mediante la persistencia del borrador.
 
 `EstadoCreacionProyectoService` vive en el inyector de la ruta que contiene
-`PaginaCreacionProyecto`. Así la página y los componentes de paso comparten la misma fotografía.
-Carga el borrador una sola vez mientras el recorrido permanece activo, conserva su revisión y
-entrega la fotografía actualizada al siguiente paso.
-
-`CoordinadorPasoCreacionProyectoService` se proporciona en cada componente de paso que utiliza el
-ciclo común. Toma el proyecto activo desde `EstadoCreacionProyectoService` y centraliza la carga
-reintentable, el bloqueo de envíos duplicados, el guardado y la notificación. No inyecta
-`ActivatedRoute` ni `Router`: después de guardar ejecuta un callback que emite `completado` a la
-página. Contexto mantiene su coordinación particular porque también combina catálogos y comunica
-el nombre al shell. No se introduce una clase base ni se trasladan estas responsabilidades a los
-formularios.
+`PaginaCreacionProyecto`. La página carga el borrador una sola vez mientras el recorrido permanece
+activo, conserva su revisión, conecta las salidas tipadas de los pasos con `guardarSeccion` y abre
+el siguiente paso después de una respuesta correcta. No existe un coordinador por paso ni se
+trasladan persistencia o navegación a los formularios compartidos.
 
 El mismo estado conserva el nombre vigente del proyecto. `FormularioContextoProyecto` comunica el
-nombre mientras se escribe, el paso de Contexto actualiza el estado y el shell lo presenta como
+nombre mientras se escribe, la página actualiza el estado y el shell lo presenta como
 título del encabezado. El formulario no conoce el encabezado y los pasos siguientes conservan la
 misma identidad; mientras no exista un nombre se utiliza “Nuevo proyecto” como respaldo.
 
@@ -258,8 +255,9 @@ Necesidad conserva la sección narrativa reutilizable fuera del recorrido de cre
 - El modelo canónico usa `situacionActual`, `problemas` e `impacto`.
 - Los tres campos se presentan apilados y a todo el ancho porque capturan explicaciones extensas;
   cada uno conserva el límite vigente de 900 caracteres.
-- El formulario utiliza `appErrorCampo`, contadores y el footer proyectado por la página. No recibe
-  funciones para consultar errores ni conoce la persistencia del borrador.
+- El formulario utiliza `appErrorCampo` y contadores. Expone únicamente un identificador opcional
+  para que la tarjeta asocie su footer externo; no proyecta acciones ni conoce la persistencia del
+  borrador.
 - `PasoNecesidadProyecto` carga y guarda mediante `EstadoCreacionProyectoService`.
 - Guardar la sección lleva `pasoActual` al menos a 4 y solicita presentar Objetivos.
 
@@ -292,13 +290,13 @@ Objetivos conserva la misma separación entre dominio reutilizable y coordinaci�
 - El objetivo general es obligatorio y admite hasta 400 caracteres.
 - Se exige entre uno y ocho objetivos específicos. El formulario administra el `FormArray`, impide
   eliminar el último control y bloquea nuevas adiciones al alcanzar el máximo.
-- El componente de paso carga y guarda mediante `EstadoCreacionProyectoService`; no manipula la
-  colección ni serializa JSON.
+- La página guarda el modelo emitido mediante `EstadoCreacionProyectoService`; el paso no manipula
+  la colección ni serializa JSON.
 - Guardar la sección lleva `pasoActual` al menos a 5 y solicita presentar Alcance.
 
 El formato persistido es
-`{"objetivoGeneral":"...","objetivosEspecificos":["...","..."]}`. La futura vista de
-Información reutilizará el modelo y el mapper, con una presentación de lectura propia.
+`{"objetivoGeneral":"...","objetivosEspecificos":["...","..."]}`. Información reutiliza el
+modelo, el mapper y el formulario; en lectura oculta las operaciones de la colección.
 
 ## Implementación de Alcance
 
@@ -310,12 +308,12 @@ Alcance define de forma explícita los límites funcionales del proyecto:
 - Ambos campos son obligatorios y admiten hasta 700 caracteres.
 - El formulario presenta dos columnas equivalentes en escritorio y una sola columna en tamaños
   reducidos. Los estilos del componente solo resuelven esta composición particular.
-- El componente de paso carga y guarda mediante `EstadoCreacionProyectoService`, reutiliza los errores comunes
+- La página carga y guarda mediante `EstadoCreacionProyectoService`, reutiliza los errores comunes
   del borrador y no serializa JSON directamente.
 - Guardar Alcance lleva `pasoActual` al menos a 6 y solicita presentar Roles.
 
 El formato persistido es `{"incluido":"...","excluido":"..."}`. Información del proyecto
-reutilizará el modelo y el mapper, pero presentará los límites mediante una vista de lectura propia.
+reutiliza el modelo, el mapper y el formulario con el modo de interacción correspondiente.
 
 ## Implementación de Roles
 
@@ -332,13 +330,13 @@ aplicativo:
   errores y no conoce el borrador ni la navegación.
 - Los roles sugeridos del componente anterior no se conservan como literales. Si el producto los
   requiere, deben provenir de una configuración o catálogo explícito.
-- El componente de paso carga y guarda mediante el coordinador común de creación.
+- La página conecta la salida del paso con el guardado común de creación.
 - Guardar Roles lleva `pasoActual` al menos a 7 y solicita presentar Equipo.
 
 El formato persistido es
 `[{"nombre":"Administrador","descripcion":"Configura la solución."}]`. Información del
-proyecto reutilizará este modelo y el mapper, pero mostrará los perfiles mediante una vista de
-lectura propia.
+proyecto reutiliza este modelo, el mapper y el formulario; agregar o retirar perfiles existe solo
+en edición.
 
 ## Implementación de Equipo
 
@@ -394,9 +392,9 @@ Los perfiles técnicos y dedicaciones viven temporalmente en
 literales. Cuando el backend exponga catálogos oficiales, el paso los proporcionará al formulario
 sin modificar el contrato persistido ni la composición de la sección.
 
-En Información del proyecto, Equipo reutilizará el modelo y el mapper. La identidad proveniente de
-Azure se mostrará mediante una vista de detalle; cualquier edición futura de asignaciones usará una
-operación propia de Información y no la persistencia del recorrido de creación.
+En Información del proyecto, Equipo reutiliza el modelo, el mapper y el formulario. En lectura se
+muestran todas las identidades y asignaciones, pero se retiran búsqueda, filtros, selección múltiple
+y cambios de catálogo. La edición guarda mediante Información y no mediante el recorrido de creación.
 
 ## Implementación de Flujo
 
@@ -408,9 +406,9 @@ Flujo incorpora el constructor visual anterior como la última sección reutiliz
   conoce rutas, HTTP, revisiones ni el borrador de creación.
 - `EstadoEditorFlujoProyectoService` se proporciona en el editor; la selección, la vista del lienzo y los
   modales no se convierten en estado global de la aplicación.
-- `PasoFlujoProyecto` deserializa `diagramFlujoJson`, distingue un contrato inválido y guarda
+- La página de Creación deserializa `diagramFlujoJson`, distingue un contrato inválido y guarda
   mediante `EstadoCreacionProyectoService` con la clave discriminante `Flujo`.
-- `PasoFlujoProyecto` incorpora al editor los perfiles canónicos de `rolesJson`. Conserva por
+- La página incorpora al paso los perfiles canónicos de `rolesJson`. Conserva por
   nombre normalizado los identificadores ya persistidos en el diagrama y retira de nodos y permisos
   las referencias a roles que ya no existen en la sección Roles.
 - La página independiente anterior, su acceso a `ActivatedRoute`, el guardado directo y la fachada
@@ -455,7 +453,7 @@ El recorrido de creación contiene nueve pasos:
 como paso, formulario, ruta o propiedad de transporte.
 
 `SECCIONES_PROYECTO` declara las ocho secciones funcionales reutilizables en creación e información.
-`PASOS_CREACION_PROYECTO` agrega la vinculación de Azure al inicio sin duplicar el catálogo. Los
+`PASOS_PROYECTO` agrega la vinculación de Azure al inicio sin duplicar el catálogo. Los
 números pertenecen al orden de creación y no se almacenan en las secciones compartidas.
 
 Todos los pasos se presentan en `/panel/proyectos/creacion`. El borrador se crea antes de abrir
@@ -465,8 +463,8 @@ Contexto para que el avance pueda recuperarse desde cualquier sesión mediante
 ## Presentación del recorrido
 
 `PaginaCreacionProyecto` es el único contenedor enrutado y presenta una sola vez el encabezado
-general, `RecorridoCreacionProyecto` y la tarjeta del paso. Un `@switch` monta exclusivamente el
-componente correspondiente al paso activo; no existe un `router-outlet` interno.
+general y `RecorridoProyecto`. Un `@switch` monta exclusivamente el paso compartido correspondiente;
+cada paso compone `TarjetaPasoProyecto` y no existe un `router-outlet` interno.
 
 - La página proporciona el paso actual y las claves realmente completadas; el componente no
   deduce el avance por la posición.
@@ -485,11 +483,11 @@ componente correspondiente al paso activo; no existe un `router-outlet` interno.
 - El listado de proyectos utiliza esta misma URL para iniciar o continuar un borrador; no monta la
   vinculación de Azure dentro de otro modal.
 - El avance que necesita otra feature se expone mediante `proyectos/public-api.ts`. Ese contrato
-  entrega posición, total y porcentaje sin filtrar `PASOS_CREACION_PROYECTO` ni mappers internos.
+  entrega posición, total y porcentaje sin filtrar `PASOS_PROYECTO` ni mappers internos.
 - El `proyectoId` se deriva de `queryParamMap`; no se captura mediante `snapshot`. Al cambiar el
   parámetro se descarta la fotografía anterior, se cancela la carga de la página y se recupera el
   borrador vigente antes de guardar o navegar.
-- La tarjeta del paso obtiene icono, título y descripción desde `PASOS_CREACION_PROYECTO`, igual
+- La tarjeta del paso obtiene icono, título y descripción desde `PASOS_PROYECTO`, igual
   que el recorrido. Los componentes de paso no replican esa identidad.
 - El encabezado y el footer del paso comparten una superficie tenue; el contenido conserva la
   superficie blanca de trabajo.
@@ -514,6 +512,6 @@ componente correspondiente al paso activo; no existe un `router-outlet` interno.
 - El paso actual no repite “En curso”: `aria-current` y el tratamiento visual ya comunican su
   ubicación. La flecha aparece únicamente cuando el paso permite navegación.
 
-La futura información del proyecto reutilizará `SECCIONES_PROYECTO` y sus modelos, pero tendrá una
-navegación de consulta sin estados de progreso de creación. Si muestra la referencia de Azure, se
-presentará como origen y trazabilidad del proyecto.
+Información del proyecto reutiliza `PASOS_PROYECTO`, `RecorridoProyecto` y los mismos componentes
+mediante una navegación sin estados de progreso. Azure se presenta en lectura como origen y
+trazabilidad; el selector global aplica una versión integral a las secciones versionadas.

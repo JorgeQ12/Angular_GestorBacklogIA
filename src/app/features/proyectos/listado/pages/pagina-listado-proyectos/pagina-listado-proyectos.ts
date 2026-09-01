@@ -5,6 +5,7 @@ import {
   PARAMETROS_RUTA,
   URL_CREACION_PROYECTO,
   crearUrlCreacionProyecto,
+  crearUrlInformacionProyecto,
 } from '../../../../../core/navegacion/rutas';
 import { EncabezadoPagina } from '../../../../../shared/components/encabezado-pagina/encabezado-pagina';
 import { EstadoError } from '../../../../../shared/components/estado-error/estado-error';
@@ -71,6 +72,11 @@ export class PaginaListadoProyectos {
   /** Reanuda el borrador desde el avance persistido por el backend. */
   protected continuarBorrador(proyecto: ProyectoListado): void {
     void this.router.navigateByUrl(crearUrlCreacionProyecto(proyecto.id));
+  }
+
+  /** Abre la consulta versionada de un proyecto publicado. */
+  protected consultarProyecto(proyecto: ProyectoListado): void {
+    void this.router.navigateByUrl(crearUrlInformacionProyecto(proyecto.id));
   }
 
   /** Refleja los criterios en la URL y reinicia la paginación. */

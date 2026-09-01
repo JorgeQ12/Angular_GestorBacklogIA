@@ -1,12 +1,15 @@
 <form
+  [attr.id]="idFormulario()"
   class="formulario-equipo"
+  [class.formulario-equipo--solo-lectura]="esSoloLectura()"
   appEnfocarPrimerControlInvalido
   [formGroup]="formulario"
   (ngSubmit)="enviar()"
 >
   <section class="formulario-equipo__contenido" aria-label="Configuración del equipo">
     @if (controlesIntegrantes().length > 0) {
-      <div class="formulario-equipo__herramientas">
+      @if (!esSoloLectura()) {
+        <div class="formulario-equipo__herramientas">
         <app-campo-busqueda
           id="busqueda-integrantes-equipo"
           class="formulario-equipo__buscar"
@@ -37,9 +40,10 @@
             Configurados <span>{{ cantidadConfigurados() }}</span>
           </button>
         </div>
-      </div>
+        </div>
+      }
 
-      @if (seleccionados().size > 0) {
+      @if (!esSoloLectura() && seleccionados().size > 0) {
         <div class="formulario-equipo__masivo" aria-label="Asignación masiva">
           <strong>{{ seleccionados().size }} seleccionados</strong>
           <div class="formulario-equipo__masivo-campos">
@@ -70,17 +74,21 @@
 
       <div class="formulario-equipo__tabla">
         <div class="formulario-equipo__columnas">
-          <label>
-            <input
-              class="ui-checkbox"
-              type="checkbox"
-              [checked]="todosVisiblesSeleccionados()"
-              [indeterminate]="algunosVisiblesSeleccionados()"
-              [disabled]="controlesVisibles().length === 0 || procesando() || sincronizando()"
-              (change)="alternarSeleccionVisibleDesdeEvento($event)"
-            />
-            <span class="ui-visually-hidden">Seleccionar integrantes visibles</span>
-          </label>
+          @if (!esSoloLectura()) {
+            <label>
+              <input
+                class="ui-checkbox"
+                type="checkbox"
+                [checked]="todosVisiblesSeleccionados()"
+                [indeterminate]="algunosVisiblesSeleccionados()"
+                [disabled]="controlesVisibles().length === 0 || procesando() || sincronizando()"
+                (change)="alternarSeleccionVisibleDesdeEvento($event)"
+              />
+              <span class="ui-visually-hidden">Seleccionar integrantes visibles</span>
+            </label>
+          } @else {
+            <span aria-hidden="true"></span>
+          }
           <span>Integrante</span>
           <span>Perfil técnico</span>
           <span>Dedicación</span>
@@ -89,7 +97,8 @@
         <div class="formulario-equipo__integrantes" formArrayName="integrantes">
           @for (integrante of controlesVisibles(); track integrante.controls.idAzure.value) {
             <article class="formulario-equipo__fila" [formGroup]="integrante">
-              <label class="formulario-equipo__seleccion">
+              @if (!esSoloLectura()) {
+                <label class="formulario-equipo__seleccion">
                 <input
                   class="ui-checkbox"
                   type="checkbox"
@@ -100,7 +109,10 @@
                 <span class="ui-visually-hidden">
                   Seleccionar {{ integrante.controls.nombre.value }}
                 </span>
-              </label>
+                </label>
+              } @else {
+                <span aria-hidden="true"></span>
+              }
               <div class="formulario-equipo__persona">
                 <span class="formulario-equipo__avatar" aria-hidden="true">
                   {{ integrante.controls.nombre.value.charAt(0).toUpperCase() }}
@@ -125,6 +137,7 @@
                   [attr.id]="'equipo-perfil-' + integrante.controls.idAzure.value"
                   [etiquetadoPor]="'equipo-perfil-etiqueta-' + integrante.controls.idAzure.value"
                   [opciones]="perfilesTecnicos()"
+                  [soloLectura]="esSoloLectura()"
                   placeholder="Selecciona un perfil"
                   formControlName="perfilTecnicoCodigo"
                   [appMensajesError]="mensajesAsignacion"
@@ -145,6 +158,7 @@
                     'equipo-dedicacion-etiqueta-' + integrante.controls.idAzure.value
                   "
                   [opciones]="dedicaciones()"
+                  [soloLectura]="esSoloLectura()"
                   placeholder="Selecciona dedicación"
                   formControlName="dedicacionCodigo"
                   [appMensajesError]="mensajesAsignacion"
@@ -171,6 +185,4 @@
       />
     }
   </section>
-
-  <ng-content select="[accionesFormularioEquipo]" />
 </form>

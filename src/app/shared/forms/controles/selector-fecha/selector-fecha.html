@@ -7,15 +7,19 @@
   type="button"
   aria-haspopup="dialog"
   [class.selector-fecha__trigger--error]="conError()"
+  [class.selector-fecha__trigger--readonly]="soloLectura()"
   [attr.aria-expanded]="abierto()"
   [attr.aria-controls]="id() + '-calendario'"
   [attr.aria-labelledby]="etiquetadoPor()"
+  [attr.aria-readonly]="soloLectura()"
   [disabled]="deshabilitado()"
   (click)="alternar()"
   (keydown)="manejarTeclaTrigger($event)"
 >
   <span [class.selector-fecha__placeholder]="!valor()">{{ textoValor() }}</span>
-  <app-icono class="selector-fecha__icono" nombre="calendario" />
+  @if (!soloLectura()) {
+    <app-icono class="selector-fecha__icono" nombre="calendario" />
+  }
 </button>
 
 <ng-template

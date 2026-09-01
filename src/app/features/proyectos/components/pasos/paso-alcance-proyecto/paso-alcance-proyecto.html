@@ -1,0 +1,18 @@
+<app-tarjeta-paso-proyecto
+  [paso]="paso"
+  [modo]="modo()"
+  [editable]="editable()"
+  [acciones]="acciones()"
+  [idFormulario]="idFormulario"
+  [procesando]="procesando()"
+  (editar)="editar.emit()"
+  (cancelar)="cancelar.emit()"
+>
+  <app-formulario-alcance-proyecto
+    [idFormulario]="idFormulario"
+    [datosIniciales]="datos()"
+    [procesando]="procesando()"
+    [modo]="modo()"
+    (guardar)="guardar.emit($event)"
+  />
+</app-tarjeta-paso-proyecto>

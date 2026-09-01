@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { SelectorTarjetas } from './selector-tarjetas';
@@ -11,11 +11,13 @@ import { SelectorTarjetas } from './selector-tarjetas';
       id="canal"
       etiquetadoPor="canal-label"
       [opciones]="opciones"
+      [soloLectura]="soloLectura()"
       [formControl]="control"
     />
   `,
 })
 class ComponentePrueba {
+  public readonly soloLectura = signal(false);
   public readonly control = new FormControl<boolean | null>(null);
   public readonly opciones = [
     { valor: true, etiqueta: 'Con interfaz', descripcion: 'Con pantallas', icono: 'aplicacionWeb' },
@@ -59,6 +61,19 @@ describe('SelectorTarjetas', () => {
 
     expect(grupo?.getAttribute('aria-labelledby')).toBe('canal-label');
     expect(obtenerControles()).toHaveLength(2);
+  });
+
+  it('conserva la alternativa seleccionada en solo lectura', () => {
+    fixture.componentInstance.control.setValue(true);
+    fixture.componentInstance.soloLectura.set(true);
+    fixture.detectChanges();
+
+    obtenerControles()[1]?.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+
+    const grupo = (fixture.nativeElement as HTMLElement).querySelector('[role="radiogroup"]');
+    expect(grupo?.getAttribute('aria-readonly')).toBe('true');
+    expect(fixture.componentInstance.control.value).toBe(true);
   });
 
   function obtenerControles(): HTMLInputElement[] {

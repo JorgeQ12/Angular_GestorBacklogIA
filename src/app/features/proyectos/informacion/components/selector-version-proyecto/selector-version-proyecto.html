@@ -1,0 +1,13 @@
+<section class="selector-version" aria-labelledby="titulo-selector-version">
+  <div>
+    <span class="selector-version__etiqueta">Historial del proyecto</span>
+    <h2 id="titulo-selector-version">Versión consultada</h2>
+    <p>La selección aplica a todas las secciones.</p>
+  </div>
+  <app-selector-campo
+    id="version-proyecto"
+    [formControl]="control"
+    [opciones]="opciones()"
+    etiquetadoPor="titulo-selector-version"
+  />
+</section>

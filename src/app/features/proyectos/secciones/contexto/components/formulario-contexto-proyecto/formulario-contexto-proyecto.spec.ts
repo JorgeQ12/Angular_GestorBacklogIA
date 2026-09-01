@@ -3,6 +3,7 @@ import { By } from '@angular/platform-browser';
 import { NgControl } from '@angular/forms';
 import { SelectorCampo } from '../../../../../../shared/forms/controles/selector-campo/selector-campo';
 import { SelectorFecha } from '../../../../../../shared/forms/controles/selector-fecha/selector-fecha';
+import { ModoFormularioProyecto } from '../../../../models/modo-formulario-proyecto.model';
 import { FormularioContextoProyecto } from './formulario-contexto-proyecto';
 
 describe('FormularioContextoProyecto', () => {
@@ -81,6 +82,34 @@ describe('FormularioContextoProyecto', () => {
     escribir('#contexto-nombre', '  Portal de clientes  ');
 
     expect(nombreCambiado).toHaveBeenLastCalledWith('Portal de clientes');
+  });
+
+  it('restaura la fotografía confirmada y bloquea el envío al volver a lectura', () => {
+    const guardar = vi.fn();
+    fixture.componentInstance.guardar.subscribe(guardar);
+    fixture.componentRef.setInput('datosIniciales', {
+      nombre: 'Proyecto confirmado',
+      responsable: 'María Gómez',
+      fechaObjetivo: '2026-09-30',
+      prioridadCatalogoId: 13,
+      descripcion: 'Descripción confirmada',
+    });
+    fixture.detectChanges();
+    escribir('#contexto-nombre', 'Cambio sin guardar');
+
+    fixture.componentRef.setInput('modo', ModoFormularioProyecto.Lectura);
+    fixture.detectChanges();
+    enviarFormulario(fixture);
+
+    expect(
+      (fixture.nativeElement as HTMLElement).querySelector<HTMLInputElement>('#contexto-nombre')
+        ?.readOnly,
+    ).toBe(true);
+    expect(
+      (fixture.nativeElement as HTMLElement).querySelector<HTMLInputElement>('#contexto-nombre')
+        ?.value,
+    ).toBe('Proyecto confirmado');
+    expect(guardar).not.toHaveBeenCalled();
   });
 
   function escribir(selector: string, valor: string): void {

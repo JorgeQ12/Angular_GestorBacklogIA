@@ -33,4 +33,14 @@ describe('FilaFormulario', () => {
     expect(boton.disabled).toBe(true);
     expect(boton.getAttribute('aria-label')).toBe('Eliminar elemento 2');
   });
+
+  it('retira la acción al presentar una colección de solo lectura', () => {
+    fixture.componentRef.setInput('soloLectura', true);
+    fixture.detectChanges();
+
+    expect((fixture.nativeElement as HTMLElement).querySelector('button')).toBeNull();
+    expect((fixture.nativeElement as HTMLElement).classList).toContain(
+      'fila-formulario--solo-lectura',
+    );
+  });
 });
