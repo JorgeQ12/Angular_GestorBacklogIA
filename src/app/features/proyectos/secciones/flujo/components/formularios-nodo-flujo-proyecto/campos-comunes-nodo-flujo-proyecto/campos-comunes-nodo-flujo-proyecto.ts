@@ -38,6 +38,7 @@ export class CamposComunesNodoFlujoProyecto {
   public readonly ayudaRoles = input(
     'Selecciona los roles ya creados que participan en este bloque.',
   );
+  public readonly mostrarRoles = input(true);
   public readonly usarPermisosRoles = input(false);
 
   protected readonly rolesDisponibles = computed(() => this.estadoEditor.roles());

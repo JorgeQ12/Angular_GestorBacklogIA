@@ -2,6 +2,7 @@ import { Injectable, computed, signal } from '@angular/core';
 import {
   DESCRIPCIONES_TIPO_BLOQUE_FLUJO,
   ETIQUETAS_TIPO_BLOQUE_FLUJO,
+  POLITICA_ROLES_POR_TIPO_BLOQUE,
   TIPOS_BLOQUE_FLUJO_DISPONIBLES,
 } from '../config/flujo-proyecto.config';
 import {
@@ -21,6 +22,7 @@ import {
   LadoConexionFlujo,
   ModoEditorNodoFlujo,
   NodoFlujoProyecto,
+  PoliticaRolesBloqueFlujo,
   RolFlujoProyecto,
   TipoBloqueFlujo,
   VistaLienzoFlujo,
@@ -303,12 +305,17 @@ export class EstadoEditorFlujoProyectoService {
       return;
     }
 
-    const { idsRoles, roles } = this.resolverRoles(borrador.nombresRoles);
     const estadoEditor = this.estadoEditorNodoSenal();
 
     if (!estadoEditor) {
       return;
     }
+
+    const politicaRoles = POLITICA_ROLES_POR_TIPO_BLOQUE[borrador.tipo];
+    const { idsRoles, roles } =
+      politicaRoles === PoliticaRolesBloqueFlujo.NoAplica
+        ? { idsRoles: [], roles: this.flujoSenal().roles }
+        : this.resolverRoles(borrador.nombresRoles);
 
     if (estadoEditor.modo === ModoEditorNodoFlujo.Crear) {
       const ahora = new Date().toISOString();
@@ -692,7 +699,10 @@ export class EstadoEditorFlujoProyectoService {
       roles: flujo.roles.map((rol) => ({ ...rol })),
       nodos: flujo.nodos.map((nodo) => ({
         ...structuredClone(nodo),
-        idsRoles: [...nodo.idsRoles],
+        idsRoles:
+          POLITICA_ROLES_POR_TIPO_BLOQUE[nodo.tipo] === PoliticaRolesBloqueFlujo.NoAplica
+            ? []
+            : [...nodo.idsRoles],
         criteriosAceptacion: this.normalizarCriteriosAceptacion(nodo.criteriosAceptacion),
       })) as NodoFlujoProyecto[],
       conexiones: flujo.conexiones.map((conexion) => ({ ...conexion })),

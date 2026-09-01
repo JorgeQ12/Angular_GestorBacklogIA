@@ -441,6 +441,11 @@ El mapper valida los textos recibidos desde `diagramFlujoJson` antes de converti
 las etiquetas, ayudas y mensajes visibles continúan en configuración o en la vista y no se modelan
 como enums.
 
+La asignación de roles depende del tipo de bloque: es obligatoria en módulo, página y acción;
+no aplica a decisión y es opcional en componente. El editor elimina cualquier asignación heredada
+de un nodo de decisión al hidratar o guardar el flujo, mientras que un componente puede conservar
+una selección explícita o persistirse con `idsRoles` vacío.
+
 Guardar Flujo lleva `pasoActual` al menos a 9 y conserva la fotografía completa de las secciones
 anteriores.
 

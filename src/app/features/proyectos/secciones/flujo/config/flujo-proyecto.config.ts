@@ -5,6 +5,7 @@ import {
   AccionPermisoModulo,
   DiaSemanaFlujo,
   EtiquetaRamaDecision,
+  PoliticaRolesBloqueFlujo,
   TipoBloqueFlujo,
 } from '../models/flujo-proyecto.model';
 
@@ -53,6 +54,18 @@ export const TIPOS_BLOQUE_FLUJO_DISPONIBLES = [
   TipoBloqueFlujo.Accion,
   TipoBloqueFlujo.Decision,
 ] as const satisfies readonly TipoBloqueFlujo[];
+
+/** Establece si cada tipo de bloque admite o exige asignaciones de roles. */
+export const POLITICA_ROLES_POR_TIPO_BLOQUE: Record<
+  TipoBloqueFlujo,
+  PoliticaRolesBloqueFlujo
+> = {
+  [TipoBloqueFlujo.Modulo]: PoliticaRolesBloqueFlujo.Obligatoria,
+  [TipoBloqueFlujo.Pagina]: PoliticaRolesBloqueFlujo.Obligatoria,
+  [TipoBloqueFlujo.Accion]: PoliticaRolesBloqueFlujo.Obligatoria,
+  [TipoBloqueFlujo.Decision]: PoliticaRolesBloqueFlujo.NoAplica,
+  [TipoBloqueFlujo.Componente]: PoliticaRolesBloqueFlujo.Opcional,
+};
 
 /** Ordena las ramas disponibles para un bloque de decisión. */
 export const RAMAS_DECISION_FLUJO = Object.values(EtiquetaRamaDecision);

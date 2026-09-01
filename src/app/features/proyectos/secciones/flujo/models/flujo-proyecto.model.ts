@@ -20,6 +20,13 @@ export enum ModoEditorNodoFlujo {
   Editar = 'editar',
 }
 
+/** Define si un tipo de bloque admite o exige asignaciones de roles. */
+export enum PoliticaRolesBloqueFlujo {
+  NoAplica = 'no-aplica',
+  Opcional = 'opcional',
+  Obligatoria = 'obligatoria',
+}
+
 /** Identifica una salida permitida para un bloque de decisión. */
 export enum EtiquetaRamaDecision {
   Si = 'Sí',

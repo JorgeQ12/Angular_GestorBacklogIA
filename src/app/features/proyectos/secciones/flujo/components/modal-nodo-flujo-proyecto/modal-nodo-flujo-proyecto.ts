@@ -17,6 +17,7 @@ import {
   ETIQUETAS_TIPO_BLOQUE_FLUJO,
   ICONOS_TIPO_BLOQUE_FLUJO,
   MENSAJES_FORMULARIO_NODO_FLUJO,
+  POLITICA_ROLES_POR_TIPO_BLOQUE,
 } from '../../config/flujo-proyecto.config';
 import {
   FormularioFranjaActividadModulo,
@@ -27,6 +28,7 @@ import {
   DiaSemanaFlujo,
   FranjaMayorActividadModulo,
   ModoEditorNodoFlujo,
+  PoliticaRolesBloqueFlujo,
   TipoBloqueFlujo,
 } from '../../models/flujo-proyecto.model';
 import { EstadoEditorFlujoProyectoService } from '../../services/estado-editor-flujo-proyecto.service';
@@ -156,14 +158,17 @@ export class ModalNodoFlujoProyecto {
   private construirFormulario(borrador: BorradorNodoFlujo): FormularioNodoFlujoProyecto {
     const esModulo = borrador.tipo === TipoBloqueFlujo.Modulo;
     const esComponente = borrador.tipo === TipoBloqueFlujo.Componente;
+    const politicaRoles = POLITICA_ROLES_POR_TIPO_BLOQUE[borrador.tipo];
+    const rolesAplican = politicaRoles !== PoliticaRolesBloqueFlujo.NoAplica;
+    const rolesObligatorios = politicaRoles === PoliticaRolesBloqueFlujo.Obligatoria;
 
     return this.constructorFormulario.group({
       titulo: this.constructorFormulario.control(borrador.titulo, Validators.required),
       descripcion: this.constructorFormulario.control(borrador.descripcion, Validators.required),
       criteriosAceptacion: this.crearCriteriosAceptacion(borrador.criteriosAceptacion),
       nombresRoles: this.constructorFormulario.control(
-        borrador.nombresRoles.join(', '),
-        Validators.required,
+        rolesAplican ? borrador.nombresRoles.join(', ') : '',
+        rolesObligatorios ? Validators.required : [],
       ),
       permisosRoles: this.constructorFormulario.control(
         esModulo ? borrador.datos.permisosRoles : [],

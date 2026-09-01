@@ -74,8 +74,9 @@
     </div>
   </section>
 
-  <section class="ui-form-section">
-    <header class="ui-form-section__header">
+  @if (mostrarRoles()) {
+    <section class="ui-form-section">
+      <header class="ui-form-section__header">
       <span class="ui-form-section__icon" aria-hidden="true">
         <app-icono nombre="roles" />
       </span>
@@ -142,5 +143,6 @@
     </div>
 
     <input id="flujo-nombres-roles" type="hidden" formControlName="nombresRoles" />
-  </section>
+    </section>
+  }
 </div>
