@@ -91,6 +91,9 @@ El acento de identidad utiliza la escala neutral gris y negra mediante `--color-
 introducen colores decorativos mediante valores locales. Los colores de información, éxito,
 advertencia y error se reservan para estados que necesiten comunicar esas condiciones.
 
+La escala `--color-category-*` distingue categorías coexistentes en visualizaciones. No comunica
+éxito, error o advertencia y cada dominio centraliza la correspondencia entre categoría y acento.
+
 ## Tipografía oficial
 
 La tipografía oficial es Prospero y se registra una sola vez en `base.css`.
@@ -343,8 +346,10 @@ dominio sin conocer las reglas de cada feature:
 
 - La feature controla si el componente existe y atiende sus salidas; el modal no mantiene estado
   de negocio ni consume servicios.
-- `descartable` controla únicamente Escape, backdrop y el botón superior. La acción de cancelar
-  permanece disponible cuando `mostrarCancelar` está habilitado.
+- `descartable` habilita Escape, backdrop y el botón superior. La acción de cancelar permanece
+  disponible cuando `mostrarCancelar` está habilitado.
+- `cierreExteriorHabilitado` permite bloquear Escape y backdrop sin ocultar el botón superior. Se
+  deshabilita en formularios donde un cierre accidental pueda descartar una edición extensa.
 - `idFormulario` permite que el botón del pie envíe un formulario proyectado sin duplicar las
   acciones dentro del contenido.
 - El componente administra `role`, relaciones ARIA, foco inicial, confinamiento del foco,

@@ -208,7 +208,7 @@ export class ModalNodoFlujoProyecto {
           tipo: TipoBloqueFlujo.Modulo,
           datos: {
             permisosRoles: valores.permisosRoles,
-            usuariosConcurrentes: valores.usuariosConcurrentes.trim(),
+            usuariosConcurrentes: String(valores.usuariosConcurrentes).trim(),
             horariosMayorActividad: valores.horariosMayorActividad,
           },
         };

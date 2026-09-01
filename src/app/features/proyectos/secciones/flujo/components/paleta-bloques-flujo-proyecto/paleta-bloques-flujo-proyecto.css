@@ -107,6 +107,8 @@
 }
 
 .paleta-bloques-flujo__elemento {
+  --acento-bloque-flujo: var(--text-muted);
+
   position: relative;
   display: grid;
   grid-template-columns: var(--control-height-lg) minmax(0, 1fr) var(--control-height-sm);
@@ -134,20 +136,8 @@
   left: 0;
   width: var(--space-1);
   border-radius: 0 var(--radius-pill) var(--radius-pill) 0;
-  background: var(--text-muted);
+  background: var(--acento-bloque-flujo);
   content: '';
-}
-
-.paleta-bloques-flujo__elemento[data-tipo='modulo']::before {
-  background: var(--text-primary);
-}
-
-.paleta-bloques-flujo__elemento[data-tipo='accion']::before {
-  background: var(--text-secondary);
-}
-
-.paleta-bloques-flujo__elemento[data-tipo='decision']::before {
-  background: var(--color-warning);
 }
 
 .paleta-bloques-flujo__elemento:hover {
@@ -167,13 +157,8 @@
   height: var(--control-height-lg);
   place-items: center;
   border-radius: var(--radius-md);
-  background: var(--surface-subtle);
-  color: var(--text-secondary);
-}
-
-.paleta-bloques-flujo__elemento[data-tipo='decision']
-  .paleta-bloques-flujo__icono-elemento {
-  color: var(--color-warning);
+  background: color-mix(in srgb, var(--acento-bloque-flujo) 12%, var(--surface-default));
+  color: var(--acento-bloque-flujo);
 }
 
 .paleta-bloques-flujo__icono-elemento app-icono {

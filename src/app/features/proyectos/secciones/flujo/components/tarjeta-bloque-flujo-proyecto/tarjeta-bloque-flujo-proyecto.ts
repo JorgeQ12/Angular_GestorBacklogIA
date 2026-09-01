@@ -11,6 +11,7 @@ import {
 import { MensajesService } from '../../../../../../core/mensajes/services/mensajes.service';
 import { IconoComponent } from '../../../../../../shared/components/icono/icono.component';
 import {
+  ACENTOS_TIPO_BLOQUE_FLUJO,
   ETIQUETAS_TIPO_BLOQUE_FLUJO,
   ICONOS_TIPO_BLOQUE_FLUJO,
 } from '../../config/flujo-proyecto.config';
@@ -40,6 +41,7 @@ export class TarjetaBloqueFlujoProyecto {
   protected readonly ramasDecision: readonly EtiquetaRamaDecision[] = ['Sí', 'No'];
   protected readonly etiquetasTipo = ETIQUETAS_TIPO_BLOQUE_FLUJO;
   protected readonly iconosTipo = ICONOS_TIPO_BLOQUE_FLUJO;
+  protected readonly acentosTipo = ACENTOS_TIPO_BLOQUE_FLUJO;
   protected readonly nombresRoles = computed(() =>
     this.bloque().idsRoles.map((idRol) => this.estadoEditor.obtenerNombreRol(idRol)),
   );

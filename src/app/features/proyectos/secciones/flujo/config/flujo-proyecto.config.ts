@@ -12,6 +12,15 @@ export const ICONOS_TIPO_BLOQUE_FLUJO = {
   [TipoBloqueFlujo.Componente]: 'contextoProyecto',
 } as const satisfies Record<TipoBloqueFlujo, NombreIconoAplicacion>;
 
+/** Asigna un acento categórico estable a cada tipo sin usar colores de estado. */
+export const ACENTOS_TIPO_BLOQUE_FLUJO: Record<TipoBloqueFlujo, string> = {
+  [TipoBloqueFlujo.Modulo]: 'var(--color-category-blue)',
+  [TipoBloqueFlujo.Pagina]: 'var(--color-category-violet)',
+  [TipoBloqueFlujo.Accion]: 'var(--color-category-green)',
+  [TipoBloqueFlujo.Decision]: 'var(--color-category-orange)',
+  [TipoBloqueFlujo.Componente]: 'var(--color-category-magenta)',
+};
+
 /** Proporciona el nombre visible correspondiente a cada tipo de bloque. */
 export const ETIQUETAS_TIPO_BLOQUE_FLUJO: Record<TipoBloqueFlujo, string> = {
   [TipoBloqueFlujo.Modulo]: 'Módulo',

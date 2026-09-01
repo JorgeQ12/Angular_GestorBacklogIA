@@ -1,6 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { IconoComponent } from '../../../../../../shared/components/icono/icono.component';
-import { ICONOS_TIPO_BLOQUE_FLUJO } from '../../config/flujo-proyecto.config';
+import {
+  ACENTOS_TIPO_BLOQUE_FLUJO,
+  ICONOS_TIPO_BLOQUE_FLUJO,
+} from '../../config/flujo-proyecto.config';
 import { TipoBloqueFlujo } from '../../models/flujo-proyecto.model';
 import { EstadoEditorFlujoProyectoService } from '../../services/estado-editor-flujo-proyecto.service';
 
@@ -16,6 +19,7 @@ export class PaletaBloquesFlujoProyecto {
 
   protected readonly opciones = computed(() => this.estadoEditor.opcionesTipoBloque());
   protected readonly iconosTipo = ICONOS_TIPO_BLOQUE_FLUJO;
+  protected readonly acentosTipo = ACENTOS_TIPO_BLOQUE_FLUJO;
 
   protected crearBloque(tipo: TipoBloqueFlujo): void {
     this.estadoEditor.iniciarCreacionNodo(tipo);

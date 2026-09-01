@@ -1,5 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TipoBloqueFlujo, FlujoProyecto } from '../../models/flujo-proyecto.model';
+import {
+  BorradorNodoFlujo,
+  FlujoProyecto,
+  TipoBloqueFlujo,
+  crearDatosNodoPredeterminados,
+} from '../../models/flujo-proyecto.model';
 import { EstadoEditorFlujoProyectoService } from '../../services/estado-editor-flujo-proyecto.service';
 import { EditorFlujoProyecto } from './editor-flujo-proyecto';
 
@@ -53,6 +58,64 @@ describe('EditorFlujoProyecto', () => {
     expect(estadoEditor.soloLectura()).toBe(true);
   });
 
+  it('aplica cinco acentos distintos en la selección y en los bloques del lienzo', () => {
+    estadoEditor.abrirPaletaBloques();
+    fixture.detectChanges();
+
+    const opciones = Array.from(
+      (fixture.nativeElement as HTMLElement).querySelectorAll<HTMLElement>(
+        '.paleta-bloques-flujo__elemento',
+      ),
+    );
+    const acentosPaleta = opciones.map((opcion) =>
+      opcion.style.getPropertyValue('--acento-bloque-flujo'),
+    );
+
+    expect(opciones).toHaveLength(Object.values(TipoBloqueFlujo).length);
+    expect(new Set(acentosPaleta).size).toBe(Object.values(TipoBloqueFlujo).length);
+
+    estadoEditor.cerrarPaletaBloques();
+    Object.values(TipoBloqueFlujo).forEach((tipo) => crearNodo(tipo));
+    fixture.detectChanges();
+
+    const tarjetas = Array.from(
+      (fixture.nativeElement as HTMLElement).querySelectorAll<HTMLElement>(
+        '.tarjeta-bloque-flujo',
+      ),
+    );
+    const acentosLienzo = tarjetas.map((tarjeta) =>
+      tarjeta.style.getPropertyValue('--acento-bloque-flujo'),
+    );
+
+    expect(tarjetas).toHaveLength(Object.values(TipoBloqueFlujo).length);
+    expect(new Set(acentosLienzo)).toEqual(new Set(acentosPaleta));
+  });
+
+  it('mantiene abierto el formulario al pulsar el fondo o Escape', () => {
+    estadoEditor.iniciarCreacionNodo(TipoBloqueFlujo.Accion);
+    fixture.detectChanges();
+    const overlay = (fixture.nativeElement as HTMLElement).querySelector(
+      '.ui-modal-overlay',
+    ) as HTMLElement;
+
+    overlay.click();
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    fixture.detectChanges();
+
+    expect(
+      (fixture.nativeElement as HTMLElement).querySelector('app-modal-nodo-flujo-proyecto'),
+    ).not.toBeNull();
+
+    const cerrar = (fixture.nativeElement as HTMLElement).querySelector(
+      '.ui-modal__close',
+    ) as HTMLButtonElement;
+    cerrar.click();
+    fixture.detectChanges();
+    expect(
+      (fixture.nativeElement as HTMLElement).querySelector('app-modal-nodo-flujo-proyecto'),
+    ).toBeNull();
+  });
+
   it.each(Object.values(TipoBloqueFlujo))(
     'presenta los roles disponibles en el formulario de %s',
     (tipo) => {
@@ -69,6 +132,18 @@ describe('EditorFlujoProyecto', () => {
       expect(modal?.querySelector<HTMLInputElement>('#flujo-rol-rol-administrador')).not.toBeNull();
     },
   );
+
+  function crearNodo(tipo: TipoBloqueFlujo): void {
+    estadoEditor.iniciarCreacionNodo(tipo);
+    estadoEditor.confirmarBorradorNodo({
+      tipo,
+      titulo: `Bloque ${tipo}`,
+      descripcion: `Descripción de ${tipo}`,
+      criteriosAceptacion: ['Criterio válido'],
+      nombresRoles: [],
+      datos: crearDatosNodoPredeterminados(tipo),
+    } as BorradorNodoFlujo);
+  }
 });
 
 const FLUJO_VACIO: FlujoProyecto = {

@@ -27,6 +27,7 @@
         type="button"
         class="paleta-bloques-flujo__elemento"
         [attr.data-tipo]="opcion.tipo"
+        [style.--acento-bloque-flujo]="acentosTipo[opcion.tipo]"
         (click)="crearBloque(opcion.tipo)">
         <span class="paleta-bloques-flujo__icono-elemento" aria-hidden="true">
           <app-icono [nombre]="iconosTipo[opcion.tipo]" />

@@ -92,6 +92,13 @@
   --color-info-surface: #edf3f9;
   --color-info-border: #d3e0ef;
 
+  /* Paleta categórica para distinguir entidades sin comunicar un estado. */
+  --color-category-blue: #2563eb;
+  --color-category-violet: #7c3aed;
+  --color-category-green: #15803d;
+  --color-category-orange: #c2410c;
+  --color-category-magenta: #be185d;
+
   /* --------------------------------------------------------------------------
      4. TOKENS SEMÁNTICOS (usar ESTOS en los componentes, no la escala cruda)
      -------------------------------------------------------------------------- */
