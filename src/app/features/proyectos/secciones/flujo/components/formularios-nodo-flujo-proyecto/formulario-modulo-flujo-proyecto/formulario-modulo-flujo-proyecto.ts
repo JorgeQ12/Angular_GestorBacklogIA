@@ -4,11 +4,13 @@ import { IconoComponent } from '../../../../../../../shared/components/icono/ico
 import { SelectorCampo } from '../../../../../../../shared/forms/controles/selector-campo/selector-campo';
 import { OpcionSelector } from '../../../../../../../shared/forms/controles/selector-campo/models/opcion-selector.model';
 import { ErrorCampoDirective } from '../../../../../../../shared/forms/errores-validacion';
+import { DIAS_SEMANA_FLUJO } from '../../../config/flujo-proyecto.config';
 import {
   ControlesFranjaActividadModulo,
   FormularioFranjaActividadModulo,
   FormularioNodoFlujoProyecto,
 } from '../../../models/formulario-nodo-flujo-proyecto.model';
+import { DiaSemanaFlujo } from '../../../models/flujo-proyecto.model';
 import { CamposComunesNodoFlujoProyecto } from '../campos-comunes-nodo-flujo-proyecto/campos-comunes-nodo-flujo-proyecto';
 
 /** Presenta la configuración propia de un nodo de módulo. */
@@ -28,15 +30,7 @@ import { CamposComunesNodoFlujoProyecto } from '../campos-comunes-nodo-flujo-pro
 })
 export class FormularioModuloFlujoProyecto {
   public readonly formulario = input.required<FormularioNodoFlujoProyecto>();
-  protected readonly diasSemana = [
-    'Lunes',
-    'Martes',
-    'Miércoles',
-    'Jueves',
-    'Viernes',
-    'Sábado',
-    'Domingo',
-  ] as const;
+  protected readonly diasSemana = DIAS_SEMANA_FLUJO;
   protected readonly opcionesHora: readonly OpcionSelector[] = this.construirOpcionesHora();
   protected readonly horariosMayorActividad = computed(
     () => this.formulario().controls.horariosMayorActividad,
@@ -55,11 +49,11 @@ export class FormularioModuloFlujoProyecto {
     franjas.markAsTouched();
   }
 
-  protected estaSeleccionadoDia(indiceFranja: number, dia: string): boolean {
+  protected estaSeleccionadoDia(indiceFranja: number, dia: DiaSemanaFlujo): boolean {
     return this.obtenerControlDias(indiceFranja)?.value.includes(dia) ?? false;
   }
 
-  protected alternarDia(indiceFranja: number, dia: string): void {
+  protected alternarDia(indiceFranja: number, dia: DiaSemanaFlujo): void {
     const controlDias = this.obtenerControlDias(indiceFranja);
     if (!controlDias) return;
 
@@ -73,13 +67,13 @@ export class FormularioModuloFlujoProyecto {
     controlDias.markAsDirty();
   }
 
-  private obtenerControlDias(indiceFranja: number): FormControl<string[]> | null {
+  private obtenerControlDias(indiceFranja: number): FormControl<DiaSemanaFlujo[]> | null {
     return this.horariosMayorActividad().at(indiceFranja)?.controls.dias ?? null;
   }
 
   private crearGrupoFranjaActividad(): FormularioFranjaActividadModulo {
     return new FormGroup<ControlesFranjaActividadModulo>({
-      dias: new FormControl<string[]>([], { nonNullable: true }),
+      dias: new FormControl<DiaSemanaFlujo[]>([], { nonNullable: true }),
       horaInicio: new FormControl('00:00', { nonNullable: true }),
       horaFin: new FormControl('00:00', { nonNullable: true }),
     });

@@ -19,6 +19,7 @@ import {
   FiltroVistaFlujoProyecto,
   FlujoProyecto,
   LadoConexionFlujo,
+  ModoEditorNodoFlujo,
   NodoFlujoProyecto,
   RolFlujoProyecto,
   TipoBloqueFlujo,
@@ -27,11 +28,8 @@ import {
   esEtiquetaRamaDecision,
 } from '../models/flujo-proyecto.model';
 
-type EstadoGuardado = 'sin-cambios' | 'guardado';
-type ModoEditorNodo = 'crear' | 'editar';
-
 interface EstadoEditorNodo {
-  modo: ModoEditorNodo;
+  modo: ModoEditorNodoFlujo;
   tipo: TipoBloqueFlujo;
   idNodo: string | null;
   posicionSugerida: { x: number; y: number };
@@ -45,6 +43,12 @@ interface PuntoPrevisualizacionConexion {
 interface OpcionesHidratacion {
   conservarVista?: boolean;
   conservarSeleccion?: boolean;
+}
+
+enum PrefijoIdentificadorFlujo {
+  Rol = 'rol',
+  Bloque = 'bloque',
+  Conexion = 'conexion',
 }
 
 const VISTA_PREDETERMINADA: VistaLienzoFlujo = {
@@ -73,8 +77,6 @@ export class EstadoEditorFlujoProyectoService {
   private readonly ladoDestinoConexionEnfocadoSenal = signal<LadoConexionFlujo | null>(null);
   private readonly paletaBloquesAbiertaSenal = signal(false);
   private readonly estadoEditorNodoSenal = signal<EstadoEditorNodo | null>(null);
-  private readonly estadoGuardadoSenal = signal<EstadoGuardado>('sin-cambios');
-  private readonly fechaUltimoGuardadoSenal = signal<string | null>(null);
   private readonly soloLecturaSenal = signal(false);
 
   public readonly tamanoLienzo = TAMANO_LIENZO_FLUJO;
@@ -142,8 +144,6 @@ export class EstadoEditorFlujoProyectoService {
         idsBloquesVisibles.has(conexion.idBloqueOrigen) && idsBloquesVisibles.has(conexion.idBloqueDestino)
     );
   });
-  public readonly fechaUltimoGuardado = computed(() => this.fechaUltimoGuardadoSenal());
-  public readonly estadoGuardado = computed(() => this.estadoGuardadoSenal());
   public readonly soloLectura = computed(() => this.soloLecturaSenal());
   public readonly tieneContenido = computed(() => this.flujoSenal().nodos.length > 0);
   public readonly previsualizacionConexionActiva = computed(() => {
@@ -160,7 +160,11 @@ export class EstadoEditorFlujoProyectoService {
     }
 
     const etiquetaOrigen = this.etiquetaOrigenConexionSenal();
-    const puntoOrigen = obtenerPuntoAnclajeBloque(nodoOrigen, 'derecha', etiquetaOrigen);
+    const puntoOrigen = obtenerPuntoAnclajeBloque(
+      nodoOrigen,
+      LadoConexionFlujo.Derecha,
+      etiquetaOrigen,
+    );
     const idDestino = this.idDestinoConexionEnfocadoSenal();
     const nodoDestino = idDestino
       ? this.flujoSenal().nodos.find((nodo) => nodo.id === idDestino)
@@ -168,7 +172,10 @@ export class EstadoEditorFlujoProyectoService {
     const ladoEnfocado = this.ladoDestinoConexionEnfocadoSenal();
     const puntero = this.punteroConexionSenal();
     const ladoDestino = nodoDestino
-      ? ladoEnfocado ?? (puntero ? resolverLadoDestinoMasCercano(nodoDestino, puntero) : 'izquierda')
+      ? ladoEnfocado ??
+        (puntero
+          ? resolverLadoDestinoMasCercano(nodoDestino, puntero)
+          : LadoConexionFlujo.Izquierda)
       : null;
     const puntoDestino = nodoDestino && ladoDestino
       ? obtenerPuntoAnclajeBloque(nodoDestino, ladoDestino)
@@ -183,18 +190,18 @@ export class EstadoEditorFlujoProyectoService {
       etiqueta: etiquetaOrigen,
       idDestino,
       ladoDestino,
-      trayectoria: construirRutaConexion(puntoOrigen, puntoDestino, ladoDestino ?? 'izquierda')
+      trayectoria: construirRutaConexion(
+        puntoOrigen,
+        puntoDestino,
+        ladoDestino ?? LadoConexionFlujo.Izquierda,
+      )
     };
   });
 
   public hidratar(flujo: FlujoProyecto, proyectoId?: string, opciones?: OpcionesHidratacion): void {
     const flujoSiguiente = this.normalizarFlujo(flujo, proyectoId);
 
-    this.establecerEstadoFlujo(
-      flujoSiguiente,
-      flujoSiguiente.nodos.length ? 'guardado' : 'sin-cambios',
-      opciones
-    );
+    this.establecerEstadoFlujo(flujoSiguiente, opciones);
   }
 
   public establecerSoloLectura(soloLectura: boolean): void {
@@ -216,7 +223,7 @@ export class EstadoEditorFlujoProyectoService {
     }
 
     const rol: RolFlujoProyecto = {
-      id: this.crearId('rol'),
+      id: this.crearId(PrefijoIdentificadorFlujo.Rol),
       nombre: nombreNormalizado,
       fechaCreacion: new Date().toISOString()
     };
@@ -263,7 +270,7 @@ export class EstadoEditorFlujoProyectoService {
 
     this.paletaBloquesAbiertaSenal.set(false);
     this.estadoEditorNodoSenal.set({
-      modo: 'crear',
+      modo: ModoEditorNodoFlujo.Crear,
       tipo,
       idNodo: null,
       posicionSugerida: this.obtenerSiguientePosicionSugerida()
@@ -280,7 +287,7 @@ export class EstadoEditorFlujoProyectoService {
     this.seleccionarBloque(idBloque);
     this.paletaBloquesAbiertaSenal.set(false);
     this.estadoEditorNodoSenal.set({
-      modo: 'editar',
+      modo: ModoEditorNodoFlujo.Editar,
       tipo: bloque.tipo,
       idNodo: bloque.id,
       posicionSugerida: bloque.posicion
@@ -303,10 +310,10 @@ export class EstadoEditorFlujoProyectoService {
       return;
     }
 
-    if (estadoEditor.modo === 'crear') {
+    if (estadoEditor.modo === ModoEditorNodoFlujo.Crear) {
       const ahora = new Date().toISOString();
       const nodo: NodoFlujoProyecto = {
-        id: this.crearId('bloque'),
+        id: this.crearId(PrefijoIdentificadorFlujo.Bloque),
         tipo: borrador.tipo,
         titulo: borrador.titulo.trim(),
         descripcion: borrador.descripcion.trim(),
@@ -416,7 +423,7 @@ export class EstadoEditorFlujoProyectoService {
     }
 
     const conexion: ConexionFlujoProyecto = {
-      id: this.crearId('conexion'),
+      id: this.crearId(PrefijoIdentificadorFlujo.Conexion),
       idBloqueOrigen,
       idBloqueDestino,
       etiqueta: etiquetaNormalizada,
@@ -524,7 +531,9 @@ export class EstadoEditorFlujoProyectoService {
 
     this.idDestinoConexionEnfocadoSenal.set(idBloque);
     this.ladoDestinoConexionEnfocadoSenal.set(
-      nodoDestino && puntero ? resolverLadoDestinoMasCercano(nodoDestino, puntero) : 'izquierda'
+      nodoDestino && puntero
+        ? resolverLadoDestinoMasCercano(nodoDestino, puntero)
+        : LadoConexionFlujo.Izquierda
     );
   }
 
@@ -631,11 +640,12 @@ export class EstadoEditorFlujoProyectoService {
     };
 
     this.flujoSenal.set(flujoFechado);
-    this.fechaUltimoGuardadoSenal.set(flujoFechado.fechaActualizacion);
-    this.estadoGuardadoSenal.set('guardado');
   }
 
-  private establecerEstadoFlujo(flujo: FlujoProyecto, estadoGuardado: EstadoGuardado, opciones?: OpcionesHidratacion): void {
+  private establecerEstadoFlujo(
+    flujo: FlujoProyecto,
+    opciones?: OpcionesHidratacion,
+  ): void {
     const conservarVista = opciones?.conservarVista ?? false;
     const conservarSeleccion = opciones?.conservarSeleccion ?? false;
     const idBloqueSeleccionado = conservarSeleccion ? this.idBloqueSeleccionadoSenal() : null;
@@ -663,8 +673,6 @@ export class EstadoEditorFlujoProyectoService {
     this.ladoDestinoConexionEnfocadoSenal.set(null);
     this.paletaBloquesAbiertaSenal.set(false);
     this.estadoEditorNodoSenal.set(null);
-    this.fechaUltimoGuardadoSenal.set(flujo.fechaActualizacion || null);
-    this.estadoGuardadoSenal.set(estadoGuardado);
   }
 
   private crearFlujoVacio(proyectoId: string): FlujoProyecto {
@@ -698,7 +706,7 @@ export class EstadoEditorFlujoProyectoService {
       return null;
     }
 
-    return obtenerPuntoAnclajeBloque(bloque, 'derecha', etiqueta);
+    return obtenerPuntoAnclajeBloque(bloque, LadoConexionFlujo.Derecha, etiqueta);
   }
 
   private obtenerSiguientePosicionSugerida(): { x: number; y: number } {
@@ -758,7 +766,7 @@ export class EstadoEditorFlujoProyectoService {
       }
 
       const rolNuevo: RolFlujoProyecto = {
-        id: this.crearId('rol'),
+        id: this.crearId(PrefijoIdentificadorFlujo.Rol),
         nombre: nombreRol,
         fechaCreacion: new Date().toISOString()
       };
@@ -773,7 +781,7 @@ export class EstadoEditorFlujoProyectoService {
     };
   }
 
-  private crearId(prefijo: string): string {
+  private crearId(prefijo: PrefijoIdentificadorFlujo): string {
     return `${prefijo}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
   }
 

@@ -11,7 +11,10 @@ import {
 import { EstadoVacio } from '../../../../../../shared/components/estado-vacio/estado-vacio';
 import { IconoComponent } from '../../../../../../shared/components/icono/icono.component';
 import { EstadoEditorFlujoProyectoService } from '../../services/estado-editor-flujo-proyecto.service';
-import { CapaConexionesFlujoProyecto } from '../capa-conexiones-flujo-proyecto/capa-conexiones-flujo-proyecto';
+import {
+  CapaConexionesFlujoProyecto,
+  ModoCapaConexionesFlujo,
+} from '../capa-conexiones-flujo-proyecto/capa-conexiones-flujo-proyecto';
 import { TarjetaBloqueFlujoProyecto } from '../tarjeta-bloque-flujo-proyecto/tarjeta-bloque-flujo-proyecto';
 
 /** Presenta el área interactiva en la que se organizan y conectan los bloques. */
@@ -25,6 +28,7 @@ import { TarjetaBloqueFlujoProyecto } from '../tarjeta-bloque-flujo-proyecto/tar
 export class LienzoFlujoProyecto {
   private readonly referenciaDestruccion = inject(DestroyRef);
   protected readonly estadoEditor = inject(EstadoEditorFlujoProyectoService);
+  protected readonly modosCapaConexiones = ModoCapaConexionesFlujo;
   @ViewChild('elementoVista', { static: true })
   private readonly elementoVista?: ElementRef<HTMLDivElement>;
 

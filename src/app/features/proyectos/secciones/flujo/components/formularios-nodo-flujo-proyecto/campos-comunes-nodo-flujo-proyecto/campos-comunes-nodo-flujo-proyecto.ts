@@ -5,6 +5,7 @@ import {
   ErrorCampoDirective,
   MensajesError,
 } from '../../../../../../../shared/forms/errores-validacion';
+import { ACCIONES_PERMISO_MODULO } from '../../../config/flujo-proyecto.config';
 import { FormularioNodoFlujoProyecto } from '../../../models/formulario-nodo-flujo-proyecto.model';
 import {
   AccionPermisoModulo,
@@ -40,12 +41,7 @@ export class CamposComunesNodoFlujoProyecto {
   public readonly usarPermisosRoles = input(false);
 
   protected readonly rolesDisponibles = computed(() => this.estadoEditor.roles());
-  protected readonly opcionesPermiso: readonly AccionPermisoModulo[] = [
-    'Ver',
-    'Crear',
-    'Editar',
-    'Eliminar',
-  ];
+  protected readonly opcionesPermiso = ACCIONES_PERMISO_MODULO;
   protected readonly controlesCriterios = computed(
     () => this.formulario().controls.criteriosAceptacion.controls,
   );
@@ -94,7 +90,10 @@ export class CamposComunesNodoFlujoProyecto {
     if (this.usarPermisosRoles()) {
       const permisosActuales = this.obtenerPermisosRoles();
       const permisosSiguientes: PermisoRolModulo[] = control.checked
-        ? [...permisosActuales, { idRol: rol.id, permisos: ['Ver'] }]
+        ? [
+            ...permisosActuales,
+            { idRol: rol.id, permisos: [AccionPermisoModulo.Ver] },
+          ]
         : permisosActuales.filter((permisoRol) => permisoRol.idRol !== rol.id);
       this.actualizarPermisosRoles(permisosSiguientes);
       return;

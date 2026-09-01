@@ -24,7 +24,9 @@ import {
 } from '../../models/formulario-nodo-flujo-proyecto.model';
 import {
   BorradorNodoFlujo,
+  DiaSemanaFlujo,
   FranjaMayorActividadModulo,
+  ModoEditorNodoFlujo,
   TipoBloqueFlujo,
 } from '../../models/flujo-proyecto.model';
 import { EstadoEditorFlujoProyectoService } from '../../services/estado-editor-flujo-proyecto.service';
@@ -67,16 +69,20 @@ export class ModalNodoFlujoProyecto {
   protected readonly formulario = computed(() => this.formularioSenal());
   protected readonly idFormulario = 'formulario-nodo-flujo-proyecto';
   protected readonly iconosTipo = ICONOS_TIPO_BLOQUE_FLUJO;
+  protected readonly modosEditorNodo = ModoEditorNodoFlujo;
+  protected readonly tiposBloque = TipoBloqueFlujo;
   protected readonly mensajesFormulario = MENSAJES_FORMULARIO_NODO_FLUJO;
   protected readonly encabezadoModal = computed(() =>
     this.estadoEditor.soloLectura()
       ? 'Versión histórica'
-      : this.estadoModal()?.modo === 'crear'
+      : this.estadoModal()?.modo === ModoEditorNodoFlujo.Crear
         ? 'Nuevo bloque del flujo'
         : 'Edición del bloque',
   );
   protected readonly textoAccionPrincipal = computed(() =>
-    this.estadoModal()?.modo === 'crear' ? 'Crear bloque' : 'Guardar cambios',
+    this.estadoModal()?.modo === ModoEditorNodoFlujo.Crear
+      ? 'Crear bloque'
+      : 'Guardar cambios',
   );
   protected readonly etiquetaTipo = computed(() => {
     const tipo = this.estadoModal()?.tipo;
@@ -94,7 +100,7 @@ export class ModalNodoFlujoProyecto {
       return `Detalle de ${this.obtenerEtiquetaTipo(estado.tipo)}`;
     }
 
-    return estado.modo === 'crear'
+    return estado.modo === ModoEditorNodoFlujo.Crear
       ? `Configurar ${this.obtenerEtiquetaTipo(estado.tipo)}`
       : `Editar ${this.obtenerEtiquetaTipo(estado.tipo)}`;
   });
@@ -106,7 +112,7 @@ export class ModalNodoFlujoProyecto {
       return 'Consulta la información que tenía este bloque en la versión seleccionada.';
     }
 
-    return estado.modo === 'crear'
+    return estado.modo === ModoEditorNodoFlujo.Crear
       ? 'Completa la información necesaria antes de incorporar este bloque al recorrido.'
       : 'Actualiza la información del bloque sin perder sus conexiones actuales.';
   });
@@ -118,7 +124,7 @@ export class ModalNodoFlujoProyecto {
 
       const bloque = this.estadoEditor.bloqueEnEdicion();
       const borrador =
-        estado.modo === 'editar' && bloque
+        estado.modo === ModoEditorNodoFlujo.Editar && bloque
           ? this.estadoEditor.obtenerBorradorDesdeNodo(bloque)
           : this.estadoEditor.obtenerBorradorPredeterminado(estado.tipo);
       const formulario = this.construirFormulario(borrador);
@@ -254,7 +260,7 @@ export class ModalNodoFlujoProyecto {
     return this.constructorFormulario.array(
       valores.map((franja) =>
         this.constructorFormulario.group({
-          dias: this.constructorFormulario.control<string[]>(franja.dias),
+          dias: this.constructorFormulario.control<DiaSemanaFlujo[]>(franja.dias),
           horaInicio: this.constructorFormulario.control(franja.horaInicio),
           horaFin: this.constructorFormulario.control(franja.horaFin),
         }),

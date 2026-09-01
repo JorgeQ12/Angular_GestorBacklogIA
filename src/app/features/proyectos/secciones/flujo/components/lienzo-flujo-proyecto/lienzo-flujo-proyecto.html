@@ -84,11 +84,13 @@
       [style.height]="estiloTamanoLienzo().height"
       [style.transform]="estiloTamanoLienzo().transform"
     >
-      <app-capa-conexiones-flujo-proyecto modo="lineas" />
+      <app-capa-conexiones-flujo-proyecto [modo]="modosCapaConexiones.Lineas" />
       @for (bloque of estadoEditor.bloquesVisibles(); track bloque.id) {
         <app-tarjeta-bloque-flujo-proyecto [bloque]="bloque" />
       }
-      <app-capa-conexiones-flujo-proyecto modo="superposicionEliminacion" />
+      <app-capa-conexiones-flujo-proyecto
+        [modo]="modosCapaConexiones.SuperposicionEliminacion"
+      />
     </div>
 
     @if (estadoEditor.tieneContenido()) {

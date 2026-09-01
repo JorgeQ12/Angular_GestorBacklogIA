@@ -434,6 +434,13 @@ El contrato persistido y el modelo interno utilizan los mismos nombres canónico
 Los tipos de nodo persistidos son `modulo`, `pagina`, `accion`, `decision` y `componente`; los lados
 de conexión admitidos son `izquierda`, `derecha`, `arriba` y `abajo`.
 
+Las identidades finitas del dominio se centralizan como enums de cadenas: `TipoBloqueFlujo`,
+`LadoConexionFlujo`, `EtiquetaRamaDecision`, `AccionPermisoModulo` y `DiaSemanaFlujo`. También se
+enumeran los modos internos del editor y de la capa de conexiones en su propietario más cercano.
+El mapper valida los textos recibidos desde `diagramFlujoJson` antes de convertirlos en esos tipos;
+las etiquetas, ayudas y mensajes visibles continúan en configuración o en la vista y no se modelan
+como enums.
+
 Guardar Flujo lleva `pasoActual` al menos a 9 y conserva la fotografía completa de las secciones
 anteriores.
 

@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { TipoBloqueFlujo, FlujoProyecto } from '../models/flujo-proyecto.model';
+import {
+  AccionPermisoModulo,
+  DiaSemanaFlujo,
+  FlujoProyecto,
+  LadoConexionFlujo,
+  TipoBloqueFlujo,
+} from '../models/flujo-proyecto.model';
 import {
   crearFlujoProyectoVacio,
   deserializarFlujoProyecto,
@@ -32,6 +38,65 @@ describe('flujo-proyecto.mapper', () => {
     });
 
     expect(deserializarFlujoProyecto(json, 42)).toBeNull();
+  });
+
+  it('rechaza valores externos que no pertenecen a los enums del contrato', () => {
+    const flujo = crearFlujoValido();
+    const modulo = {
+      ...flujo.nodos[0],
+      tipo: TipoBloqueFlujo.Modulo,
+      datos: {
+        permisosRoles: [
+          { idRol: 'rol-1', permisos: [AccionPermisoModulo.Ver] },
+        ],
+        usuariosConcurrentes: '10',
+        horariosMayorActividad: [
+          { dias: ['Festivo'], horaInicio: '08:00', horaFin: '17:00' },
+        ],
+      },
+    };
+
+    expect(
+      deserializarFlujoProyecto(
+        JSON.stringify({ ...flujo, nodos: [modulo] }),
+        42,
+      ),
+    ).toBeNull();
+    expect(
+      deserializarFlujoProyecto(
+        JSON.stringify({
+          ...flujo,
+          conexiones: [{ ...flujo.conexiones[0], ladoDestino: 'centro' }],
+        }),
+        42,
+      ),
+    ).toBeNull();
+  });
+
+  it('admite los valores enumerados en franjas y conexiones', () => {
+    const flujo = crearFlujoValido();
+    flujo.nodos = [
+      {
+        ...flujo.nodos[0],
+        tipo: TipoBloqueFlujo.Modulo,
+        datos: {
+          permisosRoles: [
+            { idRol: 'rol-1', permisos: [AccionPermisoModulo.Editar] },
+          ],
+          usuariosConcurrentes: '10',
+          horariosMayorActividad: [
+            {
+              dias: [DiaSemanaFlujo.Lunes, DiaSemanaFlujo.Miercoles],
+              horaInicio: '08:00',
+              horaFin: '17:00',
+            },
+          ],
+        },
+      },
+    ];
+    flujo.conexiones[0].ladoDestino = LadoConexionFlujo.Izquierda;
+
+    expect(deserializarFlujoProyecto(serializarFlujoProyecto(flujo), 42)).toEqual(flujo);
   });
 });
 
