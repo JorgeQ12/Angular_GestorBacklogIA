@@ -5,7 +5,18 @@ import {
   obtenerPuntoAnclajeBloque,
   resolverLadoDestinoMasCercano,
 } from '../../mappers/geometria-flujo-proyecto.mapper';
+import {
+  EtiquetaRamaDecision,
+  LadoConexionFlujo,
+  esEtiquetaRamaDecision,
+} from '../../models/flujo-proyecto.model';
 import { EstadoEditorFlujoProyectoService } from '../../services/estado-editor-flujo-proyecto.service';
+
+/** Identifica la capa visual que debe representar el componente de conexiones. */
+export enum ModoCapaConexionesFlujo {
+  Lineas = 'lineas',
+  SuperposicionEliminacion = 'superposicionEliminacion',
+}
 
 /** Representa las conexiones y sus acciones sobre el lienzo. */
 @Component({
@@ -17,7 +28,8 @@ import { EstadoEditorFlujoProyectoService } from '../../services/estado-editor-f
 })
 export class CapaConexionesFlujoProyecto {
   protected readonly estadoEditor = inject(EstadoEditorFlujoProyectoService);
-  public readonly modo = input<'lineas' | 'superposicionEliminacion'>('lineas');
+  public readonly modo = input<ModoCapaConexionesFlujo>(ModoCapaConexionesFlujo.Lineas);
+  protected readonly modosCapa = ModoCapaConexionesFlujo;
 
   protected readonly conexionesRepresentadas = computed(() => {
     const bloques = new Map(
@@ -31,12 +43,18 @@ export class CapaConexionesFlujoProyecto {
         const destino = bloques.get(conexion.idBloqueDestino);
         if (!origen || !destino) return null;
 
-        const puntoOrigen = obtenerPuntoAnclajeBloque(origen, 'derecha', conexion.etiqueta);
+        const puntoOrigen = obtenerPuntoAnclajeBloque(
+          origen,
+          LadoConexionFlujo.Derecha,
+          conexion.etiqueta,
+        );
         const ladoDestino =
-          (conexion.ladoDestino === 'derecha' ? 'izquierda' : conexion.ladoDestino) ??
+          (conexion.ladoDestino === LadoConexionFlujo.Derecha
+            ? LadoConexionFlujo.Izquierda
+            : conexion.ladoDestino) ??
           resolverLadoDestinoMasCercano(destino, puntoOrigen);
         const puntoDestino = obtenerPuntoAnclajeBloque(destino, ladoDestino);
-        const esRamaDecision = conexion.etiqueta === 'Sí' || conexion.etiqueta === 'No';
+        const esRamaDecision = esEtiquetaRamaDecision(conexion.etiqueta);
         const anchoEtiqueta = Math.max(
           34,
           conexion.etiqueta ? conexion.etiqueta.length * 7 + 18 : 34,
@@ -46,7 +64,7 @@ export class CapaConexionesFlujoProyecto {
             Math.min(84, Math.max(52, Math.abs(puntoDestino.x - puntoOrigen.x) * 0.42))
           : puntoOrigen.x + (puntoDestino.x - puntoOrigen.x) / 2;
         const centroEtiquetaY = esRamaDecision
-          ? puntoOrigen.y + (conexion.etiqueta === 'Sí' ? -18 : 18)
+          ? puntoOrigen.y + (conexion.etiqueta === EtiquetaRamaDecision.Si ? -18 : 18)
           : puntoOrigen.y + (puntoDestino.y - puntoOrigen.y) / 2 - 14;
 
         return {
@@ -75,5 +93,9 @@ export class CapaConexionesFlujoProyecto {
 
   protected eliminarConexion(idConexion: string): void {
     this.estadoEditor.eliminarConexion(idConexion);
+  }
+
+  protected esRamaDecision(etiqueta: string | null): boolean {
+    return esEtiquetaRamaDecision(etiqueta);
   }
 }

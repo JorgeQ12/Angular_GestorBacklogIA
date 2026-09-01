@@ -43,10 +43,12 @@
 
     <div class="campos-comunes-nodo-flujo__lista-criterios" formArrayName="criteriosAceptacion">
       @for (controlCriterio of controlesCriterios(); track controlCriterio; let indice = $index) {
-        <div class="campos-comunes-nodo-flujo__criterio">
-          <span class="campos-comunes-nodo-flujo__marca-criterio" aria-hidden="true">
-            <app-icono nombre="confirmar" />
-          </span>
+        <app-fila-formulario
+          [numero]="indice + 1"
+          [eliminable]="controlesCriterios().length > 1"
+          [etiquetaEliminar]="'Eliminar criterio de aceptación ' + (indice + 1)"
+          (eliminar)="eliminarCriterioAceptacion(indice)"
+        >
           <div class="ui-field">
             <label class="ui-visually-hidden" [for]="'flujo-criterio-' + indice">
               Criterio de aceptación {{ indice + 1 }}
@@ -61,21 +63,14 @@
               appErrorCampo
             />
           </div>
-          <button
-            type="button"
-            class="ui-button ui-button--text ui-button--md campos-comunes-nodo-flujo__eliminar-criterio"
-            [attr.aria-label]="'Quitar criterio ' + (indice + 1)"
-            (click)="eliminarCriterioAceptacion(indice)"
-          >
-            <app-icono class="ui-button__icon" nombre="eliminar" />
-          </button>
-        </div>
+        </app-fila-formulario>
       }
     </div>
   </section>
 
-  <section class="ui-form-section">
-    <header class="ui-form-section__header">
+  @if (mostrarRoles()) {
+    <section class="ui-form-section">
+      <header class="ui-form-section__header">
       <span class="ui-form-section__icon" aria-hidden="true">
         <app-icono nombre="roles" />
       </span>
@@ -142,5 +137,6 @@
     </div>
 
     <input id="flujo-nombres-roles" type="hidden" formControlName="nombresRoles" />
-  </section>
+    </section>
+  }
 </div>

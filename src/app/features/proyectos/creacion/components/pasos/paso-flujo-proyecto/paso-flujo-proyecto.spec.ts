@@ -1,7 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
+import { By } from '@angular/platform-browser';
 import { of } from 'rxjs';
 import { ClaveSeccionProyecto } from '../../../../config/secciones-proyecto.config';
+import { EditorFlujoProyecto } from '../../../../secciones/flujo/components/editor-flujo-proyecto/editor-flujo-proyecto';
 import { BorradorProyecto } from '../../../models/borrador-proyecto.model';
 import { EstadoCreacionProyectoService } from '../../../services/estado-creacion-proyecto.service';
 import { NotificadorErroresBorradorProyectoService } from '../../../services/notificador-errores-borrador-proyecto.service';
@@ -37,6 +39,8 @@ describe('PasoFlujoProyecto', () => {
 
   it('guarda el flujo mediante el estado común del recorrido', () => {
     crearComponente();
+    const completado = vi.fn();
+    fixture.componentInstance.completado.subscribe(completado);
 
     obtenerBoton('Guardar flujo').click();
     fixture.detectChanges();
@@ -49,6 +53,29 @@ describe('PasoFlujoProyecto', () => {
         conexiones: [],
       }),
     });
+    expect(completado).toHaveBeenCalledOnce();
+  });
+
+  it('habilita el guardado contextual solo mientras existen cambios pendientes', () => {
+    crearComponente();
+    const botonGuardarCambios = obtenerBotonPorEtiqueta('Guardar cambios del flujo');
+    const editor = fixture.debugElement.query(By.directive(EditorFlujoProyecto))
+      .componentInstance as EditorFlujoProyecto;
+
+    expect(botonGuardarCambios.disabled).toBe(true);
+
+    editor.flujoCambiado.emit({
+      ...editor.flujo(),
+      fechaActualizacion: '2026-09-01T15:00:00.000Z',
+    });
+    fixture.detectChanges();
+
+    expect(botonGuardarCambios.disabled).toBe(false);
+    botonGuardarCambios.click();
+    fixture.detectChanges();
+
+    expect(estadoCreacion.guardarSeccion).toHaveBeenCalledOnce();
+    expect(botonGuardarCambios.disabled).toBe(true);
   });
 
   it('carga en el editor los roles definidos previamente en el borrador', () => {
@@ -98,6 +125,12 @@ describe('PasoFlujoProyecto', () => {
     return Array.from(
       (fixture.nativeElement as HTMLElement).querySelectorAll<HTMLButtonElement>('button'),
     ).find((boton) => boton.textContent?.includes(texto))!;
+  }
+
+  function obtenerBotonPorEtiqueta(etiqueta: string): HTMLButtonElement {
+    return (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>(
+      `[aria-label="${etiqueta}"]`,
+    )!;
   }
 });
 

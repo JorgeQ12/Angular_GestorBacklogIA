@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { FlujoProyecto, TipoBloqueFlujo } from '../../secciones/flujo/models/flujo-proyecto.model';
+import {
+  AccionPermisoModulo,
+  FlujoProyecto,
+  TipoBloqueFlujo,
+} from '../../secciones/flujo/models/flujo-proyecto.model';
 import { sincronizarRolesDelFlujo } from './flujo-creacion-proyecto.mapper';
 
 describe('sincronizarRolesDelFlujo', () => {
@@ -37,7 +41,11 @@ describe('sincronizarRolesDelFlujo', () => {
     ]);
     expect(resultado.nodos[0].idsRoles).toEqual(['rol-administrador']);
     expect(resultado.nodos[0]).toMatchObject({
-      datos: { permisosRoles: [{ idRol: 'rol-administrador', permisos: ['Ver'] }] },
+      datos: {
+        permisosRoles: [
+          { idRol: 'rol-administrador', permisos: [AccionPermisoModulo.Ver] },
+        ],
+      },
     });
   });
 });
@@ -72,8 +80,8 @@ function crearFlujoConAsignaciones(): FlujoProyecto {
         fechaActualizacion: FECHA,
         datos: {
           permisosRoles: [
-            { idRol: 'rol-administrador', permisos: ['Ver'] },
-            { idRol: 'rol-obsoleto', permisos: ['Editar'] },
+            { idRol: 'rol-administrador', permisos: [AccionPermisoModulo.Ver] },
+            { idRol: 'rol-obsoleto', permisos: [AccionPermisoModulo.Editar] },
           ],
           usuariosConcurrentes: '20',
           horariosMayorActividad: [],

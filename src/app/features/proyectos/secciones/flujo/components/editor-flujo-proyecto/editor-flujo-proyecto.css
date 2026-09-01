@@ -11,8 +11,15 @@
   flex-direction: column;
   overflow: hidden;
   border: var(--border-width) solid var(--border-subtle);
-  border-radius: var(--radius-lg);
+  border-radius: 0;
   background: var(--surface-subtle);
+}
+
+.editor-flujo:fullscreen {
+  width: 100vw;
+  height: 100dvh;
+  min-height: 100dvh;
+  border: 0;
 }
 
 .editor-flujo__espacio-trabajo {

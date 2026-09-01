@@ -118,7 +118,7 @@
               />
             }
             @case (clavesSeccion.Flujo) {
-              <app-paso-flujo-proyecto />
+              <app-paso-flujo-proyecto (completado)="volverAlInicio()" />
             }
           }
         }

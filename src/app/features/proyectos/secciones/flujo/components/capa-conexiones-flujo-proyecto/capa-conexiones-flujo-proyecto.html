@@ -1,4 +1,4 @@
-@if (modo() === 'lineas') {
+@if (modo() === modosCapa.Lineas) {
   <svg
     class="capa-conexiones-flujo"
     [attr.viewBox]="'0 0 ' + estadoEditor.tamanoLienzo.ancho + ' ' + estadoEditor.tamanoLienzo.alto"
@@ -73,7 +73,7 @@
       <path
         class="capa-conexiones-flujo__linea capa-conexiones-flujo__linea--previsualizacion"
         [class.esta-acoplada]="previsualizacion.idDestino"
-        [class.es-rama-decision]="previsualizacion.etiqueta === 'Sí' || previsualizacion.etiqueta === 'No'"
+        [class.es-rama-decision]="esRamaDecision(previsualizacion.etiqueta)"
         [attr.d]="previsualizacion.trayectoria"
         marker-end="url(#flecha-previsualizacion)"
       />

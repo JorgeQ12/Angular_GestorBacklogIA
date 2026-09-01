@@ -434,6 +434,25 @@ El contrato persistido y el modelo interno utilizan los mismos nombres canónico
 Los tipos de nodo persistidos son `modulo`, `pagina`, `accion`, `decision` y `componente`; los lados
 de conexión admitidos son `izquierda`, `derecha`, `arriba` y `abajo`.
 
+Las identidades finitas del dominio se centralizan como enums de cadenas: `TipoBloqueFlujo`,
+`LadoConexionFlujo`, `EtiquetaRamaDecision`, `AccionPermisoModulo` y `DiaSemanaFlujo`. También se
+enumeran los modos internos del editor y de la capa de conexiones en su propietario más cercano.
+El mapper valida los textos recibidos desde `diagramFlujoJson` antes de convertirlos en esos tipos;
+las etiquetas, ayudas y mensajes visibles continúan en configuración o en la vista y no se modelan
+como enums.
+
+La asignación de roles depende del tipo de bloque: es obligatoria en módulo, página y acción;
+no aplica a decisión y es opcional en componente. El editor elimina cualquier asignación heredada
+de un nodo de decisión al hidratar o guardar el flujo, mientras que un componente puede conservar
+una selección explícita o persistirse con `idsRoles` vacío.
+
+El lienzo utiliza esquinas rectas y se une sin separación al pie de guardado del paso. Sus mandos
+agrupan zoom, restablecimiento y pantalla completa; al ampliar se conserva dentro del área activa
+el lienzo, la paleta de bloques y los formularios modales, y el mismo control permite reducirlo.
+La barra superior ofrece un guardado contextual que solo se habilita cuando el diagrama cambia y
+persiste sin abandonar el editor. La acción final “Guardar flujo” persiste la misma fotografía y,
+después de la confirmación del backend, solicita a la página regresar a `/panel/inicio`.
+
 Guardar Flujo lleva `pasoActual` al menos a 9 y conserva la fotografía completa de las secciones
 anteriores.
 

@@ -5,45 +5,7 @@
 
 .campos-comunes-nodo-flujo__lista-criterios {
   display: grid;
-  gap: var(--space-2);
-}
-
-.campos-comunes-nodo-flujo__criterio {
-  display: grid;
-  grid-template-columns: var(--control-height-md) minmax(0, 1fr) var(--control-height-md);
-  align-items: start;
-  gap: var(--space-2);
-}
-
-.campos-comunes-nodo-flujo__marca-criterio {
-  display: grid;
-  width: var(--control-height-md);
-  height: var(--control-height-md);
-  margin-top: var(--space-1);
-  place-items: center;
-  border: var(--border-width) solid var(--border-default);
-  border-radius: var(--radius-sm);
-  background: var(--surface-subtle);
-  color: var(--text-secondary);
-}
-
-.campos-comunes-nodo-flujo__marca-criterio app-icono {
-  width: var(--font-size-sm);
-  height: var(--font-size-sm);
-}
-
-.campos-comunes-nodo-flujo__criterio:has(.ui-field.has-error)
-  .campos-comunes-nodo-flujo__marca-criterio {
-  border-color: var(--field-error-color);
-  background: var(--field-error-surface);
-  color: var(--field-error-color);
-}
-
-.campos-comunes-nodo-flujo__eliminar-criterio {
-  width: var(--control-height-md);
-  height: var(--control-height-md);
-  margin-top: var(--space-1);
-  padding: 0;
+  gap: var(--space-3);
 }
 
 .campos-comunes-nodo-flujo__roles {
