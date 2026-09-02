@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { SEGMENTOS_RUTA } from '../../core/navegacion/rutas';
+import { PARAMETROS_RUTA, SEGMENTOS_RUTA } from '../../core/navegacion/rutas';
 import { EstadoCreacionProyectoService } from './creacion/services/estado-creacion-proyecto.service';
 import { ContenidoEncabezadoPasoCreacionService } from './creacion/services/contenido-encabezado-paso-creacion.service';
 import { EstadoListadoProyectosService } from './listado/services/estado-listado-proyectos.service';
@@ -22,5 +22,12 @@ export const RUTAS_PROYECTOS: Routes = [
       import('./creacion/pages/pagina-creacion-proyecto/pagina-creacion-proyecto').then(
         (modulo) => modulo.PaginaCreacionProyecto,
       ),
+  },
+  {
+    path: `:${PARAMETROS_RUTA.proyectoId}/${SEGMENTOS_RUTA.planificacion}`,
+    loadComponent: () =>
+      import(
+        './planificacion/pages/pagina-planificacion-proyecto/pagina-planificacion-proyecto'
+      ).then((modulo) => modulo.PaginaPlanificacionProyecto),
   },
 ];

@@ -7,6 +7,7 @@ export const SEGMENTOS_RUTA = {
   iniciarSesion: 'iniciar-sesion',
   inicio: 'inicio',
   panel: 'panel',
+  planificacion: 'planificacion',
   proyectos: 'proyectos',
 } as const;
 
@@ -61,4 +62,10 @@ export function crearUrlCreacionProyecto(proyectoId: number | string): string {
   return `${URL_CREACION_PROYECTO}?${PARAMETROS_RUTA.proyectoId}=${encodeURIComponent(
     String(proyectoId),
   )}`;
+}
+
+/** Construye la URL de planificación de un proyecto. */
+export function crearUrlPlanificacionProyecto(proyectoId: number | string): string {
+  const idCodificado = encodeURIComponent(String(proyectoId));
+  return `${URL_PROYECTOS}/${idCodificado}/${SEGMENTOS_RUTA.planificacion}`;
 }

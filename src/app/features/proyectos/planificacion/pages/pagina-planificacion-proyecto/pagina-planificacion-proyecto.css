@@ -1,0 +1,26 @@
+:host {
+  display: block;
+}
+
+.pagina-planificacion {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.pagina-planificacion__contenido {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.pagina-planificacion__contenido app-estado-vacio {
+  --ui-empty-state-min-height: 24rem;
+}
+
+@media (max-width: 640px) {
+  .pagina-planificacion__contenido app-estado-vacio {
+    --ui-empty-state-min-height: 18rem;
+  }
+}

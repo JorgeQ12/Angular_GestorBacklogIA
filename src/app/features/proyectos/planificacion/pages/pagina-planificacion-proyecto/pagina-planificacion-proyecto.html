@@ -1,0 +1,20 @@
+<section class='pagina-planificacion' aria-labelledby='titulo-planificacion-proyecto'>
+  <app-encabezado-pagina
+    idTitulo='titulo-planificacion-proyecto'
+    [titulo]='tituloEncabezado'
+    [etiqueta]='etiquetaEncabezado()'
+    [descripcion]='descripcionEncabezado'
+    icono='planificacion'
+  />
+
+  <section
+    class='ui-card pagina-planificacion__contenido'
+    aria-label='Estructura de planificación del proyecto'
+  >
+    <app-estado-vacio
+      icono='planificacion'
+      titulo='La estructura de planificación aún no está disponible'
+      descripcion='El árbol de elementos se incorporará en la siguiente etapa de la migración.'
+    />
+  </section>
+</section>

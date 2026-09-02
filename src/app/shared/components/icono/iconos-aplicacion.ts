@@ -96,6 +96,7 @@ export const ICONOS_APLICACION = {
   ocultar: LucideEyeOff.icon,
   objetivos: LucideListChecks.icon,
   panel: LucideLayoutDashboard.icon,
+  planificacion: LucideListTodo.icon,
   proyectos: LucideFolderKanban.icon,
   reintentar: LucideRefreshCw.icon,
   buscar: LucideSearch.icon,
