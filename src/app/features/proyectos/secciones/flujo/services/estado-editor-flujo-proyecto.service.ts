@@ -15,9 +15,7 @@ import {
 import {
   BorradorNodoFlujo,
   ConexionFlujoProyecto,
-  EstadoFiltroFlujo,
   EtiquetaRamaDecision,
-  FiltroVistaFlujoProyecto,
   FlujoProyecto,
   LadoConexionFlujo,
   ModoEditorNodoFlujo,
@@ -59,16 +57,10 @@ const VISTA_PREDETERMINADA: VistaLienzoFlujo = {
   escala: 1
 };
 
-const FILTRO_PREDETERMINADO: EstadoFiltroFlujo = {
-  modo: FiltroVistaFlujoProyecto.Todos,
-  idRol: null
-};
-
 /** Administra el estado local y las operaciones del editor visual del flujo. */
 @Injectable()
 export class EstadoEditorFlujoProyectoService {
   private readonly flujoSenal = signal<FlujoProyecto>(this.crearFlujoVacio(''));
-  private readonly filtroSenal = signal<EstadoFiltroFlujo>(FILTRO_PREDETERMINADO);
   private readonly vistaSenal = signal<VistaLienzoFlujo>(VISTA_PREDETERMINADA);
   private readonly idBloqueSeleccionadoSenal = signal<string | null>(null);
   private readonly idConexionSeleccionadaSenal = signal<string | null>(null);
@@ -92,17 +84,10 @@ export class EstadoEditorFlujoProyectoService {
   );
   public readonly flujo = computed(() => this.flujoSenal());
   public readonly roles = computed(() => this.flujoSenal().roles);
-  public readonly bloques = computed(() => this.flujoSenal().nodos);
-  public readonly conexiones = computed(() => this.flujoSenal().conexiones);
-  public readonly filtro = computed(() => this.filtroSenal());
   public readonly vista = computed(() => this.vistaSenal());
   public readonly idBloqueSeleccionado = computed(() => this.idBloqueSeleccionadoSenal());
   public readonly idConexionSeleccionada = computed(() => this.idConexionSeleccionadaSenal());
   public readonly idOrigenConexionActiva = computed(() => this.idOrigenConexionSenal());
-  public readonly etiquetaOrigenConexionActiva = computed(() => this.etiquetaOrigenConexionSenal());
-  public readonly punteroConexionActiva = computed(() => this.punteroConexionSenal());
-  public readonly idDestinoConexionActiva = computed(() => this.idDestinoConexionEnfocadoSenal());
-  public readonly ladoDestinoConexionActiva = computed(() => this.ladoDestinoConexionEnfocadoSenal());
   public readonly paletaBloquesAbierta = computed(() => this.paletaBloquesAbiertaSenal());
   public readonly estadoEditorNodo = computed(() => this.estadoEditorNodoSenal());
   public readonly editorNodoAbierto = computed(() => this.estadoEditorNodoSenal() !== null);
@@ -110,10 +95,6 @@ export class EstadoEditorFlujoProyectoService {
   public readonly bloqueSeleccionado = computed(() => {
     const idSeleccionado = this.idBloqueSeleccionadoSenal();
     return this.flujoSenal().nodos.find((bloque) => bloque.id === idSeleccionado) ?? null;
-  });
-  public readonly conexionSeleccionada = computed(() => {
-    const idSeleccionado = this.idConexionSeleccionadaSenal();
-    return this.flujoSenal().conexiones.find((conexion) => conexion.id === idSeleccionado) ?? null;
   });
   public readonly bloqueEnEdicion = computed(() => {
     const estadoEditor = this.estadoEditorNodoSenal();
@@ -123,22 +104,7 @@ export class EstadoEditorFlujoProyectoService {
 
     return this.flujoSenal().nodos.find((nodo) => nodo.id === estadoEditor.idNodo) ?? null;
   });
-  public readonly bloquesCompartidos = computed(() =>
-    this.flujoSenal().nodos.filter((bloque) => bloque.idsRoles.length > 1)
-  );
-  public readonly bloquesVisibles = computed(() => {
-    const flujo = this.flujoSenal();
-    const filtro = this.filtroSenal();
-
-    switch (filtro.modo) {
-      case FiltroVistaFlujoProyecto.Rol:
-        return flujo.nodos.filter((bloque) => bloque.idsRoles.includes(filtro.idRol ?? ''));
-      case FiltroVistaFlujoProyecto.Compartidos:
-        return flujo.nodos.filter((bloque) => bloque.idsRoles.length > 1);
-      default:
-        return flujo.nodos;
-    }
-  });
+  public readonly bloquesVisibles = computed(() => this.flujoSenal().nodos);
   public readonly conexionesVisibles = computed(() => {
     const idsBloquesVisibles = new Set(this.bloquesVisibles().map((bloque) => bloque.id));
     return this.flujoSenal().conexiones.filter(
@@ -214,54 +180,6 @@ export class EstadoEditorFlujoProyectoService {
       this.estadoEditorNodoSenal.set(null);
       this.cancelarConexion();
       this.limpiarSeleccion();
-    }
-  }
-
-  public crearRol(nombre: string): void {
-    const nombreNormalizado = nombre.trim();
-
-    if (!nombreNormalizado) {
-      return;
-    }
-
-    const rol: RolFlujoProyecto = {
-      id: this.crearId(PrefijoIdentificadorFlujo.Rol),
-      nombre: nombreNormalizado,
-      fechaCreacion: new Date().toISOString()
-    };
-
-    this.actualizarFlujo((flujo) => ({
-      ...flujo,
-      roles: [...flujo.roles, rol]
-    }));
-  }
-
-  public actualizarRol(idRol: string, cambios: Partial<Pick<RolFlujoProyecto, 'nombre'>>): void {
-    const nombreSiguiente = cambios.nombre?.trim();
-
-    this.actualizarFlujo((flujo) => ({
-      ...flujo,
-      roles: flujo.roles.map((rol) =>
-        rol.id === idRol
-          ? { ...rol, nombre: nombreSiguiente && nombreSiguiente.length ? nombreSiguiente : rol.nombre }
-          : rol
-      )
-    }));
-  }
-
-  public eliminarRol(idRol: string): void {
-    this.actualizarFlujo((flujo) => ({
-      ...flujo,
-      roles: flujo.roles.filter((rol) => rol.id !== idRol),
-      nodos: flujo.nodos.map((bloque) => ({
-        ...bloque,
-        idsRoles: bloque.idsRoles.filter((idRolActual) => idRolActual !== idRol),
-        fechaActualizacion: new Date().toISOString()
-      }))
-    }));
-
-    if (this.filtroSenal().idRol === idRol) {
-      this.filtroSenal.set(FILTRO_PREDETERMINADO);
     }
   }
 
@@ -450,17 +368,6 @@ export class EstadoEditorFlujoProyectoService {
     this.seleccionarConexion(conexion.id);
   }
 
-  public actualizarConexion(idConexion: string, cambios: Partial<Pick<ConexionFlujoProyecto, 'etiqueta'>>): void {
-    this.actualizarFlujo((flujo) => ({
-      ...flujo,
-      conexiones: flujo.conexiones.map((conexion) =>
-        conexion.id === idConexion
-          ? { ...conexion, etiqueta: cambios.etiqueta?.trim() ?? '' }
-          : conexion
-      )
-    }));
-  }
-
   public eliminarConexion(idConexion: string): void {
     this.actualizarFlujo((flujo) => ({
       ...flujo,
@@ -470,18 +377,6 @@ export class EstadoEditorFlujoProyectoService {
     if (this.idConexionSeleccionadaSenal() === idConexion) {
       this.idConexionSeleccionadaSenal.set(null);
     }
-  }
-
-  public establecerFiltro(filtro: EstadoFiltroFlujo): void {
-    this.filtroSenal.set(filtro);
-  }
-
-  public establecerVista(vista: VistaLienzoFlujo): void {
-    this.vistaSenal.set({
-      desplazamientoX: vista.desplazamientoX,
-      desplazamientoY: vista.desplazamientoY,
-      escala: this.limitar(vista.escala, 0.2, 1.8)
-    });
   }
 
   public restablecerVista(): void {
@@ -659,7 +554,6 @@ export class EstadoEditorFlujoProyectoService {
     const idConexionSeleccionada = conservarSeleccion ? this.idConexionSeleccionadaSenal() : null;
 
     this.flujoSenal.set(flujo);
-    this.filtroSenal.set(FILTRO_PREDETERMINADO);
     if (!conservarVista) {
       this.vistaSenal.set(VISTA_PREDETERMINADA);
     }

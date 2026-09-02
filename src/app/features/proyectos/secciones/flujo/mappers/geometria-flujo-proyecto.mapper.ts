@@ -66,26 +66,6 @@ export function obtenerPuntoAnclajeBloque(
   }
 }
 
-/** Resuelve el lado del nodo más cercano a un punto del lienzo. */
-export function resolverLadoConexionMasCercano(
-  bloque: Pick<NodoFlujoProyecto, 'posicion'>,
-  punto: { x: number; y: number },
-): LadoConexionFlujo {
-  const distancias: Record<LadoConexionFlujo, number> = {
-    [LadoConexionFlujo.Izquierda]: Math.abs(punto.x - bloque.posicion.x),
-    [LadoConexionFlujo.Derecha]: Math.abs(
-      punto.x - (bloque.posicion.x + TAMANO_BLOQUE_FLUJO.ancho),
-    ),
-    [LadoConexionFlujo.Arriba]: Math.abs(punto.y - bloque.posicion.y),
-    [LadoConexionFlujo.Abajo]: Math.abs(
-      punto.y - (bloque.posicion.y + TAMANO_BLOQUE_FLUJO.alto),
-    ),
-  };
-
-  return (Object.entries(distancias).sort((a, b) => a[1] - b[1])[0]?.[0] ??
-    LadoConexionFlujo.Izquierda) as LadoConexionFlujo;
-}
-
 /** Resuelve el lado de entrada permitido más cercano a un punto del lienzo. */
 export function resolverLadoDestinoMasCercano(
   bloque: Pick<NodoFlujoProyecto, 'posicion'>,

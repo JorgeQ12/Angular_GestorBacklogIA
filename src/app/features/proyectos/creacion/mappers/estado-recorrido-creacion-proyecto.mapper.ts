@@ -1,5 +1,4 @@
 import {
-  ClavePasoEspecialProyecto,
   type ClavePasoProyecto,
   PASOS_PROYECTO,
 } from '../../config/pasos-proyecto.config';

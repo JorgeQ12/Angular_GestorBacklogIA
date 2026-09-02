@@ -7,13 +7,6 @@ export enum TipoBloqueFlujo {
   Componente = 'componente',
 }
 
-/** Identifica las vistas disponibles para filtrar el lienzo. */
-export enum FiltroVistaFlujoProyecto {
-  Todos = 'todos',
-  Compartidos = 'compartidos',
-  Rol = 'rol',
-}
-
 /** Identifica si el modal incorpora un nodo nuevo o modifica uno existente. */
 export enum ModoEditorNodoFlujo {
   Crear = 'crear',
@@ -212,12 +205,6 @@ export interface FlujoProyecto {
   nodos: NodoFlujoProyecto[];
   conexiones: ConexionFlujoProyecto[];
   fechaActualizacion: string;
-}
-
-/** Conserva el filtro aplicado a los bloques del lienzo. */
-export interface EstadoFiltroFlujo {
-  modo: FiltroVistaFlujoProyecto;
-  idRol: string | null;
 }
 
 /** Define las dimensiones disponibles para ubicar nodos en el lienzo. */

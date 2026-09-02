@@ -4,7 +4,7 @@ import { provideRouter, Router, Routes } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { of, throwError } from 'rxjs';
 import { SEGMENTOS_RUTA, URL_INICIO_PANEL } from '../../../../../core/navegacion/rutas';
-import { PasoFlujoProyecto } from '../../components/pasos/paso-flujo-proyecto/paso-flujo-proyecto';
+import { PasoFlujoProyecto } from '../../../components/pasos/paso-flujo-proyecto/paso-flujo-proyecto';
 import { BorradorProyecto } from '../../models/borrador-proyecto.model';
 import type { DatosVinculacionAzure } from '../../../models/vinculacion-azure-proyecto.model';
 import { CreacionProyectoService } from '../../services/creacion-proyecto.service';
@@ -24,6 +24,7 @@ describe('PaginaCreacionProyecto', () => {
     obtenerBorrador: vi.fn(),
     validarVinculacionAzure: vi.fn(),
     crearBorrador: vi.fn(),
+    actualizarBorrador: vi.fn(),
     sincronizarEquipoAzure: vi.fn(),
   };
 
@@ -31,6 +32,7 @@ describe('PaginaCreacionProyecto', () => {
     vi.clearAllMocks();
     creacionProyecto.obtenerBorrador.mockReturnValue(of(BORRADOR_AVANZADO));
     creacionProyecto.crearBorrador.mockReturnValue(of({ id: 42, revision: 1, pasoActual: 1 }));
+    creacionProyecto.actualizarBorrador.mockReturnValue(of(BORRADOR_FLUJO));
 
     TestBed.configureTestingModule({
       imports: [PaginaCreacionProyecto],
@@ -127,7 +129,7 @@ describe('PaginaCreacionProyecto', () => {
     const pasoFlujo = harness.routeDebugElement?.query(By.directive(PasoFlujoProyecto))
       .componentInstance as PasoFlujoProyecto;
 
-    pasoFlujo.completado.emit();
+    pasoFlujo.guardar.emit(pasoFlujo.datos());
 
     expect(navegar).toHaveBeenCalledWith(URL_INICIO_PANEL);
   });

@@ -288,9 +288,9 @@ export class PaginaCreacionProyecto {
       )
       .subscribe({
         next: () => {
-          if (this.estadoCreacion.proyectoId() === proyectoId && siguiente) {
-            this.abrirPaso(siguiente);
-          }
+          if (this.estadoCreacion.proyectoId() !== proyectoId) return;
+          if (siguiente) this.abrirPaso(siguiente);
+          else this.volverAlInicio();
         },
         error: (error: unknown) =>
           this.notificadorBorrador.comunicar(error, actualizacion.seccion),

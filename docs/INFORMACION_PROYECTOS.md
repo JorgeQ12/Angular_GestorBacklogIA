@@ -78,6 +78,8 @@ Los modelos, validaciones, serializadores y formularios de las secciones viven e
   exponen `aria-readonly` y bloquean cambios sin atenuar el contenido.
 - En lectura se retiran contadores, validación visual y acciones de agregar, eliminar, seleccionar
   o asignar.
+- En Flujo, lectura conserva la apertura de los bloques para consultar su detalle; el modal presenta
+  los controles deshabilitados y únicamente permite cerrar.
 - Cancelar vuelve a hidratar la fotografía confirmada antes de presentar lectura.
 - No existen componentes `detalle-*`, pasos de Información ni adaptadores por sección paralelos.
 - `ActualizacionSeccionProyecto` relaciona de forma discriminada la sección con su modelo.

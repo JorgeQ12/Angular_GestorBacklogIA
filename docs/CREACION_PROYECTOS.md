@@ -413,8 +413,8 @@ Flujo incorpora el constructor visual anterior como la última sección reutiliz
   las referencias a roles que ya no existen en la sección Roles.
 - La página independiente anterior, su acceso a `ActivatedRoute`, el guardado directo y la fachada
   temporal en memoria no se migran. El recorrido conserva una sola página y una sola ruta.
-- La consulta de versiones históricas pertenece a la futura capacidad de Información; no se mezcla
-  con la creación del borrador.
+- Información reutiliza el editor en modo lectura: permite abrir el detalle de cada bloque, pero
+  deshabilita sus campos y retira la confirmación, la paleta y las operaciones de modificación.
 
 El contrato persistido y el modelo interno utilizan los mismos nombres canónicos en español.
 `flujo-proyecto.mapper.ts` valida el contenido y rechaza alias o estructuras heredadas:

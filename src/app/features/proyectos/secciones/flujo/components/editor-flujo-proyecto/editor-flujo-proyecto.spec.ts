@@ -70,6 +70,24 @@ describe('EditorFlujoProyecto', () => {
     ).toBeNull();
   });
 
+  it('permite consultar el detalle de un bloque en modo lectura', () => {
+    crearNodo(TipoBloqueFlujo.Accion);
+    fixture.componentRef.setInput('modo', ModoFormularioProyecto.Lectura);
+    fixture.detectChanges();
+
+    const elemento = fixture.nativeElement as HTMLElement;
+    elemento.querySelector<HTMLElement>('.tarjeta-bloque-flujo')?.click();
+    fixture.detectChanges();
+
+    const modal = elemento.querySelector<HTMLElement>('app-modal-nodo-flujo-proyecto');
+    const titulo = modal?.querySelector<HTMLInputElement>('#flujo-accion-titulo');
+
+    expect(modal).not.toBeNull();
+    expect(modal?.textContent).toContain('Detalle de acción');
+    expect(titulo?.disabled).toBe(true);
+    expect(modal?.querySelector('button[type="submit"]')).toBeNull();
+  });
+
   it('aplica cinco acentos distintos en la selección y en los bloques del lienzo', () => {
     estadoEditor.abrirPaletaBloques();
     fixture.detectChanges();
@@ -227,7 +245,7 @@ describe('EditorFlujoProyecto', () => {
       datos: {},
     });
 
-    expect(estadoEditor.bloques()[0].idsRoles).toEqual([]);
+    expect(estadoEditor.flujo().nodos[0].idsRoles).toEqual([]);
   });
 
   it('permite crear un componente sin seleccionar roles', () => {
@@ -249,7 +267,7 @@ describe('EditorFlujoProyecto', () => {
     botonGuardar?.click();
     fixture.detectChanges();
 
-    expect(estadoEditor.bloques()[0]).toMatchObject({
+    expect(estadoEditor.flujo().nodos[0]).toMatchObject({
       tipo: TipoBloqueFlujo.Componente,
       idsRoles: [],
     });
