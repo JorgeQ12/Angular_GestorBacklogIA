@@ -24,6 +24,8 @@ del proyecto sin extender el alcance autorizado.
      [inicio único del panel](../../../docs/INICIO_PANEL.md).
    - Creación de proyectos, secciones reutilizables, borradores o recorrido por pasos:
      [creación de proyectos](../../../docs/CREACION_PROYECTOS.md).
+   - Información de proyectos, pasos de consulta, modos de formulario o versionamiento:
+     [información y versiones de proyectos](../../../docs/INFORMACION_PROYECTOS.md).
    - Portafolio, listado, filtros, paginación o acciones sobre proyectos:
      [listado de proyectos](../../../docs/LISTADO_PROYECTOS.md).
 3. Inspecciona el código origen y el destino antes de proponer la estructura. Si el usuario excluye

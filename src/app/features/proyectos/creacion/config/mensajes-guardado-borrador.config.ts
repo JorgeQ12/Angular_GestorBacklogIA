@@ -1,5 +1,5 @@
 import { ClaveSeccionProyecto } from '../../config/secciones-proyecto.config';
-import { SeccionActualizableBorrador } from '../models/actualizacion-seccion-borrador.model';
+import { SeccionActualizableProyecto } from '../../models/actualizacion-seccion-proyecto.model';
 
 /** Centraliza los mensajes particulares de cada sección guardable. */
 export const MENSAJES_GUARDADO_BORRADOR = {
@@ -35,7 +35,7 @@ export const MENSAJES_GUARDADO_BORRADOR = {
     titulo: 'No fue posible guardar el flujo',
     descripcion: 'Conservamos el diagrama para que puedas intentarlo nuevamente.',
   },
-} as const satisfies Record<SeccionActualizableBorrador, MensajeGuardadoBorrador>;
+} as const satisfies Record<SeccionActualizableProyecto, MensajeGuardadoBorrador>;
 
 interface MensajeGuardadoBorrador {
   readonly titulo: string;
@@ -43,4 +43,4 @@ interface MensajeGuardadoBorrador {
 }
 
 /** Limita las secciones admitidas por la notificación de guardado. */
-export type SeccionGuardadoBorrador = SeccionActualizableBorrador;
+export type SeccionGuardadoBorrador = SeccionActualizableProyecto;

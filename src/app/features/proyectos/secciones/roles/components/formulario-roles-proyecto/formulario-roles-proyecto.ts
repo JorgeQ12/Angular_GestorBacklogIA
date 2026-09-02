@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  computed,
   effect,
   inject,
   input,
@@ -22,6 +23,7 @@ import { IconoComponent } from '../../../../../../shared/components/icono/icono.
 import { FilaFormulario } from '../../../../../../shared/forms/components/fila-formulario/fila-formulario';
 import { ErrorCampoDirective } from '../../../../../../shared/forms/errores-validacion';
 import { validarTextoRequerido } from '../../../../../../shared/forms/validadores';
+import { ModoFormularioProyecto } from '../../../../models/modo-formulario-proyecto.model';
 import {
   MENSAJES_DESCRIPCION_ROL_PROYECTO,
   MENSAJES_NOMBRE_ROL_PROYECTO,
@@ -44,17 +46,24 @@ export class FormularioRolesProyecto {
   private readonly constructorFormulario = inject(NonNullableFormBuilder);
   private readonly destroyRef = inject(DestroyRef);
 
+  /** Identifica el formulario para permitir acciones externas mediante el atributo form. */
+  public readonly idFormulario = input<string | null>(null);
+
   /** Proporciona los valores que deben presentarse en el formulario. */
   public readonly datosIniciales = input<RolesProyecto | null>(null);
 
   /** Bloquea temporalmente los controles durante la operación coordinada por la página. */
   public readonly procesando = input(false);
 
+  /** Define si la sección permite modificar sus valores o únicamente consultarlos. */
+  public readonly modo = input(ModoFormularioProyecto.Edicion);
+
   /** Entrega Roles válidos y normalizados al flujo consumidor. */
   public readonly guardar = output<RolesProyecto>();
 
   protected readonly mensajesNombre = MENSAJES_NOMBRE_ROL_PROYECTO;
   protected readonly mensajesDescripcion = MENSAJES_DESCRIPCION_ROL_PROYECTO;
+  protected readonly esSoloLectura = computed(() => this.modo() === ModoFormularioProyecto.Lectura);
   protected readonly formulario: FormularioRolesProyectoTipado = this.constructorFormulario.group({
     roles: this.constructorFormulario.array([this.crearGrupoRol()], [Validators.minLength(1)]),
   });
@@ -69,6 +78,7 @@ export class FormularioRolesProyecto {
       .subscribe(() => this.validarNombresRepetidos());
 
     effect(() => {
+      this.modo();
       const datos = this.datosIniciales();
       if (datos) this.presentarDatos(datos);
     });
@@ -84,12 +94,14 @@ export class FormularioRolesProyecto {
 
   /** Incorpora otro perfil funcional a la definición del proyecto. */
   protected agregarRol(): void {
+    if (this.esSoloLectura()) return;
     this.formulario.controls.roles.push(this.crearGrupoRol());
     this.formulario.controls.roles.markAsDirty();
   }
 
   /** Retira un perfil conservando el mínimo requerido por la sección. */
   protected eliminarRol(indice: number): void {
+    if (this.esSoloLectura()) return;
     const roles = this.formulario.controls.roles;
     if (roles.length <= 1) return;
 
@@ -100,6 +112,7 @@ export class FormularioRolesProyecto {
 
   /** Solicita persistir los valores cuando todos los perfiles están completos. */
   protected enviar(): void {
+    if (this.esSoloLectura()) return;
     this.validarNombresRepetidos();
     if (this.formulario.invalid) {
       this.formulario.markAllAsTouched();

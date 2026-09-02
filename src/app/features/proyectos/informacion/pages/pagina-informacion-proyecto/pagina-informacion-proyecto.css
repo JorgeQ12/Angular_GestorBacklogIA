@@ -1,0 +1,28 @@
+:host {
+  display: block;
+}
+.pagina-informacion {
+  display: grid;
+  gap: var(--space-5);
+}
+.pagina-informacion__estructura {
+  display: grid;
+  grid-template-columns: 17rem minmax(0, 1fr);
+  align-items: start;
+  gap: var(--space-5);
+}
+.pagina-informacion__contenido {
+  min-width: 0;
+}
+.pagina-informacion__historica {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--text-inverse-muted);
+  font-size: var(--font-size-xs);
+}
+@media (max-width: 900px) {
+  .pagina-informacion__estructura {
+    grid-template-columns: 1fr;
+  }
+}

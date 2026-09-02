@@ -17,6 +17,7 @@ import {
   ETIQUETAS_TIPO_BLOQUE_FLUJO,
   ICONOS_TIPO_BLOQUE_FLUJO,
   MENSAJES_FORMULARIO_NODO_FLUJO,
+  POLITICA_ROLES_POR_TIPO_BLOQUE,
 } from '../../config/flujo-proyecto.config';
 import {
   FormularioFranjaActividadModulo,
@@ -24,7 +25,10 @@ import {
 } from '../../models/formulario-nodo-flujo-proyecto.model';
 import {
   BorradorNodoFlujo,
+  DiaSemanaFlujo,
   FranjaMayorActividadModulo,
+  ModoEditorNodoFlujo,
+  PoliticaRolesBloqueFlujo,
   TipoBloqueFlujo,
 } from '../../models/flujo-proyecto.model';
 import { EstadoEditorFlujoProyectoService } from '../../services/estado-editor-flujo-proyecto.service';
@@ -67,16 +71,20 @@ export class ModalNodoFlujoProyecto {
   protected readonly formulario = computed(() => this.formularioSenal());
   protected readonly idFormulario = 'formulario-nodo-flujo-proyecto';
   protected readonly iconosTipo = ICONOS_TIPO_BLOQUE_FLUJO;
+  protected readonly modosEditorNodo = ModoEditorNodoFlujo;
+  protected readonly tiposBloque = TipoBloqueFlujo;
   protected readonly mensajesFormulario = MENSAJES_FORMULARIO_NODO_FLUJO;
   protected readonly encabezadoModal = computed(() =>
     this.estadoEditor.soloLectura()
       ? 'Versión histórica'
-      : this.estadoModal()?.modo === 'crear'
+      : this.estadoModal()?.modo === ModoEditorNodoFlujo.Crear
         ? 'Nuevo bloque del flujo'
         : 'Edición del bloque',
   );
   protected readonly textoAccionPrincipal = computed(() =>
-    this.estadoModal()?.modo === 'crear' ? 'Crear bloque' : 'Guardar cambios',
+    this.estadoModal()?.modo === ModoEditorNodoFlujo.Crear
+      ? 'Crear bloque'
+      : 'Guardar cambios',
   );
   protected readonly etiquetaTipo = computed(() => {
     const tipo = this.estadoModal()?.tipo;
@@ -94,7 +102,7 @@ export class ModalNodoFlujoProyecto {
       return `Detalle de ${this.obtenerEtiquetaTipo(estado.tipo)}`;
     }
 
-    return estado.modo === 'crear'
+    return estado.modo === ModoEditorNodoFlujo.Crear
       ? `Configurar ${this.obtenerEtiquetaTipo(estado.tipo)}`
       : `Editar ${this.obtenerEtiquetaTipo(estado.tipo)}`;
   });
@@ -106,7 +114,7 @@ export class ModalNodoFlujoProyecto {
       return 'Consulta la información que tenía este bloque en la versión seleccionada.';
     }
 
-    return estado.modo === 'crear'
+    return estado.modo === ModoEditorNodoFlujo.Crear
       ? 'Completa la información necesaria antes de incorporar este bloque al recorrido.'
       : 'Actualiza la información del bloque sin perder sus conexiones actuales.';
   });
@@ -118,7 +126,7 @@ export class ModalNodoFlujoProyecto {
 
       const bloque = this.estadoEditor.bloqueEnEdicion();
       const borrador =
-        estado.modo === 'editar' && bloque
+        estado.modo === ModoEditorNodoFlujo.Editar && bloque
           ? this.estadoEditor.obtenerBorradorDesdeNodo(bloque)
           : this.estadoEditor.obtenerBorradorPredeterminado(estado.tipo);
       const formulario = this.construirFormulario(borrador);
@@ -150,14 +158,17 @@ export class ModalNodoFlujoProyecto {
   private construirFormulario(borrador: BorradorNodoFlujo): FormularioNodoFlujoProyecto {
     const esModulo = borrador.tipo === TipoBloqueFlujo.Modulo;
     const esComponente = borrador.tipo === TipoBloqueFlujo.Componente;
+    const politicaRoles = POLITICA_ROLES_POR_TIPO_BLOQUE[borrador.tipo];
+    const rolesAplican = politicaRoles !== PoliticaRolesBloqueFlujo.NoAplica;
+    const rolesObligatorios = politicaRoles === PoliticaRolesBloqueFlujo.Obligatoria;
 
     return this.constructorFormulario.group({
       titulo: this.constructorFormulario.control(borrador.titulo, Validators.required),
       descripcion: this.constructorFormulario.control(borrador.descripcion, Validators.required),
       criteriosAceptacion: this.crearCriteriosAceptacion(borrador.criteriosAceptacion),
       nombresRoles: this.constructorFormulario.control(
-        borrador.nombresRoles.join(', '),
-        Validators.required,
+        rolesAplican ? borrador.nombresRoles.join(', ') : '',
+        rolesObligatorios ? Validators.required : [],
       ),
       permisosRoles: this.constructorFormulario.control(
         esModulo ? borrador.datos.permisosRoles : [],
@@ -254,7 +265,7 @@ export class ModalNodoFlujoProyecto {
     return this.constructorFormulario.array(
       valores.map((franja) =>
         this.constructorFormulario.group({
-          dias: this.constructorFormulario.control<string[]>(franja.dias),
+          dias: this.constructorFormulario.control<DiaSemanaFlujo[]>(franja.dias),
           horaInicio: this.constructorFormulario.control(franja.horaInicio),
           horaFin: this.constructorFormulario.control(franja.horaFin),
         }),

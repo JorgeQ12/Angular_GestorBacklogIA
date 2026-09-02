@@ -100,6 +100,10 @@
   background: var(--card-footer-surface);
 }
 
+.ui-form-footer--acciones-al-final {
+  justify-content: flex-end;
+}
+
 .ui-form-footer__note {
   display: flex;
   min-width: 0;
@@ -117,6 +121,12 @@
   width: var(--font-size-base);
   height: var(--font-size-base);
   flex: 0 0 auto;
+}
+
+.ui-form-footer__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
 }
 
 .ui-label {
@@ -209,6 +219,17 @@
   background: var(--field-surface-disabled);
   color: var(--text-disabled);
   opacity: 0.75;
+}
+
+.ui-control[readonly] {
+  border-color: var(--field-border);
+  background: var(--surface-default);
+  cursor: default;
+}
+
+.ui-control[readonly]:hover {
+  border-color: var(--field-border);
+  background: var(--surface-default);
 }
 
 .ui-control-icon {
@@ -409,5 +430,9 @@
 
   .ui-form-footer .ui-button {
     width: 100%;
+  }
+
+  .ui-form-footer__actions {
+    flex-direction: column-reverse;
   }
 }

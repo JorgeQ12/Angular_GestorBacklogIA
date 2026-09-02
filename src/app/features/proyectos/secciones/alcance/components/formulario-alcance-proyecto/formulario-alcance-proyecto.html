@@ -1,4 +1,5 @@
 <form
+  [attr.id]="idFormulario()"
   class="formulario-alcance"
   [formGroup]="formulario"
   [appMensajesFormulario]="mensajesFormulario"
@@ -8,7 +9,9 @@
     <div class="ui-field">
       <div class="formulario-alcance__label">
         <label class="ui-label" for="alcance-incluido">Incluido en el proyecto</label>
-        <span>{{ formulario.controls.incluido.value.length }}/{{ limites.incluido }}</span>
+        @if (!esSoloLectura()) {
+          <span>{{ formulario.controls.incluido.value.length }}/{{ limites.incluido }}</span>
+        }
       </div>
       <textarea
         id="alcance-incluido"
@@ -17,6 +20,7 @@
         [maxlength]="limites.incluido"
         placeholder="Describe los entregables, procesos, módulos o resultados que sí forman parte del proyecto."
         rows="8"
+        [readOnly]="esSoloLectura()"
         required
         appErrorCampo
       ></textarea>
@@ -25,7 +29,9 @@
     <div class="ui-field">
       <div class="formulario-alcance__label">
         <label class="ui-label" for="alcance-excluido">Fuera del alcance</label>
-        <span>{{ formulario.controls.excluido.value.length }}/{{ limites.excluido }}</span>
+        @if (!esSoloLectura()) {
+          <span>{{ formulario.controls.excluido.value.length }}/{{ limites.excluido }}</span>
+        }
       </div>
       <textarea
         id="alcance-excluido"
@@ -34,11 +40,10 @@
         [maxlength]="limites.excluido"
         placeholder="Aclara las funcionalidades, integraciones o resultados que no se contemplarán en el proyecto."
         rows="8"
+        [readOnly]="esSoloLectura()"
         required
         appErrorCampo
       ></textarea>
     </div>
   </div>
-
-  <ng-content select="[accionesFormularioAlcance]" />
 </form>

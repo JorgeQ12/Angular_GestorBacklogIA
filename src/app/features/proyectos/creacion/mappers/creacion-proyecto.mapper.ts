@@ -14,10 +14,10 @@ import {
   VinculacionAzureDto,
   VinculacionAzureSolicitudDto,
 } from '../models/vinculacion-azure.dto';
-import {
+import type {
   DatosVinculacionAzure,
   ResultadoVinculacionAzure,
-} from '../models/vinculacion-azure.model';
+} from '../../models/vinculacion-azure-proyecto.model';
 import { OrigenEquipoAzureProyecto } from '../../secciones/equipo/models/equipo-proyecto.model';
 
 /** Traduce los nombres de la interfaz al contrato esperado por el backend. */

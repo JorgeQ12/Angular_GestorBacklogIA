@@ -1,0 +1,41 @@
+<footer
+  class="ui-form-footer"
+  [class.ui-form-footer--acciones-al-final]="configuracion().alineacion === alineaciones.Fin"
+>
+  @if (configuracion().nota; as nota) {
+    <div class="ui-form-footer__note">
+      <app-icono nombre="informacion" aria-hidden="true" />
+      <p>{{ nota }}</p>
+    </div>
+  }
+
+  <div class="ui-form-footer__actions">
+    @if (configuracion().textoSecundario; as textoSecundario) {
+      <button
+        type="button"
+        class="ui-button ui-button--secondary ui-button--md"
+        [disabled]="procesando()"
+        (click)="cancelar.emit()"
+      >
+        @if (configuracion().iconoSecundario; as iconoSecundario) {
+          <app-icono class="ui-button__icon" [nombre]="iconoSecundario" />
+        }
+        {{ textoSecundario }}
+      </button>
+    }
+
+    <button
+      type="button"
+      [attr.form]="idFormulario()"
+      class="ui-button ui-button--primary ui-button--md"
+      [disabled]="procesando()"
+      (click)="ejecutarAccionPrincipal()"
+    >
+      {{ configuracion().textoPrincipal }}
+      <app-icono
+        class="ui-button__icon ui-button__icon--trailing"
+        [nombre]="configuracion().iconoPrincipal"
+      />
+    </button>
+  </div>
+</footer>

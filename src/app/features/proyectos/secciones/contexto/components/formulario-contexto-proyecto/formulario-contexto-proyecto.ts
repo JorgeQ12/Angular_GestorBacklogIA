@@ -19,6 +19,7 @@ import { validarTextoRequerido } from '../../../../../../shared/forms/validadore
 import { SelectorCampo } from '../../../../../../shared/forms/controles/selector-campo/selector-campo';
 import { OpcionSelector } from '../../../../../../shared/forms/controles/selector-campo/models/opcion-selector.model';
 import { SelectorFecha } from '../../../../../../shared/forms/controles/selector-fecha/selector-fecha';
+import { ModoFormularioProyecto } from '../../../../models/modo-formulario-proyecto.model';
 import {
   LIMITES_CONTEXTO_PROYECTO,
   MENSAJES_CONTEXTO_PROYECTO,
@@ -44,6 +45,9 @@ export class FormularioContextoProyecto {
   private readonly constructorFormulario = inject(NonNullableFormBuilder);
   private readonly destroyRef = inject(DestroyRef);
 
+  /** Identifica el formulario para permitir acciones externas mediante el atributo form. */
+  public readonly idFormulario = input<string | null>(null);
+
   /** Proporciona los valores que deben presentarse en el formulario. */
   public readonly datosIniciales = input<ContextoProyecto | null>(null);
 
@@ -53,14 +57,18 @@ export class FormularioContextoProyecto {
   /** Bloquea temporalmente los controles durante la operación coordinada por la página. */
   public readonly procesando = input(false);
 
+  /** Define si la sección permite modificar sus valores o únicamente consultarlos. */
+  public readonly modo = input(ModoFormularioProyecto.Edicion);
+
   /** Entrega un Contexto válido y normalizado al flujo consumidor. */
   public readonly guardar = output<ContextoProyecto>();
 
-  /** Comunica el nombre usado para identificar el proyecto fuera del formulario. */
-  public readonly nombreCambiado = output<string>();
+  /** Comunica la fotografía vigente para previsualizar datos fuera del formulario. */
+  public readonly contextoCambiado = output<ContextoProyecto>();
 
   protected readonly limites = LIMITES_CONTEXTO_PROYECTO;
   protected readonly mensajesFormulario = MENSAJES_CONTEXTO_PROYECTO;
+  protected readonly esSoloLectura = computed(() => this.modo() === ModoFormularioProyecto.Lectura);
   protected readonly opcionesPrioridad = computed<readonly OpcionSelector[]>(() =>
     this.prioridades().map((prioridad) => ({
       valor: prioridad.id,
@@ -80,11 +88,12 @@ export class FormularioContextoProyecto {
     });
 
   public constructor() {
-    this.formulario.controls.nombre.valueChanges
+    this.formulario.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((nombre) => this.nombreCambiado.emit(nombre.trim()));
+      .subscribe(() => this.contextoCambiado.emit(this.obtenerContextoVigente()));
 
     effect(() => {
+      this.modo();
       const datos = this.datosIniciales();
 
       if (datos) {
@@ -103,18 +112,23 @@ export class FormularioContextoProyecto {
 
   /** Solicita persistir los valores cuando todos los campos son válidos. */
   protected enviar(): void {
+    if (this.esSoloLectura()) return;
     if (this.formulario.invalid) {
       this.formulario.markAllAsTouched();
       return;
     }
 
+    this.guardar.emit(this.obtenerContextoVigente());
+  }
+
+  private obtenerContextoVigente(): ContextoProyecto {
     const valores = this.formulario.getRawValue();
-    this.guardar.emit({
+    return {
       nombre: valores.nombre.trim(),
       responsable: valores.responsable.trim(),
       fechaObjetivo: valores.fechaObjetivo,
-      prioridadCatalogoId: valores.prioridadCatalogoId!,
+      prioridadCatalogoId: valores.prioridadCatalogoId,
       descripcion: valores.descripcion.trim(),
-    });
+    };
   }
 }

@@ -29,6 +29,9 @@ export class TablaProyectos {
   /** Solicita reanudar un borrador desde el recorrido de creación. */
   public readonly continuarBorrador = output<ProyectoListado>();
 
+  /** Solicita consultar la información de un proyecto publicado. */
+  public readonly consultarProyecto = output<ProyectoListado>();
+
   /** Solicita otra página sin conocer la URL que la representa. */
   public readonly paginaCambiada = output<CambioPaginaListadoProyectos>();
 

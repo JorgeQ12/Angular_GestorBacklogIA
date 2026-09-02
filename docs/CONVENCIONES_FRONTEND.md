@@ -13,6 +13,8 @@ específicas se mantienen en documentos separados para evitar un archivo único 
 - [Formularios reactivos](FORMULARIOS_REACTIVOS.md): tipado, validación, mensajes y accesibilidad.
 - [Estilos del frontend](ESTILOS_FRONTEND.md): tokens, tipografía, primitivas y CSS encapsulado.
 - [Inicio único del panel](INICIO_PANEL.md): composición del resumen y evolución mediante permisos.
+- [Información y versiones de proyectos](INFORMACION_PROYECTOS.md): consulta integral, pasos,
+  modos de formulario y versionamiento.
 - [Integración con el backend](INTEGRACION_BACKEND.md): environments, DTO, mappers, servicios y
   errores.
 - [Listado de proyectos](LISTADO_PROYECTOS.md): portafolio, filtros, paginación y acciones por
@@ -92,8 +94,15 @@ layouts/panel/
 ```
 
 - El catálogo declara opciones; no consulta la sesión.
-- El servicio filtra el catálogo mediante permisos reactivos.
+- El servicio filtra el catálogo mediante permisos reactivos y agrega navegación contextual cuando
+  la URL identifica un agregado concreto.
 - La barra lateral solo representa los elementos recibidos.
+- Los subitems contextuales no inventan identidades: aparecen únicamente cuando la URL contiene el
+  identificador requerido y reutilizan los constructores de rutas canónicas de `core/navegacion`.
+- Los parámetros de consulta representan estado interno de una página y no cambian la opción activa
+  del menú. La coincidencia de navegación compara el path e ignora `queryParams` y fragmentos.
+- Los subitems se presentan con sangría y una guía visual conectada con su opción principal; no
+  repiten encabezados ni deben parecer tarjetas independientes del primer nivel.
 - El layout administra el shell y contiene el `router-outlet`.
 - Ocultar enlaces no reemplaza los guards de autorización de las rutas.
 - No se crean roles ficticios durante una migración incremental.

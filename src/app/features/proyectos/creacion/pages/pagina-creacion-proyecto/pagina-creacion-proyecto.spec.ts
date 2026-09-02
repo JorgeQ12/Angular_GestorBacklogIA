@@ -1,11 +1,12 @@
 import { TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { provideRouter, Router, Routes } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
-import { of } from 'rxjs';
-import { SEGMENTOS_RUTA } from '../../../../../core/navegacion/rutas';
+import { of, throwError } from 'rxjs';
+import { SEGMENTOS_RUTA, URL_INICIO_PANEL } from '../../../../../core/navegacion/rutas';
+import { PasoFlujoProyecto } from '../../../components/pasos/paso-flujo-proyecto/paso-flujo-proyecto';
 import { BorradorProyecto } from '../../models/borrador-proyecto.model';
-import { DatosVinculacionAzure } from '../../models/vinculacion-azure.model';
-import { ContenidoEncabezadoPasoCreacionService } from '../../services/contenido-encabezado-paso-creacion.service';
+import type { DatosVinculacionAzure } from '../../../models/vinculacion-azure-proyecto.model';
 import { CreacionProyectoService } from '../../services/creacion-proyecto.service';
 import { EstadoCreacionProyectoService } from '../../services/estado-creacion-proyecto.service';
 import { PaginaCreacionProyecto } from './pagina-creacion-proyecto';
@@ -14,7 +15,7 @@ const RUTAS: Routes = [
   {
     path: `${SEGMENTOS_RUTA.proyectos}/${SEGMENTOS_RUTA.creacion}`,
     component: PaginaCreacionProyecto,
-    providers: [EstadoCreacionProyectoService, ContenidoEncabezadoPasoCreacionService],
+    providers: [EstadoCreacionProyectoService],
   },
 ];
 
@@ -23,6 +24,7 @@ describe('PaginaCreacionProyecto', () => {
     obtenerBorrador: vi.fn(),
     validarVinculacionAzure: vi.fn(),
     crearBorrador: vi.fn(),
+    actualizarBorrador: vi.fn(),
     sincronizarEquipoAzure: vi.fn(),
   };
 
@@ -30,6 +32,7 @@ describe('PaginaCreacionProyecto', () => {
     vi.clearAllMocks();
     creacionProyecto.obtenerBorrador.mockReturnValue(of(BORRADOR_AVANZADO));
     creacionProyecto.crearBorrador.mockReturnValue(of({ id: 42, revision: 1, pasoActual: 1 }));
+    creacionProyecto.actualizarBorrador.mockReturnValue(of(BORRADOR_FLUJO));
 
     TestBed.configureTestingModule({
       imports: [PaginaCreacionProyecto],
@@ -46,7 +49,7 @@ describe('PaginaCreacionProyecto', () => {
 
     expect(obtenerPosicionRecorrido(elemento)).toBe('Paso 1 de 9');
     expect(elemento.querySelector('[aria-current="step"]')?.textContent).toContain('Azure DevOps');
-    expect(elemento.querySelector('app-vinculacion-azure')).not.toBeNull();
+    expect(elemento.querySelector('app-paso-vinculacion-azure-proyecto')).not.toBeNull();
     expect(elemento.querySelector('router-outlet')).toBeNull();
   });
 
@@ -60,12 +63,25 @@ describe('PaginaCreacionProyecto', () => {
     expect(elemento.querySelector('app-paso-objetivos-proyecto')).not.toBeNull();
   });
 
+  it('oculta el encabezado y el recorrido cuando falla la carga del borrador', async () => {
+    creacionProyecto.obtenerBorrador.mockReturnValueOnce(
+      throwError(() => new Error('Error de carga')),
+    );
+
+    const harness = await RouterTestingHarness.create('/proyectos/creacion?proyectoId=42');
+    const elemento = harness.routeNativeElement as HTMLElement;
+
+    expect(elemento.querySelector('app-estado-error')).not.toBeNull();
+    expect(elemento.querySelector('app-encabezado-pagina')).toBeNull();
+    expect(elemento.querySelector('app-recorrido-proyecto')).toBeNull();
+  });
+
   it('cambia solo el componente del paso y conserva la URL', async () => {
     const harness = await RouterTestingHarness.create('/proyectos/creacion?proyectoId=42');
     const elemento = harness.routeNativeElement as HTMLElement;
     const router = TestBed.inject(Router);
     const botonContexto = Array.from(
-      elemento.querySelectorAll<HTMLButtonElement>('.recorrido-creacion__boton'),
+      elemento.querySelectorAll<HTMLButtonElement>('.recorrido-proyecto__boton'),
     ).find((boton) => boton.textContent?.includes('Contexto del proyecto'));
 
     botonContexto?.click();
@@ -78,7 +94,7 @@ describe('PaginaCreacionProyecto', () => {
   it('habilita solo los pasos alcanzados por el borrador', async () => {
     const harness = await RouterTestingHarness.create('/proyectos/creacion?proyectoId=42');
     const botones = (harness.routeNativeElement as HTMLElement).querySelectorAll<HTMLButtonElement>(
-      '.recorrido-creacion__boton',
+      '.recorrido-proyecto__boton',
     );
 
     expect(botones[1].disabled).toBe(false);
@@ -105,8 +121,21 @@ describe('PaginaCreacionProyecto', () => {
     });
   });
 
+  it('regresa al inicio cuando el último paso confirma el guardado', async () => {
+    creacionProyecto.obtenerBorrador.mockReturnValue(of(BORRADOR_FLUJO));
+    const harness = await RouterTestingHarness.create('/proyectos/creacion?proyectoId=42');
+    const router = TestBed.inject(Router);
+    const navegar = vi.spyOn(router, 'navigateByUrl').mockResolvedValue(true);
+    const pasoFlujo = harness.routeDebugElement?.query(By.directive(PasoFlujoProyecto))
+      .componentInstance as PasoFlujoProyecto;
+
+    pasoFlujo.guardar.emit(pasoFlujo.datos());
+
+    expect(navegar).toHaveBeenCalledWith(URL_INICIO_PANEL);
+  });
+
   function obtenerPosicionRecorrido(elemento: HTMLElement): string {
-    return elemento.querySelector('.recorrido-creacion__posicion')?.textContent?.trim() ?? '';
+    return elemento.querySelector('.recorrido-proyecto__posicion')?.textContent?.trim() ?? '';
   }
 });
 
@@ -138,4 +167,10 @@ const BORRADOR_AVANZADO: BorradorProyecto = {
   equipoJson: '[]',
   diagramFlujoJson: '{}',
   fechaUltimoGuardado: '2026-08-25T12:00:00Z',
+};
+
+const BORRADOR_FLUJO: BorradorProyecto = {
+  ...BORRADOR_AVANZADO,
+  pasoActual: 8,
+  diagramFlujoJson: '{}',
 };

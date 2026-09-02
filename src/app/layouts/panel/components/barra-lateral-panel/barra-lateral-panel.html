@@ -27,20 +27,52 @@
 
   <nav id="navegacion-panel" class="navegacion-panel" aria-label="Secciones del aplicativo">
     @for (item of items(); track item.id) {
-      <a
-        class="navegacion-panel__enlace"
-        [routerLink]="item.ruta"
-        routerLinkActive="es-activo"
-        [routerLinkActiveOptions]="{ exact: item.coincidenciaExacta ?? false }"
-        ariaCurrentWhenActive="page"
-        [attr.aria-label]="item.descripcion"
-        [attr.title]="colapsada() ? item.etiqueta : null"
-      >
-        <span class="navegacion-panel__icono" aria-hidden="true">
-          <app-icono [nombre]="item.icono" />
-        </span>
-        <span class="navegacion-panel__texto">{{ item.etiqueta }}</span>
-      </a>
+      <div class="navegacion-panel__grupo">
+        <a
+          class="navegacion-panel__enlace"
+          [routerLink]="item.ruta"
+          routerLinkActive="es-activo"
+          [routerLinkActiveOptions]="obtenerCoincidenciaRuta(item.coincidenciaExacta)"
+          ariaCurrentWhenActive="page"
+          [attr.aria-label]="item.descripcion"
+          [attr.title]="colapsada() ? item.etiqueta : null"
+        >
+          <span class="navegacion-panel__icono" aria-hidden="true">
+            <app-icono [nombre]="item.icono" />
+          </span>
+          <span class="navegacion-panel__texto">{{ item.etiqueta }}</span>
+        </a>
+
+        @if (item.subitems?.length) {
+          <div class="navegacion-panel__subnavegacion">
+            <ul
+              class="navegacion-panel__subitems"
+              [attr.aria-label]="'Opciones de ' + item.etiqueta"
+            >
+              @for (subitem of item.subitems; track subitem.id) {
+                <li>
+                  <a
+                    class="navegacion-panel__subenlace"
+                    [routerLink]="subitem.ruta"
+                    routerLinkActive="es-activo"
+                    [routerLinkActiveOptions]="
+                      obtenerCoincidenciaRuta(subitem.coincidenciaExacta ?? true)
+                    "
+                    ariaCurrentWhenActive="page"
+                    [attr.aria-label]="subitem.descripcion"
+                    [attr.title]="colapsada() ? subitem.etiqueta : null"
+                  >
+                    <span class="navegacion-panel__subicono" aria-hidden="true">
+                      <app-icono [nombre]="subitem.icono" />
+                    </span>
+                    <span class="navegacion-panel__texto">{{ subitem.etiqueta }}</span>
+                  </a>
+                </li>
+              }
+            </ul>
+          </div>
+        }
+      </div>
     }
   </nav>
 

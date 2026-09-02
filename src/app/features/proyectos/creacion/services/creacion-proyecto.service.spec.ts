@@ -11,7 +11,7 @@ import {
   SincronizarEquipoAzureRespuestaDto,
   ValidarVinculacionAzureRespuestaDto,
 } from '../models/vinculacion-azure.dto';
-import { DatosVinculacionAzure } from '../models/vinculacion-azure.model';
+import type { DatosVinculacionAzure } from '../../models/vinculacion-azure-proyecto.model';
 import { CreacionProyectoService } from './creacion-proyecto.service';
 
 const DATOS: DatosVinculacionAzure = {

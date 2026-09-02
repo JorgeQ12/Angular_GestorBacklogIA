@@ -1,0 +1,178 @@
+<section class="pagina-informacion" aria-labelledby="titulo-informacion-proyecto">
+  @if (estado.errorCarga()) {
+    <app-estado-error
+      [titulo]="mensajeError.titulo"
+      [descripcion]="mensajeError.descripcion"
+      [reintentable]="true"
+      (reintentar)="recargar()"
+    />
+  } @else if (estado.proyectoPresentado(); as proyecto) {
+    <app-encabezado-pagina
+      idTitulo="titulo-informacion-proyecto"
+      etiqueta="Proyecto"
+      [titulo]="datosEncabezado().nombre"
+      descripcion="Consulta la definición integral y su historial de cambios."
+      icono="proyectos"
+    >
+      <span encabezadoPaginaMetadatos class="ui-page-header__meta-item">
+        RESPONSABLE <strong>{{ datosEncabezado().responsable }}</strong>
+      </span>
+      <span encabezadoPaginaMetadatos class="ui-page-header__meta-item">
+        Prioridad <strong>{{ datosEncabezado().prioridad }}</strong>
+      </span>
+      <span encabezadoPaginaMetadatos class="ui-page-header__meta-item">
+        {{ datosEncabezado().fechaObjetivo | fecha: 'breve' : 'Sin fecha objetivo' }}
+      </span>
+      @if (!proyecto.esVersionActual) {
+        <span encabezadoPaginaMetadatos class="pagina-informacion__historica">
+          <app-icono nombre="bloqueado" /> Solo lectura
+        </span>
+      }
+      <button
+        encabezadoPaginaAcciones
+        type="button"
+        class="ui-button ui-button--primary ui-button--on-inverse ui-button--md"
+        (click)="volver()"
+      >
+        <app-icono class="ui-button__icon" nombre="volver" /> Volver a proyectos
+      </button>
+    </app-encabezado-pagina>
+
+    <div class="pagina-informacion__estructura">
+      <app-recorrido-proyecto
+        titulo="Recorrido del proyecto"
+        [pasoActual]="pasoActivo()"
+        [pasosNavegables]="pasosNavegables"
+        [mostrarProgreso]="false"
+        (pasoSeleccionado)="cambiarPaso($event)"
+      />
+
+      <main class="pagina-informacion__contenido">
+        @switch (pasoActivo()) {
+          @case (pasoAzure) {
+            <app-paso-vinculacion-azure-proyecto
+              [vinculacion]="proyecto.azure"
+              [versionamiento]="versionamientoPaso()"
+              (versionCambiada)="cambiarVersion($event)"
+            />
+          }
+          @case (secciones.Contexto) {
+            <app-paso-contexto-proyecto
+              [datos]="proyecto.contexto"
+              [prioridades]="prioridades()"
+              [modo]="modoFormulario()"
+              [editable]="proyecto.esVersionActual"
+              [acciones]="accionesInformacion"
+              [procesando]="estado.guardando()"
+              [versionamiento]="versionamientoPaso()"
+              (editar)="editar(secciones.Contexto)"
+              (cancelar)="cancelarEdicion()"
+              (contextoCambiado)="actualizarContextoTemporal($event)"
+              (versionCambiada)="cambiarVersion($event)"
+              (guardar)="guardar({ seccion: secciones.Contexto, datos: $event })"
+            />
+          }
+          @case (secciones.TipoSolucion) {
+            <app-paso-tipo-solucion-proyecto
+              [datos]="proyecto.tipoSolucion"
+              [modo]="modoFormulario()"
+              [editable]="proyecto.esVersionActual"
+              [acciones]="accionesInformacion"
+              [procesando]="estado.guardando()"
+              [versionamiento]="versionamientoPaso()"
+              (editar)="editar(secciones.TipoSolucion)"
+              (cancelar)="cancelarEdicion()"
+              (versionCambiada)="cambiarVersion($event)"
+              (guardar)="guardar({ seccion: secciones.TipoSolucion, datos: $event })"
+            />
+          }
+          @case (secciones.Necesidad) {
+            <app-paso-necesidad-proyecto
+              [datos]="proyecto.necesidad"
+              [modo]="modoFormulario()"
+              [editable]="proyecto.esVersionActual"
+              [acciones]="accionesInformacion"
+              [procesando]="estado.guardando()"
+              [versionamiento]="versionamientoPaso()"
+              (editar)="editar(secciones.Necesidad)"
+              (cancelar)="cancelarEdicion()"
+              (versionCambiada)="cambiarVersion($event)"
+              (guardar)="guardar({ seccion: secciones.Necesidad, datos: $event })"
+            />
+          }
+          @case (secciones.Objetivos) {
+            <app-paso-objetivos-proyecto
+              [datos]="proyecto.objetivos"
+              [modo]="modoFormulario()"
+              [editable]="proyecto.esVersionActual"
+              [acciones]="accionesInformacion"
+              [procesando]="estado.guardando()"
+              [versionamiento]="versionamientoPaso()"
+              (editar)="editar(secciones.Objetivos)"
+              (cancelar)="cancelarEdicion()"
+              (versionCambiada)="cambiarVersion($event)"
+              (guardar)="guardar({ seccion: secciones.Objetivos, datos: $event })"
+            />
+          }
+          @case (secciones.Alcance) {
+            <app-paso-alcance-proyecto
+              [datos]="proyecto.alcance"
+              [modo]="modoFormulario()"
+              [editable]="proyecto.esVersionActual"
+              [acciones]="accionesInformacion"
+              [procesando]="estado.guardando()"
+              [versionamiento]="versionamientoPaso()"
+              (editar)="editar(secciones.Alcance)"
+              (cancelar)="cancelarEdicion()"
+              (versionCambiada)="cambiarVersion($event)"
+              (guardar)="guardar({ seccion: secciones.Alcance, datos: $event })"
+            />
+          }
+          @case (secciones.Roles) {
+            <app-paso-roles-proyecto
+              [datos]="proyecto.roles"
+              [modo]="modoFormulario()"
+              [editable]="proyecto.esVersionActual"
+              [acciones]="accionesInformacion"
+              [procesando]="estado.guardando()"
+              [versionamiento]="versionamientoPaso()"
+              (editar)="editar(secciones.Roles)"
+              (cancelar)="cancelarEdicion()"
+              (versionCambiada)="cambiarVersion($event)"
+              (guardar)="guardar({ seccion: secciones.Roles, datos: $event })"
+            />
+          }
+          @case (secciones.Equipo) {
+            <app-paso-equipo-proyecto
+              [datos]="proyecto.equipo"
+              [nombreEquipo]="proyecto.azure?.teamNombre ?? 'Team de Azure DevOps'"
+              [modo]="modoFormulario()"
+              [editable]="proyecto.esVersionActual"
+              [acciones]="accionesInformacion"
+              [procesando]="estado.guardando()"
+              [versionamiento]="versionamientoPaso()"
+              (editar)="editar(secciones.Equipo)"
+              (cancelar)="cancelarEdicion()"
+              (versionCambiada)="cambiarVersion($event)"
+              (guardar)="guardar({ seccion: secciones.Equipo, datos: $event })"
+            />
+          }
+          @case (secciones.Flujo) {
+            <app-paso-flujo-proyecto
+              [datos]="proyecto.flujo"
+              [modo]="modoFormulario()"
+              [editable]="proyecto.esVersionActual"
+              [acciones]="accionesInformacion"
+              [procesando]="estado.guardando()"
+              [versionamiento]="versionamientoPaso()"
+              (editar)="editar(secciones.Flujo)"
+              (cancelar)="cancelarEdicion()"
+              (versionCambiada)="cambiarVersion($event)"
+              (guardar)="guardar({ seccion: secciones.Flujo, datos: $event })"
+            />
+          }
+        }
+      </main>
+    </div>
+  }
+</section>

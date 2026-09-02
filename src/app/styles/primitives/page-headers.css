@@ -100,7 +100,7 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: var(--space-2);
+  gap: var(--space-1);
   margin-top: var(--space-2);
 }
 
@@ -112,10 +112,11 @@
 
 .ui-page-header__meta-item {
   display: inline-flex;
-  min-height: var(--control-height-sm);
+  min-height: var(--space-8);
   align-items: center;
   gap: var(--space-1);
-  padding-inline: var(--space-3);
+  padding-block: 2px 0;
+  padding-inline: var(--space-2);
   border: var(--border-width) solid var(--page-header-control-border);
   border-radius: var(--radius-pill);
   background: var(--page-header-control-surface);
@@ -128,7 +129,7 @@
 
 .ui-page-header__meta-item strong {
   color: var(--page-header-text);
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-2xs);
 }
 
 .ui-page-header__aside {

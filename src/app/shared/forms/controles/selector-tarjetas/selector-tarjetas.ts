@@ -40,6 +40,9 @@ export class SelectorTarjetas implements ControlValueAccessor, ControlCampoPerso
   public readonly etiquetadoPor = input<string>();
   public readonly columnas = input<2 | 3>(2);
 
+  /** Conserva la alternativa seleccionada sin permitir cambios. */
+  public readonly soloLectura = input(false);
+
   protected readonly valor = signal<ValorSelectorTarjeta | null>(null);
   protected readonly deshabilitado = signal(false);
   protected readonly conError = signal(false);
@@ -80,7 +83,7 @@ export class SelectorTarjetas implements ControlValueAccessor, ControlCampoPerso
 
   /** Confirma una opción habilitada y comunica el cambio al formulario. */
   protected seleccionar(opcion: OpcionSelectorTarjeta): void {
-    if (this.deshabilitado() || opcion.deshabilitada) return;
+    if (this.soloLectura() || this.deshabilitado() || opcion.deshabilitada) return;
     this.valor.set(opcion.valor);
     this.notificarCambio(opcion.valor);
     this.notificarTocado();
@@ -88,6 +91,11 @@ export class SelectorTarjetas implements ControlValueAccessor, ControlCampoPerso
 
   /** Informa que el usuario abandonó una opción del grupo. */
   protected marcarTocado(): void {
-    this.notificarTocado();
+    if (!this.soloLectura()) this.notificarTocado();
+  }
+
+  /** Evita que el comportamiento nativo del radio altere una selección de consulta. */
+  protected impedirSeleccionEnLectura(evento: Event): void {
+    if (this.soloLectura()) evento.preventDefault();
   }
 }

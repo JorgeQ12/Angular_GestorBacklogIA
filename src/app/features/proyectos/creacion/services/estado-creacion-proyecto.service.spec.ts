@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { firstValueFrom, of } from 'rxjs';
 import { ClaveSeccionProyecto } from '../../config/secciones-proyecto.config';
 import { PlataformaSolucion } from '../../secciones/tipo-solucion/models/tipo-solucion-proyecto.model';
-import { ActualizacionSeccionBorrador } from '../models/actualizacion-seccion-borrador.model';
+import { ActualizacionSeccionProyecto } from '../../models/actualizacion-seccion-proyecto.model';
 import { BorradorProyecto } from '../models/borrador-proyecto.model';
 import { CreacionProyectoService } from './creacion-proyecto.service';
 import { EstadoCreacionProyectoService } from './estado-creacion-proyecto.service';
@@ -20,7 +20,7 @@ describe('EstadoCreacionProyectoService', () => {
     creacionProyecto.actualizarBorrador.mockImplementation(
       (
         borrador: BorradorProyecto,
-        actualizacion: ActualizacionSeccionBorrador,
+        actualizacion: ActualizacionSeccionProyecto,
         pasoActual: number,
       ) =>
         of({

@@ -1,16 +1,23 @@
+import { DOCUMENT } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   effect,
+  ElementRef,
+  HostListener,
   inject,
   input,
   output,
+  signal,
+  viewChild,
 } from '@angular/core';
 import { LienzoFlujoProyecto } from '../lienzo-flujo-proyecto/lienzo-flujo-proyecto';
 import { ModalNodoFlujoProyecto } from '../modal-nodo-flujo-proyecto/modal-nodo-flujo-proyecto';
 import { PanelLateralFlujoProyecto } from '../panel-lateral-flujo-proyecto/panel-lateral-flujo-proyecto';
 import { FlujoProyecto } from '../../models/flujo-proyecto.model';
 import { EstadoEditorFlujoProyectoService } from '../../services/estado-editor-flujo-proyecto.service';
+import { ModoFormularioProyecto } from '../../../../models/modo-formulario-proyecto.model';
 
 /** Presenta y edita el flujo sin conocer rutas, HTTP ni el borrador de creación. */
 @Component({
@@ -26,7 +33,10 @@ import { EstadoEditorFlujoProyectoService } from '../../services/estado-editor-f
   styleUrl: './editor-flujo-proyecto.css',
 })
 export class EditorFlujoProyecto {
+  private readonly documento = inject(DOCUMENT);
+  private readonly contenedorEditor = viewChild.required<ElementRef<HTMLElement>>('contenedorEditor');
   protected readonly estadoEditor = inject(EstadoEditorFlujoProyectoService);
+  protected readonly pantallaCompleta = signal(false);
 
   /** Proporciona la fotografía canónica que debe presentar el editor. */
   public readonly flujo = input.required<FlujoProyecto>();
@@ -34,8 +44,19 @@ export class EditorFlujoProyecto {
   /** Bloquea temporalmente la edición durante el guardado remoto. */
   public readonly procesando = input(false);
 
+  /** Indica si el consumidor conserva una fotografía pendiente de guardado. */
+  public readonly cambiosPendientes = input(false);
+
+  /** Define si el diagrama admite cambios o se presenta como fotografía confirmada. */
+  public readonly modo = input(ModoFormularioProyecto.Edicion);
+
   /** Comunica una nueva fotografía cada vez que cambia el diagrama. */
   public readonly flujoCambiado = output<FlujoProyecto>();
+
+  /** Solicita al consumidor persistir el flujo sin abandonar el editor. */
+  public readonly guardarSolicitado = output<void>();
+
+  protected readonly esSoloLectura = computed(() => this.modo() === ModoFormularioProyecto.Lectura);
 
   private fotografiaHidratada = '';
   private fotografiaEmitida = '';
@@ -57,7 +78,9 @@ export class EditorFlujoProyecto {
       this.editorHidratado = true;
     });
 
-    effect(() => this.estadoEditor.establecerSoloLectura(this.procesando()));
+    effect(() =>
+      this.estadoEditor.establecerSoloLectura(this.procesando() || this.esSoloLectura()),
+    );
 
     effect(() => {
       const flujo = this.estadoEditor.flujo();
@@ -73,5 +96,29 @@ export class EditorFlujoProyecto {
       this.fotografiaEmitida = fotografia;
       queueMicrotask(() => this.flujoCambiado.emit(structuredClone(flujo)));
     });
+  }
+
+  /** Alterna el editor entre su tamaño integrado y la pantalla completa del navegador. */
+  protected async alternarPantallaCompleta(): Promise<void> {
+    const contenedor = this.contenedorEditor().nativeElement;
+
+    try {
+      if (this.documento.fullscreenElement === contenedor) {
+        await this.documento.exitFullscreen();
+      } else if (typeof contenedor.requestFullscreen === 'function') {
+        await contenedor.requestFullscreen();
+      }
+    } catch {
+      // El navegador puede rechazar la solicitud si pierde la activación del usuario.
+    } finally {
+      this.sincronizarPantallaCompleta();
+    }
+  }
+
+  @HostListener('document:fullscreenchange')
+  protected sincronizarPantallaCompleta(): void {
+    this.pantallaCompleta.set(
+      this.documento.fullscreenElement === this.contenedorEditor().nativeElement,
+    );
   }
 }

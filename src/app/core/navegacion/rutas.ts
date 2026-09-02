@@ -6,6 +6,7 @@ export const SEGMENTOS_RUTA = {
   creacion: 'creacion',
   iniciarSesion: 'iniciar-sesion',
   inicio: 'inicio',
+  informacion: 'informacion',
   panel: 'panel',
   planificacion: 'planificacion',
   proyectos: 'proyectos',
@@ -17,12 +18,24 @@ export const PARAMETROS_RUTA = {
   nombreProyecto: 'nombre',
   pagina: 'pagina',
   proyectoId: 'proyectoId',
+  pasoProyecto: 'paso',
+  versionProyectoId: 'version',
   responsableProyecto: 'responsable',
 } as const;
 
 /** Obtiene un identificador de proyecto válido desde un mapa de parámetros. */
 export function obtenerProyectoIdRuta(parametros: ParamMap): number | null {
   const proyectoId = Number(parametros.get(PARAMETROS_RUTA.proyectoId));
+  return Number.isInteger(proyectoId) && proyectoId > 0 ? proyectoId : null;
+}
+
+/** Obtiene el proyecto contextual desde una URL interna del dominio. */
+export function obtenerProyectoIdUrl(url: string): number | null {
+  const ruta = url.split(/[?#]/, 1)[0];
+  const prefijoProyecto = `${URL_PROYECTOS}/`;
+  if (!ruta.startsWith(prefijoProyecto)) return null;
+
+  const proyectoId = Number(ruta.slice(prefijoProyecto.length).split('/', 1)[0]);
   return Number.isInteger(proyectoId) && proyectoId > 0 ? proyectoId : null;
 }
 
@@ -62,6 +75,11 @@ export function crearUrlCreacionProyecto(proyectoId: number | string): string {
   return `${URL_CREACION_PROYECTO}?${PARAMETROS_RUTA.proyectoId}=${encodeURIComponent(
     String(proyectoId),
   )}`;
+}
+
+/** Construye la URL canónica de información de un proyecto publicado. */
+export function crearUrlInformacionProyecto(proyectoId: number | string): string {
+  return `${URL_PROYECTOS}/${encodeURIComponent(String(proyectoId))}/${SEGMENTOS_RUTA.informacion}`;
 }
 
 /** Construye la URL de planificación de un proyecto. */

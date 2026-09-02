@@ -1,5 +1,6 @@
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ModoFormularioProyecto } from '../../../../models/modo-formulario-proyecto.model';
 import { EquipoProyecto } from '../../models/equipo-proyecto.model';
 import { FormularioEquipoProyecto } from './formulario-equipo-proyecto';
 
@@ -143,6 +144,19 @@ describe('FormularioEquipoProyecto', () => {
 
   it('entrega la edición vigente a la página coordinadora', () => {
     expect(fixture.componentInstance.obtenerDatosVigentes()).toEqual(EQUIPO);
+  });
+
+  it('presenta todos los integrantes sin selección ni herramientas en modo lectura', () => {
+    fixture.componentRef.setInput('modo', ModoFormularioProyecto.Lectura);
+    fixture.detectChanges();
+
+    const elemento = obtenerElemento();
+    expect(elemento.querySelector('.formulario-equipo__herramientas')).toBeNull();
+    expect(elemento.querySelector('.ui-checkbox')).toBeNull();
+    expect(elemento.querySelectorAll('.formulario-equipo__fila')).toHaveLength(2);
+    expect(elemento.querySelector('#equipo-perfil-u1-control')?.getAttribute('aria-readonly')).toBe(
+      'true',
+    );
   });
 
   function pulsarBoton(texto: string): void {

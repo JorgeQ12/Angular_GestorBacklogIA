@@ -1,7 +1,21 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { IsActiveMatchOptions, RouterLink, RouterLinkActive } from '@angular/router';
 import { IconoComponent } from '../../../../shared/components/icono/icono.component';
 import { ItemNavegacionPanel } from '../../models/item-navegacion-panel.model';
+
+const COINCIDENCIA_EXACTA_SIN_CONSULTA: IsActiveMatchOptions = {
+  paths: 'exact',
+  queryParams: 'ignored',
+  matrixParams: 'ignored',
+  fragment: 'ignored',
+};
+
+const COINCIDENCIA_PARCIAL_SIN_CONSULTA: IsActiveMatchOptions = {
+  paths: 'subset',
+  queryParams: 'ignored',
+  matrixParams: 'ignored',
+  fragment: 'ignored',
+};
 
 /** Presenta la marca y las opciones disponibles de la navegación principal. */
 @Component({
@@ -35,5 +49,10 @@ export class BarraLateralPanel {
   /** Gestiona la solicitud de salida del aplicativo. */
   protected solicitarCierreSesion(): void {
     this.cerrarSesion.emit();
+  }
+
+  /** Mantiene activa la opción al cambiar estado interno mediante parámetros de consulta. */
+  protected obtenerCoincidenciaRuta(exacta = false): IsActiveMatchOptions {
+    return exacta ? COINCIDENCIA_EXACTA_SIN_CONSULTA : COINCIDENCIA_PARCIAL_SIN_CONSULTA;
   }
 }

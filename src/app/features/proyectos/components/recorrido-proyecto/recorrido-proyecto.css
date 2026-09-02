@@ -1,0 +1,278 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.recorrido-proyecto {
+  position: sticky;
+  top: var(--space-4);
+  overflow: hidden;
+  border: var(--border-width) solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--surface-subtle);
+  box-shadow: var(--shadow-sm);
+}
+
+.recorrido-proyecto__encabezado {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4);
+}
+
+.recorrido-proyecto__titulo {
+  color: var(--text-primary);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+}
+
+.recorrido-proyecto__posicion {
+  color: var(--text-secondary);
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-snug);
+  white-space: nowrap;
+}
+
+.recorrido-proyecto__progreso {
+  height: var(--space-1);
+  margin: 0 var(--space-4);
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--surface-muted);
+}
+
+.recorrido-proyecto__progreso span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--color-brand);
+  transition: width var(--transition-slow) var(--ease-standard);
+}
+
+.recorrido-proyecto__lista {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: var(--space-4) 0 0;
+  padding: var(--space-3);
+  border-top: var(--border-width) solid var(--border-divider);
+  list-style: none;
+}
+
+.recorrido-proyecto--sin-progreso .recorrido-proyecto__encabezado {
+  padding-block: var(--space-5);
+}
+
+.recorrido-proyecto--sin-progreso .recorrido-proyecto__lista {
+  margin-top: 0;
+}
+
+.recorrido-proyecto__item {
+  min-width: 0;
+}
+
+.recorrido-proyecto__boton {
+  position: relative;
+  display: grid;
+  width: 100%;
+  min-height: 3.5rem;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  overflow: hidden;
+  border: var(--border-width) solid transparent;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text-secondary);
+  font: inherit;
+  text-align: left;
+  transition:
+    border-color var(--transition-base) var(--ease-standard),
+    background var(--transition-base) var(--ease-standard),
+    box-shadow var(--transition-base) var(--ease-standard),
+    transform var(--transition-base) var(--ease-standard);
+}
+
+.recorrido-proyecto__boton:disabled {
+  opacity: 1;
+  cursor: default;
+}
+
+.recorrido-proyecto__boton:not(:disabled) {
+  cursor: pointer;
+}
+
+.recorrido-proyecto__boton:not(:disabled):hover {
+  background: var(--surface-default);
+  transform: translateX(var(--space-1));
+}
+
+.recorrido-proyecto__boton:not(:disabled):focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+.recorrido-proyecto__item--actual .recorrido-proyecto__boton {
+  border-color: var(--border-default);
+  background: var(--surface-default);
+  box-shadow: var(--shadow-xs);
+}
+
+.recorrido-proyecto__item--actual .recorrido-proyecto__boton::before {
+  position: absolute;
+  top: var(--space-2);
+  bottom: var(--space-2);
+  left: 0;
+  width: var(--space-1);
+  border-radius: 0 var(--radius-xs) var(--radius-xs) 0;
+  background: var(--color-brand);
+  content: '';
+}
+
+.recorrido-proyecto__icono {
+  position: relative;
+  display: grid;
+  width: var(--control-height-sm);
+  height: var(--control-height-sm);
+  place-items: center;
+  border: var(--border-width) solid var(--border-default);
+  border-radius: var(--radius-sm);
+  background: var(--surface-default);
+  color: var(--text-muted);
+}
+
+.recorrido-proyecto__icono > app-icono {
+  width: var(--space-4);
+  height: var(--space-4);
+}
+
+.recorrido-proyecto__item--actual .recorrido-proyecto__icono {
+  border-color: var(--color-brand);
+  background: var(--color-brand);
+  color: var(--text-inverse);
+}
+
+.recorrido-proyecto__item--completado:not(.recorrido-proyecto__item--actual)
+  .recorrido-proyecto__icono {
+  border-color: var(--color-success-border);
+  background: var(--color-success-surface);
+  color: var(--color-success);
+}
+
+.recorrido-proyecto__confirmacion {
+  position: absolute;
+  right: calc(var(--space-1) * -1);
+  bottom: calc(var(--space-1) * -1);
+  display: grid;
+  width: var(--space-4);
+  height: var(--space-4);
+  place-items: center;
+  border: calc(var(--border-width) * 2) solid var(--surface-default);
+  border-radius: var(--radius-circle);
+  background: var(--color-success);
+  color: var(--text-inverse);
+}
+
+.recorrido-proyecto__confirmacion app-icono {
+  width: var(--space-2);
+  height: var(--space-2);
+}
+
+.recorrido-proyecto__contenido {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.recorrido-proyecto__contenido small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recorrido-proyecto__contenido strong {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  overflow-wrap: anywhere;
+}
+
+.recorrido-proyecto__contenido small {
+  color: var(--text-muted);
+  font-size: var(--font-size-2xs);
+  line-height: var(--line-height-tight);
+}
+
+.recorrido-proyecto__item--actual .recorrido-proyecto__contenido strong {
+  color: var(--text-primary);
+  font-weight: var(--font-weight-bold);
+}
+
+.recorrido-proyecto__estado-accesible {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.recorrido-proyecto__direccion {
+  width: var(--space-3);
+  height: var(--space-3);
+  color: var(--text-disabled);
+}
+
+@media (max-width: 1024px) {
+  .recorrido-proyecto {
+    position: static;
+  }
+
+  .recorrido-proyecto__lista {
+    overflow-x: auto;
+    flex-direction: row;
+    gap: var(--space-2);
+    padding-bottom: var(--space-4);
+    scrollbar-width: thin;
+  }
+
+  .recorrido-proyecto__item {
+    flex: 0 0 12rem;
+  }
+
+  .recorrido-proyecto__direccion {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .recorrido-proyecto__encabezado {
+    padding: var(--space-3);
+  }
+
+  .recorrido-proyecto__progreso {
+    margin: 0 var(--space-3);
+  }
+
+  .recorrido-proyecto__lista {
+    margin-top: var(--space-3);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .recorrido-proyecto__progreso span,
+  .recorrido-proyecto__boton {
+    transition: none;
+  }
+
+  .recorrido-proyecto__boton:not(:disabled):hover {
+    transform: none;
+  }
+}

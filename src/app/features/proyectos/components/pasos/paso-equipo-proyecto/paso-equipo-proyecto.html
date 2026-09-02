@@ -1,0 +1,36 @@
+<app-tarjeta-paso-proyecto
+  [paso]="paso"
+  [modo]="modo()"
+  [editable]="editable()"
+  [detalle]="detalle()"
+  [acciones]="acciones()"
+  [idFormulario]="idFormulario"
+  [procesando]="procesando() || sincronizando()"
+  [versionamiento]="versionamiento()"
+  (editar)="editar.emit()"
+  (cancelar)="cancelar.emit()"
+  (versionCambiada)="versionCambiada.emit($event)"
+>
+  @if (sincronizable() && modo() === modos.Edicion) {
+    <button
+      accionesEncabezadoPasoProyecto
+      type="button"
+      class="ui-button ui-button--secondary ui-button--md"
+      [disabled]="sincronizando() || procesando()"
+      (click)="solicitarSincronizacion()"
+    >
+      <app-icono class="ui-button__icon" nombre="reintentar" />
+      {{ sincronizando() ? 'Sincronizando' : 'Actualizar desde Azure' }}
+    </button>
+  }
+
+  <app-formulario-equipo-proyecto
+    [idFormulario]="idFormulario"
+    [datosIniciales]="datos()"
+    [procesando]="procesando()"
+    [sincronizando]="sincronizando()"
+    [modo]="modo()"
+    (progresoCambiado)="actualizarProgreso($event)"
+    (guardar)="guardar.emit($event)"
+  />
+</app-tarjeta-paso-proyecto>

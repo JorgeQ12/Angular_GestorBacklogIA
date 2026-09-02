@@ -1,10 +1,16 @@
 <section
+  #contenedorEditor
   class="editor-flujo"
   aria-label="Editor del flujo de usuario"
 >
   <div class="editor-flujo__espacio-trabajo">
-    <app-lienzo-flujo-proyecto />
-    @if (estadoEditor.paletaBloquesAbierta()) {
+    <app-lienzo-flujo-proyecto
+      [pantallaCompleta]="pantallaCompleta()"
+      [cambiosPendientes]="cambiosPendientes()"
+      (alternarPantallaCompletaSolicitado)="alternarPantallaCompleta()"
+      (guardarSolicitado)="guardarSolicitado.emit()"
+    />
+    @if (!esSoloLectura() && estadoEditor.paletaBloquesAbierta()) {
       <app-panel-lateral-flujo-proyecto />
     }
   </div>

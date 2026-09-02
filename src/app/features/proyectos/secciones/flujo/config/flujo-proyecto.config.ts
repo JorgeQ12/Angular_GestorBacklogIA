@@ -1,7 +1,13 @@
 import type { NombreIconoAplicacion } from '../../../../../shared/components/icono/iconos-aplicacion';
 import { MensajesFormulario } from '../../../../../shared/forms/errores-validacion';
 import { CampoFormularioNodoFlujo } from '../models/formulario-nodo-flujo-proyecto.model';
-import { TipoBloqueFlujo } from '../models/flujo-proyecto.model';
+import {
+  AccionPermisoModulo,
+  DiaSemanaFlujo,
+  EtiquetaRamaDecision,
+  PoliticaRolesBloqueFlujo,
+  TipoBloqueFlujo,
+} from '../models/flujo-proyecto.model';
 
 /** Relaciona los tipos funcionales del lienzo con la iconografía compartida. */
 export const ICONOS_TIPO_BLOQUE_FLUJO = {
@@ -48,6 +54,27 @@ export const TIPOS_BLOQUE_FLUJO_DISPONIBLES = [
   TipoBloqueFlujo.Accion,
   TipoBloqueFlujo.Decision,
 ] as const satisfies readonly TipoBloqueFlujo[];
+
+/** Establece si cada tipo de bloque admite o exige asignaciones de roles. */
+export const POLITICA_ROLES_POR_TIPO_BLOQUE: Record<
+  TipoBloqueFlujo,
+  PoliticaRolesBloqueFlujo
+> = {
+  [TipoBloqueFlujo.Modulo]: PoliticaRolesBloqueFlujo.Obligatoria,
+  [TipoBloqueFlujo.Pagina]: PoliticaRolesBloqueFlujo.Obligatoria,
+  [TipoBloqueFlujo.Accion]: PoliticaRolesBloqueFlujo.Obligatoria,
+  [TipoBloqueFlujo.Decision]: PoliticaRolesBloqueFlujo.NoAplica,
+  [TipoBloqueFlujo.Componente]: PoliticaRolesBloqueFlujo.Opcional,
+};
+
+/** Ordena las ramas disponibles para un bloque de decisión. */
+export const RAMAS_DECISION_FLUJO = Object.values(EtiquetaRamaDecision);
+
+/** Ordena las operaciones configurables para los roles de un módulo. */
+export const ACCIONES_PERMISO_MODULO = Object.values(AccionPermisoModulo);
+
+/** Ordena los días disponibles en las franjas de actividad de un módulo. */
+export const DIAS_SEMANA_FLUJO = Object.values(DiaSemanaFlujo);
 
 /** Proporciona mensajes de validación propios del editor de nodos. */
 export const MENSAJES_FORMULARIO_NODO_FLUJO = {

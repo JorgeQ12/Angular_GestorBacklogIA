@@ -5,13 +5,16 @@
   [class.selector-tarjetas--2]="columnas() === 2"
   [class.selector-tarjetas--3]="columnas() === 3"
   [class.selector-tarjetas--error]="conError()"
+  [class.selector-tarjetas--readonly]="soloLectura()"
   [attr.aria-labelledby]="etiquetadoPor()"
+  [attr.aria-readonly]="soloLectura()"
 >
   @for (opcion of opciones(); track opcion.valor; let indice = $index) {
     <label
       class="selector-tarjetas__opcion"
       [class.selector-tarjetas__opcion--seleccionada]="opcion.valor === valor()"
       [class.selector-tarjetas__opcion--deshabilitada]="deshabilitado() || opcion.deshabilitada"
+      (click)="impedirSeleccionEnLectura($event)"
     >
       <input
         [id]="id() + '-opcion-' + indice"
@@ -21,6 +24,8 @@
         [value]="opcion.valor"
         [checked]="opcion.valor === valor()"
         [disabled]="deshabilitado() || opcion.deshabilitada"
+        [attr.aria-readonly]="soloLectura()"
+        [tabindex]="soloLectura() ? -1 : null"
         (change)="seleccionar(opcion)"
         (blur)="marcarTocado()"
       />

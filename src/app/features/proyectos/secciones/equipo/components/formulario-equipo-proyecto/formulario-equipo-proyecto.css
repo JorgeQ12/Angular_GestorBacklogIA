@@ -86,6 +86,16 @@
   gap: var(--space-4);
 }
 
+.formulario-equipo--solo-lectura .formulario-equipo__columnas,
+.formulario-equipo--solo-lectura .formulario-equipo__fila {
+  grid-template-columns: minmax(14rem, 1.4fr) minmax(12rem, 1fr) minmax(11rem, 0.8fr);
+}
+
+.formulario-equipo--solo-lectura .formulario-equipo__columnas > :first-child,
+.formulario-equipo--solo-lectura .formulario-equipo__fila > :first-child {
+  display: none;
+}
+
 .formulario-equipo__columnas {
   min-height: 2.75rem;
   align-items: center;

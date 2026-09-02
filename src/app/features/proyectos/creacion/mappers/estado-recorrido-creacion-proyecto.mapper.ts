@@ -1,19 +1,19 @@
 import {
-  AVANCE_BORRADOR_POR_PASO,
-  ClavePasoCreacionProyecto,
-  PASOS_CREACION_PROYECTO,
-} from '../config/pasos-creacion-proyecto.config';
+  type ClavePasoProyecto,
+  PASOS_PROYECTO,
+} from '../../config/pasos-proyecto.config';
+import { AVANCE_BORRADOR_POR_PASO } from '../config/avance-borrador-proyecto.config';
 
 /** Representa el estado visible y navegable del recorrido de creación. */
 export interface EstadoRecorridoCreacionProyecto {
-  readonly pasoActual: ClavePasoCreacionProyecto;
-  readonly pasosCompletados: readonly ClavePasoCreacionProyecto[];
-  readonly pasosNavegables: readonly ClavePasoCreacionProyecto[];
+  readonly pasoActual: ClavePasoProyecto;
+  readonly pasosCompletados: readonly ClavePasoProyecto[];
+  readonly pasosNavegables: readonly ClavePasoProyecto[];
 }
 
 /** Deriva el recorrido desde la selección actual y el máximo avance persistido. */
 export function construirEstadoRecorridoCreacion(
-  clavePasoActual: ClavePasoCreacionProyecto,
+  clavePasoActual: ClavePasoProyecto,
   avanceBorrador: number | null,
 ): EstadoRecorridoCreacionProyecto {
   if (avanceBorrador === null) {
@@ -21,11 +21,11 @@ export function construirEstadoRecorridoCreacion(
   }
 
   const avance = normalizarAvanceCreacionProyecto(avanceBorrador);
-  const pasosCompletados = PASOS_CREACION_PROYECTO.filter((paso) => {
+  const pasosCompletados = PASOS_PROYECTO.filter((paso) => {
     const avanceRequerido = AVANCE_BORRADOR_POR_PASO[paso.clave];
     return avanceRequerido === null || avanceRequerido < avance;
   }).map((paso) => paso.clave);
-  const pasosNavegables = PASOS_CREACION_PROYECTO.filter((paso) => {
+  const pasosNavegables = PASOS_PROYECTO.filter((paso) => {
     const avanceRequerido = AVANCE_BORRADOR_POR_PASO[paso.clave];
     return avanceRequerido !== null && avanceRequerido <= avance && paso.clave !== clavePasoActual;
   }).map((paso) => paso.clave);
@@ -35,7 +35,7 @@ export function construirEstadoRecorridoCreacion(
 
 /** Determina si el avance persistido permite abrir un paso. */
 export function puedeAbrirPasoCreacion(
-  paso: ClavePasoCreacionProyecto,
+  paso: ClavePasoProyecto,
   pasoActual: number,
 ): boolean {
   const avanceRequerido = AVANCE_BORRADOR_POR_PASO[paso];
@@ -45,11 +45,11 @@ export function puedeAbrirPasoCreacion(
 }
 
 /** Convierte el avance persistido en el último paso disponible del recorrido. */
-export function obtenerUltimoPasoCreacion(pasoActual: number): ClavePasoCreacionProyecto {
+export function obtenerUltimoPasoCreacion(pasoActual: number): ClavePasoProyecto {
   const avance = normalizarAvanceCreacionProyecto(pasoActual);
-  let ultimoPaso: ClavePasoCreacionProyecto = PASOS_CREACION_PROYECTO[1].clave;
+  let ultimoPaso: ClavePasoProyecto = PASOS_PROYECTO[1].clave;
 
-  for (const paso of PASOS_CREACION_PROYECTO) {
+  for (const paso of PASOS_PROYECTO) {
     const avanceRequerido = AVANCE_BORRADOR_POR_PASO[paso.clave];
     if (avanceRequerido !== null && avanceRequerido <= avance) ultimoPaso = paso.clave;
   }
@@ -69,5 +69,5 @@ export function normalizarAvanceCreacionProyecto(pasoActual: number): number {
 
 /** Convierte el avance del backend en su posición dentro del recorrido visual. */
 export function obtenerPosicionVisualCreacion(pasoActual: number): number {
-  return Math.min(normalizarAvanceCreacionProyecto(pasoActual) + 1, PASOS_CREACION_PROYECTO.length);
+  return Math.min(normalizarAvanceCreacionProyecto(pasoActual) + 1, PASOS_PROYECTO.length);
 }

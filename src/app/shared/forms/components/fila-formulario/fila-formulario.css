@@ -53,6 +53,10 @@
   margin-top: 1.25rem;
 }
 
+:host(.fila-formulario--solo-lectura) {
+  grid-template-columns: 2rem minmax(0, 1fr);
+}
+
 .fila-formulario__eliminar app-icono {
   width: 1rem;
   height: 1rem;

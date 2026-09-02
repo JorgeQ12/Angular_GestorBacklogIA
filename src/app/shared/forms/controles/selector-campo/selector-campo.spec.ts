@@ -1,5 +1,5 @@
 import { OverlayContainer } from '@angular/cdk/overlay';
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { SelectorCampo } from './selector-campo';
@@ -12,11 +12,15 @@ import { SelectorCampo } from './selector-campo';
       id="prioridad"
       etiquetadoPor="prioridad-label"
       [opciones]="opciones"
+      [soloLectura]="soloLectura()"
+      [compacto]="compacto()"
       [formControl]="control"
     />
   `,
 })
 class ComponentePrueba {
+  public readonly soloLectura = signal(false);
+  public readonly compacto = signal(false);
   public readonly control = new FormControl<number | null>(null);
   public readonly opciones = [
     { valor: 1, etiqueta: 'Alta', descripcion: 'Atención prioritaria' },
@@ -86,6 +90,29 @@ describe('SelectorCampo', () => {
 
     expect(fixture.componentInstance.control.value).toBeNull();
     expect(obtenerTrigger().textContent).toContain('Todas las prioridades');
+  });
+
+  it('conserva la selección y no abre opciones en solo lectura', () => {
+    fixture.componentInstance.control.setValue(1);
+    fixture.componentInstance.soloLectura.set(true);
+    fixture.detectChanges();
+
+    obtenerTrigger().click();
+    fixture.detectChanges();
+
+    expect(obtenerTrigger().getAttribute('aria-readonly')).toBe('true');
+    expect(overlay.querySelector('[role="listbox"]')).toBeNull();
+    expect(fixture.componentInstance.control.value).toBe(1);
+  });
+
+  it('aplica la variante compacta también al panel renderizado en el overlay', () => {
+    fixture.componentInstance.compacto.set(true);
+    fixture.detectChanges();
+    obtenerTrigger().click();
+    fixture.detectChanges();
+
+    expect(obtenerTrigger().classList).toContain('selector-campo__trigger--compacto');
+    expect(overlay.querySelector('.selector-campo__lista--compacta')).not.toBeNull();
   });
 
   function obtenerTrigger(): HTMLButtonElement {

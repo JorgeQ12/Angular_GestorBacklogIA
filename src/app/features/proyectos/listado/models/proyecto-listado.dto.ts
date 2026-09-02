@@ -1,10 +1,4 @@
-/** Refleja una referencia resumida de catálogo entregada junto a un proyecto. */
-export interface CatalogoProyectoResumenDto {
-  readonly id: number;
-  readonly codigo: string;
-  readonly nombre: string;
-  readonly descripcion: string;
-}
+import type { CatalogoProyectoResumenDto } from '../../models/catalogo-proyecto-resumen.dto';
 
 /** Refleja un registro de ObtenerProyectos. */
 export interface ProyectoListadoDto {

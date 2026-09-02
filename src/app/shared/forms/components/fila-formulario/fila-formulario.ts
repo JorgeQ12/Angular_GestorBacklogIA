@@ -8,6 +8,7 @@ import { IconoComponent } from '../../../components/icono/icono.component';
   imports: [IconoComponent],
   host: {
     '[class.fila-formulario--campos-etiquetados]': 'camposEtiquetados()',
+    '[class.fila-formulario--solo-lectura]': 'soloLectura()',
   },
   templateUrl: './fila-formulario.html',
   styleUrl: './fila-formulario.css',
@@ -24,6 +25,9 @@ export class FilaFormulario {
 
   /** Bloquea la eliminación mientras el formulario procesa otra operación. */
   public readonly procesando = input(false);
+
+  /** Oculta la operación de retiro cuando la colección se presenta para consulta. */
+  public readonly soloLectura = input(false);
 
   /** Describe la eliminación para tecnologías de asistencia. */
   public readonly etiquetaEliminar = input.required<string>();

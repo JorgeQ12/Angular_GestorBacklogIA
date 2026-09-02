@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ModoFormularioProyecto } from '../../../../models/modo-formulario-proyecto.model';
 import { FormularioAlcanceProyecto } from './formulario-alcance-proyecto';
 
 describe('FormularioAlcanceProyecto', () => {
@@ -71,6 +72,23 @@ describe('FormularioAlcanceProyecto', () => {
 
     expect(obtenerTextarea('#alcance-incluido').disabled).toBe(true);
     expect(obtenerTextarea('#alcance-excluido').disabled).toBe(true);
+  });
+
+  it('conserva ambos límites como contenido de solo lectura', () => {
+    const guardar = vi.fn();
+    fixture.componentInstance.guardar.subscribe(guardar);
+    fixture.componentRef.setInput('datosIniciales', {
+      incluido: 'Seguimiento de envíos',
+      excluido: 'Pagos en línea',
+    });
+    fixture.componentRef.setInput('modo', ModoFormularioProyecto.Lectura);
+    fixture.detectChanges();
+
+    enviarFormulario();
+
+    expect(obtenerTextarea('#alcance-incluido').readOnly).toBe(true);
+    expect(obtenerTextarea('#alcance-excluido').readOnly).toBe(true);
+    expect(guardar).not.toHaveBeenCalled();
   });
 
   function escribir(selector: string, valor: string): void {

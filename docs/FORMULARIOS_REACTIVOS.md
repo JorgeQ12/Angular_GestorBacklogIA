@@ -391,8 +391,10 @@ descripción, cuerpo y acción. La feature conserva únicamente la distribución
 propia de su dominio.
 
 Los pies repetidos de formularios dentro de tarjetas utilizan `ui-form-footer` y
-`ui-form-footer__note`. La página proyecta las acciones y conserva los textos del flujo, mientras la
-primitiva administra distribución, superficie y adaptación móvil.
+`ui-form-footer__note`. `TarjetaPasoProyecto` presenta una única instancia de
+`AccionesPasoProyecto` y la vincula al formulario proyectado mediante los atributos HTML `id` y
+`form`. El caso de uso conserva únicamente la configuración de textos e iconos; los formularios no
+proyectan footers ni selectores de acciones particulares.
 
 ## DOM y accesibilidad
 
@@ -436,6 +438,30 @@ Cada componente de formulario debe probar, como mínimo:
 - Estados interactivos propios del formulario.
 - Deshabilitación durante operaciones remotas.
 - Límites de adición y eliminación cuando utiliza un `FormArray`.
+- Presentación no editable y ausencia de emisión cuando admite modo de lectura.
+
+## Formularios reutilizables para lectura y edición
+
+Cuando una misma sección de dominio se consulta y se edita con idéntica estructura, se reutiliza
+el formulario mediante un enum de interacción. El modo no se expresa con booleanos ambiguos ni con
+los nombres de consumidores como Creación o Información.
+
+- `Edicion` es el valor predeterminado y conserva validación, contadores y operaciones.
+- `Lectura` mantiene los valores y la estructura, pero impide cualquier mutación y envío.
+- No se llama `form.disable()` para representar lectura: ese estado se reserva para operaciones
+  remotas y comunica indisponibilidad, además de atenuar los valores.
+- Los `input` y `textarea` usan `readonly`. Los controles compuestos aceptan `soloLectura`, exponen
+  `aria-readonly` y no abren overlays ni emiten cambios.
+- Las colecciones ocultan agregar y eliminar; Equipo también retira búsqueda, filtros, selección y
+  asignación masiva. El editor de Flujo oculta paleta y modales de edición.
+- Al cambiar a lectura, el formulario vuelve a hidratar `datosIniciales`, queda limpio y sin tocar.
+  Esto garantiza que cancelar descarte modificaciones aunque el componente continúe montado.
+- La página consumidora decide el modo, proporciona la configuración de acciones y coordina la
+  persistencia. `TarjetaPasoProyecto` presenta el footer; el formulario no conoce versiones, rutas
+  ni casos de uso.
+- Cuando una sección forma parte del recorrido de Proyecto, `Paso[Seccion]Proyecto` compone el
+  formulario dentro de `TarjetaPasoProyecto`. Creación e Información reutilizan ese mismo paso y
+  proporcionan configuraciones de footer diferentes; no crean adaptadores visuales paralelos.
 
 ## Prácticas que deben evitarse
 

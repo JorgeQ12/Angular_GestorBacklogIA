@@ -42,6 +42,21 @@
   transform: translateY(-1px);
 }
 
+.selector-tarjetas--readonly .selector-tarjetas__opcion {
+  cursor: default;
+}
+
+.selector-tarjetas--readonly
+  .selector-tarjetas__opcion:hover:not(.selector-tarjetas__opcion--deshabilitada) {
+  border-color: var(--border-default);
+  box-shadow: none;
+  transform: none;
+}
+
+.selector-tarjetas--readonly .selector-tarjetas__opcion--seleccionada:hover {
+  border-color: var(--border-strong);
+}
+
 .selector-tarjetas__opcion:focus-within {
   border-color: var(--field-border-focus);
   box-shadow: var(--shadow-focus);

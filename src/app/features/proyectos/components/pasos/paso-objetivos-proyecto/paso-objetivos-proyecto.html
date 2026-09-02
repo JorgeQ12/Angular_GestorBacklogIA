@@ -1,0 +1,20 @@
+<app-tarjeta-paso-proyecto
+  [paso]="paso"
+  [modo]="modo()"
+  [editable]="editable()"
+  [acciones]="acciones()"
+  [idFormulario]="idFormulario"
+  [procesando]="procesando()"
+  [versionamiento]="versionamiento()"
+  (editar)="editar.emit()"
+  (cancelar)="cancelar.emit()"
+  (versionCambiada)="versionCambiada.emit($event)"
+>
+  <app-formulario-objetivos-proyecto
+    [idFormulario]="idFormulario"
+    [datosIniciales]="datos()"
+    [procesando]="procesando()"
+    [modo]="modo()"
+    (guardar)="guardar.emit($event)"
+  />
+</app-tarjeta-paso-proyecto>

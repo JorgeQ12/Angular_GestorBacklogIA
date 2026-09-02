@@ -4,13 +4,16 @@
   #trigger
   [id]="id() + '-control'"
   class="selector-campo__trigger"
+  [class.selector-campo__trigger--compacto]="compacto()"
   type="button"
   role="combobox"
   aria-haspopup="listbox"
   [class.selector-campo__trigger--error]="conError()"
+  [class.selector-campo__trigger--readonly]="soloLectura()"
   [attr.aria-controls]="id() + '-lista'"
   [attr.aria-expanded]="abierto()"
   [attr.aria-labelledby]="etiquetadoPor()"
+  [attr.aria-readonly]="soloLectura()"
   [disabled]="deshabilitado()"
   (click)="alternar()"
   (keydown)="manejarTeclaTrigger($event)"
@@ -18,7 +21,9 @@
   <span [class.selector-campo__placeholder]="!opcionSeleccionada()">
     {{ opcionSeleccionada()?.etiqueta ?? placeholder() }}
   </span>
-  <app-icono class="selector-campo__icono" nombre="desplegar" />
+  @if (!soloLectura()) {
+    <app-icono class="selector-campo__icono" nombre="desplegar" />
+  }
 </button>
 
 <ng-template
@@ -38,6 +43,7 @@
   <div
     [id]="id() + '-lista'"
     class="selector-campo__lista"
+    [class.selector-campo__lista--compacta]="compacto()"
     role="listbox"
     [attr.aria-labelledby]="etiquetadoPor()"
     (keydown)="manejarTeclaLista($event)"

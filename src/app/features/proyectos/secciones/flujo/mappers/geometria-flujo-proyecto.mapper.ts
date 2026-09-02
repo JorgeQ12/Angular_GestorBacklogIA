@@ -23,8 +23,8 @@ const DESPLAZAMIENTO_CENTRO_CONECTOR_X = 1;
 const DESPEJE_FLECHA_VERTICAL = 3;
 const DESPLAZAMIENTO_CENTRO_CONECTOR_Y = TAMANO_BLOQUE_FLUJO.alto / 2;
 const ALTURA_CONECTOR_DECISION: Record<EtiquetaRamaDecision, number> = {
-  Sí: 74,
-  No: 114,
+  [EtiquetaRamaDecision.Si]: 74,
+  [EtiquetaRamaDecision.No]: 114,
 };
 
 /** Obtiene la altura del conector de salida según el tipo de nodo y su etiqueta. */
@@ -55,46 +55,32 @@ export function obtenerPuntoAnclajeBloque(
     bloque.posicion.y + obtenerDesplazamientoConectorSalidaY(bloque.tipo, etiqueta);
 
   switch (lado) {
-    case 'izquierda':
+    case LadoConexionFlujo.Izquierda:
       return { x: izquierda, y: bloque.posicion.y + DESPLAZAMIENTO_CENTRO_CONECTOR_Y };
-    case 'derecha':
+    case LadoConexionFlujo.Derecha:
       return { x: derecha, y: centroY };
-    case 'arriba':
+    case LadoConexionFlujo.Arriba:
       return { x: centroX, y: arriba - DESPEJE_FLECHA_VERTICAL };
-    case 'abajo':
+    case LadoConexionFlujo.Abajo:
       return { x: centroX, y: abajo + DESPEJE_FLECHA_VERTICAL };
   }
-}
-
-/** Resuelve el lado del nodo más cercano a un punto del lienzo. */
-export function resolverLadoConexionMasCercano(
-  bloque: Pick<NodoFlujoProyecto, 'posicion'>,
-  punto: { x: number; y: number },
-): LadoConexionFlujo {
-  const distancias: Record<LadoConexionFlujo, number> = {
-    izquierda: Math.abs(punto.x - bloque.posicion.x),
-    derecha: Math.abs(punto.x - (bloque.posicion.x + TAMANO_BLOQUE_FLUJO.ancho)),
-    arriba: Math.abs(punto.y - bloque.posicion.y),
-    abajo: Math.abs(punto.y - (bloque.posicion.y + TAMANO_BLOQUE_FLUJO.alto)),
-  };
-
-  return (Object.entries(distancias).sort((a, b) => a[1] - b[1])[0]?.[0] ??
-    'izquierda') as LadoConexionFlujo;
 }
 
 /** Resuelve el lado de entrada permitido más cercano a un punto del lienzo. */
 export function resolverLadoDestinoMasCercano(
   bloque: Pick<NodoFlujoProyecto, 'posicion'>,
   punto: { x: number; y: number },
-): Exclude<LadoConexionFlujo, 'derecha'> {
-  const distancias: Record<Exclude<LadoConexionFlujo, 'derecha'>, number> = {
-    izquierda: Math.abs(punto.x - bloque.posicion.x),
-    arriba: Math.abs(punto.y - bloque.posicion.y),
-    abajo: Math.abs(punto.y - (bloque.posicion.y + TAMANO_BLOQUE_FLUJO.alto)),
+): Exclude<LadoConexionFlujo, LadoConexionFlujo.Derecha> {
+  const distancias: Record<Exclude<LadoConexionFlujo, LadoConexionFlujo.Derecha>, number> = {
+    [LadoConexionFlujo.Izquierda]: Math.abs(punto.x - bloque.posicion.x),
+    [LadoConexionFlujo.Arriba]: Math.abs(punto.y - bloque.posicion.y),
+    [LadoConexionFlujo.Abajo]: Math.abs(
+      punto.y - (bloque.posicion.y + TAMANO_BLOQUE_FLUJO.alto),
+    ),
   };
 
   return (Object.entries(distancias).sort((a, b) => a[1] - b[1])[0]?.[0] ??
-    'izquierda') as Exclude<LadoConexionFlujo, 'derecha'>;
+    LadoConexionFlujo.Izquierda) as Exclude<LadoConexionFlujo, LadoConexionFlujo.Derecha>;
 }
 
 /** Construye la trayectoria SVG entre el origen y el destino de una conexión. */
@@ -108,13 +94,13 @@ export function construirRutaConexion(
   const tramoVertical = 14;
 
   switch (ladoDestino) {
-    case 'arriba':
+    case LadoConexionFlujo.Arriba:
       return `M ${puntoOrigen.x} ${puntoOrigen.y} C ${puntoOrigen.x + desplazamientoHorizontal} ${puntoOrigen.y}, ${puntoDestino.x} ${puntoDestino.y - tramoVertical - desplazamientoVertical}, ${puntoDestino.x} ${puntoDestino.y - tramoVertical} L ${puntoDestino.x} ${puntoDestino.y}`;
-    case 'abajo':
+    case LadoConexionFlujo.Abajo:
       return `M ${puntoOrigen.x} ${puntoOrigen.y} C ${puntoOrigen.x + desplazamientoHorizontal} ${puntoOrigen.y}, ${puntoDestino.x} ${puntoDestino.y + tramoVertical + desplazamientoVertical}, ${puntoDestino.x} ${puntoDestino.y + tramoVertical} L ${puntoDestino.x} ${puntoDestino.y}`;
-    case 'derecha':
+    case LadoConexionFlujo.Derecha:
       return `M ${puntoOrigen.x} ${puntoOrigen.y} C ${puntoOrigen.x + desplazamientoHorizontal} ${puntoOrigen.y}, ${puntoDestino.x + desplazamientoHorizontal} ${puntoDestino.y}, ${puntoDestino.x} ${puntoDestino.y}`;
-    case 'izquierda':
+    case LadoConexionFlujo.Izquierda:
       return `M ${puntoOrigen.x} ${puntoOrigen.y} C ${puntoOrigen.x + desplazamientoHorizontal} ${puntoOrigen.y}, ${puntoDestino.x - desplazamientoHorizontal} ${puntoDestino.y}, ${puntoDestino.x} ${puntoDestino.y}`;
   }
 }

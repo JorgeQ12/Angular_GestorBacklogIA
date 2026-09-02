@@ -1,0 +1,63 @@
+:host,
+.tarjeta-paso {
+  display: block;
+  min-width: 0;
+}
+
+.tarjeta-paso__encabezado {
+  background: var(--card-footer-surface);
+}
+
+.tarjeta-paso__descripcion {
+  margin: var(--space-1) 0 0;
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-snug);
+}
+
+.tarjeta-paso__detalle {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-snug);
+}
+
+.tarjeta-paso__detalle app-icono {
+  width: var(--font-size-sm);
+  height: var(--font-size-sm);
+  flex: 0 0 auto;
+}
+
+.tarjeta-paso__detalle strong {
+  overflow: hidden;
+  color: var(--text-secondary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tarjeta-paso__acciones-encabezado {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.tarjeta-paso__contenido {
+  min-width: 0;
+  background: var(--card-surface);
+}
+
+@media (max-width: 640px) {
+  .tarjeta-paso__encabezado,
+  .tarjeta-paso__acciones-encabezado {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .tarjeta-paso__acciones-encabezado .ui-button {
+    width: 100%;
+  }
+}

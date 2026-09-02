@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ModoFormularioProyecto } from '../../../../models/modo-formulario-proyecto.model';
 import { FormularioObjetivosProyecto } from './formulario-objetivos-proyecto';
 
 describe('FormularioObjetivosProyecto', () => {
@@ -101,6 +102,23 @@ describe('FormularioObjetivosProyecto', () => {
         ) as HTMLButtonElement
       ).disabled,
     ).toBe(true);
+  });
+
+  it('oculta las acciones de colección y restaura sus datos en lectura', () => {
+    fixture.componentRef.setInput('datosIniciales', {
+      objetivoGeneral: 'Reducir tiempos',
+      objetivosEspecificos: ['Automatizar', 'Medir'],
+    });
+    fixture.detectChanges();
+    escribir('#objetivos-general', 'Cambio local');
+
+    fixture.componentRef.setInput('modo', ModoFormularioProyecto.Lectura);
+    fixture.detectChanges();
+
+    expect(obtenerControl('#objetivos-general').readOnly).toBe(true);
+    expect(obtenerControl('#objetivos-general').value).toBe('Reducir tiempos');
+    expect(obtenerElemento().querySelector('.formulario-objetivos__acciones-lista')).toBeNull();
+    expect(obtenerElemento().querySelector('app-fila-formulario button')).toBeNull();
   });
 
   function escribir(selector: string, valor: string): void {

@@ -1,0 +1,16 @@
+:host {
+  display: block;
+  width: 14rem;
+  flex: 0 0 14rem;
+}
+
+.selector-version {
+  min-width: 0;
+}
+
+@media (max-width: 640px) {
+  :host {
+    width: 100%;
+    flex-basis: auto;
+  }
+}

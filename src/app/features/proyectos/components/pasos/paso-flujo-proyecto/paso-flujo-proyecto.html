@@ -1,0 +1,19 @@
+<app-tarjeta-paso-proyecto
+  [paso]="paso"
+  [modo]="modo()"
+  [editable]="editable()"
+  [acciones]="acciones()"
+  [procesando]="procesando()"
+  [versionamiento]="versionamiento()"
+  (editar)="editar.emit()"
+  (cancelar)="cancelar.emit()"
+  (versionCambiada)="versionCambiada.emit($event)"
+  (confirmar)="confirmar()"
+>
+  <app-editor-flujo-proyecto
+    [flujo]="flujoPresentado()"
+    [procesando]="procesando()"
+    [modo]="modo()"
+    (flujoCambiado)="flujoTemporal.set($event)"
+  />
+</app-tarjeta-paso-proyecto>

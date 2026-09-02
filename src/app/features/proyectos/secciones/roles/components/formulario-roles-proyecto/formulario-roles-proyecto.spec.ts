@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ModoFormularioProyecto } from '../../../../models/modo-formulario-proyecto.model';
 import { FormularioRolesProyecto } from './formulario-roles-proyecto';
 
 describe('FormularioRolesProyecto', () => {
@@ -96,6 +97,23 @@ describe('FormularioRolesProyecto', () => {
       (obtenerElemento().querySelector('.formulario-roles__encabezado button') as HTMLButtonElement)
         .disabled,
     ).toBe(true);
+  });
+
+  it('presenta la colección sin acciones ni envío en modo lectura', () => {
+    const guardar = vi.fn();
+    fixture.componentInstance.guardar.subscribe(guardar);
+    fixture.componentRef.setInput('datosIniciales', {
+      roles: [{ nombre: 'Administrador', descripcion: 'Configura la solución.' }],
+    });
+    fixture.componentRef.setInput('modo', ModoFormularioProyecto.Lectura);
+    fixture.detectChanges();
+
+    enviarFormulario();
+
+    expect(obtenerControl('#rol-nombre-0').readOnly).toBe(true);
+    expect(obtenerElemento().querySelector('.formulario-roles__encabezado button')).toBeNull();
+    expect(obtenerElemento().querySelector('app-fila-formulario button')).toBeNull();
+    expect(guardar).not.toHaveBeenCalled();
   });
 
   function escribir(selector: string, valor: string): void {
