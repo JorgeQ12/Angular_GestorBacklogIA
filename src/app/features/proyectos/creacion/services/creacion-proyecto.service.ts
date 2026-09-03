@@ -17,6 +17,8 @@ import {
   CrearBorradorProyectoRespuestaDto,
   CrearBorradorProyectoSolicitudDto,
   BorradorProyectoDto,
+  GuardarProyectoRespuestaDto,
+  GuardarProyectoSolicitudDto,
 } from '../models/borrador-proyecto.dto';
 import { BorradorProyecto, BorradorProyectoCreado } from '../models/borrador-proyecto.model';
 import { ActualizacionSeccionProyecto } from '../../models/actualizacion-seccion-proyecto.model';
@@ -114,6 +116,19 @@ export class CreacionProyectoService {
       .pipe(
         map((resultado) => exigirDatosResultadoApi(resultado, 'el borrador actualizado')),
         map(mapearBorradorProyecto),
+      );
+  }
+
+  /** Convierte la última revisión confirmada del borrador en un proyecto guardado. */
+  public guardarProyecto(solicitud: GuardarProyectoSolicitudDto): Observable<void> {
+    return this.http
+      .post<ResultadoApi<GuardarProyectoRespuestaDto>>(
+        ENDPOINTS_CREACION_PROYECTO.guardarProyecto,
+        solicitud,
+      )
+      .pipe(
+        map((resultado) => exigirDatosResultadoApi(resultado, 'el proyecto guardado')),
+        map(() => undefined),
       );
   }
 }

@@ -6,7 +6,10 @@ import { ResultadoApi } from '../../../../core/http/models/resultado-api.model';
 import { ClaveSeccionProyecto } from '../../config/secciones-proyecto.config';
 import { PlataformaSolucion } from '../../secciones/tipo-solucion/models/tipo-solucion-proyecto.model';
 import { ENDPOINTS_CREACION_PROYECTO } from '../config/endpoints-creacion-proyecto.config';
-import { CrearBorradorProyectoRespuestaDto } from '../models/borrador-proyecto.dto';
+import {
+  CrearBorradorProyectoRespuestaDto,
+  GuardarProyectoRespuestaDto,
+} from '../models/borrador-proyecto.dto';
 import {
   SincronizarEquipoAzureRespuestaDto,
   ValidarVinculacionAzureRespuestaDto,
@@ -403,6 +406,19 @@ describe('CreacionProyectoService', () => {
     await expect(respuesta).resolves.toMatchObject({ revision: 2, pasoActual: 6 });
   });
 
+  it('guarda el proyecto con el identificador y la revisión confirmada', async () => {
+    const respuesta = firstValueFrom(
+      servicio.guardarProyecto({ proyectoId: 42, revisionEsperada: 9 }),
+    );
+    const solicitud = httpTesting.expectOne(ENDPOINTS_CREACION_PROYECTO.guardarProyecto);
+
+    expect(solicitud.request.method).toBe('POST');
+    expect(solicitud.request.body).toEqual({ proyectoId: 42, revisionEsperada: 9 });
+    solicitud.flush(crearResultado(crearProyectoGuardadoDto()));
+
+    await expect(respuesta).resolves.toBeUndefined();
+  });
+
   it('rechaza una respuesta funcional que no contiene datos válidos', async () => {
     const respuesta = firstValueFrom(servicio.validarVinculacionAzure(DATOS));
     const solicitud = httpTesting.expectOne(ENDPOINTS_CREACION_PROYECTO.validarVinculacionAzure);
@@ -454,5 +470,37 @@ function crearBorradorDto(): CrearBorradorProyectoRespuestaDto {
     fechaUltimoGuardado: '2026-08-24T12:00:00Z',
     azure: VINCULACION_DTO,
     insumos: [],
+  };
+}
+
+function crearProyectoGuardadoDto(): GuardarProyectoRespuestaDto {
+  return {
+    id: 42,
+    nombre: 'InterIA',
+    responsable: 'Jorge',
+    descripcion: 'Gestión inteligente del backlog.',
+    prioridadCatalogoId: 14,
+    prioridadCatalogo: {
+      id: 14,
+      codigo: 'media',
+      nombre: 'Media',
+      descripcion: 'Prioridad media',
+    },
+    estadoCatalogoId: 21,
+    estadoCatalogo: {
+      id: 21,
+      codigo: 'en_progreso',
+      nombre: 'En progreso',
+      descripcion: 'Proyecto guardado',
+    },
+    fechaObjetivo: '2026-09-30T00:00:00',
+    numeroVersionActual: 1,
+    tipoSolucionJson: '{}',
+    necesidadJson: '{}',
+    objetivosJson: '{}',
+    alcanceJson: '{}',
+    rolesJson: '[]',
+    equipoJson: '[]',
+    diagramFlujoJson: '{}',
   };
 }
