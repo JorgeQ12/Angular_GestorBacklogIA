@@ -123,7 +123,7 @@
                 [modo]="modoEdicion"
                 [acciones]="accionesFlujo"
                 [procesando]="guardandoSeccion()"
-                (guardar)="guardarSeccion({ seccion: secciones.Flujo, datos: $event }, null)"
+                (guardar)="guardarProyecto($event)"
               />
             } @else {
               <app-estado-error

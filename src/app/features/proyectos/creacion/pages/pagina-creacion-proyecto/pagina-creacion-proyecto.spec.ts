@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { provideRouter, Router, Routes } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
-import { of, throwError } from 'rxjs';
+import { of, Subject, throwError } from 'rxjs';
 import { SEGMENTOS_RUTA, URL_INICIO_PANEL } from '../../../../../core/navegacion/rutas';
 import { PasoFlujoProyecto } from '../../../components/pasos/paso-flujo-proyecto/paso-flujo-proyecto';
 import { BorradorProyecto } from '../../models/borrador-proyecto.model';
@@ -25,6 +25,7 @@ describe('PaginaCreacionProyecto', () => {
     validarVinculacionAzure: vi.fn(),
     crearBorrador: vi.fn(),
     actualizarBorrador: vi.fn(),
+    guardarProyecto: vi.fn(),
     sincronizarEquipoAzure: vi.fn(),
   };
 
@@ -32,7 +33,10 @@ describe('PaginaCreacionProyecto', () => {
     vi.clearAllMocks();
     creacionProyecto.obtenerBorrador.mockReturnValue(of(BORRADOR_AVANZADO));
     creacionProyecto.crearBorrador.mockReturnValue(of({ id: 42, revision: 1, pasoActual: 1 }));
-    creacionProyecto.actualizarBorrador.mockReturnValue(of(BORRADOR_FLUJO));
+    creacionProyecto.actualizarBorrador.mockReturnValue(
+      of({ ...BORRADOR_FLUJO, revision: 5, pasoActual: 9 }),
+    );
+    creacionProyecto.guardarProyecto.mockReturnValue(of(undefined));
 
     TestBed.configureTestingModule({
       imports: [PaginaCreacionProyecto],
@@ -121,8 +125,10 @@ describe('PaginaCreacionProyecto', () => {
     });
   });
 
-  it('regresa al inicio cuando el último paso confirma el guardado', async () => {
+  it('actualiza el flujo, guarda con la nueva revisión y luego regresa al inicio', async () => {
     creacionProyecto.obtenerBorrador.mockReturnValue(of(BORRADOR_FLUJO));
+    const confirmacionGuardado = new Subject<void>();
+    creacionProyecto.guardarProyecto.mockReturnValueOnce(confirmacionGuardado.asObservable());
     const harness = await RouterTestingHarness.create('/proyectos/creacion?proyectoId=42');
     const router = TestBed.inject(Router);
     const navegar = vi.spyOn(router, 'navigateByUrl').mockResolvedValue(true);
@@ -130,6 +136,16 @@ describe('PaginaCreacionProyecto', () => {
       .componentInstance as PasoFlujoProyecto;
 
     pasoFlujo.guardar.emit(pasoFlujo.datos());
+
+    expect(creacionProyecto.actualizarBorrador).toHaveBeenCalled();
+    expect(creacionProyecto.guardarProyecto).toHaveBeenCalledWith({
+      proyectoId: 42,
+      revisionEsperada: 5,
+    });
+    expect(navegar).not.toHaveBeenCalled();
+
+    confirmacionGuardado.next();
+    confirmacionGuardado.complete();
 
     expect(navegar).toHaveBeenCalledWith(URL_INICIO_PANEL);
   });
