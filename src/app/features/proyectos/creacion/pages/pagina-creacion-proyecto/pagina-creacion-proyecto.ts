@@ -9,7 +9,15 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription, distinctUntilChanged, finalize, map } from 'rxjs';
+import {
+  EMPTY,
+  Subscription,
+  catchError,
+  distinctUntilChanged,
+  finalize,
+  map,
+  switchMap,
+} from 'rxjs';
 import type { OpcionCatalogo } from '../../../../../core/catalogos/models/opcion-catalogo.model';
 import { CatalogosService } from '../../../../../core/catalogos/services/catalogos.service';
 import { NotificadorErroresApiService } from '../../../../../core/mensajes/services/notificador-errores-api.service';
@@ -62,6 +70,7 @@ import { deserializarTipoSolucionProyecto } from '../../../secciones/tipo-soluci
 import {
   ERROR_CONSULTA_AZURE,
   ERROR_CREACION_BORRADOR,
+  ERROR_GUARDADO_PROYECTO,
   ERROR_SINCRONIZACION_EQUIPO,
 } from '../../config/mensajes-error-creacion-proyecto.config';
 import {
@@ -121,8 +130,8 @@ export class PaginaCreacionProyecto {
   protected readonly accionesCreacion = ACCIONES_CREACION_PASO_PROYECTO;
   protected readonly accionesFlujo: AccionesPasoProyecto = {
     ...ACCIONES_CREACION_PASO_PROYECTO,
-    textoPrincipal: 'Guardar flujo',
-    iconoPrincipal: 'confirmar',
+    textoPrincipal: 'Guardar proyecto',
+    iconoPrincipal: 'guardar',
     nota: 'El diagrama completo se guardará en el borrador del proyecto.',
   };
   protected readonly recorridoListo = signal(false);
@@ -275,7 +284,7 @@ export class PaginaCreacionProyecto {
 
   protected guardarSeccion(
     actualizacion: ActualizacionSeccionProyecto,
-    siguiente: ClavePasoProyecto | null,
+    siguiente: ClavePasoProyecto,
   ): void {
     const proyectoId = this.estadoCreacion.proyectoId();
     if (proyectoId === null || this.guardandoSeccion()) return;
@@ -289,11 +298,50 @@ export class PaginaCreacionProyecto {
       .subscribe({
         next: () => {
           if (this.estadoCreacion.proyectoId() !== proyectoId) return;
-          if (siguiente) this.abrirPaso(siguiente);
-          else this.volverAlInicio();
+          this.abrirPaso(siguiente);
         },
         error: (error: unknown) =>
           this.notificadorBorrador.comunicar(error, actualizacion.seccion),
+      });
+  }
+
+  /** Actualiza el flujo, guarda el proyecto con la nueva revisión y regresa al inicio. */
+  protected guardarProyecto(flujo: FlujoProyecto): void {
+    const proyectoId = this.estadoCreacion.proyectoId();
+    if (proyectoId === null || this.guardandoSeccion()) return;
+
+    const actualizacion: ActualizacionSeccionProyecto = {
+      seccion: ClaveSeccionProyecto.Flujo,
+      datos: flujo,
+    };
+    this.guardandoSeccion.set(true);
+    this.guardadoActual = this.estadoCreacion
+      .guardarSeccion(actualizacion)
+      .pipe(
+        catchError((error: unknown) => {
+          this.notificadorBorrador.comunicar(error, actualizacion.seccion);
+          return EMPTY;
+        }),
+        switchMap((borrador) =>
+          this.creacionProyecto
+            .guardarProyecto({
+              proyectoId: borrador.id,
+              revisionEsperada: borrador.revision,
+            })
+            .pipe(
+              catchError((error: unknown) => {
+                this.notificadorErrores.comunicar(error, ERROR_GUARDADO_PROYECTO);
+                return EMPTY;
+              }),
+            ),
+        ),
+        finalize(() => this.guardandoSeccion.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: () => {
+          if (this.estadoCreacion.proyectoId() === proyectoId) this.volverAlInicio();
+        },
       });
   }
 

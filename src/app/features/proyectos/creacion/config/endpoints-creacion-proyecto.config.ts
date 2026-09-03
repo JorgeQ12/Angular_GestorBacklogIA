@@ -10,4 +10,5 @@ export const ENDPOINTS_CREACION_PROYECTO = {
   crearBorrador: `${environment.apiBaseUrl}${RUTA_PROYECTOS}/CrearBorrador`,
   obtenerBorrador: `${environment.apiBaseUrl}${RUTA_PROYECTOS}/ObtenerBorrador`,
   actualizarBorrador: `${environment.apiBaseUrl}${RUTA_PROYECTOS}/ActualizarBorrador`,
+  guardarProyecto: `${environment.apiBaseUrl}${RUTA_PROYECTOS}/GuardarProyecto`,
 } as const;

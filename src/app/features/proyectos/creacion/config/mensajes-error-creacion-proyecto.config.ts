@@ -17,3 +17,9 @@ export const ERROR_SINCRONIZACION_EQUIPO = {
   titulo: 'No fue posible actualizar el equipo',
   descripcion: 'Revisa la membresía del Team en Azure DevOps e intenta nuevamente.',
 } satisfies ContextoErrorApi;
+
+/** Proporciona respaldo cuando el borrador no puede convertirse en proyecto definitivo. */
+export const ERROR_GUARDADO_PROYECTO = {
+  titulo: 'No fue posible guardar el proyecto',
+  descripcion: 'El flujo quedó guardado como borrador. Intenta finalizar el proyecto nuevamente.',
+} satisfies ContextoErrorApi;

@@ -448,8 +448,10 @@ El lienzo utiliza esquinas rectas y se une sin separación al pie de guardado de
 agrupan zoom, restablecimiento y pantalla completa; al ampliar se conserva dentro del área activa
 el lienzo, la paleta de bloques y los formularios modales, y el mismo control permite reducirlo.
 La barra superior ofrece un guardado contextual que solo se habilita cuando el diagrama cambia y
-persiste sin abandonar el editor. La acción final “Guardar flujo” persiste la misma fotografía y,
-después de la confirmación del backend, solicita a la página regresar a `/panel/inicio`.
+persiste sin abandonar el editor. La acción final “Guardar flujo” ejecuta primero
+`ActualizarBorrador` con la fotografía completa. Con la revisión confirmada por esa respuesta
+ejecuta `GuardarProyecto`, enviando `proyectoId` y `revisionEsperada`; únicamente después de
+confirmar ambas operaciones la página regresa a `/panel/inicio`.
 
 Guardar Flujo lleva `pasoActual` al menos a 9 y conserva la fotografía completa de las secciones
 anteriores.
