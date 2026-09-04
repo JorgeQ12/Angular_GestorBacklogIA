@@ -38,11 +38,17 @@ export class LienzoFlujoProyecto {
   /** Indica si el flujo contiene cambios que todavía no se han persistido. */
   public readonly cambiosPendientes = input(false);
 
+  /** Mantiene disponible la acción mientras el backend construye el primer diagrama. */
+  public readonly generandoConIA = input(false);
+
   /** Solicita al editor alternar el modo de pantalla completa. */
   public readonly alternarPantallaCompletaSolicitado = output<void>();
 
   /** Solicita persistir la fotografía vigente sin abandonar el editor. */
   public readonly guardarSolicitado = output<void>();
+
+  /** Solicita generar el primer diagrama a partir del contexto del proyecto. */
+  public readonly generarConIASolicitado = output<void>();
 
   @ViewChild('elementoVista', { static: true })
   private readonly elementoVista?: ElementRef<HTMLDivElement>;

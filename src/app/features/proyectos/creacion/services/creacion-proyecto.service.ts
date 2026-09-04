@@ -13,6 +13,7 @@ import {
   mapearSolicitudVinculacionAzure,
 } from '../mappers/creacion-proyecto.mapper';
 import { mapearCambioSeccionProyecto } from '../../mappers/actualizacion-seccion-proyecto.mapper';
+import { mapearDiagramaFlujoGeneradoIA } from '../mappers/flujo-creacion-proyecto.mapper';
 import {
   CrearBorradorProyectoRespuestaDto,
   CrearBorradorProyectoSolicitudDto,
@@ -20,6 +21,10 @@ import {
   GuardarProyectoRespuestaDto,
   GuardarProyectoSolicitudDto,
 } from '../models/borrador-proyecto.dto';
+import type {
+  GenerarDiagramaFlujoIARespuestaDto,
+  GenerarDiagramaFlujoIASolicitudDto,
+} from '../models/generacion-diagrama-flujo-ia.dto';
 import { BorradorProyecto, BorradorProyectoCreado } from '../models/borrador-proyecto.model';
 import { ActualizacionSeccionProyecto } from '../../models/actualizacion-seccion-proyecto.model';
 import {
@@ -31,6 +36,7 @@ import type {
   ResultadoVinculacionAzure,
 } from '../../models/vinculacion-azure-proyecto.model';
 import { OrigenEquipoAzureProyecto } from '../../secciones/equipo/models/equipo-proyecto.model';
+import type { FlujoProyecto } from '../../secciones/flujo/models/flujo-proyecto.model';
 
 /** Ejecuta y adapta las operaciones remotas del recorrido de creación. */
 @Injectable({ providedIn: 'root' })
@@ -129,6 +135,20 @@ export class CreacionProyectoService {
       .pipe(
         map((resultado) => exigirDatosResultadoApi(resultado, 'el proyecto guardado')),
         map(() => undefined),
+      );
+  }
+
+  /** Genera un diagrama sin persistirlo a partir del contexto vigente del proyecto. */
+  public generarDiagramaFlujoIA(proyectoId: number): Observable<FlujoProyecto> {
+    const solicitud: GenerarDiagramaFlujoIASolicitudDto = { proyectoId };
+    return this.http
+      .post<ResultadoApi<GenerarDiagramaFlujoIARespuestaDto>>(
+        ENDPOINTS_CREACION_PROYECTO.generarDiagramaFlujoIA,
+        solicitud,
+      )
+      .pipe(
+        map((resultado) => exigirDatosResultadoApi(resultado, 'el diagrama generado con IA')),
+        map((respuesta) => mapearDiagramaFlujoGeneradoIA(respuesta, proyectoId)),
       );
   }
 }

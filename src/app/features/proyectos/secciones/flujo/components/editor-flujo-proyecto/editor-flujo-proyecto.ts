@@ -47,6 +47,9 @@ export class EditorFlujoProyecto {
   /** Indica si el consumidor conserva una fotografía pendiente de guardado. */
   public readonly cambiosPendientes = input(false);
 
+  /** Indica que la propuesta inicial está siendo construida por el backend. */
+  public readonly generandoConIA = input(false);
+
   /** Define si el diagrama admite cambios o se presenta como fotografía confirmada. */
   public readonly modo = input(ModoFormularioProyecto.Edicion);
 
@@ -55,6 +58,9 @@ export class EditorFlujoProyecto {
 
   /** Solicita al consumidor persistir el flujo sin abandonar el editor. */
   public readonly guardarSolicitado = output<void>();
+
+  /** Solicita al caso de uso generar el primer diagrama con IA. */
+  public readonly generarConIASolicitado = output<void>();
 
   protected readonly esSoloLectura = computed(() => this.modo() === ModoFormularioProyecto.Lectura);
 

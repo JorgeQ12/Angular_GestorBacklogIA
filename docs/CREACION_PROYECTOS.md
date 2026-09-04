@@ -453,6 +453,13 @@ persiste sin abandonar el editor. La acción final “Guardar flujo” ejecuta p
 ejecuta `GuardarProyecto`, enviando `proyectoId` y `revisionEsperada`; únicamente después de
 confirmar ambas operaciones la página regresa a `/panel/inicio`.
 
+Cuando el canvas está vacío ofrece “Generar con IA” junto a la creación manual. La página solicita
+`GenerarDiagramaFlujoIA` enviando únicamente `proyectoId`; el backend construye el contexto con la
+información funcional ya guardada y devuelve directamente el contrato canónico de `FlujoProyecto`.
+La respuesta reemplaza solo la fotografía local del editor y permanece pendiente hasta que el
+usuario guarde. Cuando ya existe contenido, la acción se presenta como “Regenerar con IA” en el
+encabezado del paso y exige confirmación antes de reemplazar el diagrama actual.
+
 Guardar Flujo lleva `pasoActual` al menos a 9 y conserva la fotografía completa de las secciones
 anteriores.
 

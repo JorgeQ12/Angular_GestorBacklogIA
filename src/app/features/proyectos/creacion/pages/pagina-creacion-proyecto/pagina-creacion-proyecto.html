@@ -123,6 +123,10 @@
                 [modo]="modoEdicion"
                 [acciones]="accionesFlujo"
                 [procesando]="guardandoSeccion()"
+                [generandoConIA]="generandoDiagramaConIA()"
+                [cambioInicialPendiente]="flujoGeneradoConIA() !== null"
+                (generarConIA)="generarDiagramaFlujoConIA()"
+                (guardarBorrador)="guardarFlujoEnBorrador($event)"
                 (guardar)="guardarProyecto($event)"
               />
             } @else {

@@ -1,6 +1,7 @@
 <section
   class="lienzo-flujo"
   [class.es-solo-lectura]="estadoEditor.soloLectura()"
+  [attr.aria-busy]="generandoConIA()"
   aria-label="Diagrama funcional del proyecto"
 >
   <div
@@ -83,16 +84,27 @@
         titulo="Construye el recorrido del proyecto"
         descripcion="Agrega el primer bloque y conecta módulos, páginas, acciones, decisiones y componentes."
       >
-        @if (!estadoEditor.soloLectura()) {
-          <button
-            estadoVacioAcciones
-            type="button"
-            class="ui-button ui-button--primary ui-button--md"
-            (click)="abrirPaletaBloques()"
-          >
-            <app-icono class="ui-button__icon" nombre="agregar" />
-            Crear primer bloque
-          </button>
+        @if (!estadoEditor.soloLectura() || generandoConIA()) {
+          <div estadoVacioAcciones class="lienzo-flujo__acciones-vacio">
+            <button
+              type="button"
+              class="ui-button ui-button--primary ui-button--md"
+              [disabled]="generandoConIA()"
+              (click)="generarConIASolicitado.emit()"
+            >
+              <app-icono class="ui-button__icon" nombre="generarConIA" />
+              {{ generandoConIA() ? 'Generando diagrama…' : 'Generar con IA' }}
+            </button>
+            <button
+              type="button"
+              class="ui-button ui-button--secondary ui-button--md"
+              [disabled]="generandoConIA()"
+              (click)="abrirPaletaBloques()"
+            >
+              <app-icono class="ui-button__icon" nombre="agregar" />
+              Crear manualmente
+            </button>
+          </div>
         }
       </app-estado-vacio>
     }

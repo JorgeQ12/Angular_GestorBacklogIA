@@ -23,3 +23,9 @@ export const ERROR_GUARDADO_PROYECTO = {
   titulo: 'No fue posible guardar el proyecto',
   descripcion: 'El flujo quedó guardado como borrador. Intenta finalizar el proyecto nuevamente.',
 } satisfies ContextoErrorApi;
+
+/** Proporciona respaldo cuando la IA no puede producir un diagrama utilizable. */
+export const ERROR_GENERACION_DIAGRAMA_FLUJO_IA = {
+  titulo: 'No fue posible generar el diagrama',
+  descripcion: 'Conservamos el flujo actual para que puedas intentarlo nuevamente.',
+} satisfies ContextoErrorApi;

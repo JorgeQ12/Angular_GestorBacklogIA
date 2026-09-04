@@ -4,7 +4,19 @@ import {
   RolFlujoProyecto,
   TipoBloqueFlujo,
 } from '../../secciones/flujo/models/flujo-proyecto.model';
+import { deserializarFlujoProyecto } from '../../secciones/flujo/mappers/flujo-proyecto.mapper';
 import { RolesProyecto } from '../../secciones/roles/models/roles-proyecto.model';
+import type { GenerarDiagramaFlujoIARespuestaDto } from '../models/generacion-diagrama-flujo-ia.dto';
+
+/** Valida y adapta el contrato canónico generado por IA antes de entregarlo al editor. */
+export function mapearDiagramaFlujoGeneradoIA(
+  respuesta: GenerarDiagramaFlujoIARespuestaDto,
+  proyectoId: number,
+): FlujoProyecto {
+  const flujo = deserializarFlujoProyecto(JSON.stringify(respuesta), proyectoId);
+  if (!flujo) throw new Error('El diagrama generado no cumple el contrato esperado.');
+  return flujo;
+}
 
 /**
  * Incorpora al editor los roles definidos previamente y conserva sus identidades ya persistidas.

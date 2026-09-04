@@ -3,17 +3,34 @@
   [modo]="modo()"
   [editable]="editable()"
   [acciones]="acciones()"
-  [procesando]="procesando()"
+  [procesando]="ocupado()"
   [versionamiento]="versionamiento()"
   (editar)="editar.emit()"
   (cancelar)="cancelar.emit()"
   (versionCambiada)="versionCambiada.emit($event)"
   (confirmar)="confirmar()"
 >
+  @if (modo() === modos.Edicion && tieneContenido()) {
+    <button
+      accionesEncabezadoPasoProyecto
+      type="button"
+      class="ui-button ui-button--secondary ui-button--md"
+      [disabled]="ocupado()"
+      (click)="solicitarGeneracionConIA()"
+    >
+      <app-icono class="ui-button__icon" nombre="generarConIA" />
+      {{ generandoConIA() ? 'Generando…' : 'Regenerar con IA' }}
+    </button>
+  }
+
   <app-editor-flujo-proyecto
     [flujo]="flujoPresentado()"
-    [procesando]="procesando()"
+    [procesando]="ocupado()"
+    [cambiosPendientes]="cambiosPendientes()"
+    [generandoConIA]="generandoConIA()"
     [modo]="modo()"
     (flujoCambiado)="flujoTemporal.set($event)"
+    (guardarSolicitado)="guardarCambiosEnBorrador()"
+    (generarConIASolicitado)="solicitarGeneracionConIA()"
   />
 </app-tarjeta-paso-proyecto>
