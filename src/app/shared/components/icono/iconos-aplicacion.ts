@@ -35,6 +35,7 @@ import {
   LucideRefreshCw,
   LucideSave,
   LucideSearch,
+  LucideSend,
   LucideScanText,
   LucideServerCog,
   LucideSmartphone,
@@ -70,6 +71,7 @@ const ICONO_AZURE_DEVOPS = {
 /** Catálogo semántico inicial de iconos compartidos por la aplicación. */
 export const ICONOS_APLICACION = {
   agregar: LucidePlus.icon,
+  asistenteIA: LucideSparkles.icon,
   aplicacionEscritorio: LucideMonitor.icon,
   aplicacionMovil: LucideSmartphone.icon,
   aplicacionWeb: LucideAppWindow.icon,
@@ -88,6 +90,7 @@ export const ICONOS_APLICACION = {
   continuar: LucideChevronRight.icon,
   desplegar: LucideChevronDown.icon,
   eliminar: LucideTrash2.icon,
+  enviar: LucideSend.icon,
   error: LucideCircleX.icon,
   editar: LucidePencilLine.icon,
   expandirPanel: LucidePanelLeftOpen.icon,

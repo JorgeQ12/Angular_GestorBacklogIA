@@ -20,6 +20,10 @@ export const FORMATOS_FECHA = {
     month: 'long',
     year: 'numeric',
   },
+  hora: {
+    hour: 'numeric',
+    minute: '2-digit',
+  },
 } as const satisfies Record<string, Intl.DateTimeFormatOptions>;
 
 /** Identifica un formato visual de fecha registrado. */

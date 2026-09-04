@@ -23,6 +23,12 @@ hasta que todas hayan finalizado, aunque existan varias solicitudes concurrentes
 `finalize`, tanto en respuestas correctas como en errores. Los componentes que ejecutan solicitudes
 HTTP ordinarias no deben activar ni ocultar manualmente el cargador.
 
+Una operación conversacional o prolongada que mantiene interacción útil en la página puede
+administrar carga local. En ese caso el servicio HTTP establece explícitamente
+`OMITIR_CARGA_GLOBAL` en el `HttpContext` y el componente presenta todos sus estados locales. La
+exclusión no se decide por URL dentro del interceptor ni se usa para ocultar silenciosamente una
+carga sin alternativa visual. El Asistente IA es el primer consumidor de este contrato.
+
 El componente se monta una sola vez en `app.html`, antes del `router-outlet`:
 
 ```html
