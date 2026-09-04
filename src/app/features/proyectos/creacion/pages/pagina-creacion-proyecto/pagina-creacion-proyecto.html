@@ -135,5 +135,14 @@
         }
       </main>
     </div>
+
+    @if (mostrarAsistenteIA()) {
+      @if (contextoAsistenteIA(); as contextoIA) {
+        <app-asistente-ia-flotante
+          [contexto]="contextoIA"
+          (contextoActualizado)="recargarBorradorDesdeIA($event)"
+        />
+      }
+    }
   }
 </section>

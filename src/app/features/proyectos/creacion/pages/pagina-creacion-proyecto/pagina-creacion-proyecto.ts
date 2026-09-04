@@ -25,6 +25,10 @@ import { URL_INICIO_PANEL, obtenerProyectoIdRuta } from '../../../../../core/nav
 import { EncabezadoPagina } from '../../../../../shared/components/encabezado-pagina/encabezado-pagina';
 import { EstadoError } from '../../../../../shared/components/estado-error/estado-error';
 import { IconoComponent } from '../../../../../shared/components/icono/icono.component';
+import {
+  AsistenteIAFlotante,
+  type ContextoAsistenteIA,
+} from '../../../../inteligencia-artificial/asistente-ia/public-api';
 import { PasoAlcanceProyecto } from '../../../components/pasos/paso-alcance-proyecto/paso-alcance-proyecto';
 import { PasoContextoProyecto } from '../../../components/pasos/paso-contexto-proyecto/paso-contexto-proyecto';
 import { PasoEquipoProyecto } from '../../../components/pasos/paso-equipo-proyecto/paso-equipo-proyecto';
@@ -39,7 +43,10 @@ import {
   ClavePasoEspecialProyecto,
   type ClavePasoProyecto,
 } from '../../../config/pasos-proyecto.config';
-import { ClaveSeccionProyecto } from '../../../config/secciones-proyecto.config';
+import {
+  ClaveSeccionProyecto,
+  SECCIONES_PROYECTO,
+} from '../../../config/secciones-proyecto.config';
 import type { ActualizacionSeccionProyecto } from '../../../models/actualizacion-seccion-proyecto.model';
 import {
   ACCIONES_CREACION_PASO_PROYECTO,
@@ -73,6 +80,7 @@ import {
   ERROR_GUARDADO_PROYECTO,
   ERROR_SINCRONIZACION_EQUIPO,
 } from '../../config/mensajes-error-creacion-proyecto.config';
+import { AVANCE_BORRADOR_POR_PASO } from '../../config/avance-borrador-proyecto.config';
 import {
   construirEstadoRecorridoCreacion,
   obtenerUltimoPasoCreacion,
@@ -91,6 +99,7 @@ import { NotificadorErroresBorradorProyectoService } from '../../services/notifi
     EncabezadoPagina,
     EstadoError,
     IconoComponent,
+    AsistenteIAFlotante,
     RecorridoProyecto,
     PasoVinculacionAzureProyecto,
     PasoContextoProyecto,
@@ -211,6 +220,27 @@ export class PaginaCreacionProyecto {
   protected readonly tituloEncabezado = computed(
     () => this.estadoCreacion.nombreProyecto() || 'Nuevo proyecto',
   );
+  protected readonly mostrarAsistenteIA = computed(() => {
+    const borrador = this.estadoCreacion.borrador();
+    return (
+      !!borrador &&
+      borrador.pasoActual >= AVANCE_BORRADOR_POR_PASO[ClaveSeccionProyecto.Necesidad]
+    );
+  });
+  protected readonly contextoAsistenteIA = computed<ContextoAsistenteIA | null>(() => {
+    const borrador = this.estadoCreacion.borrador();
+    const proyectoId = this.idProyecto();
+    if (!borrador || proyectoId === null) return null;
+
+    const seccionActiva = this.estadoRecorrido().pasoActual;
+    const seccion = SECCIONES_PROYECTO.find((item) => item.clave === seccionActiva);
+    return {
+      proyectoId,
+      revisionContexto: borrador.revision,
+      seccionActiva,
+      nombreSeccion: seccion?.titulo ?? 'Creación del proyecto',
+    };
+  });
 
   public constructor() {
     this.cargarPrioridades();
@@ -372,6 +402,22 @@ export class PaginaCreacionProyecto {
   protected cargarRecorrido(): void {
     const proyectoId = this.idProyecto();
     if (proyectoId !== null) this.prepararRecorrido(proyectoId);
+  }
+
+  /** Recarga únicamente el borrador que originó la propuesta confirmada. */
+  protected recargarBorradorDesdeIA(proyectoId: number): void {
+    if (this.idProyecto() !== proyectoId) return;
+
+    this.estadoCreacion
+      .recargar(proyectoId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        error: (error: unknown) =>
+          this.notificadorErrores.comunicar(error, {
+            titulo: 'La propuesta se aplicó, pero no pudimos refrescar el formulario',
+            descripcion: 'Recarga el borrador para ver la información actualizada.',
+          }),
+      });
   }
 
   private cargarPrioridades(): void {

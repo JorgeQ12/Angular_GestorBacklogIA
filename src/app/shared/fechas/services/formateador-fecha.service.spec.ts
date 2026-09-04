@@ -21,6 +21,12 @@ describe('FormateadorFechaService', () => {
     expect(formateador.formatear('fecha-invalida')).toBe('Sin fecha');
   });
 
+  it('representa la hora sin depender de los datos regionales de DatePipe', () => {
+    const fecha = new Date(2026, 8, 4, 9, 5);
+
+    expect(formateador.formatear(fecha, 'hora')).toContain('9:05');
+  });
+
   it('representa el tiempo transcurrido con el locale de la aplicación', () => {
     const ahora = new Date('2026-08-24T12:00:00-05:00').getTime();
 

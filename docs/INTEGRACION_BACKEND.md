@@ -142,6 +142,8 @@ respuestas técnicas no reconocidas.
 ## Carga y errores
 
 - El interceptor de carga global cubre automáticamente las solicitudes HTTP.
+- Las conversaciones prolongadas pueden excluirse mediante `OMITIR_CARGA_GLOBAL` solo cuando su
+  feature presenta carga, envío y error locales sin bloquear la página.
 - Las páginas no agregan textos o loaders locales para la misma petición.
 - Una falla no se convierte en contadores en cero ni en estados vacíos engañosos.
 - La página utiliza `EstadoError`, permite reintentar y oculta el contenido que depende de la

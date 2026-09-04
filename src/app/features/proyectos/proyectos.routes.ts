@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { PARAMETROS_RUTA, SEGMENTOS_RUTA } from '../../core/navegacion/rutas';
+import { EstadoAsistenteIAService } from '../inteligencia-artificial/asistente-ia/public-api';
 import { EstadoCreacionProyectoService } from './creacion/services/estado-creacion-proyecto.service';
 import { EstadoListadoProyectosService } from './listado/services/estado-listado-proyectos.service';
 import { EstadoInformacionProyectoService } from './informacion/services/estado-informacion-proyecto.service';
@@ -25,7 +26,7 @@ export const RUTAS_PROYECTOS: Routes = [
   },
   {
     path: SEGMENTOS_RUTA.creacion,
-    providers: [EstadoCreacionProyectoService],
+    providers: [EstadoCreacionProyectoService, EstadoAsistenteIAService],
     loadComponent: () =>
       import('./creacion/pages/pagina-creacion-proyecto/pagina-creacion-proyecto').then(
         (modulo) => modulo.PaginaCreacionProyecto,
