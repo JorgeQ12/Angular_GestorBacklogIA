@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
 import { By } from '@angular/platform-browser';
 import { provideRouter, Router, Routes } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
@@ -10,12 +11,16 @@ import type { DatosVinculacionAzure } from '../../../models/vinculacion-azure-pr
 import { CreacionProyectoService } from '../../services/creacion-proyecto.service';
 import { EstadoCreacionProyectoService } from '../../services/estado-creacion-proyecto.service';
 import { PaginaCreacionProyecto } from './pagina-creacion-proyecto';
+import {
+  AsistenteIaFlotante,
+  EstadoAsistenteIaService,
+} from '../../../../inteligencia-artificial/asistente-conversacional/public-api';
 
 const RUTAS: Routes = [
   {
     path: `${SEGMENTOS_RUTA.proyectos}/${SEGMENTOS_RUTA.creacion}`,
     component: PaginaCreacionProyecto,
-    providers: [EstadoCreacionProyectoService],
+    providers: [EstadoCreacionProyectoService, EstadoAsistenteIaService],
   },
 ];
 
@@ -42,6 +47,7 @@ describe('PaginaCreacionProyecto', () => {
       imports: [PaginaCreacionProyecto],
       providers: [
         provideRouter(RUTAS),
+        provideHttpClient(),
         { provide: CreacionProyectoService, useValue: creacionProyecto },
       ],
     });
@@ -65,6 +71,36 @@ describe('PaginaCreacionProyecto', () => {
     expect(obtenerPosicionRecorrido(elemento)).toBe('Paso 5 de 9');
     expect(elemento.querySelector('[aria-current="step"]')?.textContent).toContain('Objetivos');
     expect(elemento.querySelector('app-paso-objetivos-proyecto')).not.toBeNull();
+    expect(elemento.querySelector('app-asistente-ia-flotante')).not.toBeNull();
+  });
+
+  it('mantiene oculto el Asistente IA antes de alcanzar necesidad de negocio', async () => {
+    creacionProyecto.obtenerBorrador.mockReturnValueOnce(
+      of({ ...BORRADOR_AVANZADO, pasoActual: 2 }),
+    );
+    const harness = await RouterTestingHarness.create('/proyectos/creacion?proyectoId=42');
+
+    expect(
+      (harness.routeNativeElement as HTMLElement).querySelector('app-asistente-ia-flotante'),
+    ).toBeNull();
+  });
+
+  it('recarga el borrador después de aplicar una propuesta de IA', async () => {
+    const harness = await RouterTestingHarness.create('/proyectos/creacion?proyectoId=42');
+    const asistente = harness.routeDebugElement?.query(By.directive(AsistenteIaFlotante));
+
+    asistente?.componentInstance.contextoActualizado.emit(42);
+
+    expect(creacionProyecto.obtenerBorrador).toHaveBeenCalledTimes(2);
+  });
+
+  it('ignora una propuesta resuelta para un proyecto que ya no está activo', async () => {
+    const harness = await RouterTestingHarness.create('/proyectos/creacion?proyectoId=42');
+    const asistente = harness.routeDebugElement?.query(By.directive(AsistenteIaFlotante));
+
+    asistente?.componentInstance.contextoActualizado.emit(84);
+
+    expect(creacionProyecto.obtenerBorrador).toHaveBeenCalledTimes(1);
   });
 
   it('oculta el encabezado y el recorrido cuando falla la carga del borrador', async () => {

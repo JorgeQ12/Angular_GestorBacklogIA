@@ -5,6 +5,8 @@ específicas se mantienen en documentos separados para evitar un archivo único 
 
 ## Documentos especializados
 
+- [Asistente IA conversacional](ASISTENTE_IA.md): alcance por proyecto, propuestas, persistencia y
+  límites entre IA y Proyectos.
 - [Autenticación mediante Kong y Microsoft](AUTENTICACION_KONG.md): popup, sesión, endpoints y
   responsabilidades.
 - [Carga global](CARGA_GLOBAL.md): estado concurrente, interceptor HTTP y presentación única.

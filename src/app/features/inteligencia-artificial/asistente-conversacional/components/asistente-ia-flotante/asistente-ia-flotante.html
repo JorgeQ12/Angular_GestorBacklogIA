@@ -1,0 +1,38 @@
+<div class="asistente-ia-flotante">
+  @if (abierto()) {
+    <div class="asistente-ia-flotante__panel">
+      <app-panel-asistente-ia
+        [mensajes]="estado.mensajes()"
+        [nombreSeccion]="contexto().nombreSeccion"
+        [cargando]="estado.cargando()"
+        [errorCarga]="estado.errorCarga()"
+        [enviando]="estado.enviando()"
+        [mensajePendiente]="estado.mensajePendiente()"
+        [propuestaProcesando]="estado.propuestaProcesando()"
+        (cerrar)="cerrar()"
+        (reintentar)="estado.cargar(contexto().proyectoId, true)"
+        (mensajeEnviado)="enviarMensaje($event)"
+        (propuestaAplicada)="aplicarPropuesta($event)"
+        (propuestaRechazada)="rechazarPropuesta($event)"
+      />
+    </div>
+  } @else {
+    <button
+      #activador
+      type="button"
+      class="asistente-ia-flotante__activador"
+      aria-label="Abrir Asistente IA"
+      aria-controls="panel-asistente-ia"
+      aria-expanded="false"
+      data-etiqueta="Asistente IA"
+      (click)="alternar()"
+    >
+      <span class="asistente-ia-flotante__marca" aria-hidden="true">
+        <img src="/brand/logo.svg" alt="" />
+        <span class="asistente-ia-flotante__insignia">
+          <app-icono nombre="asistenteIa" />
+        </span>
+      </span>
+    </button>
+  }
+</div>

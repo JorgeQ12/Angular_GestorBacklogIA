@@ -1,0 +1,275 @@
+<section
+  id="panel-asistente-ia"
+  class="panel-asistente"
+  role="dialog"
+  aria-modal="false"
+  aria-labelledby="titulo-panel-asistente-ia"
+  [attr.aria-busy]="cargando() || enviando()"
+>
+  <header class="panel-asistente__encabezado">
+    <div class="panel-asistente__identidad">
+      <span class="panel-asistente__icono" aria-hidden="true">
+        <app-icono nombre="asistenteIa" />
+      </span>
+      <div class="panel-asistente__titulo">
+        <div class="panel-asistente__titulo-linea">
+          <h2 id="titulo-panel-asistente-ia">Asistente IA</h2>
+          <span
+            class="panel-asistente__disponibilidad"
+            [class.panel-asistente__disponibilidad--procesando]="cargando() || enviando()"
+            [class.panel-asistente__disponibilidad--error]="errorCarga()"
+            aria-live="polite"
+          >
+            <span aria-hidden="true"></span>
+            @if (errorCarga()) {
+              Sin conexión
+            } @else if (cargando()) {
+              Conectando
+            } @else if (enviando()) {
+              Analizando
+            } @else {
+              Disponible
+            }
+          </span>
+        </div>
+      </div>
+    </div>
+    <button
+      type="button"
+      class="panel-asistente__cerrar"
+      aria-label="Cerrar Asistente IA"
+      (click)="cerrar.emit()"
+    >
+      <app-icono nombre="cerrar" />
+    </button>
+  </header>
+
+  <div class="panel-asistente__contexto">
+    <span class="panel-asistente__contexto-icono" aria-hidden="true">
+      <app-icono nombre="contextoProyecto" />
+    </span>
+    <span>Trabajando en</span>
+    <strong>{{ nombreSeccion() }}</strong>
+  </div>
+
+  <div #listaMensajes class="panel-asistente__mensajes" aria-live="polite">
+    @if (cargando()) {
+      <div class="panel-asistente__estado">
+        <span class="panel-asistente__indicador" aria-hidden="true"></span>
+        <strong>Conectando con tu proyecto</strong>
+        <p>Estoy recuperando el contexto y la conversación.</p>
+      </div>
+    } @else if (errorCarga()) {
+      <div class="panel-asistente__estado panel-asistente__estado--error">
+        <span class="panel-asistente__estado-icono" aria-hidden="true">
+          <app-icono nombre="alerta" />
+        </span>
+        <strong>No pude cargar el historial</strong>
+        <p>Reintenta para continuar desde la conversación del proyecto.</p>
+        <button
+          type="button"
+          class="ui-button ui-button--secondary ui-button--md"
+          (click)="reintentar.emit()"
+        >
+          <app-icono class="ui-button__icon" nombre="reintentar" />
+          Reintentar
+        </button>
+      </div>
+    } @else {
+      @if (mensajes().length === 0) {
+        <div class="panel-asistente__bienvenida">
+          <div class="panel-asistente__bienvenida-icono" aria-hidden="true">
+            <span></span>
+            <app-icono nombre="asistenteIa" />
+          </div>
+          <span class="panel-asistente__bienvenida-estado">
+            <span aria-hidden="true"></span>
+            Contexto conectado
+          </span>
+          <h3>Construyamos una definición más sólida</h3>
+          <p>
+            Puedo analizar esta sección, encontrar vacíos y preparar una propuesta lista para tu
+            revisión.
+          </p>
+          <ul class="panel-asistente__capacidades" aria-label="Capacidades del asistente">
+            <li>
+              <app-icono nombre="buscar" />
+              Detectar vacíos
+            </li>
+            <li>
+              <app-icono nombre="editar" />
+              Mejorar claridad
+            </li>
+            <li>
+              <app-icono nombre="asistenteIa" />
+              Crear propuestas
+            </li>
+          </ul>
+        </div>
+      }
+
+      @for (mensaje of mensajes(); track mensaje.id) {
+        <article
+          class="mensaje-asistente"
+          [class.mensaje-asistente--usuario]="mensaje.rol === roles.Usuario"
+        >
+          @if (mensaje.rol === roles.Asistente) {
+            <span class="mensaje-asistente__avatar" aria-hidden="true">
+              <app-icono nombre="asistenteIa" />
+            </span>
+          }
+
+          <div class="mensaje-asistente__contenido">
+            <div class="mensaje-asistente__metadatos">
+              <strong>{{ mensaje.rol === roles.Usuario ? 'Tú' : 'Asistente IA' }}</strong>
+              <time [attr.datetime]="mensaje.fechaCreacion">
+                {{ mensaje.fechaCreacion | fecha: 'hora' : '' }}
+              </time>
+            </div>
+            <div class="mensaje-asistente__burbuja">
+              <p>{{ mensaje.texto }}</p>
+            </div>
+
+            @if (mensaje.propuesta; as propuesta) {
+              <section
+                class="propuesta-ia"
+                [attr.aria-label]="'Propuesta para ' + propuesta.seccion"
+              >
+                <div class="propuesta-ia__titulo">
+                  <span class="propuesta-ia__icono" aria-hidden="true">
+                    <app-icono nombre="asistenteIa" />
+                  </span>
+                  <div>
+                    <span class="propuesta-ia__etiqueta">Sugerencia estructurada</span>
+                    <strong>Propuesta para {{ propuesta.seccion }}</strong>
+                    <p>{{ propuesta.resumen }}</p>
+                  </div>
+                </div>
+
+                @if (propuesta.detalles.length) {
+                  <dl class="propuesta-ia__detalles">
+                    @for (detalle of propuesta.detalles; track detalle.etiqueta) {
+                      <div>
+                        <dt>{{ detalle.etiqueta }}</dt>
+                        @for (valor of detalle.valores; track $index) {
+                          <dd>{{ valor }}</dd>
+                        }
+                      </div>
+                    }
+                  </dl>
+                }
+
+                @if (propuesta.estado === estadosPropuesta.Pendiente) {
+                  <div class="propuesta-ia__acciones">
+                    <button
+                      type="button"
+                      class="ui-button ui-button--primary ui-button--md"
+                      [disabled]="operacionBloqueada()"
+                      (click)="propuestaAplicada.emit(mensaje.id)"
+                    >
+                      <app-icono class="ui-button__icon" nombre="confirmar" />
+                      Aplicar propuesta
+                    </button>
+                    <button
+                      type="button"
+                      class="ui-button ui-button--secondary ui-button--md"
+                      [disabled]="operacionBloqueada()"
+                      (click)="propuestaRechazada.emit(mensaje.id)"
+                    >
+                      Rechazar
+                    </button>
+                  </div>
+                } @else {
+                  <p
+                    class="propuesta-ia__estado"
+                    [class.propuesta-ia__estado--aplicada]="
+                      propuesta.estado === estadosPropuesta.Aplicada
+                    "
+                  >
+                    <app-icono
+                      [nombre]="
+                        propuesta.estado === estadosPropuesta.Aplicada ? 'confirmar' : 'cerrar'
+                      "
+                    />
+                    {{
+                      propuesta.estado === estadosPropuesta.Aplicada
+                        ? 'Propuesta aplicada'
+                        : 'Propuesta rechazada'
+                    }}
+                  </p>
+                }
+              </section>
+            }
+          </div>
+        </article>
+      }
+
+      @if (mensajePendiente(); as mensaje) {
+        <article class="mensaje-asistente mensaje-asistente--usuario">
+          <div class="mensaje-asistente__contenido">
+            <div class="mensaje-asistente__metadatos"><strong>Tú</strong></div>
+            <div class="mensaje-asistente__burbuja"><p>{{ mensaje }}</p></div>
+          </div>
+        </article>
+        <article class="mensaje-asistente" role="status">
+          <span
+            class="mensaje-asistente__avatar mensaje-asistente__avatar--activo"
+            aria-hidden="true"
+          >
+            <app-icono nombre="asistenteIa" />
+          </span>
+          <div class="mensaje-asistente__contenido">
+            <div class="mensaje-asistente__metadatos"><strong>Asistente IA</strong></div>
+            <div class="panel-asistente__pensando">
+              <span class="panel-asistente__pensando-texto">Analizando la sección</span>
+              <span class="panel-asistente__puntos" aria-hidden="true">
+                <span></span><span></span><span></span>
+              </span>
+              <span class="ui-visually-hidden">
+                El Asistente IA está preparando una respuesta
+              </span>
+            </div>
+          </div>
+        </article>
+      }
+    }
+  </div>
+
+  <form class="panel-asistente__formulario" [formGroup]="formulario" (ngSubmit)="enviar()">
+    <label class="ui-visually-hidden" for="mensaje-asistente-ia">
+      Mensaje para el Asistente IA
+    </label>
+    <div class="panel-asistente__compositor">
+      <textarea
+        id="mensaje-asistente-ia"
+        class="ui-control panel-asistente__entrada"
+        formControlName="mensaje"
+        rows="2"
+        [maxlength]="limiteMensaje"
+        aria-describedby="atajo-mensaje-asistente-ia"
+        placeholder="Pregunta, pide una revisión o solicita una propuesta…"
+        (keydown)="manejarTeclado($event)"
+        required
+      ></textarea>
+      <button
+        type="submit"
+        class="panel-asistente__enviar"
+        aria-label="Enviar mensaje"
+        [disabled]="formulario.invalid || operacionBloqueada()"
+      >
+        <app-icono nombre="enviar" />
+      </button>
+    </div>
+    <div class="panel-asistente__formulario-meta">
+      <span id="atajo-mensaje-asistente-ia">
+        <strong>Enter</strong> para enviar · <strong>Shift + Enter</strong> para nueva línea
+      </span>
+      <span>{{ formulario.controls.mensaje.value.length }}/{{ limiteMensaje }}</span>
+    </div>
+  </form>
+
+  <div class="panel-asistente__aviso">
+    <app-icono nombre="bloqueado" aria-hidden="true" />
+    <p>Ningún cambio se aplica sin tu aprobación.</p>
+  </div>
+</section>

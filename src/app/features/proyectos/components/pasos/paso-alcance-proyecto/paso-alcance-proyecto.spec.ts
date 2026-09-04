@@ -33,7 +33,7 @@ describe('PasoAlcanceProyecto', () => {
 
     expect(botonPrincipal.getAttribute('form')).toBe(formulario.id);
     expect(botonPrincipal.form).toBe(formulario);
-    formulario.requestSubmit(botonPrincipal);
+    botonPrincipal.click();
 
     expect(guardar).toHaveBeenCalledWith({ incluido: 'Incluido', excluido: 'Excluido' });
   });
