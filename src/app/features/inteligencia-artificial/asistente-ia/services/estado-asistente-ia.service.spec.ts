@@ -2,16 +2,16 @@ import { TestBed } from '@angular/core/testing';
 import { Subject, firstValueFrom, of, throwError } from 'rxjs';
 import { NotificadorErroresApiService } from '../../../../core/mensajes/services/notificador-errores-api.service';
 import {
-  EstadoPropuestaAsistenteIa,
-  RolMensajeAsistenteIa,
-  type ContextoAsistenteIa,
-  type MensajeAsistenteIa,
-  type RespuestaEnvioAsistenteIa,
+  EstadoPropuestaAsistenteIA,
+  RolMensajeAsistenteIA,
+  type ContextoAsistenteIA,
+  type MensajeAsistenteIA,
+  type RespuestaEnvioAsistenteIA,
 } from '../models/asistente-ia.model';
-import { AsistenteIaApiService } from './asistente-ia-api.service';
-import { EstadoAsistenteIaService } from './estado-asistente-ia.service';
+import { AsistenteIAApiService } from './asistente-ia-api.service';
+import { EstadoAsistenteIAService } from './estado-asistente-ia.service';
 
-describe('EstadoAsistenteIaService', () => {
+describe('EstadoAsistenteIAService', () => {
   const api = {
     obtenerConversacion: vi.fn(),
     enviarMensaje: vi.fn(),
@@ -19,7 +19,7 @@ describe('EstadoAsistenteIaService', () => {
     rechazarPropuesta: vi.fn(),
   };
   const notificador = { comunicar: vi.fn() };
-  let servicio: EstadoAsistenteIaService;
+  let servicio: EstadoAsistenteIAService;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -28,12 +28,12 @@ describe('EstadoAsistenteIaService', () => {
     );
     TestBed.configureTestingModule({
       providers: [
-        EstadoAsistenteIaService,
-        { provide: AsistenteIaApiService, useValue: api },
+        EstadoAsistenteIAService,
+        { provide: AsistenteIAApiService, useValue: api },
         { provide: NotificadorErroresApiService, useValue: notificador },
       ],
     });
-    servicio = TestBed.inject(EstadoAsistenteIaService);
+    servicio = TestBed.inject(EstadoAsistenteIAService);
   });
 
   it('conserva un único historial cargado para el proyecto activo', () => {
@@ -49,12 +49,12 @@ describe('EstadoAsistenteIaService', () => {
     const cargaAnterior = new Subject<{
       proyectoId: number;
       conversacionId: null;
-      mensajes: readonly MensajeAsistenteIa[];
+      mensajes: readonly MensajeAsistenteIA[];
     }>();
     const cargaVigente = new Subject<{
       proyectoId: number;
       conversacionId: null;
-      mensajes: readonly MensajeAsistenteIa[];
+      mensajes: readonly MensajeAsistenteIA[];
     }>();
     api.obtenerConversacion
       .mockReturnValueOnce(cargaAnterior)
@@ -69,7 +69,7 @@ describe('EstadoAsistenteIaService', () => {
   });
 
   it('descarta un envío pendiente cuando cambia el proyecto activo', () => {
-    const respuesta = new Subject<RespuestaEnvioAsistenteIa>();
+    const respuesta = new Subject<RespuestaEnvioAsistenteIA>();
     api.enviarMensaje.mockReturnValue(respuesta);
     servicio.cargar(42);
     servicio.enviar(CONTEXTO, 'Analiza esta sección').subscribe();
@@ -77,7 +77,7 @@ describe('EstadoAsistenteIaService', () => {
     servicio.seleccionarProyecto(84);
     respuesta.next({
       conversacionId: 7,
-      mensajeUsuario: crearMensaje(2, RolMensajeAsistenteIa.Usuario),
+      mensajeUsuario: crearMensaje(2, RolMensajeAsistenteIA.Usuario),
       mensajeAsistente: crearMensaje(3),
     });
 
@@ -94,7 +94,7 @@ describe('EstadoAsistenteIaService', () => {
       of({
         proyectoId: 42,
         mensajeId: 9,
-        estado: EstadoPropuestaAsistenteIa.Aplicada,
+        estado: EstadoPropuestaAsistenteIA.Aplicada,
         revision: 5,
       }),
     );
@@ -103,12 +103,12 @@ describe('EstadoAsistenteIaService', () => {
     const resultado = await firstValueFrom(servicio.aplicar(CONTEXTO, 9));
 
     expect(resultado.proyectoId).toBe(42);
-    expect(servicio.mensajes()[0]?.propuesta?.estado).toBe(EstadoPropuestaAsistenteIa.Aplicada);
+    expect(servicio.mensajes()[0]?.propuesta?.estado).toBe(EstadoPropuestaAsistenteIA.Aplicada);
     expect(servicio.propuestaProcesando()).toBeNull();
   });
 
   it('bloquea operaciones superpuestas mientras existe un envío pendiente', () => {
-    api.enviarMensaje.mockReturnValue(new Subject<RespuestaEnvioAsistenteIa>());
+    api.enviarMensaje.mockReturnValue(new Subject<RespuestaEnvioAsistenteIA>());
     servicio.cargar(42);
     servicio.enviar(CONTEXTO, 'Primer mensaje').subscribe();
     servicio.enviar(CONTEXTO, 'Segundo mensaje').subscribe();
@@ -126,7 +126,7 @@ describe('EstadoAsistenteIaService', () => {
       of({
         proyectoId: 84,
         mensajeId: 9,
-        estado: EstadoPropuestaAsistenteIa.Aplicada,
+        estado: EstadoPropuestaAsistenteIA.Aplicada,
         revision: 5,
       }),
     );
@@ -134,7 +134,7 @@ describe('EstadoAsistenteIaService', () => {
 
     servicio.aplicar(CONTEXTO, 9).subscribe();
 
-    expect(servicio.mensajes()[0]?.propuesta?.estado).toBe(EstadoPropuestaAsistenteIa.Pendiente);
+    expect(servicio.mensajes()[0]?.propuesta?.estado).toBe(EstadoPropuestaAsistenteIA.Pendiente);
     expect(notificador.comunicar).toHaveBeenCalledOnce();
   });
 
@@ -153,7 +153,7 @@ describe('EstadoAsistenteIaService', () => {
   });
 });
 
-const CONTEXTO: ContextoAsistenteIa = {
+const CONTEXTO: ContextoAsistenteIA = {
   proyectoId: 42,
   revisionContexto: 4,
   seccionActiva: 'objetivos',
@@ -162,9 +162,9 @@ const CONTEXTO: ContextoAsistenteIa = {
 
 function crearMensaje(
   id: number,
-  rol = RolMensajeAsistenteIa.Asistente,
+  rol = RolMensajeAsistenteIA.Asistente,
   conPropuesta = false,
-): MensajeAsistenteIa {
+): MensajeAsistenteIA {
   return {
     id,
     rol,
@@ -178,7 +178,7 @@ function crearMensaje(
           seccion: 'objetivos',
           resumen: 'Mejora los objetivos.',
           contenidoJson: '{}',
-          estado: EstadoPropuestaAsistenteIa.Pendiente,
+          estado: EstadoPropuestaAsistenteIA.Pendiente,
           detalles: [],
         }
       : null,

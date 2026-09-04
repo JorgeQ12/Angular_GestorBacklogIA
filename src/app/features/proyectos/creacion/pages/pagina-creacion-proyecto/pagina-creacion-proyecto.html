@@ -136,11 +136,11 @@
       </main>
     </div>
 
-    @if (mostrarAsistenteIa()) {
-      @if (contextoAsistenteIa(); as contextoIa) {
+    @if (mostrarAsistenteIA()) {
+      @if (contextoAsistenteIA(); as contextoIA) {
         <app-asistente-ia-flotante
-          [contexto]="contextoIa"
-          (contextoActualizado)="recargarBorradorDesdeIa($event)"
+          [contexto]="contextoIA"
+          (contextoActualizado)="recargarBorradorDesdeIA($event)"
         />
       }
     }

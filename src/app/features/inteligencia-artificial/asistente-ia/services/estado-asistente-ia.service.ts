@@ -18,19 +18,19 @@ import {
   ERROR_PROPUESTA_ASISTENTE_IA,
 } from '../config/mensajes-asistente-ia.config';
 import type {
-  ContextoAsistenteIa,
-  MensajeAsistenteIa,
-  ResultadoResolucionPropuestaIa,
+  ContextoAsistenteIA,
+  MensajeAsistenteIA,
+  ResultadoResolucionPropuestaIA,
 } from '../models/asistente-ia.model';
-import { AsistenteIaApiService } from './asistente-ia-api.service';
+import { AsistenteIAApiService } from './asistente-ia-api.service';
 
 /** Conserva una única conversación de IA durante la vida de la ruta del proyecto. */
 @Injectable()
-export class EstadoAsistenteIaService {
-  private readonly api = inject(AsistenteIaApiService);
+export class EstadoAsistenteIAService {
+  private readonly api = inject(AsistenteIAApiService);
   private readonly notificador = inject(NotificadorErroresApiService);
   private readonly destroyRef = inject(DestroyRef);
-  private readonly estadoMensajes = signal<readonly MensajeAsistenteIa[]>([]);
+  private readonly estadoMensajes = signal<readonly MensajeAsistenteIA[]>([]);
   private readonly estadoCargando = signal(false);
   private readonly estadoErrorCarga = signal(false);
   private readonly estadoEnviando = signal(false);
@@ -111,7 +111,7 @@ export class EstadoAsistenteIaService {
   }
 
   /** Envía un turno únicamente mientras su proyecto continúa activo y disponible. */
-  public enviar(contexto: ContextoAsistenteIa, texto: string): Observable<void> {
+  public enviar(contexto: ContextoAsistenteIA, texto: string): Observable<void> {
     const mensaje = texto.trim();
     if (!mensaje || !this.puedeOperar(contexto.proyectoId) || this.estadoEnviando()) return EMPTY;
 
@@ -143,9 +143,9 @@ export class EstadoAsistenteIaService {
 
   /** Aplica una propuesta pendiente y conserva su nuevo estado en el historial activo. */
   public aplicar(
-    contexto: ContextoAsistenteIa,
+    contexto: ContextoAsistenteIA,
     mensajeId: number,
-  ): Observable<ResultadoResolucionPropuestaIa> {
+  ): Observable<ResultadoResolucionPropuestaIA> {
     if (!this.puedeOperar(contexto.proyectoId) || this.hayOperacionEnCurso()) return EMPTY;
     this.estadoPropuestaProcesando.set(mensajeId);
     return this.api.aplicarPropuesta(contexto, mensajeId).pipe(
@@ -200,7 +200,7 @@ export class EstadoAsistenteIaService {
   }
 
   private exigirProyectoResultado(
-    resultado: ResultadoResolucionPropuestaIa,
+    resultado: ResultadoResolucionPropuestaIA,
     proyectoEsperado: number,
   ): void {
     if (resultado.proyectoId !== proyectoEsperado) {
@@ -208,7 +208,7 @@ export class EstadoAsistenteIaService {
     }
   }
 
-  private actualizarEstadoPropuesta(resultado: ResultadoResolucionPropuestaIa): void {
+  private actualizarEstadoPropuesta(resultado: ResultadoResolucionPropuestaIA): void {
     this.estadoMensajes.update((mensajes) =>
       mensajes.map((mensaje) =>
         mensaje.id === resultado.mensajeId && mensaje.propuesta

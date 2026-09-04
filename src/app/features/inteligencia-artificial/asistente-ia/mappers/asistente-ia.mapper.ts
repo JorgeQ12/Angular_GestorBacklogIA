@@ -1,47 +1,47 @@
 import type {
-  ConversacionAsistenteIaDto,
-  EnviarMensajeAsistenteIaRespuestaDto,
-  MensajeAsistenteIaDto,
-  ResolverPropuestaAsistenteIaRespuestaDto,
+  ConversacionAsistenteIADto,
+  EnviarMensajeAsistenteIARespuestaDto,
+  MensajeAsistenteIADto,
+  ResolverPropuestaAsistenteIARespuestaDto,
 } from '../models/asistente-ia.dto';
 import type {
-  ConversacionAsistenteIa,
-  DetallePropuestaAsistenteIa,
-  MensajeAsistenteIa,
-  RespuestaEnvioAsistenteIa,
-  ResultadoResolucionPropuestaIa,
+  ConversacionAsistenteIA,
+  DetallePropuestaAsistenteIA,
+  MensajeAsistenteIA,
+  RespuestaEnvioAsistenteIA,
+  ResultadoResolucionPropuestaIA,
 } from '../models/asistente-ia.model';
 import {
-  EstadoPropuestaAsistenteIa,
-  RolMensajeAsistenteIa,
+  EstadoPropuestaAsistenteIA,
+  RolMensajeAsistenteIA,
 } from '../models/asistente-ia.model';
 
 /** Adapta el historial HTTP a los modelos consumidos por el panel. */
-export function mapearConversacionAsistenteIa(
-  dto: ConversacionAsistenteIaDto,
-): ConversacionAsistenteIa {
+export function mapearConversacionAsistenteIA(
+  dto: ConversacionAsistenteIADto,
+): ConversacionAsistenteIA {
   return {
     proyectoId: dto.proyectoId,
     conversacionId: dto.conversacionId,
-    mensajes: dto.mensajes.map(mapearMensajeAsistenteIa),
+    mensajes: dto.mensajes.map(mapearMensajeAsistenteIA),
   };
 }
 
 /** Adapta los turnos confirmados de una nueva interacción. */
-export function mapearRespuestaEnvioAsistenteIa(
-  dto: EnviarMensajeAsistenteIaRespuestaDto,
-): RespuestaEnvioAsistenteIa {
+export function mapearRespuestaEnvioAsistenteIA(
+  dto: EnviarMensajeAsistenteIARespuestaDto,
+): RespuestaEnvioAsistenteIA {
   return {
     conversacionId: dto.conversacionId,
-    mensajeUsuario: mapearMensajeAsistenteIa(dto.mensajeUsuario),
-    mensajeAsistente: mapearMensajeAsistenteIa(dto.mensajeAsistente),
+    mensajeUsuario: mapearMensajeAsistenteIA(dto.mensajeUsuario),
+    mensajeAsistente: mapearMensajeAsistenteIA(dto.mensajeAsistente),
   };
 }
 
 /** Normaliza el estado externo devuelto al resolver una propuesta. */
-export function mapearResolucionPropuestaIa(
-  dto: ResolverPropuestaAsistenteIaRespuestaDto,
-): ResultadoResolucionPropuestaIa {
+export function mapearResolucionPropuestaIA(
+  dto: ResolverPropuestaAsistenteIARespuestaDto,
+): ResultadoResolucionPropuestaIA {
   return {
     proyectoId: dto.proyectoId,
     mensajeId: dto.mensajeId,
@@ -50,7 +50,7 @@ export function mapearResolucionPropuestaIa(
   };
 }
 
-function mapearMensajeAsistenteIa(dto: MensajeAsistenteIaDto): MensajeAsistenteIa {
+function mapearMensajeAsistenteIA(dto: MensajeAsistenteIADto): MensajeAsistenteIA {
   return {
     id: dto.id,
     rol: normalizarRol(dto.rol),
@@ -71,23 +71,23 @@ function mapearMensajeAsistenteIa(dto: MensajeAsistenteIaDto): MensajeAsistenteI
   };
 }
 
-function normalizarRol(rol: string): RolMensajeAsistenteIa {
+function normalizarRol(rol: string): RolMensajeAsistenteIA {
   const normalizado = rol.toLowerCase();
-  if (normalizado === RolMensajeAsistenteIa.Usuario) return RolMensajeAsistenteIa.Usuario;
-  if (normalizado === RolMensajeAsistenteIa.Asistente) return RolMensajeAsistenteIa.Asistente;
+  if (normalizado === RolMensajeAsistenteIA.Usuario) return RolMensajeAsistenteIA.Usuario;
+  if (normalizado === RolMensajeAsistenteIA.Asistente) return RolMensajeAsistenteIA.Asistente;
   throw new Error(`Rol desconocido en la conversación del Asistente IA: ${rol}`);
 }
 
-function normalizarEstado(estado: string): EstadoPropuestaAsistenteIa {
+function normalizarEstado(estado: string): EstadoPropuestaAsistenteIA {
   const normalizado = estado.toLowerCase();
-  if (normalizado === EstadoPropuestaAsistenteIa.Pendiente) {
-    return EstadoPropuestaAsistenteIa.Pendiente;
+  if (normalizado === EstadoPropuestaAsistenteIA.Pendiente) {
+    return EstadoPropuestaAsistenteIA.Pendiente;
   }
-  if (normalizado === EstadoPropuestaAsistenteIa.Aplicada) {
-    return EstadoPropuestaAsistenteIa.Aplicada;
+  if (normalizado === EstadoPropuestaAsistenteIA.Aplicada) {
+    return EstadoPropuestaAsistenteIA.Aplicada;
   }
-  if (normalizado === EstadoPropuestaAsistenteIa.Rechazada) {
-    return EstadoPropuestaAsistenteIa.Rechazada;
+  if (normalizado === EstadoPropuestaAsistenteIA.Rechazada) {
+    return EstadoPropuestaAsistenteIA.Rechazada;
   }
   throw new Error(`Estado desconocido en una propuesta del Asistente IA: ${estado}`);
 }
@@ -95,7 +95,7 @@ function normalizarEstado(estado: string): EstadoPropuestaAsistenteIa {
 function crearDetallesPropuesta(
   seccion: string,
   contenidoJson: string,
-): readonly DetallePropuestaAsistenteIa[] {
+): readonly DetallePropuestaAsistenteIA[] {
   try {
     const contenido: unknown = JSON.parse(contenidoJson);
     switch (seccion.toLocaleLowerCase()) {
@@ -128,14 +128,14 @@ function crearDetallesPropuesta(
 function detallesObjeto(
   contenido: unknown,
   campos: readonly (readonly [string, string])[],
-): readonly DetallePropuestaAsistenteIa[] {
+): readonly DetallePropuestaAsistenteIA[] {
   if (!esObjeto(contenido)) return [];
   return campos
     .map(([etiqueta, clave]) => ({ etiqueta, valores: normalizarValores(contenido[clave]) }))
     .filter((detalle) => detalle.valores.length > 0);
 }
 
-function detallesRoles(contenido: unknown): readonly DetallePropuestaAsistenteIa[] {
+function detallesRoles(contenido: unknown): readonly DetallePropuestaAsistenteIA[] {
   if (!Array.isArray(contenido)) return [];
   return contenido.flatMap((rol, indice) => {
     if (!esObjeto(rol)) return [];

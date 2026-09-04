@@ -71,7 +71,7 @@ const ICONO_AZURE_DEVOPS = {
 /** Catálogo semántico inicial de iconos compartidos por la aplicación. */
 export const ICONOS_APLICACION = {
   agregar: LucidePlus.icon,
-  asistenteIa: LucideSparkles.icon,
+  asistenteIA: LucideSparkles.icon,
   aplicacionEscritorio: LucideMonitor.icon,
   aplicacionMovil: LucideSmartphone.icon,
   aplicacionWeb: LucideAppWindow.icon,

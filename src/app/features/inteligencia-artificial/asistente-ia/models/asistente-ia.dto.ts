@@ -1,5 +1,5 @@
 /** Representa la propuesta estructurada recibida desde el API. */
-export interface PropuestaAsistenteIaDto {
+export interface PropuestaAsistenteIADto {
   readonly seccion: string;
   readonly resumen: string;
   readonly contenidoJson: string;
@@ -7,7 +7,7 @@ export interface PropuestaAsistenteIaDto {
 }
 
 /** Representa un mensaje persistido en el contrato HTTP. */
-export interface MensajeAsistenteIaDto {
+export interface MensajeAsistenteIADto {
   readonly id: number;
   readonly rol: string;
   readonly texto: string;
@@ -15,25 +15,25 @@ export interface MensajeAsistenteIaDto {
   readonly fechaCreacion: string;
   readonly seccionContexto: string | null;
   readonly revisionContexto: number | null;
-  readonly propuesta: PropuestaAsistenteIaDto | null;
+  readonly propuesta: PropuestaAsistenteIADto | null;
 }
 
 /** Agrupa el historial remoto asociado a un proyecto. */
-export interface ConversacionAsistenteIaDto {
+export interface ConversacionAsistenteIADto {
   readonly proyectoId: number;
   readonly conversacionId: number | null;
-  readonly mensajes: readonly MensajeAsistenteIaDto[];
+  readonly mensajes: readonly MensajeAsistenteIADto[];
 }
 
 /** Contiene los dos turnos persistidos por una interacción. */
-export interface EnviarMensajeAsistenteIaRespuestaDto {
+export interface EnviarMensajeAsistenteIARespuestaDto {
   readonly conversacionId: number;
-  readonly mensajeUsuario: MensajeAsistenteIaDto;
-  readonly mensajeAsistente: MensajeAsistenteIaDto;
+  readonly mensajeUsuario: MensajeAsistenteIADto;
+  readonly mensajeAsistente: MensajeAsistenteIADto;
 }
 
 /** Informa el estado y la revisión resultantes al resolver una propuesta. */
-export interface ResolverPropuestaAsistenteIaRespuestaDto {
+export interface ResolverPropuestaAsistenteIARespuestaDto {
   readonly proyectoId: number;
   readonly mensajeId: number;
   readonly estado: string;
@@ -41,7 +41,7 @@ export interface ResolverPropuestaAsistenteIaRespuestaDto {
 }
 
 /** Define el contexto mínimo enviado al modelo junto con el mensaje. */
-export interface EnviarMensajeAsistenteIaSolicitudDto {
+export interface EnviarMensajeAsistenteIASolicitudDto {
   readonly proyectoId: number;
   readonly revisionContexto: number;
   readonly seccionContexto: string;
@@ -49,14 +49,14 @@ export interface EnviarMensajeAsistenteIaSolicitudDto {
 }
 
 /** Identifica la propuesta y la revisión esperada antes de aplicarla. */
-export interface AplicarPropuestaAsistenteIaSolicitudDto {
+export interface AplicarPropuestaAsistenteIASolicitudDto {
   readonly proyectoId: number;
   readonly mensajeId: number;
   readonly revisionEsperada: number;
 }
 
 /** Identifica la propuesta que el usuario decidió rechazar. */
-export interface RechazarPropuestaAsistenteIaSolicitudDto {
+export interface RechazarPropuestaAsistenteIASolicitudDto {
   readonly proyectoId: number;
   readonly mensajeId: number;
 }

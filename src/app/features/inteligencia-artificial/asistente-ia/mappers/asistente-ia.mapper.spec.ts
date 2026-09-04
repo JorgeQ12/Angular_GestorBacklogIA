@@ -1,12 +1,12 @@
-import { mapearConversacionAsistenteIa } from './asistente-ia.mapper';
+import { mapearConversacionAsistenteIA } from './asistente-ia.mapper';
 import {
-  EstadoPropuestaAsistenteIa,
-  RolMensajeAsistenteIa,
+  EstadoPropuestaAsistenteIA,
+  RolMensajeAsistenteIA,
 } from '../models/asistente-ia.model';
 
 describe('asistente-ia.mapper', () => {
   it('adapta una propuesta canónica a detalles legibles para el panel', () => {
-    const conversacion = mapearConversacionAsistenteIa({
+    const conversacion = mapearConversacionAsistenteIA({
       proyectoId: 42,
       conversacionId: 7,
       mensajes: [
@@ -30,8 +30,8 @@ describe('asistente-ia.mapper', () => {
     });
 
     const mensaje = conversacion.mensajes[0];
-    expect(mensaje?.rol).toBe(RolMensajeAsistenteIa.Asistente);
-    expect(mensaje?.propuesta?.estado).toBe(EstadoPropuestaAsistenteIa.Pendiente);
+    expect(mensaje?.rol).toBe(RolMensajeAsistenteIA.Asistente);
+    expect(mensaje?.propuesta?.estado).toBe(EstadoPropuestaAsistenteIA.Pendiente);
     expect(mensaje?.propuesta?.detalles).toEqual([
       { etiqueta: 'Objetivo general', valores: ['Reducir reprocesos'] },
       { etiqueta: 'Objetivos específicos', valores: ['Automatizar validaciones'] },
@@ -40,7 +40,7 @@ describe('asistente-ia.mapper', () => {
 
   it('rechaza roles externos desconocidos en lugar de concederles una identidad válida', () => {
     expect(() =>
-      mapearConversacionAsistenteIa({
+      mapearConversacionAsistenteIA({
         proyectoId: 42,
         conversacionId: 7,
         mensajes: [crearMensajeExterno('Sistema', 'Pendiente')],
@@ -50,7 +50,7 @@ describe('asistente-ia.mapper', () => {
 
   it('rechaza estados externos desconocidos en lugar de habilitar una propuesta pendiente', () => {
     expect(() =>
-      mapearConversacionAsistenteIa({
+      mapearConversacionAsistenteIA({
         proyectoId: 42,
         conversacionId: 7,
         mensajes: [crearMensajeExterno('Asistente', 'Archivada')],

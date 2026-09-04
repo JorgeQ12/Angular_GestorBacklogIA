@@ -7,13 +7,13 @@ especificar proyectos.
 
 El recorrido integra un único **Asistente IA** por proyecto desde Necesidad de negocio. Se presenta
 como botón flotante y conserva la misma conversación al cambiar de paso; no existe un asistente por
-sección. Su implementación pertenece a `features/inteligencia-artificial/asistente-conversacional`
+sección. Su implementación pertenece a `features/inteligencia-artificial/asistente-ia`
 y la página comparte únicamente proyecto, revisión y sección activa.
 
 Las propuestas no modifican formularios localmente ni se aplican al recibir la respuesta. El
 usuario confirma Aplicar o Rechazar. Una aplicación correcta incrementa la revisión en el backend
 y la página solicita una nueva fotografía mediante `EstadoCreacionProyectoService.recargar`.
-Consultar [Asistente IA conversacional](ASISTENTE_IA.md) para contratos, seguridad y organización.
+Consultar [Asistente IA](ASISTENTE_IA.md) para contratos, seguridad y organización.
 
 ## Punto de partida
 

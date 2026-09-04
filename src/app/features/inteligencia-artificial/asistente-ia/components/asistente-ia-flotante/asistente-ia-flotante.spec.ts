@@ -2,13 +2,13 @@ import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { EMPTY, Observable, of } from 'rxjs';
 import {
-  EstadoPropuestaAsistenteIa,
-  type ResultadoResolucionPropuestaIa,
+  EstadoPropuestaAsistenteIA,
+  type ResultadoResolucionPropuestaIA,
 } from '../../models/asistente-ia.model';
-import { EstadoAsistenteIaService } from '../../services/estado-asistente-ia.service';
-import { AsistenteIaFlotante } from './asistente-ia-flotante';
+import { EstadoAsistenteIAService } from '../../services/estado-asistente-ia.service';
+import { AsistenteIAFlotante } from './asistente-ia-flotante';
 
-describe('AsistenteIaFlotante', () => {
+describe('AsistenteIAFlotante', () => {
   const estado = {
     mensajes: signal([]),
     cargando: signal(false),
@@ -19,20 +19,20 @@ describe('AsistenteIaFlotante', () => {
     seleccionarProyecto: vi.fn(),
     cargar: vi.fn(),
     enviar: vi.fn(() => EMPTY),
-    aplicar: vi.fn((): Observable<ResultadoResolucionPropuestaIa> => EMPTY),
+    aplicar: vi.fn((): Observable<ResultadoResolucionPropuestaIA> => EMPTY),
     rechazar: vi.fn(() => EMPTY),
   };
 
   beforeEach(() => {
     vi.clearAllMocks();
     TestBed.configureTestingModule({
-      imports: [AsistenteIaFlotante],
-      providers: [{ provide: EstadoAsistenteIaService, useValue: estado }],
+      imports: [AsistenteIAFlotante],
+      providers: [{ provide: EstadoAsistenteIAService, useValue: estado }],
     });
   });
 
   it('reemplaza el acceso flotante por el panel mientras la conversación está abierta', () => {
-    const fixture = TestBed.createComponent(AsistenteIaFlotante);
+    const fixture = TestBed.createComponent(AsistenteIAFlotante);
     fixture.componentRef.setInput('contexto', {
       proyectoId: 10,
       revisionContexto: 2,
@@ -61,11 +61,11 @@ describe('AsistenteIaFlotante', () => {
       of({
         proyectoId: 10,
         mensajeId: 9,
-        estado: EstadoPropuestaAsistenteIa.Aplicada,
+        estado: EstadoPropuestaAsistenteIA.Aplicada,
         revision: 3,
       }),
     );
-    const fixture = TestBed.createComponent(AsistenteIaFlotante);
+    const fixture = TestBed.createComponent(AsistenteIAFlotante);
     fixture.componentRef.setInput('contexto', {
       proyectoId: 10,
       revisionContexto: 2,
@@ -84,7 +84,7 @@ describe('AsistenteIaFlotante', () => {
   });
 
   it('restaura el foco en el acceso flotante al cerrar el panel', async () => {
-    const fixture = TestBed.createComponent(AsistenteIaFlotante);
+    const fixture = TestBed.createComponent(AsistenteIAFlotante);
     fixture.componentRef.setInput('contexto', {
       proyectoId: 10,
       revisionContexto: 2,

@@ -1,17 +1,17 @@
 import { LOCALE_ID } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { PanelAsistenteIa } from './panel-asistente-ia';
+import { PanelAsistenteIA } from './panel-asistente-ia';
 
-describe('PanelAsistenteIa', () => {
+describe('PanelAsistenteIA', () => {
   beforeEach(() =>
     TestBed.configureTestingModule({
-      imports: [PanelAsistenteIa],
+      imports: [PanelAsistenteIA],
       providers: [{ provide: LOCALE_ID, useValue: 'es-CO' }],
     }),
   );
 
   it('envía el mensaje capturado y limpia el compositor inmediatamente', () => {
-    const fixture = TestBed.createComponent(PanelAsistenteIa);
+    const fixture = TestBed.createComponent(PanelAsistenteIA);
     fixture.componentRef.setInput('mensajes', []);
     fixture.componentRef.setInput('nombreSeccion', 'Necesidad de negocio');
     fixture.detectChanges();
@@ -29,7 +29,7 @@ describe('PanelAsistenteIa', () => {
   });
 
   it('no emite un mensaje vacío al enviar un formulario inválido', () => {
-    const fixture = TestBed.createComponent(PanelAsistenteIa);
+    const fixture = TestBed.createComponent(PanelAsistenteIA);
     fixture.componentRef.setInput('mensajes', []);
     fixture.componentRef.setInput('nombreSeccion', 'Necesidad de negocio');
     fixture.detectChanges();
@@ -44,7 +44,7 @@ describe('PanelAsistenteIa', () => {
   });
 
   it('envía con Enter y permite una nueva línea con Shift + Enter', () => {
-    const fixture = TestBed.createComponent(PanelAsistenteIa);
+    const fixture = TestBed.createComponent(PanelAsistenteIA);
     fixture.componentRef.setInput('mensajes', []);
     fixture.componentRef.setInput('nombreSeccion', 'Necesidad de negocio');
     fixture.detectChanges();
@@ -82,7 +82,7 @@ describe('PanelAsistenteIa', () => {
   });
 
   it('deshabilita el formulario y bloquea Enter durante una operación remota', () => {
-    const fixture = TestBed.createComponent(PanelAsistenteIa);
+    const fixture = TestBed.createComponent(PanelAsistenteIA);
     fixture.componentRef.setInput('mensajes', []);
     fixture.componentRef.setInput('nombreSeccion', 'Necesidad de negocio');
     fixture.detectChanges();
@@ -107,7 +107,7 @@ describe('PanelAsistenteIa', () => {
   });
 
   it('bloquea el compositor después de un error de carga hasta reintentar', () => {
-    const fixture = TestBed.createComponent(PanelAsistenteIa);
+    const fixture = TestBed.createComponent(PanelAsistenteIA);
     fixture.componentRef.setInput('mensajes', []);
     fixture.componentRef.setInput('nombreSeccion', 'Necesidad de negocio');
     fixture.componentRef.setInput('errorCarga', true);
@@ -123,7 +123,7 @@ describe('PanelAsistenteIa', () => {
   });
 
   it('presenta el mensaje del asistente y mantiene ocultas las etiquetas accesibles', () => {
-    const fixture = TestBed.createComponent(PanelAsistenteIa);
+    const fixture = TestBed.createComponent(PanelAsistenteIA);
     fixture.componentRef.setInput('nombreSeccion', 'Necesidad de negocio');
     fixture.componentRef.setInput('mensajes', []);
     fixture.detectChanges();
@@ -152,7 +152,7 @@ describe('PanelAsistenteIa', () => {
   });
 
   it('presenta una propuesta legible y solicita confirmación explícita', () => {
-    const fixture = TestBed.createComponent(PanelAsistenteIa);
+    const fixture = TestBed.createComponent(PanelAsistenteIA);
     fixture.componentRef.setInput('nombreSeccion', 'Alcance');
     fixture.componentRef.setInput('mensajes', [
       {
@@ -189,7 +189,7 @@ describe('PanelAsistenteIa', () => {
   });
 
   it('bloquea las decisiones de propuesta mientras existe otra operación remota', () => {
-    const fixture = TestBed.createComponent(PanelAsistenteIa);
+    const fixture = TestBed.createComponent(PanelAsistenteIA);
     fixture.componentRef.setInput('nombreSeccion', 'Alcance');
     fixture.componentRef.setInput('mensajes', [
       {

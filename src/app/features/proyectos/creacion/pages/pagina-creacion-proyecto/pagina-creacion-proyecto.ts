@@ -26,9 +26,9 @@ import { EncabezadoPagina } from '../../../../../shared/components/encabezado-pa
 import { EstadoError } from '../../../../../shared/components/estado-error/estado-error';
 import { IconoComponent } from '../../../../../shared/components/icono/icono.component';
 import {
-  AsistenteIaFlotante,
-  type ContextoAsistenteIa,
-} from '../../../../inteligencia-artificial/asistente-conversacional/public-api';
+  AsistenteIAFlotante,
+  type ContextoAsistenteIA,
+} from '../../../../inteligencia-artificial/asistente-ia/public-api';
 import { PasoAlcanceProyecto } from '../../../components/pasos/paso-alcance-proyecto/paso-alcance-proyecto';
 import { PasoContextoProyecto } from '../../../components/pasos/paso-contexto-proyecto/paso-contexto-proyecto';
 import { PasoEquipoProyecto } from '../../../components/pasos/paso-equipo-proyecto/paso-equipo-proyecto';
@@ -99,7 +99,7 @@ import { NotificadorErroresBorradorProyectoService } from '../../services/notifi
     EncabezadoPagina,
     EstadoError,
     IconoComponent,
-    AsistenteIaFlotante,
+    AsistenteIAFlotante,
     RecorridoProyecto,
     PasoVinculacionAzureProyecto,
     PasoContextoProyecto,
@@ -220,14 +220,14 @@ export class PaginaCreacionProyecto {
   protected readonly tituloEncabezado = computed(
     () => this.estadoCreacion.nombreProyecto() || 'Nuevo proyecto',
   );
-  protected readonly mostrarAsistenteIa = computed(() => {
+  protected readonly mostrarAsistenteIA = computed(() => {
     const borrador = this.estadoCreacion.borrador();
     return (
       !!borrador &&
       borrador.pasoActual >= AVANCE_BORRADOR_POR_PASO[ClaveSeccionProyecto.Necesidad]
     );
   });
-  protected readonly contextoAsistenteIa = computed<ContextoAsistenteIa | null>(() => {
+  protected readonly contextoAsistenteIA = computed<ContextoAsistenteIA | null>(() => {
     const borrador = this.estadoCreacion.borrador();
     const proyectoId = this.idProyecto();
     if (!borrador || proyectoId === null) return null;
@@ -405,7 +405,7 @@ export class PaginaCreacionProyecto {
   }
 
   /** Recarga únicamente el borrador que originó la propuesta confirmada. */
-  protected recargarBorradorDesdeIa(proyectoId: number): void {
+  protected recargarBorradorDesdeIA(proyectoId: number): void {
     if (this.idProyecto() !== proyectoId) return;
 
     this.estadoCreacion

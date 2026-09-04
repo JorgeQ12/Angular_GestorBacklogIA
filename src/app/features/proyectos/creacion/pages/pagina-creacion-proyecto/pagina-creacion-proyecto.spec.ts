@@ -12,15 +12,15 @@ import { CreacionProyectoService } from '../../services/creacion-proyecto.servic
 import { EstadoCreacionProyectoService } from '../../services/estado-creacion-proyecto.service';
 import { PaginaCreacionProyecto } from './pagina-creacion-proyecto';
 import {
-  AsistenteIaFlotante,
-  EstadoAsistenteIaService,
-} from '../../../../inteligencia-artificial/asistente-conversacional/public-api';
+  AsistenteIAFlotante,
+  EstadoAsistenteIAService,
+} from '../../../../inteligencia-artificial/asistente-ia/public-api';
 
 const RUTAS: Routes = [
   {
     path: `${SEGMENTOS_RUTA.proyectos}/${SEGMENTOS_RUTA.creacion}`,
     component: PaginaCreacionProyecto,
-    providers: [EstadoCreacionProyectoService, EstadoAsistenteIaService],
+    providers: [EstadoCreacionProyectoService, EstadoAsistenteIAService],
   },
 ];
 
@@ -87,7 +87,7 @@ describe('PaginaCreacionProyecto', () => {
 
   it('recarga el borrador después de aplicar una propuesta de IA', async () => {
     const harness = await RouterTestingHarness.create('/proyectos/creacion?proyectoId=42');
-    const asistente = harness.routeDebugElement?.query(By.directive(AsistenteIaFlotante));
+    const asistente = harness.routeDebugElement?.query(By.directive(AsistenteIAFlotante));
 
     asistente?.componentInstance.contextoActualizado.emit(42);
 
@@ -96,7 +96,7 @@ describe('PaginaCreacionProyecto', () => {
 
   it('ignora una propuesta resuelta para un proyecto que ya no está activo', async () => {
     const harness = await RouterTestingHarness.create('/proyectos/creacion?proyectoId=42');
-    const asistente = harness.routeDebugElement?.query(By.directive(AsistenteIaFlotante));
+    const asistente = harness.routeDebugElement?.query(By.directive(AsistenteIAFlotante));
 
     asistente?.componentInstance.contextoActualizado.emit(84);
 

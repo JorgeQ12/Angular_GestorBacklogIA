@@ -1,4 +1,4 @@
-# Asistente IA conversacional
+# Asistente IA
 
 Este documento define la capacidad de acompañamiento mediante IA durante la creación de un
 proyecto. El nombre visible es **Asistente IA** y su código pertenece a
@@ -12,7 +12,7 @@ persistido gobierna su visibilidad, por lo que continúa disponible si el usuari
 sección anterior después de haber alcanzado Necesidad.
 
 - El botón utiliza `public/brand/logo.svg` como identidad de la aplicación y la insignia semántica
-  `asistenteIa` del catálogo central de iconos.
+  `asistenteIA` del catálogo central de iconos.
 - El acceso cerrado es un círculo monocromático que combina el logo con la insignia semántica de
   IA. Conserva un nombre accesible, muestra una etiqueta al interactuar y utiliza movimiento sutil
   con pausas amplias; si el usuario reduce el movimiento, las animaciones se desactivan. Se ubica
@@ -28,10 +28,10 @@ sección anterior después de haber alcanzado Necesidad.
 
 ## Límite entre IA y Proyectos
 
-`AsistenteIaFlotante` recibe solamente `ContextoAsistenteIa`:
+`AsistenteIAFlotante` recibe solamente `ContextoAsistenteIA`:
 
 ```ts
-interface ContextoAsistenteIa {
+interface ContextoAsistenteIA {
   proyectoId: number;
   revisionContexto: number;
   seccionActiva: string;
@@ -48,11 +48,11 @@ el backend.
 
 ```text
 PaginaCreacionProyecto
-  └─ ContextoAsistenteIa
-       └─ AsistenteIaFlotante
-            ├─ EstadoAsistenteIaService
-            ├─ AsistenteIaApiService
-            └─ PanelAsistenteIa (presentacional)
+  └─ ContextoAsistenteIA
+       └─ AsistenteIAFlotante
+            ├─ EstadoAsistenteIAService
+            ├─ AsistenteIAApiService
+            └─ PanelAsistenteIA (presentacional)
 ```
 
 El estado de IA se proporciona en el inyector de la ruta de creación. Mantiene historial, carga,

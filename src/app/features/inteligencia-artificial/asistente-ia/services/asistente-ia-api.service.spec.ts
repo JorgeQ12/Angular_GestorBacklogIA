@@ -4,18 +4,18 @@ import { TestBed } from '@angular/core/testing';
 import { OMITIR_CARGA_GLOBAL } from '../../../../core/carga-global/contextos/carga-global.contexto';
 import { environment } from '../../../../../environments/environment';
 import { ENDPOINTS_ASISTENTE_IA } from '../config/endpoints-asistente-ia.config';
-import type { ContextoAsistenteIa } from '../models/asistente-ia.model';
-import { AsistenteIaApiService } from './asistente-ia-api.service';
+import type { ContextoAsistenteIA } from '../models/asistente-ia.model';
+import { AsistenteIAApiService } from './asistente-ia-api.service';
 
-describe('AsistenteIaApiService', () => {
-  let servicio: AsistenteIaApiService;
+describe('AsistenteIAApiService', () => {
+  let servicio: AsistenteIAApiService;
   let httpTesting: HttpTestingController;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [provideHttpClient(), provideHttpClientTesting()],
     });
-    servicio = TestBed.inject(AsistenteIaApiService);
+    servicio = TestBed.inject(AsistenteIAApiService);
     httpTesting = TestBed.inject(HttpTestingController);
   });
 
@@ -66,7 +66,7 @@ describe('AsistenteIaApiService', () => {
   });
 
   it('envía únicamente el contexto mínimo y el mensaje normalizado', () => {
-    const contexto: ContextoAsistenteIa = {
+    const contexto: ContextoAsistenteIA = {
       proyectoId: 42,
       revisionContexto: 4,
       seccionActiva: 'objetivos',
@@ -157,7 +157,7 @@ describe('AsistenteIaApiService', () => {
   });
 });
 
-const CONTEXTO: ContextoAsistenteIa = {
+const CONTEXTO: ContextoAsistenteIA = {
   proyectoId: 42,
   revisionContexto: 4,
   seccionActiva: 'objetivos',

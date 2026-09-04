@@ -14,9 +14,9 @@ import { IconoComponent } from '../../../../../shared/components/icono/icono.com
 import { FechaPipe } from '../../../../../shared/fechas/pipes/fecha.pipe';
 import { validarTextoRequerido } from '../../../../../shared/forms/validadores/texto-requerido.validator';
 import {
-  EstadoPropuestaAsistenteIa,
-  RolMensajeAsistenteIa,
-  type MensajeAsistenteIa,
+  EstadoPropuestaAsistenteIA,
+  RolMensajeAsistenteIA,
+  type MensajeAsistenteIA,
 } from '../../models/asistente-ia.model';
 
 /** Presenta el historial y emite acciones sin conocer HTTP ni modelos de Proyectos. */
@@ -27,12 +27,12 @@ import {
   templateUrl: './panel-asistente-ia.html',
   styleUrl: './panel-asistente-ia.css',
 })
-export class PanelAsistenteIa {
+export class PanelAsistenteIA {
   private readonly constructorFormulario = inject(NonNullableFormBuilder);
   private readonly listaMensajes = viewChild<ElementRef<HTMLElement>>('listaMensajes');
 
   /** Recibe el historial confirmado que debe presentar el panel. */
-  public readonly mensajes = input.required<readonly MensajeAsistenteIa[]>();
+  public readonly mensajes = input.required<readonly MensajeAsistenteIA[]>();
 
   /** Identifica la sección utilizada como contexto del siguiente turno. */
   public readonly nombreSeccion = input.required<string>();
@@ -68,8 +68,8 @@ export class PanelAsistenteIa {
   public readonly propuestaRechazada = output<number>();
 
   protected readonly limiteMensaje = 4000;
-  protected readonly roles = RolMensajeAsistenteIa;
-  protected readonly estadosPropuesta = EstadoPropuestaAsistenteIa;
+  protected readonly roles = RolMensajeAsistenteIA;
+  protected readonly estadosPropuesta = EstadoPropuestaAsistenteIA;
   protected readonly formulario = this.constructorFormulario.group({
     mensaje: ['', [validarTextoRequerido, Validators.maxLength(this.limiteMensaje)]],
   });
