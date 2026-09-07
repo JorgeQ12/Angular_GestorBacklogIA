@@ -5,10 +5,12 @@ import { provideRouter, Router, Routes } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { of, Subject, throwError } from 'rxjs';
 import { SEGMENTOS_RUTA, URL_INICIO_PANEL } from '../../../../../core/navegacion/rutas';
+import { PasoEquipoProyecto } from '../../../components/pasos/paso-equipo-proyecto/paso-equipo-proyecto';
 import { PasoFlujoProyecto } from '../../../components/pasos/paso-flujo-proyecto/paso-flujo-proyecto';
 import { ClaveSeccionProyecto } from '../../../config/secciones-proyecto.config';
 import { BorradorProyecto } from '../../models/borrador-proyecto.model';
 import type { DatosVinculacionAzure } from '../../../models/vinculacion-azure-proyecto.model';
+import type { EquipoProyecto } from '../../../secciones/equipo/models/equipo-proyecto.model';
 import {
   FlujoProyecto,
   TipoBloqueFlujo,
@@ -229,6 +231,37 @@ describe('PaginaCreacionProyecto', () => {
     expect(navegar).not.toHaveBeenCalled();
   });
 
+  it('recupera las asignaciones de Equipo al volver después de guardarlas', async () => {
+    creacionProyecto.obtenerBorrador.mockReturnValue(of(BORRADOR_EQUIPO));
+    creacionProyecto.sincronizarEquipoAzure.mockReturnValue(of(ORIGEN_EQUIPO));
+    creacionProyecto.actualizarBorrador.mockReturnValueOnce(
+      of({
+        ...BORRADOR_EQUIPO,
+        revision: 5,
+        pasoActual: 8,
+        equipoJson: JSON.stringify(EQUIPO_CONFIGURADO.integrantes),
+      }),
+    );
+    const harness = await RouterTestingHarness.create('/proyectos/creacion?proyectoId=42');
+    const pasoEquipoInicial = harness.routeDebugElement?.query(By.directive(PasoEquipoProyecto))
+      .componentInstance as PasoEquipoProyecto;
+
+    pasoEquipoInicial.guardar.emit(EQUIPO_CONFIGURADO);
+    harness.detectChanges();
+
+    const botonEquipo = Array.from(
+      (harness.routeNativeElement as HTMLElement).querySelectorAll<HTMLButtonElement>(
+        '.recorrido-proyecto__boton',
+      ),
+    ).find((boton) => boton.textContent?.includes('Equipo'));
+    botonEquipo?.click();
+    harness.detectChanges();
+
+    const pasoEquipoRestaurado = harness.routeDebugElement?.query(By.directive(PasoEquipoProyecto))
+      .componentInstance as PasoEquipoProyecto;
+    expect(pasoEquipoRestaurado.datos()).toEqual(EQUIPO_CONFIGURADO);
+  });
+
   function obtenerPosicionRecorrido(elemento: HTMLElement): string {
     return elemento.querySelector('.recorrido-proyecto__posicion')?.textContent?.trim() ?? '';
   }
@@ -268,6 +301,37 @@ const BORRADOR_FLUJO: BorradorProyecto = {
   ...BORRADOR_AVANZADO,
   pasoActual: 8,
   diagramFlujoJson: '{}',
+};
+
+const BORRADOR_EQUIPO: BorradorProyecto = {
+  ...BORRADOR_AVANZADO,
+  pasoActual: 7,
+  equipoAzure: null,
+  equipoJson: '[]',
+};
+
+const ORIGEN_EQUIPO = {
+  idEquipo: 'equipo-azure-1',
+  nombreEquipo: 'Producto digital',
+  integrantes: [
+    {
+      idAzure: 'usuario-1',
+      nombre: 'María Gómez',
+      correo: 'maria@interia.co',
+      esAdministradorAzure: false,
+    },
+  ],
+  fechaSincronizacion: '2026-09-07T10:00:00.000Z',
+};
+
+const EQUIPO_CONFIGURADO: EquipoProyecto = {
+  integrantes: [
+    {
+      ...ORIGEN_EQUIPO.integrantes[0],
+      perfilTecnicoCodigo: 'qa',
+      dedicacionCodigo: '75',
+    },
+  ],
 };
 
 const FLUJO_GENERADO_IA: FlujoProyecto = {

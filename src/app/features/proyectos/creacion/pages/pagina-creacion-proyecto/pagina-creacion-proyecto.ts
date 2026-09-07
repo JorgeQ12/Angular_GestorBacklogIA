@@ -335,6 +335,9 @@ export class PaginaCreacionProyecto {
       .subscribe({
         next: () => {
           if (this.estadoCreacion.proyectoId() !== proyectoId) return;
+          if (actualizacion.seccion === ClaveSeccionProyecto.Equipo) {
+            this.equipoActualizado.set(null);
+          }
           this.abrirPaso(siguiente);
         },
         error: (error: unknown) =>
