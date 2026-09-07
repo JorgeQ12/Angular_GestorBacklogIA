@@ -111,6 +111,7 @@ export const ICONOS_APLICACION = {
   alcance: LucideScanText.icon,
   equipo: LucideUsersRound.icon,
   flujo: LucideWorkflow.icon,
+  generarConIA: LucideSparkles.icon,
   roles: LucideUserRoundCog.icon,
   seguimiento: LucideTrendingUp.icon,
   tareaCompletada: LucideClipboardCheck.icon,

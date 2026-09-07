@@ -77,6 +77,7 @@ import { deserializarTipoSolucionProyecto } from '../../../secciones/tipo-soluci
 import {
   ERROR_CONSULTA_AZURE,
   ERROR_CREACION_BORRADOR,
+  ERROR_GENERACION_DIAGRAMA_FLUJO_IA,
   ERROR_GUARDADO_PROYECTO,
   ERROR_SINCRONIZACION_EQUIPO,
 } from '../../config/mensajes-error-creacion-proyecto.config';
@@ -130,6 +131,7 @@ export class PaginaCreacionProyecto {
   private readonly pasoSeleccionado = signal<ClavePasoProyecto | null>(null);
   private cargaRecorridoActual: Subscription | null = null;
   private guardadoActual: Subscription | null = null;
+  private generacionFlujoActual: Subscription | null = null;
   private proyectoAnterior: number | null | undefined;
   private sincronizacionInicialEquipoSolicitada = false;
 
@@ -150,9 +152,11 @@ export class PaginaCreacionProyecto {
   protected readonly resultadoValidacion = signal<ResultadoVinculacionAzure | null>(null);
   protected readonly procesandoVinculacion = signal(false);
   protected readonly guardandoSeccion = signal(false);
+  protected readonly generandoDiagramaConIA = signal(false);
   protected readonly sincronizandoEquipo = signal(false);
   private readonly origenEquipoActualizado = signal<OrigenEquipoAzureProyecto | null>(null);
   private readonly equipoActualizado = signal<EquipoProyecto | null>(null);
+  protected readonly flujoGeneradoConIA = signal<FlujoProyecto | null>(null);
 
   protected readonly contexto = computed(() => this.estadoCreacion.borrador()?.contexto ?? null);
   protected readonly tipoSolucion = computed(() => {
@@ -195,6 +199,9 @@ export class PaginaCreacionProyecto {
     () => this.origenEquipo()?.nombreEquipo || 'Team de Azure DevOps',
   );
   protected readonly flujo = computed<FlujoProyecto | null>(() => {
+    const generado = this.flujoGeneradoConIA();
+    if (generado) return generado;
+
     const borrador = this.estadoCreacion.borrador();
     if (!borrador) return null;
     const flujo = deserializarFlujoProyecto(borrador.diagramFlujoJson, borrador.id);
@@ -328,6 +335,9 @@ export class PaginaCreacionProyecto {
       .subscribe({
         next: () => {
           if (this.estadoCreacion.proyectoId() !== proyectoId) return;
+          if (actualizacion.seccion === ClaveSeccionProyecto.Equipo) {
+            this.equipoActualizado.set(null);
+          }
           this.abrirPaso(siguiente);
         },
         error: (error: unknown) =>
@@ -338,7 +348,7 @@ export class PaginaCreacionProyecto {
   /** Actualiza el flujo, guarda el proyecto con la nueva revisión y regresa al inicio. */
   protected guardarProyecto(flujo: FlujoProyecto): void {
     const proyectoId = this.estadoCreacion.proyectoId();
-    if (proyectoId === null || this.guardandoSeccion()) return;
+    if (proyectoId === null || this.guardandoSeccion() || this.generandoDiagramaConIA()) return;
 
     const actualizacion: ActualizacionSeccionProyecto = {
       seccion: ClaveSeccionProyecto.Flujo,
@@ -372,6 +382,54 @@ export class PaginaCreacionProyecto {
         next: () => {
           if (this.estadoCreacion.proyectoId() === proyectoId) this.volverAlInicio();
         },
+      });
+  }
+
+  /** Persiste los cambios del canvas en el borrador y mantiene abierto el paso de Flujo. */
+  protected guardarFlujoEnBorrador(flujo: FlujoProyecto): void {
+    const proyectoId = this.estadoCreacion.proyectoId();
+    if (proyectoId === null || this.guardandoSeccion() || this.generandoDiagramaConIA()) return;
+
+    const actualizacion: ActualizacionSeccionProyecto = {
+      seccion: ClaveSeccionProyecto.Flujo,
+      datos: flujo,
+    };
+    this.guardandoSeccion.set(true);
+    this.guardadoActual = this.estadoCreacion
+      .guardarSeccion(actualizacion)
+      .pipe(
+        finalize(() => this.guardandoSeccion.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: () => {
+          if (this.estadoCreacion.proyectoId() !== proyectoId) return;
+          this.flujoGeneradoConIA.set(null);
+        },
+        error: (error: unknown) =>
+          this.notificadorBorrador.comunicar(error, actualizacion.seccion),
+      });
+  }
+
+  /** Solicita una propuesta de IA y reemplaza únicamente la fotografía local del editor. */
+  protected generarDiagramaFlujoConIA(): void {
+    const proyectoId = this.estadoCreacion.proyectoId();
+    if (proyectoId === null || this.generandoDiagramaConIA() || this.guardandoSeccion()) return;
+
+    this.generandoDiagramaConIA.set(true);
+    this.generacionFlujoActual = this.creacionProyecto
+      .generarDiagramaFlujoIA(proyectoId)
+      .pipe(
+        finalize(() => this.generandoDiagramaConIA.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (flujo) => {
+          if (this.estadoCreacion.proyectoId() !== proyectoId) return;
+          this.flujoGeneradoConIA.set(flujo);
+        },
+        error: (error: unknown) =>
+          this.notificadorErrores.comunicar(error, ERROR_GENERACION_DIAGRAMA_FLUJO_IA),
       });
   }
 
@@ -430,10 +488,12 @@ export class PaginaCreacionProyecto {
   private prepararRecorrido(proyectoId: number | null): void {
     this.cargaRecorridoActual?.unsubscribe();
     this.guardadoActual?.unsubscribe();
+    this.generacionFlujoActual?.unsubscribe();
     this.pasoSeleccionado.set(null);
     this.errorCargaRecorrido.set(false);
     this.origenEquipoActualizado.set(null);
     this.equipoActualizado.set(null);
+    this.flujoGeneradoConIA.set(null);
     this.sincronizacionInicialEquipoSolicitada = false;
     this.estadoCreacion.seleccionarProyecto(proyectoId);
     if (proyectoId === null) {
