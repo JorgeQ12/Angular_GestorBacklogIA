@@ -7,7 +7,7 @@
 >
   @if (errorCarga()) {
     <app-estado-error
-      class="catalogos__error"
+      [paginaCompleta]="true"
       titulo="No fue posible obtener los catálogos"
       descripcion="Verifica la conexión e intenta cargar nuevamente la información."
       [reintentable]="true"

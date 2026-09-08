@@ -32,6 +32,10 @@ describe('PaginaInformacionProyecto', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
+    estado.proyectoActual.set({ id: 42, versionId: 81 });
+    estado.proyectoPresentado.set(null);
+    estado.errorCarga.set(false);
+    estado.guardando.set(false);
     consulta$ = new BehaviorSubject(convertToParamMap({}));
     await TestBed.configureTestingModule({
       imports: [PaginaInformacionProyecto],
@@ -73,6 +77,21 @@ describe('PaginaInformacionProyecto', () => {
     consulta$.next(convertToParamMap({ version: '72' }));
     TestBed.flushEffects();
     expect(estado.presentarVersion).toHaveBeenLastCalledWith(72);
+  });
+
+  it('presenta un error de página completa sin encabezado ni recorrido', () => {
+    estado.errorCarga.set(true);
+    fixture.detectChanges();
+
+    const elemento = fixture.nativeElement as HTMLElement;
+    const error = elemento.querySelector<HTMLElement>('app-estado-error');
+
+    expect(error?.classList.contains('estado-error--pagina-completa')).toBe(true);
+    expect(elemento.querySelector('app-encabezado-pagina')).toBeNull();
+    expect(elemento.querySelector('app-recorrido-proyecto')).toBeNull();
+    expect(elemento.querySelector('.pagina-informacion')?.getAttribute('aria-label')).toBe(
+      'Estado de carga del proyecto',
+    );
   });
 
   it('rehidrata los metadatos del encabezado desde la fotografía presentada', () => {

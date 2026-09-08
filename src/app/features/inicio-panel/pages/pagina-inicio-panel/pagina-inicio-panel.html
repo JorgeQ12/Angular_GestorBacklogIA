@@ -5,7 +5,7 @@
 >
   @if (errorResumen()) {
     <app-estado-error
-      class="inicio-panel__error"
+      [paginaCompleta]="true"
       [reintentable]="true"
       (reintentar)="cargarResumen()"
     />

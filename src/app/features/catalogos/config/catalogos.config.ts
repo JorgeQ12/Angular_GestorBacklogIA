@@ -13,12 +13,8 @@ export const MENSAJES_CATALOGO = {
     maxlength: 'La descripción admite hasta 500 caracteres.',
   },
 } satisfies MensajesFormulario<keyof DatosCatalogo>;
-/** Contexto funcional para el notificador transversal. */
+/** Contexto funcional para comunicar fallos de guardado sin reemplazar la página. */
 export const ERRORES_CATALOGOS = {
-  carga: {
-    titulo: 'No fue posible cargar los catálogos',
-    descripcion: 'Intenta consultar nuevamente la configuración.',
-  },
   guardado: {
     titulo: 'No fue posible guardar',
     descripcion: 'Revisa la información e inténtalo nuevamente.',

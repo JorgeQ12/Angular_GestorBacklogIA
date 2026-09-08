@@ -65,7 +65,7 @@ describe('Página de catálogos', () => {
     const root = f.nativeElement as HTMLElement;
     const error = root.querySelector<HTMLElement>('app-estado-error');
     expect(error).not.toBeNull();
-    expect(error?.classList.contains('catalogos__error')).toBe(true);
+    expect(error?.classList.contains('estado-error--pagina-completa')).toBe(true);
     expect(root.querySelector('app-encabezado-pagina')).toBeNull();
     expect(root.querySelector('.catalogos__recorrido')).toBeNull();
     expect(root.querySelector('app-estado-vacio')).toBeNull();
@@ -76,7 +76,7 @@ describe('Página de catálogos', () => {
     f.detectChanges();
     expect(f.nativeElement.textContent).toContain('Logística');
     expect(f.nativeElement.querySelector('app-encabezado-pagina')).not.toBeNull();
-    expect(comunicar).toHaveBeenCalledTimes(1);
+    expect(comunicar).not.toHaveBeenCalled();
   });
   it('conserva la edición al fallar y evita enviar dos veces mientras guarda', () => {
     const pendiente = new Subject<Catalogo>();

@@ -101,6 +101,11 @@ describe('PaginaInicioPanel', () => {
     );
     expect(elemento.querySelector('app-encabezado-pagina')).toBeNull();
     expect(elemento.querySelector('app-indicadores-proyectos')).toBeNull();
+    expect(
+      elemento
+        .querySelector('app-estado-error')
+        ?.classList.contains('estado-error--pagina-completa'),
+    ).toBe(true);
     expect(elemento.querySelector('app-estado-error button app-icono')).toBeTruthy();
   });
 

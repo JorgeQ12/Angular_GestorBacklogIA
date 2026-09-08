@@ -510,7 +510,9 @@ cada paso compone `TarjetaPasoProyecto` y no existe un `router-outlet` interno.
 - `puedeAbrirPasoCreacion` impide seleccionar componentes posteriores al avance persistido; no se
   requiere un guard porque no existen URLs de paso que proteger.
 - Al cargar un borrador, `obtenerUltimoPasoCreacion` selecciona el último paso alcanzado. Si la
-  consulta falla, la página presenta el estado reintentable sin alterar la URL.
+  consulta falla, el estado reintentable de página completa reemplaza encabezado y recorrido sin
+  alterar la URL. Un flujo guardado que no pueda interpretarse conserva un error parcial dentro del
+  paso porque el resto de la fotografía continúa siendo confiable.
 - Consumidores externos como el panel navegan únicamente a `/panel/proyectos/creacion`; para
   reanudar agregan `proyectoId` mediante `crearUrlCreacionProyecto`.
 - La consulta de proyectos utiliza esta misma URL para iniciar o continuar un borrador; no monta la

@@ -294,7 +294,7 @@ confiable:
 
 ```html
 @if (errorCarga()) {
-<app-estado-error [reintentable]="true" (reintentar)="cargar()" />
+<app-estado-error [paginaCompleta]="true" [reintentable]="true" (reintentar)="cargar()" />
 } @else {
 <!-- Encabezado y contenido de la página. -->
 }
@@ -304,7 +304,13 @@ confiable:
 - El reintento es opcional, se habilita mediante `reintentable` y conserva icono y estilo comunes.
 - El encabezado, los indicadores y las secciones dependientes de la consulta permanecen en el
   bloque exitoso.
-- Una variante local puede ajustar `--ui-error-state-min-height` sin duplicar estilos.
+- `paginaCompleta` centraliza la altura disponible del panel para fallos que reemplazan toda la
+  página; las features no repiten cálculos de viewport ni clases locales equivalentes.
+- Los errores parciales omiten `paginaCompleta` y permanecen dentro de la sección cuya información
+  invalidaron, sin retirar el resto del contenido confiable.
+- Un error representado mediante `EstadoError` no abre simultáneamente `ModalMensaje`: el estado y
+  su reintento constituyen la comunicación y recuperación completas. Los errores de acciones que
+  conservan la página, como guardar o eliminar, sí utilizan el notificador global.
 - Un estado vacío representa una consulta exitosa sin datos; un estado de error representa una
   consulta fallida.
 

@@ -23,6 +23,7 @@ describe('PaginaConsultaProyectos', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
+    estadoConsulta.errorCarga.set(false);
     pagina = signal<PaginaProyectos | null>(PAGINA);
     parametros$ = new BehaviorSubject(convertToParamMap({ estado: 'En Progreso', pagina: '2' }));
     route.queryParamMap = parametros$;
@@ -97,6 +98,26 @@ describe('PaginaConsultaProyectos', () => {
 
     expect(texto).not.toContain('11 resultados');
     expect(texto).not.toContain('Limpiar filtros');
+  });
+
+  it('reemplaza toda la página por un error bloqueante y permite reintentar', () => {
+    estadoConsulta.errorCarga.set(true);
+    fixture.detectChanges();
+
+    const elemento = fixture.nativeElement as HTMLElement;
+    const error = elemento.querySelector<HTMLElement>('app-estado-error');
+
+    expect(error?.classList).toContain('estado-error--pagina-completa');
+    expect(elemento.querySelector('app-encabezado-pagina')).toBeNull();
+    expect(elemento.querySelector('app-filtros-proyectos')).toBeNull();
+    expect(elemento.querySelector('.pagina-consulta-proyectos__contenido')).toBeNull();
+    expect(elemento.querySelector('.pagina-consulta-proyectos')?.getAttribute('aria-label')).toBe(
+      'Estado de carga de proyectos',
+    );
+
+    error?.querySelector<HTMLButtonElement>('button')?.click();
+
+    expect(estadoConsulta.reintentar).toHaveBeenCalledTimes(1);
   });
 
   it('reanuda un borrador sin construir rutas internas del recorrido', () => {

@@ -90,9 +90,10 @@ No se migra una tabla genérica mientras exista un solo consumidor. Su estructur
 celdas permanecen específicas de la consulta; una extracción futura requerirá otro uso real con el
 mismo contrato estable.
 
-El loader global representa la solicitud. Una consulta fallida presenta `EstadoError` reintentable
-y no se convierte en una colección vacía. Una respuesta exitosa sin registros presenta
-`EstadoVacio` y permite corregir los criterios o iniciar un proyecto.
+El loader global representa la solicitud. Una consulta fallida reemplaza el encabezado, los filtros
+y los resultados por `EstadoError` reintentable de página completa; no conserva superficies sin
+datos confiables ni se convierte en una colección vacía. Una respuesta exitosa sin registros
+presenta `EstadoVacio` y permite corregir los criterios o iniciar un proyecto.
 
 El contrato remoto vigente todavía recibe `nombre` y `responsable` como filtros independientes y
 los combina mediante `AND`. Por eso el control unificado se adapta temporalmente a `nombre`; no se

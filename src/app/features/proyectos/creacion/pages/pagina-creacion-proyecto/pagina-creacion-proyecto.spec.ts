@@ -111,7 +111,9 @@ describe('PaginaCreacionProyecto', () => {
     const harness = await RouterTestingHarness.create('/proyectos/creacion?proyectoId=42');
     const elemento = harness.routeNativeElement as HTMLElement;
 
-    expect(elemento.querySelector('app-estado-error')).not.toBeNull();
+    expect(elemento.querySelector('app-estado-error')?.classList).toContain(
+      'estado-error--pagina-completa',
+    );
     expect(elemento.querySelector('app-encabezado-pagina')).toBeNull();
     expect(elemento.querySelector('app-recorrido-proyecto')).toBeNull();
   });

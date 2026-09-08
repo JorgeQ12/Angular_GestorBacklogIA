@@ -115,9 +115,8 @@ export class PaginaCatalogos implements OnInit {
               null,
           );
         },
-        error: (error) => {
+        error: () => {
           this.errorCarga.set(true);
-          this.errores.comunicar(error, ERRORES_CATALOGOS.carga);
         },
       });
   }

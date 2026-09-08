@@ -8,6 +8,9 @@ import { IconoComponent } from '../icono/icono.component';
   imports: [IconoComponent],
   templateUrl: './estado-error.html',
   styleUrl: './estado-error.css',
+  host: {
+    '[class.estado-error--pagina-completa]': 'paginaCompleta()',
+  },
 })
 export class EstadoError {
   /** Proporciona el mensaje principal de la falla. */
@@ -18,6 +21,9 @@ export class EstadoError {
 
   /** Habilita la recuperación manual del contenido. */
   public readonly reintentable = input(false);
+
+  /** Extiende un fallo bloqueante a toda la altura disponible de una página del panel. */
+  public readonly paginaCompleta = input(false);
 
   /** Solicita repetir la operación que produjo la falla. */
   public readonly reintentar = output<void>();

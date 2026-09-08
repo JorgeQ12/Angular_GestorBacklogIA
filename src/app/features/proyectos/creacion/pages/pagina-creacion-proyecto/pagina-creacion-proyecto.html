@@ -1,7 +1,17 @@
-<section class="pagina-creacion" aria-labelledby="titulo-creacion-proyecto">
+<section
+  class="pagina-creacion"
+  [attr.aria-labelledby]="recorridoListo() ? 'titulo-creacion-proyecto' : null"
+  [attr.aria-label]="
+    errorCargaRecorrido()
+      ? 'Estado de carga del borrador'
+      : !recorridoListo()
+        ? 'Cargando recorrido del proyecto'
+        : null
+  "
+>
   @if (errorCargaRecorrido()) {
     <app-estado-error
-      class="pagina-creacion__error"
+      [paginaCompleta]="true"
       titulo="No fue posible obtener el borrador"
       descripcion="Verifica la conexión e intenta cargar nuevamente la información."
       [reintentable]="true"
