@@ -1,12 +1,13 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { IconoComponent } from '../../../../shared/components/icono/icono.component';
+import { RegionDesplazable } from '../../../../shared/components/region-desplazable/region-desplazable';
 import type { ValorCatalogo } from '../../models/catalogo.model';
 
 /** Presenta las opciones en una tabla administrativa responsiva y desplazable. */
 @Component({
   selector: 'app-tabla-opciones-catalogo',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IconoComponent],
+  imports: [IconoComponent, RegionDesplazable],
   templateUrl: './tabla-opciones-catalogo.html',
   styleUrl: './tabla-opciones-catalogo.css',
 })

@@ -172,6 +172,18 @@ dentro de `.ui-field` como si utiliza `.ui-control-wrap`. La primitiva elimina e
 del navegador y mantiene la accesibilidad mediante `--field-border-focus` y `--shadow-focus`.
 Las features no agregan bordes negros, outlines ni sombras locales para representar el foco.
 
+### Scrollbars
+
+`shared/components/region-desplazable` proporciona `app-region-desplazable` para regiones que deben
+mostrar el indicador sobre el contenido sin reservar un canal lateral. El componente conserva el
+desplazamiento nativo por rueda, touch y teclado, oculta su representación y sincroniza una barrita
+superpuesta de 4 px que también admite arrastre. La pista permanece invisible y la barrita aparece
+al pasar el puntero, enfocar, desplazar o arrastrar; al salir o cesar la interacción vuelve a
+ocultarse. Cada consumidor define mediante su clase anfitriona la altura máxima y proporciona
+`etiqueta` para nombrar la región accesible. Se aplica explícitamente en cada región desplazable;
+no se usa como reemplazo automático del scroll de `html` o `body`, porque alteraría el contexto de
+elementos sticky, modales y overlays.
+
 ### Botones
 
 `primitives/buttons.css` es responsable de:

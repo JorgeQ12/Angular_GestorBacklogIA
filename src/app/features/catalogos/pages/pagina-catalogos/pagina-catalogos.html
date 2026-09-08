@@ -39,39 +39,44 @@
         </header>
 
         <div class="ui-card__body catalogos__maestro-cuerpo">
-          <nav class="catalogos__lista" aria-label="Catálogos disponibles">
-            @for (tipo of tipos(); track tipo.id) {
-              <button
-                type="button"
-                class="catalogos__tipo"
-                [class.catalogos__tipo--seleccionado]="seleccionado()?.id === tipo.id"
-                [attr.aria-current]="seleccionado()?.id === tipo.id ? 'true' : null"
-                [disabled]="bloqueado()"
-                (click)="seleccionar(tipo)"
-              >
-                <span class="catalogos__tipo-icono" aria-hidden="true">
-                  <app-icono nombre="catalogos" />
-                </span>
-                <span class="catalogos__tipo-contenido">
-                  <span class="catalogos__tipo-titulo">
-                    <strong>{{ tipo.nombre }}</strong>
-                    @if (!tipo.activo) {
-                      <span class="catalogos__estado-entidad catalogos__estado-entidad--inactivo">
-                        Inactivo
-                      </span>
-                    }
+          <app-region-desplazable
+            class="catalogos__lista-desplazamiento"
+            etiqueta="Lista de catálogos disponibles"
+          >
+            <nav class="catalogos__lista" aria-label="Catálogos disponibles">
+              @for (tipo of tipos(); track tipo.id) {
+                <button
+                  type="button"
+                  class="catalogos__tipo"
+                  [class.catalogos__tipo--seleccionado]="seleccionado()?.id === tipo.id"
+                  [attr.aria-current]="seleccionado()?.id === tipo.id ? 'true' : null"
+                  [disabled]="bloqueado()"
+                  (click)="seleccionar(tipo)"
+                >
+                  <span class="catalogos__tipo-icono" aria-hidden="true">
+                    <app-icono nombre="catalogos" />
                   </span>
-                  <span class="catalogos__tipo-descripcion">{{ tipo.descripcion }}</span>
-                </span>
-                <app-icono class="catalogos__tipo-flecha" nombre="continuar" />
-              </button>
-            } @empty {
-              <div class="catalogos__lista-vacia">
-                <strong>Sin catálogos</strong>
-                <span>No hay resultados para los filtros seleccionados.</span>
-              </div>
-            }
-          </nav>
+                  <span class="catalogos__tipo-contenido">
+                    <span class="catalogos__tipo-titulo">
+                      <strong>{{ tipo.nombre }}</strong>
+                      @if (!tipo.activo) {
+                        <span class="catalogos__estado-entidad catalogos__estado-entidad--inactivo">
+                          Inactivo
+                        </span>
+                      }
+                    </span>
+                    <span class="catalogos__tipo-descripcion">{{ tipo.descripcion }}</span>
+                  </span>
+                  <app-icono class="catalogos__tipo-flecha" nombre="continuar" />
+                </button>
+              } @empty {
+                <div class="catalogos__lista-vacia">
+                  <strong>Sin catálogos</strong>
+                  <span>No hay resultados para los filtros seleccionados.</span>
+                </div>
+              }
+            </nav>
+          </app-region-desplazable>
         </div>
 
         <footer class="ui-card__footer catalogos__pie catalogos__pie--maestro">

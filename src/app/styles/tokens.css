@@ -284,6 +284,15 @@
   --page-header-border: color-mix(in srgb, var(--surface-default) 10%, transparent);
   --page-header-control-surface: color-mix(in srgb, var(--surface-default) 9%, transparent);
   --page-header-control-border: color-mix(in srgb, var(--surface-default) 14%, transparent);
+
+  /* --------------------------------------------------------------------------
+     17. PRIMITIVA DE SCROLLBAR
+     -------------------------------------------------------------------------- */
+  --scrollbar-size: var(--space-1);
+  --scrollbar-thumb: var(--border-strong);
+  --scrollbar-thumb-hover: var(--text-muted);
+  --scrollbar-thumb-min-size: var(--control-height-sm);
+  --scrollbar-offset: var(--space-1);
 }
 
 /* Reduce de forma coordinada el movimiento de toda regla basada en los tokens del sistema. */
