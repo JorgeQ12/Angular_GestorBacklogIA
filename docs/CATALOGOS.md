@@ -63,8 +63,9 @@ La carga HTTP ordinaria utiliza el cargador global. Mientras una consulta o muta
 la página bloquea todos los caminos de activación y el editor deshabilita el `FormGroup`. La función
 de envío también comprueba el bloqueo para cubrir clic, submit y teclado.
 
-Una consulta fallida muestra `EstadoError` con reintento y no se convierte en un estado vacío. Un
-guardado fallido mantiene abierto el editor y conserva sus valores. La página solo reemplaza la
+Una consulta fallida reemplaza toda la composición por `EstadoError` con reintento: no conserva el
+encabezado ni se convierte en un estado vacío, y ocupa la altura disponible del contenido del panel.
+Un guardado fallido mantiene abierto el editor y conserva sus valores. La página solo reemplaza la
 fotografía local después de una respuesta exitosa. Las suscripciones se cancelan al destruir la
 página y una confirmación pendiente no ejecuta la operación después de abandonar la ruta.
 

@@ -7,6 +7,10 @@
   gap: var(--space-5);
 }
 
+.catalogos__error {
+  --ui-error-state-min-height: calc(100dvh - var(--space-6) - var(--space-12));
+}
+
 .catalogos__recorrido {
   --catalogos-altura-lista: 28rem;
 

@@ -1,0 +1,73 @@
+<section class="pagina-consulta-proyectos" aria-labelledby="titulo-consulta-proyectos">
+  <app-encabezado-pagina
+    idTitulo="titulo-consulta-proyectos"
+    titulo="Proyectos"
+    etiqueta="Portafolio"
+    descripcion="Consulta las iniciativas disponibles y continúa su definición cuando sea necesario."
+    icono="proyectos"
+  >
+    <button
+      encabezadoPaginaAcciones
+      type="button"
+      class="ui-button ui-button--primary ui-button--on-inverse ui-button--md"
+      (click)="crearProyecto()"
+    >
+      <app-icono class="ui-button__icon" nombre="agregar" />
+      Nuevo proyecto
+    </button>
+  </app-encabezado-pagina>
+
+  <article class="ui-card pagina-consulta-proyectos__contenido">
+    <div class="pagina-consulta-proyectos__filtros">
+      <app-filtros-proyectos
+        [filtrosIniciales]="filtros()"
+        (filtrosCambiados)="actualizarFiltros($event)"
+      />
+    </div>
+
+    <div class="pagina-consulta-proyectos__resultados">
+      @if (estadoConsulta.errorCarga()) {
+        <app-estado-error
+          class="pagina-consulta-proyectos__estado"
+          [titulo]="mensajeError.titulo"
+          [descripcion]="mensajeError.descripcion"
+          [reintentable]="true"
+          (reintentar)="estadoConsulta.reintentar()"
+        />
+      } @else if (estadoConsulta.pagina(); as pagina) {
+        @if (pagina.proyectos.length) {
+          <app-tabla-proyectos
+            [proyectos]="pagina.proyectos"
+            [paginaActual]="pagina.paginaActual"
+            [totalPaginas]="pagina.totalPaginas"
+            (continuarBorrador)="continuarBorrador($event)"
+            (consultarProyecto)="consultarProyecto($event)"
+            (paginaCambiada)="cambiarPagina($event)"
+          />
+        } @else {
+          <app-estado-vacio
+            class="pagina-consulta-proyectos__estado"
+            icono="proyectos"
+            titulo="No encontramos proyectos"
+            [descripcion]="
+              hayFiltros()
+                ? 'Borra la búsqueda o selecciona Todos los estados para ver el portafolio completo.'
+                : 'Las iniciativas disponibles aparecerán en este portafolio.'
+            "
+          >
+            <div estadoVacioAcciones class="pagina-consulta-proyectos__acciones-vacio">
+              <button
+                type="button"
+                class="ui-button ui-button--primary ui-button--md"
+                (click)="crearProyecto()"
+              >
+                <app-icono class="ui-button__icon" nombre="agregar" />
+                Nuevo proyecto
+              </button>
+            </div>
+          </app-estado-vacio>
+        }
+      }
+    </div>
+  </article>
+</section>

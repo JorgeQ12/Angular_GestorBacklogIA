@@ -124,7 +124,7 @@ features/proyectos/
 ├── mappers/
 ├── secciones/
 ├── creacion/
-├── listado/
+├── consulta/
 └── informacion/
     ├── config/
     ├── mappers/

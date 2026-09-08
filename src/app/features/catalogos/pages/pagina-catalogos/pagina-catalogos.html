@@ -1,20 +1,27 @@
-<section class="catalogos" aria-labelledby="titulo-catalogos">
-  <app-encabezado-pagina
-    idTitulo="titulo-catalogos"
-    titulo="Catálogos"
-    etiqueta="Configuración"
-    descripcion="Administra las opciones reutilizables de los formularios y procesos."
-    icono="catalogos"
-  />
-
+<section
+  class="catalogos"
+  [attr.aria-labelledby]="!cargando() && !errorCarga() ? 'titulo-catalogos' : null"
+  [attr.aria-label]="
+    errorCarga() ? 'Estado de carga de catálogos' : cargando() ? 'Cargando catálogos' : null
+  "
+>
   @if (errorCarga()) {
     <app-estado-error
+      class="catalogos__error"
       titulo="No fue posible obtener los catálogos"
       descripcion="Verifica la conexión e intenta cargar nuevamente la información."
       [reintentable]="true"
       (reintentar)="cargar()"
     />
   } @else if (!cargando()) {
+    <app-encabezado-pagina
+      idTitulo="titulo-catalogos"
+      titulo="Catálogos"
+      etiqueta="Configuración"
+      descripcion="Administra las opciones reutilizables de los formularios y procesos."
+      icono="catalogos"
+    />
+
     <div class="catalogos__recorrido">
       <aside class="ui-card catalogos__maestro" aria-labelledby="titulo-lista-catalogos">
         <header class="ui-card__header catalogos__cabecera catalogos__maestro-encabezado">

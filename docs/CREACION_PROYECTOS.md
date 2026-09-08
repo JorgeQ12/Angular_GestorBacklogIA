@@ -513,7 +513,7 @@ cada paso compone `TarjetaPasoProyecto` y no existe un `router-outlet` interno.
   consulta falla, la página presenta el estado reintentable sin alterar la URL.
 - Consumidores externos como el panel navegan únicamente a `/panel/proyectos/creacion`; para
   reanudar agregan `proyectoId` mediante `crearUrlCreacionProyecto`.
-- El listado de proyectos utiliza esta misma URL para iniciar o continuar un borrador; no monta la
+- La consulta de proyectos utiliza esta misma URL para iniciar o continuar un borrador; no monta la
   vinculación de Azure dentro de otro modal.
 - El avance que necesita otra feature se expone mediante `proyectos/public-api.ts`. Ese contrato
   entrega posición, total y porcentaje sin filtrar `PASOS_PROYECTO` ni mappers internos.
