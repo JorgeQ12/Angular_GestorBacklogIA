@@ -43,6 +43,52 @@ describe('PanelAsistenteIA', () => {
     expect(emitido).not.toHaveBeenCalled();
   });
 
+  it.each([
+    [
+      'Detectar vacíos',
+      'Detecta vacíos en esta sección y hazme preguntas concretas para completarla.',
+    ],
+    ['Mejorar claridad', 'Ayúdame a mejorar la claridad y precisión de esta sección.'],
+    [
+      'Crear propuestas',
+      'Crea una propuesta completa para esta sección con el contexto disponible.',
+    ],
+  ])('envía la acción sugerida %s como un mensaje', (etiqueta, mensaje) => {
+    const fixture = TestBed.createComponent(PanelAsistenteIA);
+    fixture.componentRef.setInput('mensajes', []);
+    fixture.componentRef.setInput('nombreSeccion', 'Necesidad de negocio');
+    fixture.detectChanges();
+    const emitido = vi.fn();
+    fixture.componentInstance.mensajeEnviado.subscribe(emitido);
+    const boton = Array.from(
+      (fixture.nativeElement as HTMLElement).querySelectorAll<HTMLButtonElement>(
+        '.panel-asistente__capacidad',
+      ),
+    ).find((elemento) => elemento.textContent?.trim() === etiqueta);
+
+    expect(boton).toBeDefined();
+    boton!.click();
+
+    expect(emitido).toHaveBeenCalledWith(mensaje);
+  });
+
+  it('deshabilita las acciones sugeridas durante una operación remota', () => {
+    const fixture = TestBed.createComponent(PanelAsistenteIA);
+    fixture.componentRef.setInput('mensajes', []);
+    fixture.componentRef.setInput('nombreSeccion', 'Necesidad de negocio');
+    fixture.componentRef.setInput('enviando', true);
+    fixture.detectChanges();
+
+    const botones = Array.from(
+      (fixture.nativeElement as HTMLElement).querySelectorAll<HTMLButtonElement>(
+        '.panel-asistente__capacidad',
+      ),
+    );
+
+    expect(botones).toHaveLength(3);
+    expect(botones.every((boton) => boton.disabled)).toBe(true);
+  });
+
   it('envía con Enter y permite una nueva línea con Shift + Enter', () => {
     const fixture = TestBed.createComponent(PanelAsistenteIA);
     fixture.componentRef.setInput('mensajes', []);
@@ -144,9 +190,7 @@ describe('PanelAsistenteIA', () => {
     const elemento = fixture.nativeElement as HTMLElement;
     const etiqueta = elemento.querySelector<HTMLLabelElement>('label[for="mensaje-asistente-ia"]');
 
-    expect(elemento.textContent).toContain(
-      'Cuéntame cuál es la situación actual del proceso.',
-    );
+    expect(elemento.textContent).toContain('Cuéntame cuál es la situación actual del proceso.');
     expect(etiqueta?.classList.contains('ui-visually-hidden')).toBe(true);
     expect(elemento.querySelector('.sr-only')).toBeNull();
   });

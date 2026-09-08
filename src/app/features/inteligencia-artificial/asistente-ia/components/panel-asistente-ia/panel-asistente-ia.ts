@@ -19,6 +19,24 @@ import {
   type MensajeAsistenteIA,
 } from '../../models/asistente-ia.model';
 
+const ACCIONES_RAPIDAS = [
+  {
+    etiqueta: 'Detectar vacíos',
+    icono: 'buscar',
+    mensaje: 'Detecta vacíos en esta sección y hazme preguntas concretas para completarla.',
+  },
+  {
+    etiqueta: 'Mejorar claridad',
+    icono: 'editar',
+    mensaje: 'Ayúdame a mejorar la claridad y precisión de esta sección.',
+  },
+  {
+    etiqueta: 'Crear propuestas',
+    icono: 'asistenteIA',
+    mensaje: 'Crea una propuesta completa para esta sección con el contexto disponible.',
+  },
+] as const;
+
 /** Presenta el historial y emite acciones sin conocer HTTP ni modelos de Proyectos. */
 @Component({
   selector: 'app-panel-asistente-ia',
@@ -68,6 +86,7 @@ export class PanelAsistenteIA {
   public readonly propuestaRechazada = output<number>();
 
   protected readonly limiteMensaje = 4000;
+  protected readonly accionesRapidas = ACCIONES_RAPIDAS;
   protected readonly roles = RolMensajeAsistenteIA;
   protected readonly estadosPropuesta = EstadoPropuestaAsistenteIA;
   protected readonly formulario = this.constructorFormulario.group({
@@ -107,6 +126,14 @@ export class PanelAsistenteIA {
     }
 
     const mensaje = this.formulario.controls.mensaje.value.trim();
+    this.mensajeEnviado.emit(mensaje);
+    this.formulario.reset();
+  }
+
+  /** Inicia una solicitud sugerida desde el estado de bienvenida. */
+  protected ejecutarAccionRapida(mensaje: string): void {
+    if (this.operacionBloqueada()) return;
+
     this.mensajeEnviado.emit(mensaje);
     this.formulario.reset();
   }

@@ -7,9 +7,10 @@ asistente diferente por paso.
 
 ## Experiencia
 
-El asistente se presenta como un botón flotante a partir de Necesidad de negocio. El avance
-persistido gobierna su visibilidad, por lo que continúa disponible si el usuario vuelve a una
-sección anterior después de haber alcanzado Necesidad.
+El asistente se presenta como un botón flotante cuando el paso visible es Necesidad de negocio
+o uno posterior. Al regresar a Contexto o Tipo de solución se ocultan el botón y el panel, aunque
+el borrador haya avanzado más. Al volver a Necesidad o un paso posterior reaparece el acceso;
+el estado de la conversación se conserva en el inyector de la ruta del proyecto.
 
 - El botón utiliza `public/brand/logo.svg` como identidad de la aplicación y la insignia semántica
   `asistenteIA` del catálogo central de iconos.
@@ -23,6 +24,9 @@ sección anterior después de haber alcanzado Necesidad.
 - `Escape` cierra el panel y devuelve el foco al botón flotante.
 - En móvil ocupa casi toda la ventana disponible; en escritorio mantiene un ancho de conversación.
 - La conversación es única por proyecto y no se reinicia al cambiar de paso.
+- El estado de bienvenida ofrece acciones sugeridas accesibles para detectar vacíos, mejorar la
+  claridad o solicitar una propuesta. Cada botón inicia directamente el turno correspondiente y
+  se bloquea mientras exista una operación remota.
 - Las respuestas pueden orientar, hacer preguntas o presentar una propuesta. El modelo nunca
   aplica directamente un cambio.
 
@@ -70,12 +74,12 @@ mensajes del asistente, puede guardar una propuesta con estado `Pendiente`, `Apl
 
 Las operaciones viven bajo `/api/GeneracionIA/Asistente`:
 
-| Operación | Método | Responsabilidad |
-|---|---|---|
-| `ObtenerConversacion` | GET | Recuperar el historial del borrador asociado al proyecto. |
-| `EnviarMensaje` | POST | Construir contexto, consultar el modelo y persistir ambos mensajes. |
-| `AplicarPropuesta` | POST | Validar revisión, actualizar una sección y marcar la propuesta. |
-| `RechazarPropuesta` | POST | Marcar explícitamente que la propuesta no se utilizará. |
+| Operación             | Método | Responsabilidad                                                     |
+| --------------------- | ------ | ------------------------------------------------------------------- |
+| `ObtenerConversacion` | GET    | Recuperar el historial del borrador asociado al proyecto.           |
+| `EnviarMensaje`       | POST   | Construir contexto, consultar el modelo y persistir ambos mensajes. |
+| `AplicarPropuesta`    | POST   | Validar revisión, actualizar una sección y marcar la propuesta.     |
+| `RechazarPropuesta`   | POST   | Marcar explícitamente que la propuesta no se utilizará.             |
 
 Todas las respuestas conservan `ResultadoApi<T>`. El frontend utiliza DTO, mapper y modelos
 separados y no expone el JSON técnico directamente en el panel.

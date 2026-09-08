@@ -94,6 +94,40 @@ describe('PaginaCreacionProyecto', () => {
     ).toBeNull();
   });
 
+  it.each(['Contexto del proyecto', 'Tipo de solución'])(
+    'oculta el asistente al volver a %s y lo muestra al regresar a Necesidad',
+    async (tituloPaso) => {
+      const harness = await RouterTestingHarness.create('/proyectos/creacion?proyectoId=42');
+      const elemento = harness.routeNativeElement as HTMLElement;
+      const estadoIA = harness.routeDebugElement!.injector.get(EstadoAsistenteIAService);
+
+      expect(elemento.querySelector('app-asistente-ia-flotante')).not.toBeNull();
+
+      const botonAnterior = Array.from(
+        elemento.querySelectorAll<HTMLButtonElement>('.recorrido-proyecto__boton'),
+      ).find((boton) => boton.textContent?.includes(tituloPaso));
+      expect(botonAnterior).toBeDefined();
+      botonAnterior!.click();
+      harness.detectChanges();
+
+      expect(elemento.querySelector('[aria-current="step"]')?.textContent).toContain(tituloPaso);
+      expect(elemento.querySelector('app-asistente-ia-flotante')).toBeNull();
+
+      const botonNecesidad = Array.from(
+        elemento.querySelectorAll<HTMLButtonElement>('.recorrido-proyecto__boton'),
+      ).find((boton) => boton.textContent?.includes('Necesidad de negocio'));
+      expect(botonNecesidad).toBeDefined();
+      botonNecesidad!.click();
+      harness.detectChanges();
+
+      const asistente = harness.routeDebugElement!.query(By.directive(AsistenteIAFlotante));
+      expect(asistente).not.toBeNull();
+      expect(asistente.componentInstance.contexto().seccionActiva).toBe(ClaveSeccionProyecto.Necesidad);
+      expect(asistente.injector.get(EstadoAsistenteIAService)).toBe(estadoIA);
+      expect(creacionProyecto.obtenerBorrador).toHaveBeenCalledTimes(1);
+    },
+  );
+
   it('recarga el borrador después de aplicar una propuesta de IA', async () => {
     const harness = await RouterTestingHarness.create('/proyectos/creacion?proyectoId=42');
     const asistente = harness.routeDebugElement?.query(By.directive(AsistenteIAFlotante));

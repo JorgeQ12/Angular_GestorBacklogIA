@@ -86,6 +86,42 @@ describe('FormularioEquipoProyecto', () => {
     expect(controlGeneral.checked).toBe(true);
   });
 
+  it('bloquea la edición individual mientras existe una selección masiva', () => {
+    const seleccion = obtenerElemento().querySelector<HTMLInputElement>(
+      '.formulario-equipo__seleccion input',
+    )!;
+
+    seleccion.checked = true;
+    seleccion.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+
+    expect(obtenerControlesAsignacionIndividual().every((control) => control.disabled)).toBe(true);
+    expect(obtenerControlBoton('#equipo-perfil-masivo-control').disabled).toBe(false);
+    expect(obtenerControlBoton('#equipo-dedicacion-masiva-control').disabled).toBe(false);
+    expect(seleccion.disabled).toBe(false);
+
+    seleccion.checked = false;
+    seleccion.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+
+    expect(obtenerControlesAsignacionIndividual().every((control) => !control.disabled)).toBe(true);
+  });
+
+  it('no guarda asignaciones pendientes aunque sus controles estén bloqueados por la selección', () => {
+    const seleccionPendiente = obtenerElemento().querySelectorAll<HTMLInputElement>(
+      '.formulario-equipo__seleccion input',
+    )[1];
+    const guardar = vi.fn();
+    fixture.componentInstance.guardar.subscribe(guardar);
+
+    seleccionPendiente.checked = true;
+    seleccionPendiente.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+    enviarFormulario();
+
+    expect(guardar).not.toHaveBeenCalled();
+  });
+
   it('asigna el mismo perfil y dedicación a varios integrantes', () => {
     obtenerElemento()
       .querySelectorAll<HTMLInputElement>('.formulario-equipo__seleccion input')
@@ -185,6 +221,14 @@ describe('FormularioEquipoProyecto', () => {
 
   function obtenerControlBoton(selector: string): HTMLButtonElement {
     return obtenerElemento().querySelector(selector) as HTMLButtonElement;
+  }
+
+  function obtenerControlesAsignacionIndividual(): HTMLButtonElement[] {
+    return Array.from(
+      obtenerElemento().querySelectorAll<HTMLButtonElement>(
+        '.formulario-equipo__fila app-selector-campo button',
+      ),
+    );
   }
 
   function obtenerElemento(): HTMLElement {

@@ -10,6 +10,9 @@ como botón flotante y conserva la misma conversación al cambiar de paso; no ex
 sección. Su implementación pertenece a `features/inteligencia-artificial/asistente-ia`
 y la página comparte únicamente proyecto, revisión y sección activa.
 
+La visibilidad depende del paso que se está viendo: al retroceder a Contexto o Tipo de solución,
+el asistente se oculta; al volver a Necesidad o un paso posterior reaparece con la misma conversación.
+
 Las propuestas no modifican formularios localmente ni se aplican al recibir la respuesta. El
 usuario confirma Aplicar o Rechazar. Una aplicación correcta incrementa la revisión en el backend
 y la página solicita una nueva fotografía mediante `EstadoCreacionProyectoService.recargar`.
@@ -367,7 +370,10 @@ DevOps. No duplica los roles funcionales definidos en el paso anterior:
   “Actualizar desde Azure” se integran en el único encabezado del paso mediante un contexto
   opcional proporcionado en la ruta de creación.
 - La selección múltiple permite aplicar un perfil técnico, una dedicación o ambos valores a todas
-  las personas seleccionadas. La selección es estado temporal de interfaz y no se persiste.
+  las personas seleccionadas. Mientras exista al menos una selección, los selectores individuales
+  de perfil y dedicación quedan deshabilitados para evitar ediciones simultáneas; los checkboxes y
+  la barra de asignación masiva permanecen disponibles. Al liberar la selección, la edición por fila
+  se habilita nuevamente. La selección es estado temporal de interfaz y no se persiste.
 - “Actualizar desde Azure” consulta nuevamente la membresía, relaciona integrantes mediante
   `idAzure`, conserva sus asignaciones, incorpora personas nuevas sin configurar y retira las que
   ya no pertenecen al Team.

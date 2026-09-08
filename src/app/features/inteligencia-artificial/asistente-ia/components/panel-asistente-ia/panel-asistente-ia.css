@@ -309,22 +309,11 @@
   list-style: none;
 }
 
-.panel-asistente__capacidades li {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-  padding: var(--space-2) var(--space-3);
-  border: var(--border-width) solid var(--border-subtle);
+.panel-asistente__capacidad {
   border-radius: var(--radius-pill);
-  background: var(--surface-default);
-  color: var(--text-secondary);
-  font-size: var(--font-size-2xs);
-  box-shadow: var(--shadow-xs);
 }
 
-.panel-asistente__capacidades app-icono {
-  width: 0.8rem;
-  height: 0.8rem;
+.panel-asistente__capacidad app-icono {
   color: var(--color-info-strong);
 }
 
