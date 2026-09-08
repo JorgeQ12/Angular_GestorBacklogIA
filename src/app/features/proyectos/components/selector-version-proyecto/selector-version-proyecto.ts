@@ -27,10 +27,13 @@ export class SelectorVersionProyecto {
 
   /** Proporciona el historial ordenado disponible. */
   public readonly versiones = input.required<readonly VersionProyectoResumen[]>();
+
   /** Identifica la fotografía presentada actualmente. */
   public readonly versionSeleccionadaId = input.required<number>();
+
   /** Bloquea temporalmente el selector durante operaciones remotas. */
   public readonly deshabilitado = input(false);
+
   /** Solicita presentar una fotografía distinta. */
   public readonly versionCambiada = output<number>();
 

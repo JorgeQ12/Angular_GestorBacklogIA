@@ -141,6 +141,12 @@
   box-shadow: none;
 }
 
+/* Las acciones textuales deshabilitadas conservan su superficie transparente. */
+.ui-button--text:disabled {
+  border: 0;
+  background: transparent;
+}
+
 .ui-button--block {
   width: 100%;
 }

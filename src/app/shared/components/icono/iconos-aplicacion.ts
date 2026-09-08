@@ -70,6 +70,7 @@ const ICONO_AZURE_DEVOPS = {
 
 /** Catálogo semántico inicial de iconos compartidos por la aplicación. */
 export const ICONOS_APLICACION = {
+  catalogos: LucideListChecks.icon,
   agregar: LucidePlus.icon,
   asistenteIA: LucideSparkles.icon,
   aplicacionEscritorio: LucideMonitor.icon,

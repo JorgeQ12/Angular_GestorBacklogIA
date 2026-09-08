@@ -23,6 +23,18 @@ export const routes: Routes = [
       import('./layouts/panel/panel-layout').then((modulo) => modulo.PanelLayout),
     children: [
       {
+        path: SEGMENTOS_RUTA.catalogos,
+        redirectTo: `${SEGMENTOS_RUTA.configuracion}/${SEGMENTOS_RUTA.catalogos}`,
+        pathMatch: 'full',
+      },
+      {
+        path: `${SEGMENTOS_RUTA.configuracion}/${SEGMENTOS_RUTA.catalogos}`,
+        loadComponent: () =>
+          import('./features/catalogos/pages/pagina-catalogos/pagina-catalogos').then(
+            (modulo) => modulo.PaginaCatalogos,
+          ),
+      },
+      {
         path: '',
         pathMatch: 'full',
         redirectTo: SEGMENTOS_RUTA.inicio,

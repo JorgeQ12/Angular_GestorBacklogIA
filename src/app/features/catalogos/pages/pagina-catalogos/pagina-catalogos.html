@@ -1,0 +1,211 @@
+<section class="catalogos" aria-labelledby="titulo-catalogos">
+  <app-encabezado-pagina
+    idTitulo="titulo-catalogos"
+    titulo="Catálogos"
+    etiqueta="Configuración"
+    descripcion="Administra las opciones reutilizables de los formularios y procesos."
+    icono="catalogos"
+  />
+
+  @if (errorCarga()) {
+    <app-estado-error
+      titulo="No fue posible obtener los catálogos"
+      descripcion="Verifica la conexión e intenta cargar nuevamente la información."
+      [reintentable]="true"
+      (reintentar)="cargar()"
+    />
+  } @else if (!cargando()) {
+    <div class="catalogos__recorrido">
+      <aside class="ui-card catalogos__maestro" aria-labelledby="titulo-lista-catalogos">
+        <header class="ui-card__header catalogos__cabecera catalogos__maestro-encabezado">
+          <div class="catalogos__cabecera-principal">
+            <div class="ui-card__heading">
+              <span class="ui-card__icon" aria-hidden="true">
+                <app-icono nombre="catalogos" />
+              </span>
+              <h2 id="titulo-lista-catalogos" class="ui-card__title">Catálogos</h2>
+            </div>
+            <button
+              type="button"
+              class="ui-button ui-button--text ui-button--md catalogos__accion-icono"
+              aria-label="Actualizar catálogos"
+              title="Actualizar catálogos"
+              [disabled]="bloqueado()"
+              (click)="cargar()"
+            >
+              <app-icono nombre="reintentar" />
+            </button>
+          </div>
+        </header>
+
+        <div class="ui-card__body catalogos__maestro-cuerpo">
+          <nav class="catalogos__lista" aria-label="Catálogos disponibles">
+            @for (tipo of tipos(); track tipo.id) {
+              <button
+                type="button"
+                class="catalogos__tipo"
+                [class.catalogos__tipo--seleccionado]="seleccionado()?.id === tipo.id"
+                [attr.aria-current]="seleccionado()?.id === tipo.id ? 'true' : null"
+                [disabled]="bloqueado()"
+                (click)="seleccionar(tipo)"
+              >
+                <span class="catalogos__tipo-icono" aria-hidden="true">
+                  <app-icono nombre="catalogos" />
+                </span>
+                <span class="catalogos__tipo-contenido">
+                  <span class="catalogos__tipo-titulo">
+                    <strong>{{ tipo.nombre }}</strong>
+                    @if (!tipo.activo) {
+                      <span class="catalogos__estado-entidad catalogos__estado-entidad--inactivo">
+                        Inactivo
+                      </span>
+                    }
+                  </span>
+                  <span class="catalogos__tipo-descripcion">{{ tipo.descripcion }}</span>
+                </span>
+                <app-icono class="catalogos__tipo-flecha" nombre="continuar" />
+              </button>
+            } @empty {
+              <div class="catalogos__lista-vacia">
+                <strong>Sin catálogos</strong>
+                <span>No hay resultados para los filtros seleccionados.</span>
+              </div>
+            }
+          </nav>
+        </div>
+
+        <footer class="ui-card__footer catalogos__pie catalogos__pie--maestro">
+          <button
+            type="button"
+            class="ui-button ui-button--primary ui-button--md catalogos__accion-crear"
+            [disabled]="bloqueado() || errorCarga()"
+            (click)="abrirTipo()"
+          >
+            <app-icono class="ui-button__icon" nombre="agregar" />
+            Crear catálogo
+          </button>
+        </footer>
+      </aside>
+
+      @if (seleccionado(); as tipo) {
+        <section
+          class="ui-card catalogos__detalle-panel"
+          [attr.aria-labelledby]="'catalogo-' + tipo.id"
+        >
+          <header class="ui-card__header catalogos__encabezado">
+            <div class="ui-card__heading catalogos__encabezado-identidad">
+              <span class="ui-card__icon" aria-hidden="true">
+                <app-icono nombre="catalogos" />
+              </span>
+              <div>
+                <h2 class="ui-card__title" [id]="'catalogo-' + tipo.id">{{ tipo.nombre }}</h2>
+                <p class="catalogos__detalle">
+                  @if (!tipo.activo) {
+                    <span class="catalogos__estado-entidad catalogos__estado-entidad--inactivo">
+                      Inactivo
+                    </span>
+                    <span aria-hidden="true">·</span>
+                  }
+                  <span>{{ tipo.descripcion }}</span>
+                </p>
+              </div>
+            </div>
+
+            <app-campo-busqueda
+              class="catalogos__busqueda-opciones"
+              id="buscar-opciones-catalogo"
+              [etiqueta]="'Buscar opciones en ' + tipo.nombre"
+              [placeholder]="'Buscar opciones en ' + tipo.nombre"
+              [formControl]="buscarValores"
+            />
+          </header>
+
+          @if (!tipo.activo) {
+            <div class="catalogos__aviso" role="status">
+              <app-icono nombre="alerta" />
+              Este catálogo está inactivo. Actívalo para agregar nuevas opciones.
+            </div>
+          }
+
+          <div class="ui-card__body catalogos__opciones-cuerpo">
+            @if (valoresVisibles().length) {
+              <app-tabla-opciones-catalogo
+                [opciones]="valoresVisibles()"
+                [bloqueado]="bloqueado()"
+                (editarOpcion)="abrirValor($event)"
+                (cambiarEstadoOpcion)="cambiarEstadoValor($event)"
+              />
+            } @else {
+              <app-estado-vacio
+                class="catalogos__estado-vacio"
+                icono="catalogos"
+                titulo="Sin opciones"
+                descripcion="No hay opciones que coincidan con los filtros seleccionados."
+              />
+            }
+          </div>
+
+          <footer class="ui-card__footer catalogos__pie">
+            <button
+              type="button"
+              class="ui-button ui-button--text ui-button--md catalogos__accion-icono"
+              [attr.aria-label]="'Editar catálogo ' + tipo.nombre"
+              [attr.title]="'Editar catálogo ' + tipo.nombre"
+              [disabled]="bloqueado()"
+              (click)="abrirTipo(tipo)"
+            >
+              <app-icono class="ui-button__icon" nombre="editar" />
+            </button>
+            <button
+              type="button"
+              class="ui-button ui-button--text ui-button--md catalogos__accion-icono"
+              [attr.aria-label]="(tipo.activo ? 'Desactivar ' : 'Activar ') + tipo.nombre"
+              [attr.title]="(tipo.activo ? 'Desactivar ' : 'Activar ') + tipo.nombre"
+              [disabled]="bloqueado()"
+              (click)="cambiarEstadoTipo(tipo)"
+            >
+              <app-icono [nombre]="tipo.activo ? 'ocultar' : 'mostrar'" />
+            </button>
+            <button
+              type="button"
+              class="ui-button ui-button--primary ui-button--md catalogos__accion-crear"
+              [disabled]="bloqueado() || !tipo.activo"
+              (click)="abrirValor()"
+            >
+              <app-icono class="ui-button__icon" nombre="agregar" />
+              Crear opción
+            </button>
+          </footer>
+        </section>
+      } @else {
+        <section class="ui-card catalogos__detalle-vacio" aria-label="Detalle del catálogo">
+          <header class="ui-card__header">
+            <div class="ui-card__heading">
+              <span class="ui-card__icon" aria-hidden="true">
+                <app-icono nombre="catalogos" />
+              </span>
+              <div>
+                <h2 class="ui-card__title">Detalle del catálogo</h2>
+                <p class="catalogos__descripcion">Selecciona un catálogo para ver sus opciones.</p>
+              </div>
+            </div>
+          </header>
+          <app-estado-vacio
+            icono="catalogos"
+            titulo="Selecciona un catálogo"
+            descripcion="El detalle y las opciones aparecerán en esta tarjeta."
+          />
+        </section>
+      }
+    </div>
+  }
+
+  @if (editor(); as contextoEditor) {
+    <app-editor-catalogo
+      [contexto]="contextoEditor"
+      [ocupado]="ocupado()"
+      (cerrar)="cerrarEditor()"
+      (guardar)="guardar($event)"
+    />
+  }
+</section>

@@ -205,6 +205,8 @@ Los modificadores se combinan por responsabilidad:
 - `on-inverse` adapta la acción a una superficie oscura sin crear clases de una feature.
 - Las acciones `text` conservan su color durante hover y comunican la interacción únicamente con
   movimiento; el foco visible permanece independiente para navegación con teclado.
+- Al deshabilitarse, las acciones `text` conservan el fondo y el borde transparentes para evitar
+  que los iconos o enlaces cambien visualmente a botones sólidos durante operaciones bloqueantes.
 
 ### Iconografía
 

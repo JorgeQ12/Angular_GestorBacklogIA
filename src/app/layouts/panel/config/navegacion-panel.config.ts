@@ -1,6 +1,7 @@
 import { InjectionToken } from '@angular/core';
 import {
   URL_INICIO_PANEL,
+  URL_CATALOGOS,
   URL_PROYECTOS,
   crearUrlInformacionProyecto,
 } from '../../../core/navegacion/rutas';
@@ -26,6 +27,14 @@ export const NAVEGACION_PANEL = [
     icono: 'proyectos',
     ruta: URL_PROYECTOS,
     coincidenciaExacta: false,
+  },
+  {
+    id: ClaveItemNavegacionPanel.Catalogos,
+    etiqueta: 'Catálogos',
+    descripcion: 'Administrar catálogos y opciones',
+    icono: 'catalogos',
+    ruta: URL_CATALOGOS,
+    coincidenciaExacta: true,
   },
 ] as const satisfies readonly ItemNavegacionPanel[];
 
