@@ -26,12 +26,16 @@ export class EstadoInformacionProyectoService {
 
   /** Expone la única fotografía que puede originar una nueva versión. */
   public readonly proyectoActual = this.proyectoActualEstado.asReadonly();
+
   /** Expone la fotografía vigente o histórica seleccionada globalmente. */
   public readonly proyectoPresentado = this.proyectoPresentadoEstado.asReadonly();
+
   /** Expone el historial disponible para el selector. */
   public readonly versiones = this.versionesEstado.asReadonly();
+
   /** Indica que no existe una fotografía utilizable para la consulta solicitada. */
   public readonly errorCarga = this.errorCargaEstado.asReadonly();
+
   /** Bloquea nuevos guardados mientras se crea una versión. */
   public readonly guardando = this.guardandoEstado.asReadonly();
 

@@ -1,0 +1,45 @@
+<app-modal
+  [titulo]="titulo()"
+  [descripcion]="descripcion()"
+  [icono]="icono()"
+  idFormulario="formulario-catalogo"
+  [descartable]="!ocupado()"
+  [mostrarCancelar]="!ocupado()"
+  [confirmacionDeshabilitada]="ocupado()"
+  [cierreExteriorHabilitado]="false"
+  iconoConfirmar="guardar"
+  (cerrar)="cerrar.emit()"
+>
+  <form
+    id="formulario-catalogo"
+    [formGroup]="formulario"
+    [appMensajesFormulario]="mensajes"
+    appEnfocarPrimerControlInvalido
+    (ngSubmit)="enviar()"
+    class="ui-form-grid"
+  >
+    <div class="ui-field">
+      <label class="ui-label" for="catalogo-nombre">Nombre</label>
+      <input
+        class="ui-control"
+        id="catalogo-nombre"
+        formControlName="nombre"
+        appErrorCampo
+        required
+        [maxlength]="limites.nombre"
+      />
+    </div>
+    <div class="ui-field">
+      <label class="ui-label" for="catalogo-descripcion">Descripción</label>
+      <textarea
+        class="ui-control ui-textarea"
+        id="catalogo-descripcion"
+        formControlName="descripcion"
+        appErrorCampo
+        required
+        [maxlength]="limites.descripcion"
+        rows="4"
+      ></textarea>
+    </div>
+  </form>
+</app-modal>

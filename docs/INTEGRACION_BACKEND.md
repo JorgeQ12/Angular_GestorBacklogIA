@@ -67,6 +67,12 @@ Los valores administrados por el backend no se replican como listas estáticas e
 - Los valores inactivos no se ofrecen en formularios nuevos.
 - No se queman IDs de tipos o valores provenientes de semillas de base de datos.
 
+## Administración de catálogos
+
+La administración reutiliza el endpoint y DTO de valores de `core/catalogos`, valida cada
+`ResultadoApi` antes del mapeo y mantiene la autorización y las restricciones de integridad en el
+backend. La experiencia, los contratos y los estados se describen en [Catálogos](CATALOGOS.md).
+
 ## Borradores y concurrencia
 
 Cuando una actualización exige la fotografía completa del borrador, el estado del flujo conserva
