@@ -62,12 +62,21 @@ describe('Página de catálogos', () => {
   it('distingue error de consulta y permite reintentar', () => {
     api.obtenerTipos.mockReturnValueOnce(throwError(() => new Error('fallo')));
     const f = crear();
-    expect(f.nativeElement.querySelector('app-estado-error')).not.toBeNull();
-    expect(f.nativeElement.querySelector('app-estado-vacio')).toBeNull();
+    const root = f.nativeElement as HTMLElement;
+    const error = root.querySelector<HTMLElement>('app-estado-error');
+    expect(error).not.toBeNull();
+    expect(error?.classList.contains('estado-error--pagina-completa')).toBe(true);
+    expect(root.querySelector('app-encabezado-pagina')).toBeNull();
+    expect(root.querySelector('.catalogos__recorrido')).toBeNull();
+    expect(root.querySelector('app-estado-vacio')).toBeNull();
+    expect(root.querySelector('.catalogos')?.getAttribute('aria-label')).toBe(
+      'Estado de carga de catálogos',
+    );
     pulsar(f.nativeElement, 'Reintentar');
     f.detectChanges();
     expect(f.nativeElement.textContent).toContain('Logística');
-    expect(comunicar).toHaveBeenCalledTimes(1);
+    expect(f.nativeElement.querySelector('app-encabezado-pagina')).not.toBeNull();
+    expect(comunicar).not.toHaveBeenCalled();
   });
   it('conserva la edición al fallar y evita enviar dos veces mientras guarda', () => {
     const pendiente = new Subject<Catalogo>();

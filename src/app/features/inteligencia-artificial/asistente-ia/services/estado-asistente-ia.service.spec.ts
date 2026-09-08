@@ -145,7 +145,7 @@ describe('EstadoAsistenteIAService', () => {
 
     servicio.cargar(42);
     expect(servicio.errorCarga()).toBe(true);
-    expect(notificador.comunicar).toHaveBeenCalledOnce();
+    expect(notificador.comunicar).not.toHaveBeenCalled();
 
     servicio.cargar(42, true);
     expect(servicio.errorCarga()).toBe(false);

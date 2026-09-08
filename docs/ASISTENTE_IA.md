@@ -124,9 +124,11 @@ contexto sin perder la trazabilidad persistida.
 ## Carga, error y accesibilidad
 
 Las solicitudes del asistente usan `OMITIR_CARGA_GLOBAL` porque son operaciones largas con estado
-local y no deben bloquear el formulario. El panel presenta carga inicial, mensaje pendiente y
-propuesta en proceso. Los fallos se normalizan con `NotificadorErroresApiService` y los conflictos
-de revisión no se reintentan ni sobrescriben automáticamente.
+local y no deben bloquear el formulario. El panel presenta carga inicial, error con reintento,
+mensaje pendiente y propuesta en proceso. El error de carga permanece en el panel y no abre un
+modal redundante; los fallos al enviar o resolver propuestas se normalizan con
+`NotificadorErroresApiService`, y los conflictos de revisión no se reintentan ni sobrescriben
+automáticamente.
 
 El panel usa un formulario reactivo tipado, límite de 4000 caracteres, región viva para nuevos
 mensajes, etiquetas accesibles y botones nativos. La API del formulario deshabilita el compositor

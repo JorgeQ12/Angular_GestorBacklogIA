@@ -13,7 +13,6 @@ import {
 } from 'rxjs';
 import { NotificadorErroresApiService } from '../../../../core/mensajes/services/notificador-errores-api.service';
 import {
-  ERROR_CARGA_ASISTENTE_IA,
   ERROR_ENVIO_ASISTENTE_IA,
   ERROR_PROPUESTA_ASISTENTE_IA,
 } from '../config/mensajes-asistente-ia.config';
@@ -101,10 +100,9 @@ export class EstadoAsistenteIAService {
           this.historialCargado = true;
           this.estadoMensajes.set(conversacion.mensajes);
         },
-        error: (error: unknown) => {
+        error: () => {
           if (this.proyectoActivo !== proyectoId) return;
           this.estadoErrorCarga.set(true);
-          this.notificador.comunicar(error, ERROR_CARGA_ASISTENTE_IA);
         },
       });
     this.cargaActual = carga.closed ? null : carga;

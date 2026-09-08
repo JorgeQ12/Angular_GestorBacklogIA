@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 import { PARAMETROS_RUTA, SEGMENTOS_RUTA } from '../../core/navegacion/rutas';
 import { EstadoAsistenteIAService } from '../inteligencia-artificial/asistente-ia/public-api';
 import { EstadoCreacionProyectoService } from './creacion/services/estado-creacion-proyecto.service';
-import { EstadoListadoProyectosService } from './listado/services/estado-listado-proyectos.service';
+import { EstadoConsultaProyectosService } from './consulta/services/estado-consulta-proyectos.service';
 import { EstadoInformacionProyectoService } from './informacion/services/estado-informacion-proyecto.service';
 
 /** Define las rutas internas del dominio de Proyectos. */
@@ -18,10 +18,10 @@ export const RUTAS_PROYECTOS: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    providers: [EstadoListadoProyectosService],
+    providers: [EstadoConsultaProyectosService],
     loadComponent: () =>
-      import('./listado/pages/pagina-listado-proyectos/pagina-listado-proyectos').then(
-        (modulo) => modulo.PaginaListadoProyectos,
+      import('./consulta/pages/pagina-consulta-proyectos/pagina-consulta-proyectos').then(
+        (modulo) => modulo.PaginaConsultaProyectos,
       ),
   },
   {

@@ -20,10 +20,6 @@
   gap: var(--space-4);
 }
 
-.inicio-panel__error {
-  --ui-error-state-min-height: calc(100dvh - var(--space-6) - var(--space-12));
-}
-
 @media (max-width: 1280px) {
   .inicio-panel__columnas {
     grid-template-columns: minmax(0, 1fr);

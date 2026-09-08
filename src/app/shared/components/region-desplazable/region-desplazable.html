@@ -1,0 +1,28 @@
+<div
+  #viewport
+  class="region-desplazable__viewport"
+  tabindex="0"
+  role="region"
+  [attr.aria-label]="etiqueta()"
+  (scroll)="gestionarDesplazamiento()"
+>
+  <div #contenido class="region-desplazable__contenido">
+    <ng-content />
+  </div>
+</div>
+
+<div #pista class="region-desplazable__pista" aria-hidden="true">
+  <span
+    #control
+    class="region-desplazable__control"
+    [class.region-desplazable__control--visible]="controlVisible()"
+    [class.region-desplazable__control--activo]="controlActivo()"
+    [class.region-desplazable__control--arrastrado]="controlArrastrado()"
+    [style.height.px]="alturaControl()"
+    [style.transform]="'translateY(' + posicionControl() + 'px)'"
+    (pointerdown)="iniciarArrastre($event)"
+    (pointermove)="arrastrar($event)"
+    (pointerup)="finalizarArrastre($event)"
+    (pointercancel)="finalizarArrastre($event)"
+  ></span>
+</div>

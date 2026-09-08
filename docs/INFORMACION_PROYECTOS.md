@@ -22,6 +22,8 @@ valores devueltos por el API.
 - `?version=<id>` identifica una versión histórica. La versión actual se omite de la URL.
 - Cambiar de paso no vuelve a consultar el proyecto.
 - Cambiar de versión recupera una sola fotografía histórica y la aplica a todas las secciones.
+- Una falla al recuperar la fotografía vigente o histórica reemplaza encabezado y recorrido por el
+  estado reintentable de página completa; no presenta metadatos obtenidos de una consulta anterior.
 - La ruta deriva `proyectoId` desde `paramMap`; no captura parámetros mediante `snapshot`.
 - Cuando la URL identifica el proyecto, la barra lateral presenta “Información” como subitem
   contextual de “Proyectos” y enlaza a la misma ruta canónica. El subitem no aparece en el listado
@@ -124,7 +126,7 @@ features/proyectos/
 ├── mappers/
 ├── secciones/
 ├── creacion/
-├── listado/
+├── consulta/
 └── informacion/
     ├── config/
     ├── mappers/

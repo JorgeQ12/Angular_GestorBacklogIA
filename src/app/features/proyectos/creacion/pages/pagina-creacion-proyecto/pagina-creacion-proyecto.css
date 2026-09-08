@@ -21,10 +21,6 @@
   min-width: 0;
 }
 
-.pagina-creacion__error {
-  --ui-error-state-min-height: 28rem;
-}
-
 @media (max-width: 1024px) {
   .pagina-creacion__recorrido {
     grid-template-columns: minmax(0, 1fr);

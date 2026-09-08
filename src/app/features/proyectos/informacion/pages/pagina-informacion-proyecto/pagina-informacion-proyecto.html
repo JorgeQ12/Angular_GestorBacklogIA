@@ -1,6 +1,19 @@
-<section class="pagina-informacion" aria-labelledby="titulo-informacion-proyecto">
+<section
+  class="pagina-informacion"
+  [attr.aria-labelledby]="
+    !estado.errorCarga() && estado.proyectoPresentado() ? 'titulo-informacion-proyecto' : null
+  "
+  [attr.aria-label]="
+    estado.errorCarga()
+      ? 'Estado de carga del proyecto'
+      : !estado.proyectoPresentado()
+        ? 'Cargando información del proyecto'
+        : null
+  "
+>
   @if (estado.errorCarga()) {
     <app-estado-error
+      [paginaCompleta]="true"
       [titulo]="mensajeError.titulo"
       [descripcion]="mensajeError.descripcion"
       [reintentable]="true"

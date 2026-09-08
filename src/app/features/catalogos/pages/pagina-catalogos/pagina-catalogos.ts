@@ -17,6 +17,7 @@ import { EncabezadoPagina } from '../../../../shared/components/encabezado-pagin
 import { EstadoError } from '../../../../shared/components/estado-error/estado-error';
 import { EstadoVacio } from '../../../../shared/components/estado-vacio/estado-vacio';
 import { IconoComponent } from '../../../../shared/components/icono/icono.component';
+import { RegionDesplazable } from '../../../../shared/components/region-desplazable/region-desplazable';
 import { CampoBusqueda } from '../../../../shared/forms/controles/campo-busqueda/campo-busqueda';
 import { EditorCatalogo } from '../../components/editor-catalogo/editor-catalogo';
 import { TablaOpcionesCatalogo } from '../../components/tabla-opciones-catalogo/tabla-opciones-catalogo';
@@ -40,6 +41,7 @@ import { AdministracionCatalogosService } from '../../services/administracion-ca
     EstadoError,
     EstadoVacio,
     IconoComponent,
+    RegionDesplazable,
     CampoBusqueda,
     EditorCatalogo,
     TablaOpcionesCatalogo,
@@ -107,12 +109,14 @@ export class PaginaCatalogos implements OnInit {
           this.tipos.set(this.ordenar(datos.tipos));
           this.valores.set(this.ordenar(datos.valores));
           this.seleccionadoId.set(
-            seleccionAnterior ?? this.tipos().find((tipo) => tipo.activo)?.id ?? this.tipos()[0]?.id ?? null,
+            seleccionAnterior ??
+              this.tipos().find((tipo) => tipo.activo)?.id ??
+              this.tipos()[0]?.id ??
+              null,
           );
         },
-        error: (error) => {
+        error: () => {
           this.errorCarga.set(true);
-          this.errores.comunicar(error, ERRORES_CATALOGOS.carga);
         },
       });
   }

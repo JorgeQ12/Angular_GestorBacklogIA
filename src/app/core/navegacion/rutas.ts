@@ -66,7 +66,7 @@ export const URL_INICIO_PANEL = `/${RUTA_INICIO_PANEL}` as const;
 /** Identifica la ruta relativa de entrada al dominio de Proyectos. */
 export const RUTA_PROYECTOS = `${RUTA_PANEL}/${SEGMENTOS_RUTA.proyectos}` as const;
 
-/** Proporciona la URL absoluta del listado de proyectos. */
+/** Proporciona la URL absoluta de la consulta de proyectos. */
 export const URL_PROYECTOS = `/${RUTA_PROYECTOS}` as const;
 
 /** Identifica la única ruta relativa del recorrido de creación. */

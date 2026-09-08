@@ -5,13 +5,6 @@
 
 .tabla-opciones__desplazamiento {
   max-height: calc(var(--catalogos-altura-lista, 28rem) + var(--control-height-md));
-  overflow-y: auto;
-  overscroll-behavior: contain;
-}
-
-.tabla-opciones__desplazamiento:focus-visible {
-  outline: 0;
-  box-shadow: inset var(--shadow-focus);
 }
 
 .tabla-opciones {

@@ -20,7 +20,7 @@ específicas se mantienen en documentos separados para evitar un archivo único 
   modos de formulario y versionamiento.
 - [Integración con el backend](INTEGRACION_BACKEND.md): environments, DTO, mappers, servicios y
   errores.
-- [Listado de proyectos](LISTADO_PROYECTOS.md): portafolio, filtros, paginación y acciones por
+- [Consulta de proyectos](CONSULTA_PROYECTOS.md): filtros, paginación y acciones por
   proyecto.
 
 ## Organización principal

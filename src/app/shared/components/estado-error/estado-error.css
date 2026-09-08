@@ -4,6 +4,10 @@
   min-width: 0;
 }
 
+:host(.estado-error--pagina-completa) {
+  --ui-error-state-min-height: calc(100dvh - var(--space-6) - var(--space-12));
+}
+
 .ui-error-state {
   display: grid;
   min-height: var(--ui-error-state-min-height, 20rem);

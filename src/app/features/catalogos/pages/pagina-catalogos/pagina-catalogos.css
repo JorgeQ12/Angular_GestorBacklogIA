@@ -61,14 +61,14 @@
   min-width: 0;
 }
 
+.catalogos__lista-desplazamiento {
+  max-height: var(--catalogos-altura-lista);
+}
+
 .catalogos__lista {
   display: grid;
-  max-height: var(--catalogos-altura-lista);
   gap: var(--space-1);
   padding: var(--space-3);
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  scrollbar-gutter: stable;
 }
 
 .catalogos__tipo {
