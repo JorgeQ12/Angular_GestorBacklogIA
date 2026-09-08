@@ -91,19 +91,20 @@
             Puedo analizar esta sección, encontrar vacíos y preparar una propuesta lista para tu
             revisión.
           </p>
-          <ul class="panel-asistente__capacidades" aria-label="Capacidades del asistente">
-            <li>
-              <app-icono nombre="buscar" />
-              Detectar vacíos
-            </li>
-            <li>
-              <app-icono nombre="editar" />
-              Mejorar claridad
-            </li>
-            <li>
-              <app-icono nombre="asistenteIA" />
-              Crear propuestas
-            </li>
+          <ul class="panel-asistente__capacidades" aria-label="Acciones sugeridas">
+            @for (accion of accionesRapidas; track accion.etiqueta) {
+              <li>
+                <button
+                  type="button"
+                  class="ui-button ui-button--secondary ui-button--md panel-asistente__capacidad"
+                  [disabled]="operacionBloqueada()"
+                  (click)="ejecutarAccionRapida(accion.mensaje)"
+                >
+                  <app-icono class="ui-button__icon" [nombre]="accion.icono" />
+                  {{ accion.etiqueta }}
+                </button>
+              </li>
+            }
           </ul>
         </div>
       }
@@ -208,7 +209,9 @@
         <article class="mensaje-asistente mensaje-asistente--usuario">
           <div class="mensaje-asistente__contenido">
             <div class="mensaje-asistente__metadatos"><strong>Tú</strong></div>
-            <div class="mensaje-asistente__burbuja"><p>{{ mensaje }}</p></div>
+            <div class="mensaje-asistente__burbuja">
+              <p>{{ mensaje }}</p>
+            </div>
           </div>
         </article>
         <article class="mensaje-asistente" role="status">

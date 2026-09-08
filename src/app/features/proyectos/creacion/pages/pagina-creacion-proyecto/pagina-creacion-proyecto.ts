@@ -229,9 +229,11 @@ export class PaginaCreacionProyecto {
   );
   protected readonly mostrarAsistenteIA = computed(() => {
     const borrador = this.estadoCreacion.borrador();
+    const avancePasoVisible = AVANCE_BORRADOR_POR_PASO[this.estadoRecorrido().pasoActual];
     return (
       !!borrador &&
-      borrador.pasoActual >= AVANCE_BORRADOR_POR_PASO[ClaveSeccionProyecto.Necesidad]
+      avancePasoVisible !== null &&
+      avancePasoVisible >= AVANCE_BORRADOR_POR_PASO[ClaveSeccionProyecto.Necesidad]
     );
   });
   protected readonly contextoAsistenteIA = computed<ContextoAsistenteIA | null>(() => {
