@@ -46,7 +46,6 @@ import {
   LucideSmartphone,
   LucideSlidersHorizontal,
   LucideSparkles,
-  LucideSparkles,
   LucideTrendingUp,
   LucideTriangleAlert,
   LucideTrash2,

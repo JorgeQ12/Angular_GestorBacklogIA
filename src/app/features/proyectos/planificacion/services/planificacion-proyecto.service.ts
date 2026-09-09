@@ -105,7 +105,7 @@ export class PlanificacionProyectoService {
   public sincronizarEpicaPrincipal(
     proyectoId: number,
   ): Observable<ResultadoSincronizacionEpicaAzurePlanificacion> {
-    const params = new HttpParams().set('proyectoId', proyectoId);
+    const params = new HttpParams().set('ProyectoId', proyectoId);
     return this.http
       .post<ResultadoApi<ResultadoSincronizacionEpicaAzurePlanificacionDto>>(
         ENDPOINTS_PLANIFICACION_PROYECTO.sincronizarEpicaPrincipal,

@@ -31,15 +31,15 @@ export class ConsultaProyectosService {
 
   private construirParametros(consulta: ConsultaProyectos): HttpParams {
     let parametros = new HttpParams()
-      .set('paginaActual', consulta.pagina)
-      .set('paginaTamano', consulta.paginaTamano);
+      .set('PaginaActual', consulta.pagina)
+      .set('PaginaTamano', consulta.paginaTamano);
     const nombre = consulta.nombre.trim();
     const responsable = consulta.responsable.trim();
 
-    if (nombre) parametros = parametros.set('nombre', nombre);
-    if (responsable) parametros = parametros.set('responsable', responsable);
+    if (nombre) parametros = parametros.set('Nombre', nombre);
+    if (responsable) parametros = parametros.set('Responsable', responsable);
     if (consulta.estado !== null) {
-      parametros = parametros.set('estado', VALOR_API_ESTADO_PROYECTO[consulta.estado]);
+      parametros = parametros.set('Estado', VALOR_API_ESTADO_PROYECTO[consulta.estado]);
     }
 
     return parametros;

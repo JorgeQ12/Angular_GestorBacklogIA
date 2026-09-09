@@ -129,6 +129,7 @@ describe('PlanificacionProyectoService', () => {
     );
 
     expect(solicitud.request.method).toBe('POST');
+    expect(solicitud.request.url).toMatch(/\/api\/GeneracionIA\/GenerarItemsTrabajoIA$/);
     expect(solicitud.request.body).toEqual({
       proyectoId: 42,
       nivel: NivelGeneracionIaPlanificacionDto.Historias,
@@ -206,7 +207,7 @@ describe('PlanificacionProyectoService', () => {
 
     expect(solicitud.request.method).toBe('POST');
     expect(solicitud.request.body).toBeNull();
-    expect(solicitud.request.params.get('proyectoId')).toBe('42');
+    expect(solicitud.request.params.get('ProyectoId')).toBe('42');
     solicitud.flush(
       crearResultado({
         epicaId: 15,

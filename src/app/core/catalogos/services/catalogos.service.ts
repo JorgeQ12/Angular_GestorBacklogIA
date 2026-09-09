@@ -15,7 +15,7 @@ export class CatalogosService {
 
   /** Obtiene las opciones activas del tipo de catálogo solicitado. */
   public obtenerOpciones(nombreCatalogo: string): Observable<readonly OpcionCatalogo[]> {
-    const params = new HttpParams().set('catalogoTipoNombre', nombreCatalogo);
+    const params = new HttpParams().set('CatalogoTipoNombre', nombreCatalogo);
 
     return this.http
       .get<ResultadoApi<readonly CatalogoValorDto[]>>(ENDPOINTS_CATALOGOS.obtenerValores, {
