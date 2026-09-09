@@ -2,7 +2,7 @@ import { PARAMETROS_RUTA, SEGMENTOS_RUTA } from '../../core/navegacion/rutas';
 import { RUTAS_PROYECTOS } from './proyectos.routes';
 
 describe('RUTAS_PROYECTOS', () => {
-  it('expone listado, creación e información como casos de uso hermanos', () => {
+  it('expone consulta, creación e información como casos de uso hermanos', () => {
     expect(RUTAS_PROYECTOS).toHaveLength(3);
     expect(RUTAS_PROYECTOS[0].path).toBe(
       `:${PARAMETROS_RUTA.proyectoId}/${SEGMENTOS_RUTA.informacion}`,

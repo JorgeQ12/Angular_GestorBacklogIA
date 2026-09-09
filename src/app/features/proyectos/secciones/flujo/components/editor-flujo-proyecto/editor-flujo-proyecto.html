@@ -7,8 +7,10 @@
     <app-lienzo-flujo-proyecto
       [pantallaCompleta]="pantallaCompleta()"
       [cambiosPendientes]="cambiosPendientes()"
+      [generandoConIA]="generandoConIA()"
       (alternarPantallaCompletaSolicitado)="alternarPantallaCompleta()"
       (guardarSolicitado)="guardarSolicitado.emit()"
+      (generarConIASolicitado)="generarConIASolicitado.emit()"
     />
     @if (!esSoloLectura() && estadoEditor.paletaBloquesAbierta()) {
       <app-panel-lateral-flujo-proyecto />

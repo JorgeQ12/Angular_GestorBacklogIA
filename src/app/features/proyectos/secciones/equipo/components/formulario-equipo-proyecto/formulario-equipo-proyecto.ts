@@ -168,6 +168,7 @@ export class FormularioEquipoProyecto {
     });
     effect(() => {
       const bloquear = this.procesando() || this.sincronizando();
+      const bloquearAsignacionIndividual = this.seleccionados().size > 0;
       if (bloquear) {
         if (this.formulario.enabled) this.formulario.disable({ emitEvent: false });
         if (this.controlBusqueda.enabled) this.controlBusqueda.disable({ emitEvent: false });
@@ -176,6 +177,7 @@ export class FormularioEquipoProyecto {
         }
       } else {
         if (this.formulario.disabled) this.formulario.enable({ emitEvent: false });
+        this.actualizarAsignacionesIndividuales(bloquearAsignacionIndividual);
         if (this.controlBusqueda.disabled) this.controlBusqueda.enable({ emitEvent: false });
         if (this.asignacionMasiva.disabled) {
           this.asignacionMasiva.enable({ emitEvent: false });
@@ -250,7 +252,11 @@ export class FormularioEquipoProyecto {
   /** Solicita persistir el equipo cuando todos sus integrantes están configurados. */
   protected enviar(): void {
     if (this.esSoloLectura()) return;
-    if (this.formulario.invalid || this.controlesIntegrantes().length === 0) {
+    const integrantes = this.controlesIntegrantes();
+    const tieneAsignacionesPendientes = integrantes.some(
+      (grupo) => !estaConfigurado(grupo.getRawValue()),
+    );
+    if (integrantes.length === 0 || tieneAsignacionesPendientes) {
       this.formulario.markAllAsTouched();
       this.filtro.set(FiltroEquipoProyecto.Pendientes);
       return;
@@ -282,6 +288,17 @@ export class FormularioEquipoProyecto {
       esAdministradorAzure: [integrante.esAdministradorAzure],
       perfilTecnicoCodigo: [integrante.perfilTecnicoCodigo, [Validators.required]],
       dedicacionCodigo: [integrante.dedicacionCodigo, [Validators.required]],
+    });
+  }
+
+  /** Evita combinar la edición por fila con una asignación masiva en curso. */
+  private actualizarAsignacionesIndividuales(deshabilitar: boolean): void {
+    this.formulario.controls.integrantes.controls.forEach((grupo) => {
+      const controles = [grupo.controls.perfilTecnicoCodigo, grupo.controls.dedicacionCodigo];
+      controles.forEach((control) => {
+        if (deshabilitar && control.enabled) control.disable({ emitEvent: false });
+        if (!deshabilitar && control.disabled) control.enable({ emitEvent: false });
+      });
     });
   }
 

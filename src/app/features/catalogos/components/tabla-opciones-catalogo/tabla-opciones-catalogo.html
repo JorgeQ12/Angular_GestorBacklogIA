@@ -1,0 +1,67 @@
+<app-region-desplazable
+  class="ui-table-region tabla-opciones__desplazamiento"
+  etiqueta="Opciones del catálogo"
+>
+  <table class="ui-table tabla-opciones">
+    <caption class="ui-visually-hidden">
+      Opciones disponibles en el catálogo seleccionado
+    </caption>
+    <colgroup>
+      <col class="tabla-opciones__columna-titulo" />
+      <col />
+      <col class="tabla-opciones__columna-estado" />
+      <col class="tabla-opciones__columna-acciones" />
+    </colgroup>
+    <thead>
+      <tr>
+        <th scope="col">Título</th>
+        <th scope="col">Descripción</th>
+        <th scope="col">Estado</th>
+        <th scope="col" class="ui-table__actions">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (opcion of opciones(); track opcion.id) {
+        <tr>
+          <td>
+            <strong class="ui-table__primary-text">{{ opcion.nombre }}</strong>
+          </td>
+          <td>
+            <span class="ui-table__secondary-text">{{ opcion.descripcion }}</span>
+          </td>
+          <td>
+            <app-indicador-estado
+              [texto]="opcion.activo ? 'Activo' : 'Inactivo'"
+              [tono]="opcion.activo ? 'neutral' : 'advertencia'"
+              [presentacion]="opcion.activo ? 'discreta' : 'etiqueta'"
+            />
+          </td>
+          <td class="ui-table__actions">
+            <div class="ui-table__action-group">
+              <button
+                type="button"
+                class="ui-button ui-button--secondary ui-button--md ui-table__icon-action"
+                [attr.aria-label]="'Editar opción ' + opcion.nombre"
+                [attr.title]="'Editar opción ' + opcion.nombre"
+                [disabled]="bloqueado()"
+                (click)="editarOpcion.emit(opcion)"
+              >
+                <app-icono nombre="editar" />
+              </button>
+              <button
+                type="button"
+                class="ui-button ui-button--secondary ui-button--md ui-table__icon-action"
+                [attr.aria-label]="(opcion.activo ? 'Desactivar ' : 'Activar ') + opcion.nombre"
+                [attr.title]="(opcion.activo ? 'Desactivar ' : 'Activar ') + opcion.nombre"
+                [disabled]="bloqueado()"
+                (click)="cambiarEstadoOpcion.emit(opcion)"
+              >
+                <app-icono [nombre]="opcion.activo ? 'ocultar' : 'mostrar'" />
+              </button>
+            </div>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</app-region-desplazable>

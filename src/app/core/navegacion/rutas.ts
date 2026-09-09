@@ -2,6 +2,8 @@ import { type ParamMap } from '@angular/router';
 
 /** Centraliza los segmentos canónicos usados por el enrutador. */
 export const SEGMENTOS_RUTA = {
+  catalogos: 'catalogos',
+  configuracion: 'configuracion',
   autenticacion: 'autenticacion',
   creacion: 'creacion',
   iniciarSesion: 'iniciar-sesion',
@@ -52,6 +54,10 @@ export const RUTA_PANEL = SEGMENTOS_RUTA.panel;
 /** Proporciona la URL absoluta del panel principal. */
 export const URL_PANEL = `/${RUTA_PANEL}` as const;
 
+/** Proporciona la URL canónica de administración de catálogos. */
+export const URL_CATALOGOS =
+  `${URL_PANEL}/${SEGMENTOS_RUTA.configuracion}/${SEGMENTOS_RUTA.catalogos}` as const;
+
 /** Identifica la ruta relativa del inicio del panel. */
 export const RUTA_INICIO_PANEL = `${RUTA_PANEL}/${SEGMENTOS_RUTA.inicio}` as const;
 
@@ -61,7 +67,7 @@ export const URL_INICIO_PANEL = `/${RUTA_INICIO_PANEL}` as const;
 /** Identifica la ruta relativa de entrada al dominio de Proyectos. */
 export const RUTA_PROYECTOS = `${RUTA_PANEL}/${SEGMENTOS_RUTA.proyectos}` as const;
 
-/** Proporciona la URL absoluta del listado de proyectos. */
+/** Proporciona la URL absoluta de la consulta de proyectos. */
 export const URL_PROYECTOS = `/${RUTA_PROYECTOS}` as const;
 
 /** Identifica la única ruta relativa del recorrido de creación. */

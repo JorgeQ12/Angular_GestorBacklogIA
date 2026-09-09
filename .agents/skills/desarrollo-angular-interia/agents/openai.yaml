@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Desarrollo Angular InterIA'
+  short_description: 'Integra nuevas funciones y valida el frontend'
+  default_prompt: 'Usa $desarrollo-angular-interia para integrar esta funcionalidad Angular con todas las validaciones del proyecto.'

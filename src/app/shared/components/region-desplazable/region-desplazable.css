@@ -1,0 +1,74 @@
+:host {
+  position: relative;
+  display: block;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.region-desplazable__viewport {
+  width: 100%;
+  max-height: inherit;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+
+.region-desplazable__viewport::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.region-desplazable__viewport:focus-visible {
+  outline: 0;
+  box-shadow: inset var(--shadow-focus);
+}
+
+.region-desplazable__contenido {
+  min-width: 100%;
+}
+
+.region-desplazable__pista {
+  position: absolute;
+  z-index: var(--z-raised);
+  top: var(--scrollbar-offset);
+  right: var(--scrollbar-offset);
+  bottom: var(--scrollbar-offset);
+  width: var(--scrollbar-size);
+  pointer-events: none;
+}
+
+.region-desplazable__control {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  min-height: var(--scrollbar-thumb-min-size);
+  border-radius: var(--radius-pill);
+  background: var(--scrollbar-thumb);
+  opacity: 0;
+  cursor: grab;
+  pointer-events: none;
+  touch-action: none;
+  transition:
+    background-color var(--transition-fast) var(--ease-standard),
+    opacity var(--transition-fast) var(--ease-standard);
+}
+
+:host(:hover) .region-desplazable__control--visible,
+:host(:focus-within) .region-desplazable__control--visible,
+.region-desplazable__control--activo,
+.region-desplazable__control--arrastrado {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.region-desplazable__control:hover,
+.region-desplazable__control--arrastrado {
+  background: var(--scrollbar-thumb-hover);
+}
+
+.region-desplazable__control--arrastrado {
+  cursor: grabbing;
+}

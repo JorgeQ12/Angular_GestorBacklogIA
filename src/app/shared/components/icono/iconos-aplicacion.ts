@@ -35,9 +35,11 @@ import {
   LucideRefreshCw,
   LucideSave,
   LucideSearch,
+  LucideSend,
   LucideScanText,
   LucideServerCog,
   LucideSmartphone,
+  LucideSparkles,
   LucideTrendingUp,
   LucideTriangleAlert,
   LucideTrash2,
@@ -68,7 +70,9 @@ const ICONO_AZURE_DEVOPS = {
 
 /** Catálogo semántico inicial de iconos compartidos por la aplicación. */
 export const ICONOS_APLICACION = {
+  catalogos: LucideListChecks.icon,
   agregar: LucidePlus.icon,
+  asistenteIA: LucideSparkles.icon,
   aplicacionEscritorio: LucideMonitor.icon,
   aplicacionMovil: LucideSmartphone.icon,
   aplicacionWeb: LucideAppWindow.icon,
@@ -87,6 +91,7 @@ export const ICONOS_APLICACION = {
   continuar: LucideChevronRight.icon,
   desplegar: LucideChevronDown.icon,
   eliminar: LucideTrash2.icon,
+  enviar: LucideSend.icon,
   error: LucideCircleX.icon,
   editar: LucidePencilLine.icon,
   expandirPanel: LucidePanelLeftOpen.icon,
@@ -108,6 +113,7 @@ export const ICONOS_APLICACION = {
   alcance: LucideScanText.icon,
   equipo: LucideUsersRound.icon,
   flujo: LucideWorkflow.icon,
+  generarConIA: LucideSparkles.icon,
   roles: LucideUserRoundCog.icon,
   seguimiento: LucideTrendingUp.icon,
   tareaCompletada: LucideClipboardCheck.icon,

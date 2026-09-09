@@ -5,6 +5,10 @@ import { firstValueFrom } from 'rxjs';
 import { ResultadoApi } from '../../../../core/http/models/resultado-api.model';
 import { ClaveSeccionProyecto } from '../../config/secciones-proyecto.config';
 import { PlataformaSolucion } from '../../secciones/tipo-solucion/models/tipo-solucion-proyecto.model';
+import {
+  FlujoProyecto,
+  TipoBloqueFlujo,
+} from '../../secciones/flujo/models/flujo-proyecto.model';
 import { ENDPOINTS_CREACION_PROYECTO } from '../config/endpoints-creacion-proyecto.config';
 import {
   CrearBorradorProyectoRespuestaDto,
@@ -419,6 +423,17 @@ describe('CreacionProyectoService', () => {
     await expect(respuesta).resolves.toBeUndefined();
   });
 
+  it('genera el diagrama con IA y entrega el contrato canónico del canvas', async () => {
+    const respuesta = firstValueFrom(servicio.generarDiagramaFlujoIA(42));
+    const solicitud = httpTesting.expectOne(ENDPOINTS_CREACION_PROYECTO.generarDiagramaFlujoIA);
+
+    expect(solicitud.request.method).toBe('POST');
+    expect(solicitud.request.body).toEqual({ proyectoId: 42 });
+    solicitud.flush(crearResultado(FLUJO_GENERADO_IA));
+
+    await expect(respuesta).resolves.toEqual(FLUJO_GENERADO_IA);
+  });
+
   it('rechaza una respuesta funcional que no contiene datos válidos', async () => {
     const respuesta = firstValueFrom(servicio.validarVinculacionAzure(DATOS));
     const solicitud = httpTesting.expectOne(ENDPOINTS_CREACION_PROYECTO.validarVinculacionAzure);
@@ -504,3 +519,24 @@ function crearProyectoGuardadoDto(): GuardarProyectoRespuestaDto {
     diagramFlujoJson: '{}',
   };
 }
+
+const FLUJO_GENERADO_IA: FlujoProyecto = {
+  proyectoId: '42',
+  roles: [],
+  nodos: [
+    {
+      id: 'accion-validar-solicitud',
+      tipo: TipoBloqueFlujo.Accion,
+      titulo: 'Validar solicitud',
+      descripcion: 'Comprueba la información registrada.',
+      criteriosAceptacion: ['La información obligatoria está completa.'],
+      posicion: { x: 80, y: 80 },
+      idsRoles: [],
+      fechaCreacion: '2026-09-04T10:00:00.000Z',
+      fechaActualizacion: '2026-09-04T10:00:00.000Z',
+      datos: {},
+    },
+  ],
+  conexiones: [],
+  fechaActualizacion: '2026-09-04T10:00:00.000Z',
+};

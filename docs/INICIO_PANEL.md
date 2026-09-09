@@ -68,7 +68,8 @@ La migración conserva puntos explícitos para conectar posteriormente:
 - Detalle de proyectos.
 
 El resumen vacío solo actúa como valor inicial mientras el loader global cubre la solicitud. Una
-falla presenta un estado de error y no se confunde con totales en cero.
+falla reemplaza el encabezado y las secciones por el estado de error de página completa; no se
+confunde con totales en cero ni conserva superficies sustentadas por datos ausentes.
 
 ## Evolución con permisos
 

@@ -3,6 +3,21 @@
 Este documento registra el recorrido funcional y las responsabilidades estables para crear y
 especificar proyectos.
 
+## Acompañamiento mediante IA
+
+El recorrido integra un único **Asistente IA** por proyecto desde Necesidad de negocio. Se presenta
+como botón flotante y conserva la misma conversación al cambiar de paso; no existe un asistente por
+sección. Su implementación pertenece a `features/inteligencia-artificial/asistente-ia`
+y la página comparte únicamente proyecto, revisión y sección activa.
+
+La visibilidad depende del paso que se está viendo: al retroceder a Contexto o Tipo de solución,
+el asistente se oculta; al volver a Necesidad o un paso posterior reaparece con la misma conversación.
+
+Las propuestas no modifican formularios localmente ni se aplican al recibir la respuesta. El
+usuario confirma Aplicar o Rechazar. Una aplicación correcta incrementa la revisión en el backend
+y la página solicita una nueva fotografía mediante `EstadoCreacionProyectoService.recargar`.
+Consultar [Asistente IA](ASISTENTE_IA.md) para contratos, seguridad y organización.
+
 ## Punto de partida
 
 La creación comienza y permanece en `/panel/proyectos/creacion`. La página captura la referencia de Azure,
@@ -355,7 +370,10 @@ DevOps. No duplica los roles funcionales definidos en el paso anterior:
   “Actualizar desde Azure” se integran en el único encabezado del paso mediante un contexto
   opcional proporcionado en la ruta de creación.
 - La selección múltiple permite aplicar un perfil técnico, una dedicación o ambos valores a todas
-  las personas seleccionadas. La selección es estado temporal de interfaz y no se persiste.
+  las personas seleccionadas. Mientras exista al menos una selección, los selectores individuales
+  de perfil y dedicación quedan deshabilitados para evitar ediciones simultáneas; los checkboxes y
+  la barra de asignación masiva permanecen disponibles. Al liberar la selección, la edición por fila
+  se habilita nuevamente. La selección es estado temporal de interfaz y no se persiste.
 - “Actualizar desde Azure” consulta nuevamente la membresía, relaciona integrantes mediante
   `idAzure`, conserva sus asignaciones, incorpora personas nuevas sin configurar y retira las que
   ya no pertenecen al Team.
@@ -447,11 +465,21 @@ una selección explícita o persistirse con `idsRoles` vacío.
 El lienzo utiliza esquinas rectas y se une sin separación al pie de guardado del paso. Sus mandos
 agrupan zoom, restablecimiento y pantalla completa; al ampliar se conserva dentro del área activa
 el lienzo, la paleta de bloques y los formularios modales, y el mismo control permite reducirlo.
+Cada bloque captura el puntero durante el arrastre, procesa únicamente el puntero que inició el
+gesto y libera sus listeners tanto al soltar como al cancelar. La tarjeta desactiva el desplazamiento
+táctil nativo mientras se mueve para conservar un arrastre continuo con mouse, lápiz o toque.
 La barra superior ofrece un guardado contextual que solo se habilita cuando el diagrama cambia y
 persiste sin abandonar el editor. La acción final “Guardar flujo” ejecuta primero
 `ActualizarBorrador` con la fotografía completa. Con la revisión confirmada por esa respuesta
 ejecuta `GuardarProyecto`, enviando `proyectoId` y `revisionEsperada`; únicamente después de
 confirmar ambas operaciones la página regresa a `/panel/inicio`.
+
+Cuando el canvas está vacío ofrece “Generar con IA” junto a la creación manual. La página solicita
+`GenerarDiagramaFlujoIA` enviando únicamente `proyectoId`; el backend construye el contexto con la
+información funcional ya guardada y devuelve directamente el contrato canónico de `FlujoProyecto`.
+La respuesta reemplaza solo la fotografía local del editor y permanece pendiente hasta que el
+usuario guarde. Cuando ya existe contenido, la acción se presenta como “Regenerar con IA” en el
+encabezado del paso y exige confirmación antes de reemplazar el diagrama actual.
 
 Guardar Flujo lleva `pasoActual` al menos a 9 y conserva la fotografía completa de las secciones
 anteriores.
@@ -498,10 +526,12 @@ cada paso compone `TarjetaPasoProyecto` y no existe un `router-outlet` interno.
 - `puedeAbrirPasoCreacion` impide seleccionar componentes posteriores al avance persistido; no se
   requiere un guard porque no existen URLs de paso que proteger.
 - Al cargar un borrador, `obtenerUltimoPasoCreacion` selecciona el último paso alcanzado. Si la
-  consulta falla, la página presenta el estado reintentable sin alterar la URL.
+  consulta falla, el estado reintentable de página completa reemplaza encabezado y recorrido sin
+  alterar la URL. Un flujo guardado que no pueda interpretarse conserva un error parcial dentro del
+  paso porque el resto de la fotografía continúa siendo confiable.
 - Consumidores externos como el panel navegan únicamente a `/panel/proyectos/creacion`; para
   reanudar agregan `proyectoId` mediante `crearUrlCreacionProyecto`.
-- El listado de proyectos utiliza esta misma URL para iniciar o continuar un borrador; no monta la
+- La consulta de proyectos utiliza esta misma URL para iniciar o continuar un borrador; no monta la
   vinculación de Azure dentro de otro modal.
 - El avance que necesita otra feature se expone mediante `proyectos/public-api.ts`. Ese contrato
   entrega posición, total y porcentaje sin filtrar `PASOS_PROYECTO` ni mappers internos.

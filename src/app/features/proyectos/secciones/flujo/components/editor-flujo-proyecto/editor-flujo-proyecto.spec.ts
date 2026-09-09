@@ -59,6 +59,37 @@ describe('EditorFlujoProyecto', () => {
     expect(estadoEditor.soloLectura()).toBe(true);
   });
 
+  it('mantiene el arrastre del bloque hasta soltar o cancelar el mismo puntero', () => {
+    fixture.componentRef.setInput('flujo', FLUJO_CON_ROLES);
+    fixture.detectChanges();
+    crearNodo(TipoBloqueFlujo.Accion);
+    fixture.detectChanges();
+
+    const tarjeta = (fixture.nativeElement as HTMLElement).querySelector<HTMLElement>(
+      '.tarjeta-bloque-flujo',
+    )!;
+    const posicionInicial = estadoEditor.flujo().nodos[0].posicion;
+
+    tarjeta.dispatchEvent(crearEventoPuntero('pointerdown', 100, 100, 7));
+    window.dispatchEvent(crearEventoPuntero('pointermove', 160, 145, 7));
+    window.dispatchEvent(crearEventoPuntero('pointerup', 160, 145, 8));
+    window.dispatchEvent(crearEventoPuntero('pointermove', 200, 180, 8));
+    window.dispatchEvent(crearEventoPuntero('pointermove', 220, 190, 7));
+
+    expect(estadoEditor.flujo().nodos[0].posicion).toEqual({
+      x: posicionInicial.x + 120,
+      y: posicionInicial.y + 90,
+    });
+
+    window.dispatchEvent(crearEventoPuntero('pointercancel', 220, 190, 7));
+    window.dispatchEvent(crearEventoPuntero('pointermove', 260, 230, 7));
+
+    expect(estadoEditor.flujo().nodos[0].posicion).toEqual({
+      x: posicionInicial.x + 120,
+      y: posicionInicial.y + 90,
+    });
+  });
+
   it('bloquea el editor y retira sus superficies de edición en modo lectura', () => {
     fixture.componentRef.setInput('modo', ModoFormularioProyecto.Lectura);
     estadoEditor.abrirPaletaBloques();
@@ -109,9 +140,7 @@ describe('EditorFlujoProyecto', () => {
     fixture.detectChanges();
 
     const tarjetas = Array.from(
-      (fixture.nativeElement as HTMLElement).querySelectorAll<HTMLElement>(
-        '.tarjeta-bloque-flujo',
-      ),
+      (fixture.nativeElement as HTMLElement).querySelectorAll<HTMLElement>('.tarjeta-bloque-flujo'),
     );
     const acentosLienzo = tarjetas.map((tarjeta) =>
       tarjeta.style.getPropertyValue('--acento-bloque-flujo'),
@@ -208,22 +237,19 @@ describe('EditorFlujoProyecto', () => {
     TipoBloqueFlujo.Pagina,
     TipoBloqueFlujo.Accion,
     TipoBloqueFlujo.Componente,
-  ])(
-    'presenta los roles disponibles en el formulario de %s',
-    (tipo) => {
-      fixture.componentRef.setInput('flujo', FLUJO_CON_ROLES);
-      fixture.detectChanges();
+  ])('presenta los roles disponibles en el formulario de %s', (tipo) => {
+    fixture.componentRef.setInput('flujo', FLUJO_CON_ROLES);
+    fixture.detectChanges();
 
-      estadoEditor.iniciarCreacionNodo(tipo);
-      fixture.detectChanges();
+    estadoEditor.iniciarCreacionNodo(tipo);
+    fixture.detectChanges();
 
-      const modal = (fixture.nativeElement as HTMLElement).querySelector(
-        'app-modal-nodo-flujo-proyecto',
-      );
-      expect(modal?.textContent).toContain('Administrador');
-      expect(modal?.querySelector<HTMLInputElement>('#flujo-rol-rol-administrador')).not.toBeNull();
-    },
-  );
+    const modal = (fixture.nativeElement as HTMLElement).querySelector(
+      'app-modal-nodo-flujo-proyecto',
+    );
+    expect(modal?.textContent).toContain('Administrador');
+    expect(modal?.querySelector<HTMLInputElement>('#flujo-rol-rol-administrador')).not.toBeNull();
+  });
 
   it('elimina la asignación de roles de los bloques de decisión', () => {
     fixture.componentRef.setInput('flujo', FLUJO_CON_ROLES);
@@ -232,9 +258,7 @@ describe('EditorFlujoProyecto', () => {
     estadoEditor.iniciarCreacionNodo(TipoBloqueFlujo.Decision);
     fixture.detectChanges();
 
-    expect(
-      (fixture.nativeElement as HTMLElement).querySelector('#flujo-nombres-roles'),
-    ).toBeNull();
+    expect((fixture.nativeElement as HTMLElement).querySelector('#flujo-nombres-roles')).toBeNull();
 
     estadoEditor.confirmarBorradorNodo({
       tipo: TipoBloqueFlujo.Decision,
@@ -299,9 +323,8 @@ describe('EditorFlujoProyecto', () => {
 
     expect(elemento.querySelectorAll('[id^="flujo-criterio-"]')).toHaveLength(1);
     expect(
-      elemento.querySelector<HTMLButtonElement>(
-        '[aria-label="Eliminar criterio de aceptación 1"]',
-      )?.disabled,
+      elemento.querySelector<HTMLButtonElement>('[aria-label="Eliminar criterio de aceptación 1"]')
+        ?.disabled,
     ).toBe(true);
   });
 
@@ -323,6 +346,23 @@ describe('EditorFlujoProyecto', () => {
     >(selector)!;
     control.value = valor;
     control.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+
+  function crearEventoPuntero(
+    tipo: 'pointerdown' | 'pointermove' | 'pointerup' | 'pointercancel',
+    clientX: number,
+    clientY: number,
+    pointerId: number,
+  ): PointerEvent {
+    const evento = new Event(tipo, { bubbles: true, cancelable: true });
+
+    Object.defineProperties(evento, {
+      clientX: { value: clientX },
+      clientY: { value: clientY },
+      pointerId: { value: pointerId },
+    });
+
+    return evento as PointerEvent;
   }
 });
 

@@ -22,4 +22,13 @@ describe('EstadoError', () => {
     expect(elemento.querySelector('app-icono')).toBeTruthy();
     expect(elemento.querySelector('.ui-error-state__retry app-icono')).toBeTruthy();
   });
+
+  it('expone la variante compartida cuando el error reemplaza una página completa', () => {
+    fixture.componentRef.setInput('paginaCompleta', true);
+    fixture.detectChanges();
+
+    expect((fixture.nativeElement as HTMLElement).classList).toContain(
+      'estado-error--pagina-completa',
+    );
+  });
 });

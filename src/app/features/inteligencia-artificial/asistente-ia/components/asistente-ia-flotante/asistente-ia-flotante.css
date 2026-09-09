@@ -1,0 +1,194 @@
+:host {
+  display: contents;
+}
+
+.asistente-ia-flotante {
+  position: fixed;
+  right: var(--space-6);
+  bottom: var(--space-6);
+  z-index: var(--z-popover);
+}
+
+.asistente-ia-flotante__panel {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
+
+.asistente-ia-flotante__activador {
+  position: relative;
+  display: grid;
+  width: 4rem;
+  height: 4rem;
+  place-items: center;
+  padding: 0;
+  overflow: visible;
+  border: calc(var(--border-width) * 2) solid var(--surface-default);
+  border-radius: var(--radius-circle);
+  background: var(--surface-inverse);
+  color: var(--text-inverse);
+  box-shadow: var(--shadow-lg);
+  animation: entrada-activador-asistente var(--transition-slow) var(--ease-emphasized);
+  transition:
+    transform var(--transition-base) var(--ease-standard),
+    box-shadow var(--transition-base) var(--ease-standard);
+}
+
+.asistente-ia-flotante__activador::before {
+  position: absolute;
+  inset: calc(var(--space-1) * -1);
+  border: calc(var(--border-width) * 2) solid var(--surface-inverse);
+  border-radius: inherit;
+  content: '';
+  opacity: 0;
+  pointer-events: none;
+  animation: pulso-activador-asistente 4.5s var(--ease-standard) infinite;
+}
+
+.asistente-ia-flotante__activador::after {
+  position: absolute;
+  top: 50%;
+  right: calc(100% + var(--space-2));
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--surface-inverse);
+  color: var(--text-inverse);
+  box-shadow: var(--shadow-md);
+  content: attr(data-etiqueta);
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-none);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(var(--space-1), -50%);
+  transition:
+    opacity var(--transition-base) var(--ease-standard),
+    transform var(--transition-base) var(--ease-standard);
+  white-space: nowrap;
+}
+
+.asistente-ia-flotante__activador:hover {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: var(--shadow-xl);
+}
+
+.asistente-ia-flotante__activador:hover::after,
+.asistente-ia-flotante__activador:focus-visible::after {
+  opacity: 1;
+  transform: translate(0, -50%);
+}
+
+.asistente-ia-flotante__activador:focus-visible {
+  outline: 0;
+  box-shadow: var(--shadow-focus), var(--shadow-xl);
+}
+
+.asistente-ia-flotante__marca {
+  position: relative;
+  display: grid;
+  width: 3.15rem;
+  height: 3.15rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: var(--radius-circle);
+  background: var(--surface-default);
+  box-shadow: inset 0 0 0 var(--border-width) var(--border-strong);
+}
+
+.asistente-ia-flotante__marca img {
+  display: block;
+  width: 0.95rem;
+  height: 1.4rem;
+  object-fit: contain;
+}
+
+.asistente-ia-flotante__insignia {
+  position: absolute;
+  top: -0.2rem;
+  right: -0.25rem;
+  display: grid;
+  width: 1.3rem;
+  height: 1.3rem;
+  place-items: center;
+  border: 2px solid var(--surface-default);
+  border-radius: var(--radius-circle);
+  background: var(--surface-inverse);
+  color: var(--text-inverse);
+  animation: destello-insignia-asistente 4.5s var(--ease-emphasized) infinite;
+}
+
+.asistente-ia-flotante__insignia app-icono {
+  display: block;
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+@keyframes entrada-activador-asistente {
+  from {
+    opacity: 0;
+    transform: translateY(var(--space-3)) scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes pulso-activador-asistente {
+  0%,
+  68%,
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+
+  76% {
+    opacity: 0.35;
+  }
+
+  90% {
+    opacity: 0;
+    transform: scale(1.18);
+  }
+}
+
+@keyframes destello-insignia-asistente {
+  0%,
+  70%,
+  100% {
+    transform: rotate(0) scale(1);
+  }
+
+  78% {
+    transform: rotate(-10deg) scale(1.12);
+  }
+
+  86% {
+    transform: rotate(10deg) scale(1.12);
+  }
+
+  94% {
+    transform: rotate(0) scale(1);
+  }
+}
+
+@media (max-width: 640px) {
+  .asistente-ia-flotante {
+    right: var(--space-2);
+    bottom: var(--space-2);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .asistente-ia-flotante__activador,
+  .asistente-ia-flotante__activador::before,
+  .asistente-ia-flotante__insignia {
+    animation: none;
+  }
+
+  .asistente-ia-flotante__activador,
+  .asistente-ia-flotante__activador::after {
+    transition: none;
+  }
+}

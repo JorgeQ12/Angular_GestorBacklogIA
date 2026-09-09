@@ -25,6 +25,10 @@ import { URL_INICIO_PANEL, obtenerProyectoIdRuta } from '../../../../../core/nav
 import { EncabezadoPagina } from '../../../../../shared/components/encabezado-pagina/encabezado-pagina';
 import { EstadoError } from '../../../../../shared/components/estado-error/estado-error';
 import { IconoComponent } from '../../../../../shared/components/icono/icono.component';
+import {
+  AsistenteIAFlotante,
+  type ContextoAsistenteIA,
+} from '../../../../inteligencia-artificial/asistente-ia/public-api';
 import { PasoAlcanceProyecto } from '../../../components/pasos/paso-alcance-proyecto/paso-alcance-proyecto';
 import { PasoContextoProyecto } from '../../../components/pasos/paso-contexto-proyecto/paso-contexto-proyecto';
 import { PasoEquipoProyecto } from '../../../components/pasos/paso-equipo-proyecto/paso-equipo-proyecto';
@@ -39,7 +43,10 @@ import {
   ClavePasoEspecialProyecto,
   type ClavePasoProyecto,
 } from '../../../config/pasos-proyecto.config';
-import { ClaveSeccionProyecto } from '../../../config/secciones-proyecto.config';
+import {
+  ClaveSeccionProyecto,
+  SECCIONES_PROYECTO,
+} from '../../../config/secciones-proyecto.config';
 import type { ActualizacionSeccionProyecto } from '../../../models/actualizacion-seccion-proyecto.model';
 import {
   ACCIONES_CREACION_PASO_PROYECTO,
@@ -70,9 +77,11 @@ import { deserializarTipoSolucionProyecto } from '../../../secciones/tipo-soluci
 import {
   ERROR_CONSULTA_AZURE,
   ERROR_CREACION_BORRADOR,
+  ERROR_GENERACION_DIAGRAMA_FLUJO_IA,
   ERROR_GUARDADO_PROYECTO,
   ERROR_SINCRONIZACION_EQUIPO,
 } from '../../config/mensajes-error-creacion-proyecto.config';
+import { AVANCE_BORRADOR_POR_PASO } from '../../config/avance-borrador-proyecto.config';
 import {
   construirEstadoRecorridoCreacion,
   obtenerUltimoPasoCreacion,
@@ -91,6 +100,7 @@ import { NotificadorErroresBorradorProyectoService } from '../../services/notifi
     EncabezadoPagina,
     EstadoError,
     IconoComponent,
+    AsistenteIAFlotante,
     RecorridoProyecto,
     PasoVinculacionAzureProyecto,
     PasoContextoProyecto,
@@ -121,6 +131,7 @@ export class PaginaCreacionProyecto {
   private readonly pasoSeleccionado = signal<ClavePasoProyecto | null>(null);
   private cargaRecorridoActual: Subscription | null = null;
   private guardadoActual: Subscription | null = null;
+  private generacionFlujoActual: Subscription | null = null;
   private proyectoAnterior: number | null | undefined;
   private sincronizacionInicialEquipoSolicitada = false;
 
@@ -141,9 +152,11 @@ export class PaginaCreacionProyecto {
   protected readonly resultadoValidacion = signal<ResultadoVinculacionAzure | null>(null);
   protected readonly procesandoVinculacion = signal(false);
   protected readonly guardandoSeccion = signal(false);
+  protected readonly generandoDiagramaConIA = signal(false);
   protected readonly sincronizandoEquipo = signal(false);
   private readonly origenEquipoActualizado = signal<OrigenEquipoAzureProyecto | null>(null);
   private readonly equipoActualizado = signal<EquipoProyecto | null>(null);
+  protected readonly flujoGeneradoConIA = signal<FlujoProyecto | null>(null);
 
   protected readonly contexto = computed(() => this.estadoCreacion.borrador()?.contexto ?? null);
   protected readonly tipoSolucion = computed(() => {
@@ -186,6 +199,9 @@ export class PaginaCreacionProyecto {
     () => this.origenEquipo()?.nombreEquipo || 'Team de Azure DevOps',
   );
   protected readonly flujo = computed<FlujoProyecto | null>(() => {
+    const generado = this.flujoGeneradoConIA();
+    if (generado) return generado;
+
     const borrador = this.estadoCreacion.borrador();
     if (!borrador) return null;
     const flujo = deserializarFlujoProyecto(borrador.diagramFlujoJson, borrador.id);
@@ -211,6 +227,29 @@ export class PaginaCreacionProyecto {
   protected readonly tituloEncabezado = computed(
     () => this.estadoCreacion.nombreProyecto() || 'Nuevo proyecto',
   );
+  protected readonly mostrarAsistenteIA = computed(() => {
+    const borrador = this.estadoCreacion.borrador();
+    const avancePasoVisible = AVANCE_BORRADOR_POR_PASO[this.estadoRecorrido().pasoActual];
+    return (
+      !!borrador &&
+      avancePasoVisible !== null &&
+      avancePasoVisible >= AVANCE_BORRADOR_POR_PASO[ClaveSeccionProyecto.Necesidad]
+    );
+  });
+  protected readonly contextoAsistenteIA = computed<ContextoAsistenteIA | null>(() => {
+    const borrador = this.estadoCreacion.borrador();
+    const proyectoId = this.idProyecto();
+    if (!borrador || proyectoId === null) return null;
+
+    const seccionActiva = this.estadoRecorrido().pasoActual;
+    const seccion = SECCIONES_PROYECTO.find((item) => item.clave === seccionActiva);
+    return {
+      proyectoId,
+      revisionContexto: borrador.revision,
+      seccionActiva,
+      nombreSeccion: seccion?.titulo ?? 'Creación del proyecto',
+    };
+  });
 
   public constructor() {
     this.cargarPrioridades();
@@ -298,6 +337,9 @@ export class PaginaCreacionProyecto {
       .subscribe({
         next: () => {
           if (this.estadoCreacion.proyectoId() !== proyectoId) return;
+          if (actualizacion.seccion === ClaveSeccionProyecto.Equipo) {
+            this.equipoActualizado.set(null);
+          }
           this.abrirPaso(siguiente);
         },
         error: (error: unknown) =>
@@ -308,7 +350,7 @@ export class PaginaCreacionProyecto {
   /** Actualiza el flujo, guarda el proyecto con la nueva revisión y regresa al inicio. */
   protected guardarProyecto(flujo: FlujoProyecto): void {
     const proyectoId = this.estadoCreacion.proyectoId();
-    if (proyectoId === null || this.guardandoSeccion()) return;
+    if (proyectoId === null || this.guardandoSeccion() || this.generandoDiagramaConIA()) return;
 
     const actualizacion: ActualizacionSeccionProyecto = {
       seccion: ClaveSeccionProyecto.Flujo,
@@ -345,6 +387,54 @@ export class PaginaCreacionProyecto {
       });
   }
 
+  /** Persiste los cambios del canvas en el borrador y mantiene abierto el paso de Flujo. */
+  protected guardarFlujoEnBorrador(flujo: FlujoProyecto): void {
+    const proyectoId = this.estadoCreacion.proyectoId();
+    if (proyectoId === null || this.guardandoSeccion() || this.generandoDiagramaConIA()) return;
+
+    const actualizacion: ActualizacionSeccionProyecto = {
+      seccion: ClaveSeccionProyecto.Flujo,
+      datos: flujo,
+    };
+    this.guardandoSeccion.set(true);
+    this.guardadoActual = this.estadoCreacion
+      .guardarSeccion(actualizacion)
+      .pipe(
+        finalize(() => this.guardandoSeccion.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: () => {
+          if (this.estadoCreacion.proyectoId() !== proyectoId) return;
+          this.flujoGeneradoConIA.set(null);
+        },
+        error: (error: unknown) =>
+          this.notificadorBorrador.comunicar(error, actualizacion.seccion),
+      });
+  }
+
+  /** Solicita una propuesta de IA y reemplaza únicamente la fotografía local del editor. */
+  protected generarDiagramaFlujoConIA(): void {
+    const proyectoId = this.estadoCreacion.proyectoId();
+    if (proyectoId === null || this.generandoDiagramaConIA() || this.guardandoSeccion()) return;
+
+    this.generandoDiagramaConIA.set(true);
+    this.generacionFlujoActual = this.creacionProyecto
+      .generarDiagramaFlujoIA(proyectoId)
+      .pipe(
+        finalize(() => this.generandoDiagramaConIA.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (flujo) => {
+          if (this.estadoCreacion.proyectoId() !== proyectoId) return;
+          this.flujoGeneradoConIA.set(flujo);
+        },
+        error: (error: unknown) =>
+          this.notificadorErrores.comunicar(error, ERROR_GENERACION_DIAGRAMA_FLUJO_IA),
+      });
+  }
+
   protected actualizarContextoTemporal(contexto: ContextoProyecto): void {
     this.estadoCreacion.actualizarNombreProyecto(contexto.nombre);
   }
@@ -374,6 +464,22 @@ export class PaginaCreacionProyecto {
     if (proyectoId !== null) this.prepararRecorrido(proyectoId);
   }
 
+  /** Recarga únicamente el borrador que originó la propuesta confirmada. */
+  protected recargarBorradorDesdeIA(proyectoId: number): void {
+    if (this.idProyecto() !== proyectoId) return;
+
+    this.estadoCreacion
+      .recargar(proyectoId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        error: (error: unknown) =>
+          this.notificadorErrores.comunicar(error, {
+            titulo: 'La propuesta se aplicó, pero no pudimos refrescar el formulario',
+            descripcion: 'Recarga el borrador para ver la información actualizada.',
+          }),
+      });
+  }
+
   private cargarPrioridades(): void {
     this.catalogos
       .obtenerOpciones(CATALOGO_PRIORIDADES_PROYECTO)
@@ -384,10 +490,12 @@ export class PaginaCreacionProyecto {
   private prepararRecorrido(proyectoId: number | null): void {
     this.cargaRecorridoActual?.unsubscribe();
     this.guardadoActual?.unsubscribe();
+    this.generacionFlujoActual?.unsubscribe();
     this.pasoSeleccionado.set(null);
     this.errorCargaRecorrido.set(false);
     this.origenEquipoActualizado.set(null);
     this.equipoActualizado.set(null);
+    this.flujoGeneradoConIA.set(null);
     this.sincronizacionInicialEquipoSolicitada = false;
     this.estadoCreacion.seleccionarProyecto(proyectoId);
     if (proyectoId === null) {

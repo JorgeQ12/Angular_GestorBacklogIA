@@ -60,10 +60,7 @@ export class TarjetaBloqueFlujoProyecto {
     this.estadoEditor.abrirEditorNodo(this.bloque().id);
   }
 
-  protected iniciarArrastreConexion(
-    evento: PointerEvent,
-    etiqueta?: EtiquetaRamaDecision,
-  ): void {
+  protected iniciarArrastreConexion(evento: PointerEvent, etiqueta?: EtiquetaRamaDecision): void {
     evento.preventDefault();
     evento.stopPropagation();
     this.estadoEditor.iniciarArrastreConexion(this.bloque().id, etiqueta);
@@ -139,12 +136,20 @@ export class TarjetaBloqueFlujoProyecto {
 
     evento.preventDefault();
     evento.stopPropagation();
+    const elemento = evento.currentTarget as HTMLElement;
+    const punteroId = evento.pointerId;
     this.estadoEditor.seleccionarBloque(this.bloque().id);
     const clienteXInicial = evento.clientX;
     const clienteYInicial = evento.clientY;
     const posicionInicial = this.bloque().posicion;
 
+    if (typeof elemento.setPointerCapture === 'function') {
+      elemento.setPointerCapture(punteroId);
+    }
+
     const moverPuntero = (eventoMovimiento: PointerEvent): void => {
+      if (eventoMovimiento.pointerId !== punteroId) return;
+
       const escala = this.estadoEditor.vista().escala;
       const desplazamientoX = (eventoMovimiento.clientX - clienteXInicial) / escala;
       const desplazamientoY = (eventoMovimiento.clientY - clienteYInicial) / escala;
@@ -161,13 +166,23 @@ export class TarjetaBloqueFlujoProyecto {
         y: posicionInicial.y + desplazamientoY,
       });
     };
-    const detenerArrastre = (): void => {
+    const detenerArrastre = (eventoFinal?: PointerEvent): void => {
+      if (eventoFinal && eventoFinal.pointerId !== punteroId) return;
+
       window.removeEventListener('pointermove', moverPuntero);
       window.removeEventListener('pointerup', detenerArrastre);
+      window.removeEventListener('pointercancel', detenerArrastre);
+      if (
+        typeof elemento.hasPointerCapture === 'function' &&
+        elemento.hasPointerCapture(punteroId)
+      ) {
+        elemento.releasePointerCapture(punteroId);
+      }
     };
 
     window.addEventListener('pointermove', moverPuntero);
-    window.addEventListener('pointerup', detenerArrastre, { once: true });
+    window.addEventListener('pointerup', detenerArrastre);
+    window.addEventListener('pointercancel', detenerArrastre);
     this.referenciaDestruccion.onDestroy(detenerArrastre);
   }
 }

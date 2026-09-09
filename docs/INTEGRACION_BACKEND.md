@@ -67,6 +67,12 @@ Los valores administrados por el backend no se replican como listas estáticas e
 - Los valores inactivos no se ofrecen en formularios nuevos.
 - No se queman IDs de tipos o valores provenientes de semillas de base de datos.
 
+## Administración de catálogos
+
+La administración reutiliza el endpoint y DTO de valores de `core/catalogos`, valida cada
+`ResultadoApi` antes del mapeo y mantiene la autorización y las restricciones de integridad en el
+backend. La experiencia, los contratos y los estados se describen en [Catálogos](CATALOGOS.md).
+
 ## Borradores y concurrencia
 
 Cuando una actualización exige la fotografía completa del borrador, el estado del flujo conserva
@@ -126,8 +132,9 @@ colecciones de errores de validación. Así se conserva, cuando existe:
 - `codigoError` para especializar reglas de dominio.
 - El estado HTTP para respaldos técnicos conocidos, como conflicto o falta de permisos.
 
-Las páginas no interpretan `HttpErrorResponse` ni abren mensajes manualmente. Entregan el error y
-el contexto de la operación a `NotificadorErroresApiService`. La prioridad de presentación es:
+Las páginas no interpretan `HttpErrorResponse` ni abren mensajes manualmente. Los fallos de acciones
+que conservan contenido utilizable entregan el error y el contexto de la operación a
+`NotificadorErroresApiService`. La prioridad de presentación es:
 
 1. Mensaje funcional proporcionado por el backend.
 2. Detalles funcionales proporcionados por el backend.
@@ -142,13 +149,16 @@ respuestas técnicas no reconocidas.
 ## Carga y errores
 
 - El interceptor de carga global cubre automáticamente las solicitudes HTTP.
+- Las conversaciones prolongadas pueden excluirse mediante `OMITIR_CARGA_GLOBAL` solo cuando su
+  feature presenta carga, envío y error locales sin bloquear la página.
 - Las páginas no agregan textos o loaders locales para la misma petición.
 - Una falla no se convierte en contadores en cero ni en estados vacíos engañosos.
 - La página utiliza `EstadoError`, permite reintentar y oculta el contenido que depende de la
   consulta. Un shell estable puede conservar su encabezado; un encabezado derivado de la respuesta
   también debe ocultarse.
-- Los callbacks HTTP utilizan `NotificadorErroresApiService`; no duplican decisiones por estado ni
-  textos de error dentro de cada página.
+- Las consultas que presentan `EstadoError` con reintento no abren además un mensaje modal. Los
+  callbacks de guardado, eliminación u otras acciones que conservan la página utilizan
+  `NotificadorErroresApiService` y no duplican decisiones por estado.
 - Los detalles técnicos del backend no se muestran directamente al usuario.
 
 ## Pruebas
@@ -175,6 +185,6 @@ interceptor de credenciales existente incluirá automáticamente la cookie de se
 5. Mapear DTO a modelo explícitamente.
 6. Encapsular HTTP en un servicio de la feature.
 7. Diferenciar error, vacío y datos disponibles.
-8. Declarar el respaldo de cada operación en la configuración de la feature y comunicar fallos con
-   `NotificadorErroresApiService`.
+8. Declarar el respaldo de las acciones no representadas en línea y comunicar sus fallos con
+   `NotificadorErroresApiService`; una carga con `EstadoError` no duplica esa comunicación.
 9. Probar mapper, servicio, normalización del error y página.

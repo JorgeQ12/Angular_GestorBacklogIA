@@ -172,6 +172,18 @@ dentro de `.ui-field` como si utiliza `.ui-control-wrap`. La primitiva elimina e
 del navegador y mantiene la accesibilidad mediante `--field-border-focus` y `--shadow-focus`.
 Las features no agregan bordes negros, outlines ni sombras locales para representar el foco.
 
+### Scrollbars
+
+`shared/components/region-desplazable` proporciona `app-region-desplazable` para regiones que deben
+mostrar el indicador sobre el contenido sin reservar un canal lateral. El componente conserva el
+desplazamiento nativo por rueda, touch y teclado, oculta su representación y sincroniza una barrita
+superpuesta de 4 px que también admite arrastre. La pista permanece invisible y la barrita aparece
+al pasar el puntero, enfocar, desplazar o arrastrar; al salir o cesar la interacción vuelve a
+ocultarse. Cada consumidor define mediante su clase anfitriona la altura máxima y proporciona
+`etiqueta` para nombrar la región accesible. Se aplica explícitamente en cada región desplazable;
+no se usa como reemplazo automático del scroll de `html` o `body`, porque alteraría el contexto de
+elementos sticky, modales y overlays.
+
 ### Botones
 
 `primitives/buttons.css` es responsable de:
@@ -205,6 +217,39 @@ Los modificadores se combinan por responsabilidad:
 - `on-inverse` adapta la acción a una superficie oscura sin crear clases de una feature.
 - Las acciones `text` conservan su color durante hover y comunican la interacción únicamente con
   movimiento; el foco visible permanece independiente para navegación con teclado.
+- Al deshabilitarse, las acciones `text` conservan el fondo y el borde transparentes para evitar
+  que los iconos o enlaces cambien visualmente a botones sólidos durante operaciones bloqueantes.
+
+### Tablas e indicadores de estado
+
+`primitives/tables.css` unifica la estructura visual de tablas semánticas sin definir sus columnas,
+acciones ni reglas de negocio:
+
+```html
+<div class="ui-table-region" tabindex="0" role="region" aria-label="Resultados">
+  <table class="ui-table">
+    <thead></thead>
+    <tbody>
+      <tr>
+        <td><strong class="ui-table__primary-text">Registro</strong></td>
+        <td class="ui-table__actions">
+          <div class="ui-table__action-group"></div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+```
+
+- `ui-table` controla densidad, encabezados, divisores y estados de interacción.
+- La feature conserva el HTML nativo, los anchos especiales y el contenido de cada celda.
+- `ui-table__icon-action` mantiene dimensiones consistentes para acciones representadas por iconos.
+- `RegionDesplazable` puede sustituir la región exterior cuando la tabla requiere scroll vertical
+  superpuesto.
+
+`IndicadorEstado` representa estados sin conocer su significado en el dominio. La feature proporciona
+el texto y traduce su estado a un tono `neutral`, `informativo`, `positivo`, `advertencia` o `critico`.
+La presentación `discreta` utiliza punto y texto; `etiqueta` agrega superficie y borde.
 
 ### Iconografía
 
@@ -280,7 +325,7 @@ confiable:
 
 ```html
 @if (errorCarga()) {
-<app-estado-error [reintentable]="true" (reintentar)="cargar()" />
+<app-estado-error [paginaCompleta]="true" [reintentable]="true" (reintentar)="cargar()" />
 } @else {
 <!-- Encabezado y contenido de la página. -->
 }
@@ -290,7 +335,13 @@ confiable:
 - El reintento es opcional, se habilita mediante `reintentable` y conserva icono y estilo comunes.
 - El encabezado, los indicadores y las secciones dependientes de la consulta permanecen en el
   bloque exitoso.
-- Una variante local puede ajustar `--ui-error-state-min-height` sin duplicar estilos.
+- `paginaCompleta` centraliza la altura disponible del panel para fallos que reemplazan toda la
+  página; las features no repiten cálculos de viewport ni clases locales equivalentes.
+- Los errores parciales omiten `paginaCompleta` y permanecen dentro de la sección cuya información
+  invalidaron, sin retirar el resto del contenido confiable.
+- Un error representado mediante `EstadoError` no abre simultáneamente `ModalMensaje`: el estado y
+  su reintento constituyen la comunicación y recuperación completas. Los errores de acciones que
+  conservan la página, como guardar o eliminar, sí utilizan el notificador global.
 - Un estado vacío representa una consulta exitosa sin datos; un estado de error representa una
   consulta fallida.
 

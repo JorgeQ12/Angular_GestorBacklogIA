@@ -15,6 +15,7 @@ export class EstadoCreacionProyectoService {
   private readonly estadoNombreProyecto = signal('');
   private proyectoIdActivo: number | null = null;
   private cargaEnCurso: Observable<BorradorProyecto> | null = null;
+  private secuenciaCarga = 0;
 
   /** Expone la fotografía vigente sin permitir su modificación externa. */
   public readonly borrador = this.estadoBorrador.asReadonly();
@@ -43,9 +44,21 @@ export class EstadoCreacionProyectoService {
     if (vigente?.id === proyectoId) return of(vigente);
     if (this.cargaEnCurso) return this.cargaEnCurso;
 
+    return this.crearCarga(proyectoId);
+  }
+
+  /** Fuerza una fotografía nueva después de un cambio confirmado fuera de los pasos. */
+  public recargar(proyectoId: number): Observable<BorradorProyecto> {
+    this.seleccionarProyecto(proyectoId);
+    this.cargaEnCurso = null;
+    return this.crearCarga(proyectoId);
+  }
+
+  private crearCarga(proyectoId: number): Observable<BorradorProyecto> {
+    const secuencia = ++this.secuenciaCarga;
     const solicitud = this.creacionProyecto.obtenerBorrador(proyectoId).pipe(
       tap((borrador) => {
-        if (this.proyectoIdActivo !== proyectoId) return;
+        if (this.proyectoIdActivo !== proyectoId || this.secuenciaCarga !== secuencia) return;
 
         this.estadoBorrador.set(borrador);
         this.estadoNombreProyecto.set(borrador.contexto.nombre.trim());

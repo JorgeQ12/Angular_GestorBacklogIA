@@ -169,7 +169,7 @@ export class SelectorCampo implements ControlValueAccessor, ControlCampoPersonal
 
   /** Confirma una opción habilitada y comunica el cambio al formulario. */
   protected seleccionar(opcion: OpcionSelector): void {
-    if (this.soloLectura() || opcion.deshabilitada) return;
+    if (this.deshabilitado() || this.soloLectura() || opcion.deshabilitada) return;
     this.valor.set(opcion.valor);
     this.notificarCambio(opcion.valor);
     this.notificarTocado();

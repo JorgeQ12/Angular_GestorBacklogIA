@@ -5,9 +5,12 @@ específicas se mantienen en documentos separados para evitar un archivo único 
 
 ## Documentos especializados
 
+- [Asistente IA](ASISTENTE_IA.md): alcance por proyecto, propuestas, persistencia y
+  límites entre IA y Proyectos.
 - [Autenticación mediante Kong y Microsoft](AUTENTICACION_KONG.md): popup, sesión, endpoints y
   responsabilidades.
 - [Carga global](CARGA_GLOBAL.md): estado concurrente, interceptor HTTP y presentación única.
+- [Catálogos](CATALOGOS.md): administración de tipos y opciones reutilizables.
 - [Creación de proyectos](CREACION_PROYECTOS.md): vinculación con Azure, borrador y recorrido de
   especificación.
 - [Formularios reactivos](FORMULARIOS_REACTIVOS.md): tipado, validación, mensajes y accesibilidad.
@@ -17,7 +20,7 @@ específicas se mantienen en documentos separados para evitar un archivo único 
   modos de formulario y versionamiento.
 - [Integración con el backend](INTEGRACION_BACKEND.md): environments, DTO, mappers, servicios y
   errores.
-- [Listado de proyectos](LISTADO_PROYECTOS.md): portafolio, filtros, paginación y acciones por
+- [Consulta de proyectos](CONSULTA_PROYECTOS.md): filtros, paginación y acciones por
   proyecto.
 
 ## Organización principal
@@ -163,7 +166,10 @@ export enum PlataformaSolucion {
 - Las clases, directivas y servicios exportados describen su responsabilidad.
 - Los contratos públicos (`input`, `output`, modelos y constantes) describen su finalidad.
 - Los métodos indican para qué existen dentro del flujo.
+- Los métodos y constructores se separan de los miembros contiguos mediante una línea en blanco.
 - Los comentarios son breves y no narran la implementación interna.
+- Cada bloque JSDoc de un miembro de clase se separa del miembro anterior mediante una línea en
+  blanco y permanece inmediatamente unido a la declaración que documenta.
 - Los callbacks, asignaciones y propiedades privadas evidentes no requieren comentarios.
 - Los pendientes reales usan `TODO` e indican el punto de integración faltante.
 
