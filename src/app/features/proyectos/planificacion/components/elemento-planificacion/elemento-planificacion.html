@@ -1,0 +1,133 @@
+<article
+  class='elemento-planificacion elemento-planificacion--{{ elemento().tipo }}'
+  [class.elemento-planificacion--inactivo]='!elemento().activo'
+>
+  @if (muestraAlternador()) {
+    <button
+      type='button'
+      class='elemento-planificacion__alternador'
+      [attr.aria-label]='etiquetaAlternador()'
+      [attr.aria-expanded]='expandido()'
+      [disabled]='expansionDeshabilitada() || !tieneHijos()'
+      (click)='alternarExpansion()'
+    >
+      @if (expandido()) {
+        <app-icono nombre='contraerRama' />
+      } @else {
+        <app-icono nombre='expandirRama' />
+      }
+    </button>
+  } @else {
+    <span class='elemento-planificacion__terminal' aria-hidden='true'></span>
+  }
+
+  <span class='elemento-planificacion__icono' aria-hidden='true'>
+    @switch (elemento().tipo) {
+      @case (tipos.Epica) {
+        <app-icono nombre='epica' />
+      }
+      @case (tipos.Caracteristica) {
+        <app-icono nombre='caracteristica' />
+      }
+      @case (tipos.ListaRequisitos) {
+        <app-icono nombre='listaRequisitos' />
+      }
+      @case (tipos.ActividadRequisito) {
+        <app-icono nombre='actividadRequisito' />
+      }
+      @case (tipos.TareaRequisito) {
+        <app-icono nombre='tareaRequisito' />
+      }
+      @case (tipos.Historia) {
+        <app-icono nombre='historiaUsuario' />
+      }
+      @case (tipos.Tarea) {
+        <app-icono nombre='tarea' />
+      }
+    }
+  </span>
+
+  @if (puedeConsultar()) {
+    <button
+      type='button'
+      class='elemento-planificacion__contenido elemento-planificacion__contenido--accion'
+      [attr.aria-label]='etiquetaConsulta()'
+      (click)='consultar.emit()'
+    >
+      <strong>{{ elemento().titulo }}</strong>
+      @if (elemento().vinculadaAzure) {
+        <span class='elemento-planificacion__origen'>Azure</span>
+      }
+      <small>{{ descripcion() }}</small>
+    </button>
+  } @else {
+    <span class='elemento-planificacion__contenido'>
+      <strong>{{ elemento().titulo }}</strong>
+      @if (elemento().vinculadaAzure) {
+        <span class='elemento-planificacion__origen'>Azure</span>
+      }
+      <small>{{ descripcion() }}</small>
+    </span>
+  }
+
+  @if (puedeCrearHijo() || muestraMenuAcciones()) {
+    <span class='elemento-planificacion__acciones'>
+      @if (puedeCrearHijo()) {
+        <button
+          type='button'
+          class='elemento-planificacion__crear-hijo ui-tooltip'
+          [attr.data-tooltip]='etiquetaCrearHijo()'
+          [attr.aria-label]='etiquetaCrearHijo()'
+          [disabled]='accionesDeshabilitadas()'
+          (click)='crearHijo.emit()'
+        >
+          <span class='ui-create-icon' aria-hidden='true'>
+            <app-icono [nombre]='iconoHijo()' />
+            <span><app-icono nombre='agregar' /></span>
+          </span>
+        </button>
+      }
+      @if (muestraMenuAcciones()) {
+        <button
+          type='button'
+          class='elemento-planificacion__abrir-menu'
+          [attr.aria-label]="'Acciones de ' + elemento().titulo"
+          aria-haspopup='menu'
+          [attr.aria-expanded]='menuAccionesAbierto()'
+          [disabled]='accionesDeshabilitadas()'
+          (click)='abrirOCerrarMenu($event)'
+        >
+          <app-icono nombre='masOpciones' />
+        </button>
+        @if (menuAccionesAbierto()) {
+          <span class='elemento-planificacion__menu' role='menu'>
+            @if (puedeSincronizar()) {
+              <button type='button' role='menuitem' (click)='ejecutarSincronizacion($event)'>
+                <app-icono nombre='sincronizar' />
+                Sincronizar con Azure
+              </button>
+            }
+            @if (puedeEditar()) {
+              <button type='button' role='menuitem' (click)='ejecutarEdicion($event)'>
+                <app-icono nombre='editar' />
+                Editar información
+              </button>
+            }
+            @if (puedeEliminar()) {
+              <button
+                type='button'
+                role='menuitem'
+                class='elemento-planificacion__eliminar'
+                [attr.aria-label]='etiquetaEliminacion()'
+                (click)='ejecutarEliminacion($event)'
+              >
+                <app-icono nombre='eliminar' />
+                Eliminar
+              </button>
+            }
+          </span>
+        }
+      }
+    </span>
+  }
+</article>

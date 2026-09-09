@@ -1,0 +1,22 @@
+<button
+  type='button'
+  class='publicacion-azure'
+  [class.publicacion-azure--disponible]='disponibilidad().puedePublicar'
+  [disabled]='estaDeshabilitado()'
+  [attr.title]='mensaje()'
+  [attr.aria-label]='etiquetaAccesible()'
+  (click)='publicar.emit()'
+>
+  <span class='publicacion-azure__icono' aria-hidden='true'>
+    <app-icono nombre='azureDevOps' />
+  </span>
+  <span class='publicacion-azure__contenido'>
+    <strong>{{ textos.titulo }}</strong>
+    <small>{{ mensaje() }}</small>
+  </span>
+  <app-icono
+    class='publicacion-azure__estado'
+    [nombre]='iconoEstado()'
+    aria-hidden='true'
+  />
+</button>

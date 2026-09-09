@@ -72,7 +72,7 @@ describe('NavegacionPanelService', () => {
     ]);
   });
 
-  it('incorpora Información cuando la URL identifica un proyecto actual', () => {
+  it('incorpora Información y Planificación cuando la URL identifica un proyecto actual', () => {
     const servicio = TestBed.inject(NavegacionPanelService);
     navegarA('/panel/proyectos/42/informacion');
 
@@ -84,6 +84,10 @@ describe('NavegacionPanelService', () => {
       expect.objectContaining({
         id: ClaveItemNavegacionPanel.InformacionProyecto,
         ruta: '/panel/proyectos/42/informacion',
+      }),
+      expect.objectContaining({
+        id: ClaveItemNavegacionPanel.PlanificacionProyecto,
+        ruta: '/panel/proyectos/42/planificacion',
       }),
     ]);
   });

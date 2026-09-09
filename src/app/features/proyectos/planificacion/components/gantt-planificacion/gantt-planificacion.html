@@ -1,0 +1,346 @@
+<section class='gantt-planificacion' aria-label='Diagrama de Gantt del proyecto'>
+  <header class='gantt-planificacion__controles'>
+    <div class='gantt-planificacion__busqueda'>
+      <app-campo-busqueda
+        [id]='idBusqueda'
+        etiqueta='Buscar en el Diagrama de Gantt'
+        placeholder='Buscar épica, característica, historia o tarea'
+        [formControl]='busquedaControl'
+      />
+    </div>
+
+    @if (versionSeleccionadaId() !== null && versiones().length) {
+      <app-selector-version-planificacion
+        [versiones]='versiones()'
+        [versionSeleccionadaId]='versionSeleccionadaId()!'
+        [deshabilitado]='deshabilitado()'
+        [aparienciaGantt]='true'
+        (versionCambiada)='versionCambiada.emit($event)'
+      />
+    }
+
+    <div class='gantt-planificacion__escala'>
+      <span [id]='idEtiquetaEscala' class='ui-visually-hidden'>Escala temporal</span>
+      <app-selector-campo
+        [id]='idEscala'
+        [etiquetadoPor]='idEtiquetaEscala'
+        contexto='Escala temporal'
+        [opciones]='opcionesEscala'
+        [compacto]='true'
+        [aparienciaGantt]='true'
+        [formControl]='escalaControl'
+      />
+    </div>
+
+    <div class='gantt-planificacion__menu' (click)='$event.stopPropagation()'>
+      <button
+        type='button'
+        class='ui-button ui-button--secondary gantt-planificacion__vista'
+        [class.gantt-planificacion__vista--abierta]='panelVistaAbierto()'
+        [attr.aria-expanded]='panelVistaAbierto()'
+        aria-haspopup='true'
+        aria-controls='opciones-vista-gantt'
+        [disabled]='deshabilitado()'
+        (click)='alternarPanelVista($event)'
+      >
+        <app-icono class='ui-button__icon' nombre='ajustesVista' />
+        Vista
+        <app-icono class='ui-button__icon gantt-planificacion__desplegar' nombre='desplegar' />
+      </button>
+
+      @if (panelVistaAbierto()) {
+        <div id='opciones-vista-gantt' class='gantt-planificacion__panel-vista'>
+          <header>
+            <strong>Vista</strong>
+            <small>Configura cómo explorar la planificación.</small>
+          </header>
+          <div class='gantt-planificacion__opciones-vista'>
+            <label class='gantt-planificacion__opcion-vista'>
+              <span>
+                <strong>{{ expansionCompleta() ? 'Contraer todo' : 'Expandir todo' }}</strong>
+              </span>
+              <input
+                type='checkbox'
+                class='gantt-planificacion__interruptor-input'
+                [checked]='expansionCompleta()'
+                [disabled]='busqueda().length > 0 || clavesExpandibles().length === 0'
+                (change)='cambiarExpansion($event)'
+              />
+              <span class='gantt-planificacion__interruptor' aria-hidden='true'><i></i></span>
+            </label>
+            <label class='gantt-planificacion__opcion-vista'>
+              <span>
+                <strong>Mostrar padres</strong>
+              </span>
+              <input
+                type='checkbox'
+                class='gantt-planificacion__interruptor-input'
+                [checked]='mostrarRelaciones()'
+                (change)='cambiarRelaciones($event)'
+              />
+              <span class='gantt-planificacion__interruptor' aria-hidden='true'><i></i></span>
+            </label>
+            <div class='gantt-planificacion__divisor-vista' aria-hidden='true'></div>
+            <button
+              type='button'
+              class='gantt-planificacion__opcion-vista gantt-planificacion__opcion-vista--navegacion'
+              (click)='volverAlArbol()'
+            >
+              <span class='gantt-planificacion__icono-opcion' aria-hidden='true'>
+                <app-icono nombre='flujo' />
+              </span>
+              <span>
+                <strong>Vista del árbol</strong>
+                <small>Explora el backlog.</small>
+              </span>
+              <app-icono class='gantt-planificacion__continuar' nombre='continuar' />
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  </header>
+
+  @if (datos().elementos.length === 0) {
+    <app-estado-vacio
+      icono='gantt'
+      titulo='Aún no hay elementos para planificar'
+      descripcion='Crea una épica y agrega sus elementos para construir el cronograma.'
+    >
+      <div estadoVacioAcciones>
+        <button type='button' class='ui-button ui-button--secondary ui-button--md' (click)='volver.emit()'>
+          <app-icono class='ui-button__icon' nombre='volver' />
+          Volver al árbol
+        </button>
+      </div>
+    </app-estado-vacio>
+  } @else {
+    <div class='gantt-planificacion__tablero-contenedor'>
+      <div
+        #tablero
+        class='gantt-planificacion__tablero'
+        [class.gantt-planificacion__tablero--relacion]='relacionResaltada() !== null'
+        [style.--gantt-ancho-dia.px]='anchoDia()'
+        [style.--gantt-ancho-linea.px]='anchoLineaTemporal()'
+        (scroll)='sincronizarDesplazamiento()'
+        (wheel)='desplazarConRueda($event)'
+      >
+        <div class='gantt-planificacion__cuadricula'>
+          <div class='gantt-planificacion__cabecera-lista'>
+            <div class='gantt-planificacion__encabezado-lista'>
+              <strong>Elementos de la planificación</strong>
+              <span>{{ elementosVisibles().length }} visibles</span>
+            </div>
+            <div class='gantt-planificacion__resumen' aria-label='Resumen del cronograma'>
+              <span><app-icono nombre='epica' /><strong>{{ conteos().epicas }}</strong><span class='ui-visually-hidden'> épicas</span></span>
+              <span><app-icono nombre='caracteristica' /><strong>{{ conteos().caracteristicas }}</strong><span class='ui-visually-hidden'> características</span></span>
+              <span><app-icono nombre='historiaUsuario' /><strong>{{ conteos().historias }}</strong><span class='ui-visually-hidden'> historias</span></span>
+              <span><app-icono nombre='tarea' /><strong>{{ conteos().tareas }}</strong><span class='ui-visually-hidden'> tareas</span></span>
+              <span class='gantt-planificacion__periodo'><app-icono nombre='calendario' />{{ fechaInicial() }} — {{ fechaFinal() }} · {{ duracionDias() }} días</span>
+              <span><app-icono nombre='seguimiento' /><strong>{{ horasTareas() }} h</strong><span class='ui-visually-hidden'> de esfuerzo</span></span>
+            </div>
+          </div>
+          <div class='gantt-planificacion__cabecera-tiempo'>
+            <div class='gantt-planificacion__segmentos'>
+              @for (segmento of segmentosEncabezado(); track segmento.clave) {
+                <span
+                  [style.left.px]='posicionSegmento(segmento)'
+                  [style.width.px]='anchoSegmento(segmento)'
+                >
+                  {{ segmento.etiqueta }}
+                </span>
+              }
+            </div>
+            <div class='gantt-planificacion__dias'>
+              @for (dia of dias(); track dia.clave) {
+                <span [class.es-fin-semana]='dia.finSemana' [class.es-hoy]='dia.hoy'>
+                  @if (mostrarDetalleDias()) {
+                    <small>{{ dia.diaSemana }}</small><strong>{{ dia.numero }}</strong>
+                  } @else if (mostrarSemana(dia)) {
+                    <strong>{{ semana(dia.fecha) }}</strong>
+                  }
+                </span>
+              }
+            </div>
+          </div>
+
+          <div class='gantt-planificacion__marcas-agua' aria-hidden='true'>
+            @for (posicion of posicionesMarcaAgua(); track posicion.x + '-' + posicion.y) {
+              <span
+                class='gantt-planificacion__marca-agua'
+                [style.left.px]='posicion.x'
+                [style.top.px]='posicion.y'
+                [style.width.px]='tamanoMarcaAgua()'
+                [style.height.px]='tamanoMarcaAgua()'
+              >
+                <img src='/brand/logo.svg' alt='' />
+              </span>
+            }
+          </div>
+
+          <div class='gantt-planificacion__cuadricula-calendario' aria-hidden='true'>
+            @for (dia of dias(); track dia.clave) {
+              <span [class.es-fin-semana]='dia.finSemana' [class.es-hoy]='dia.hoy'></span>
+            }
+          </div>
+
+          @if (ventanaRenderizado().espacioSuperior > 0) {
+            <div
+              class='gantt-planificacion__espacio'
+              [style.height.px]='ventanaRenderizado().espacioSuperior'
+            ></div>
+            <div
+              class='gantt-planificacion__espacio'
+              [style.height.px]='ventanaRenderizado().espacioSuperior'
+            ></div>
+          }
+
+          @for (elemento of ventanaRenderizado().elementos; track elemento.clave) {
+            <div
+              class='gantt-planificacion__elemento'
+              [class]="'gantt-planificacion__elemento gantt-planificacion__elemento--' + elemento.tipo"
+              [class.es-inactivo]='!elemento.activo'
+              [class.es-origen-relacion]='esOrigenRelacion(elemento.clave)'
+              [class.es-destino-relacion]='esDestinoRelacion(elemento.clave)'
+              [style.padding-left.px]='sangriaElemento(elemento)'
+              (pointerenter)='resaltarRelacion(elemento.clave)'
+              (pointerleave)='limpiarResaltado(elemento.clave)'
+            >
+              <button
+                type='button'
+                class='gantt-planificacion__alternar'
+                [class.es-marcador]='!elemento.tieneHijos'
+                [disabled]='!elemento.tieneHijos'
+                [attr.aria-label]='elemento.tieneHijos ? (estaContraido(elemento.clave) ? "Expandir " + elemento.titulo : "Contraer " + elemento.titulo) : null'
+                [attr.aria-expanded]='elemento.tieneHijos ? !estaContraido(elemento.clave) : null'
+                (click)='alternarElemento(elemento)'
+              >
+                @if (elemento.tieneHijos) {
+                  <app-icono
+                    [nombre]='estaContraido(elemento.clave) ? "expandirElemento" : "contraerElemento"'
+                  />
+                }
+              </button>
+              <span class='gantt-planificacion__tipo' aria-hidden='true'>
+                <app-icono [nombre]='iconoTipo(elemento.tipo)' />
+              </span>
+              <span
+                class='gantt-planificacion__texto-elemento'
+                tabindex='0'
+                [attr.aria-describedby]='"detalle-gantt-" + elemento.clave'
+                (pointerenter)='mostrarTooltip(elemento.clave, $event)'
+                (pointerleave)='ocultarTooltip(elemento.clave)'
+                (focus)='mostrarTooltip(elemento.clave, $event)'
+                (blur)='limpiarResaltado(elemento.clave)'
+              >
+                <strong>{{ elemento.titulo }}</strong>
+                <small>{{ etiquetaTipo(elemento.tipo) }} · {{ elemento.estimacionHoras }} h</small>
+                @if (mostrarRelaciones() && elemento.tituloPadre) {
+                  <small><b>Padre:</b> {{ elemento.tituloPadre }}</small>
+                }
+                @if (elemento.dependencias) {
+                  <small><b>Dependencia:</b> {{ elemento.dependencias }}</small>
+                }
+              </span>
+              <aside
+                [id]='"detalle-gantt-" + elemento.clave'
+                role='tooltip'
+                [class.es-visible]='posicionTooltip()?.clave === elemento.clave'
+                [class.es-debajo]='posicionTooltip()?.clave === elemento.clave && posicionTooltip()?.ubicacion === "abajo"'
+                [style.left.px]='posicionTooltip()?.clave === elemento.clave ? posicionTooltip()?.izquierda : null'
+                [style.top.px]='posicionTooltip()?.clave === elemento.clave ? posicionTooltip()?.arriba : null'
+                [style.--gantt-flecha-tooltip.px]='posicionTooltip()?.clave === elemento.clave ? posicionTooltip()?.flechaIzquierda : null'
+              >
+                <header>
+                  <span>{{ etiquetaTipo(elemento.tipo) }}</span>
+                  <strong>{{ elemento.titulo }}</strong>
+                </header>
+                <div class='gantt-planificacion__metricas-tooltip'>
+                  <span>
+                    <small>Periodo</small>
+                    <strong>{{ fechaElemento(elemento.fechaInicio) }} — {{ fechaElemento(elemento.fechaFinal) }}</strong>
+                  </span>
+                  <span>
+                    <small>Esfuerzo</small>
+                    <strong>{{ elemento.estimacionHoras }} h</strong>
+                  </span>
+                </div>
+                @if (elemento.tituloPadre) {
+                  <p><small>Elemento padre</small><strong>{{ elemento.tituloPadre }}</strong></p>
+                }
+                @if (elemento.dependencias) {
+                  <p><small>Dependencia</small><strong>{{ elemento.dependencias }}</strong></p>
+                }
+                <footer>Información de planificación</footer>
+              </aside>
+            </div>
+            <div
+              class='gantt-planificacion__pista'
+              [class.es-origen-relacion]='esOrigenRelacion(elemento.clave)'
+              [class.es-destino-relacion]='esDestinoRelacion(elemento.clave)'
+              (pointerenter)='resaltarRelacion(elemento.clave)'
+              (pointerleave)='limpiarResaltado(elemento.clave)'
+            >
+              @if (conector(elemento.clave); as relacion) {
+                <svg
+                  class='gantt-planificacion__conector'
+                  [class]="'gantt-planificacion__conector gantt-planificacion__conector--' + tipoVisualConector(elemento.clave)"
+                  [class.es-resaltado]='esConectorResaltado(elemento.clave)'
+                  [style.height.px]='relacion.alto'
+                  [attr.viewBox]='"0 0 " + anchoLineaTemporal() + " " + relacion.alto'
+                  [attr.aria-label]='"Relación de " + (elemento.tituloPadre ?? "elemento padre") + " hacia " + elemento.titulo'
+                  role='img'
+                  tabindex='0'
+                  preserveAspectRatio='none'
+                  (focus)='resaltarRelacion(elemento.clave)'
+                  (blur)='limpiarResaltado(elemento.clave)'
+                >
+                  <path
+                    class='gantt-planificacion__conector-impacto'
+                    [attr.d]='relacion.recorrido'
+                    (pointerenter)='resaltarRelacion(elemento.clave)'
+                    (pointerleave)='limpiarResaltado(elemento.clave)'
+                  ></path>
+                  <path class='gantt-planificacion__trazo' [attr.d]='relacion.recorrido'></path>
+                  <circle [attr.cx]='relacion.inicioX' [attr.cy]='relacion.inicioY' r='3'></circle>
+                  <circle [attr.cx]='relacion.finalX' [attr.cy]='relacion.finalY' r='3'></circle>
+                </svg>
+              }
+              <span
+                class='gantt-planificacion__barra'
+                [class]="'gantt-planificacion__barra gantt-planificacion__barra--' + elemento.tipo"
+                [class.es-resumen]='elemento.tieneHijos'
+                [style.left.px]='posicionBarra(elemento)'
+                [style.--gantt-barra-izquierda.px]='posicionBarra(elemento)'
+                [style.width.px]='anchoBarra(elemento)'
+                [attr.title]='descripcionBarra(elemento)'
+              >
+                <span [class.es-adaptable]='anchoBarra(elemento) < 260'>{{ elemento.titulo }}</span>
+              </span>
+            </div>
+          }
+
+          @if (ventanaRenderizado().espacioInferior > 0) {
+            <div
+              class='gantt-planificacion__espacio'
+              [style.height.px]='ventanaRenderizado().espacioInferior'
+            ></div>
+            <div
+              class='gantt-planificacion__espacio'
+              [style.height.px]='ventanaRenderizado().espacioInferior'
+            ></div>
+          }
+        </div>
+      </div>
+      <div
+        #barraHorizontal
+        class='gantt-planificacion__desplazamiento-horizontal'
+        tabindex='0'
+        aria-label='Desplazamiento horizontal de la línea temporal'
+        (scroll)='desplazarDesdeBarra()'
+      >
+        <span [style.width.px]='anchoLineaTemporal()' aria-hidden='true'></span>
+      </div>
+    </div>
+  }
+</section>

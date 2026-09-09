@@ -1,0 +1,264 @@
+<form
+  [attr.id]='idFormulario()'
+  class='formulario-elemento'
+  [formGroup]='formulario'
+  [appMensajesFormulario]='mensajesFormulario'
+  appEnfocarPrimerControlInvalido
+  (ngSubmit)='enviar()'
+>
+  <div class='formulario-elemento__principal'>
+  <section class='ui-form-section' aria-labelledby='elemento-informacion-principal'>
+    <header class='ui-form-section__header'>
+      <span class='ui-form-section__icon' aria-hidden='true'><app-icono [nombre]="tipo() === tipos.Epica ? 'contextoProyecto' : 'informacion'" /></span>
+      <div>
+        <h3 id='elemento-informacion-principal' class='ui-form-section__title'>Información principal</h3>
+        <p class='ui-form-section__description'>{{ tipo() === tipos.Epica ? 'Nombre y descripción general de la épica.' : tipo() === tipos.Tarea ? 'Nombre y descripción general de la tarea.' : 'Nombre y descripción general del elemento.' }}</p>
+      </div>
+    </header>
+    <div class='ui-form-section__body formulario-elemento__campos'>
+      <div class='ui-field'>
+        <label class='ui-label' for='elemento-titulo'>Título</label>
+        <input
+          id='elemento-titulo'
+          class='ui-control'
+          type='text'
+          formControlName='titulo'
+          [maxlength]='limites.titulo'
+          [readOnly]='esSoloLectura()'
+          autocomplete='off'
+          appErrorCampo
+        />
+      </div>
+      <div class='ui-field'>
+        <label class='ui-label' for='elemento-descripcion'>Descripción</label>
+        <textarea
+          id='elemento-descripcion'
+          class='ui-control ui-textarea formulario-elemento__textarea'
+          rows='5'
+          formControlName='descripcion'
+          [maxlength]='limites.descripcion'
+          [readOnly]='esSoloLectura()'
+          appErrorCampo
+        ></textarea>
+      </div>
+    </div>
+  </section>
+
+  @switch (tipo()) {
+    @case (tipos.Epica) {
+      <section class='ui-form-section' aria-labelledby='elemento-definicion-epica'>
+        <header class='ui-form-section__header'>
+          <span class='ui-form-section__icon' aria-hidden='true'><app-icono nombre='ajustesVista' /></span>
+          <div>
+            <h3 id='elemento-definicion-epica' class='ui-form-section__title'>Definición funcional</h3>
+            <p class='ui-form-section__description'>Información que delimita y valida el trabajo esperado.</p>
+          </div>
+        </header>
+        <div class='ui-form-section__body formulario-elemento__campos'>
+          <div class='ui-field'>
+            <label class='ui-label' for='elemento-alcance'>Alcance</label>
+            <textarea id='elemento-alcance' class='ui-control ui-textarea formulario-elemento__textarea' rows='5' formControlName='alcance' [readOnly]='esSoloLectura()'></textarea>
+          </div>
+          <div class='ui-field'>
+            <label class='ui-label' for='elemento-riesgos'>Riesgos</label>
+            <textarea id='elemento-riesgos' class='ui-control ui-textarea formulario-elemento__textarea' rows='4' formControlName='riesgos' [readOnly]='esSoloLectura()'></textarea>
+          </div>
+          <div class='ui-field'>
+            <label class='ui-label' for='elemento-criterios-exito'>Criterios de éxito</label>
+            <textarea id='elemento-criterios-exito' class='ui-control ui-textarea formulario-elemento__textarea' rows='4' formControlName='criteriosExito' [readOnly]='esSoloLectura()'></textarea>
+          </div>
+        </div>
+      </section>
+    }
+    @case (tipos.Caracteristica) {
+      <section class='ui-form-section' aria-labelledby='elemento-definicion-caracteristica'>
+        <header class='ui-form-section__header'>
+          <span class='ui-form-section__icon' aria-hidden='true'><app-icono nombre='caracteristica' /></span>
+          <div>
+            <h3 id='elemento-definicion-caracteristica' class='ui-form-section__title'>Definición funcional</h3>
+            <p class='ui-form-section__description'>Delimita el trabajo que cubre la característica.</p>
+          </div>
+        </header>
+        <div class='ui-form-section__body'>
+          <div class='ui-field'>
+            <label class='ui-label' for='elemento-alcance'>Alcance</label>
+            <textarea id='elemento-alcance' class='ui-control ui-textarea formulario-elemento__textarea' rows='5' formControlName='alcance' [readOnly]='esSoloLectura()' appErrorCampo></textarea>
+          </div>
+        </div>
+      </section>
+    }
+    @case (tipos.Historia) {
+      <section class='ui-form-section' aria-labelledby='elemento-definicion-historia'>
+        <header class='ui-form-section__header'>
+          <span class='ui-form-section__icon' aria-hidden='true'><app-icono nombre='historiaUsuario' /></span>
+          <div>
+            <h3 id='elemento-definicion-historia' class='ui-form-section__title'>Definición de la historia</h3>
+            <p class='ui-form-section__description'>Objetivo, alcance y condiciones de aceptación.</p>
+          </div>
+        </header>
+        <div class='ui-form-section__body formulario-elemento__campos'>
+          <div class='ui-field'>
+            <label class='ui-label' for='elemento-objetivo'>Objetivo</label>
+            <textarea id='elemento-objetivo' class='ui-control ui-textarea formulario-elemento__textarea' rows='3' formControlName='objetivo' [readOnly]='esSoloLectura()' appErrorCampo></textarea>
+          </div>
+          <div class='ui-field'>
+            <label class='ui-label' for='elemento-alcance'>Alcance</label>
+            <textarea id='elemento-alcance' class='ui-control ui-textarea formulario-elemento__textarea' rows='4' formControlName='alcance' [readOnly]='esSoloLectura()' appErrorCampo></textarea>
+          </div>
+          <div class='ui-field'>
+            <label class='ui-label' for='elemento-criterios-aceptacion'>Criterios de aceptación</label>
+            <textarea id='elemento-criterios-aceptacion' class='ui-control ui-textarea formulario-elemento__textarea' rows='6' formControlName='criteriosAceptacion' [readOnly]='esSoloLectura()' appErrorCampo></textarea>
+          </div>
+        </div>
+      </section>
+    }
+    @case (tipos.Tarea) {
+      <section class='ui-form-section' aria-labelledby='elemento-definicion-tarea'>
+        <header class='ui-form-section__header'>
+          <span class='ui-form-section__icon' aria-hidden='true'><app-icono nombre='ajustesVista' /></span>
+          <div>
+            <h3 id='elemento-definicion-tarea' class='ui-form-section__title'>Definición funcional</h3>
+            <p class='ui-form-section__description'>Información que delimita y valida el trabajo esperado.</p>
+          </div>
+        </header>
+        <div class='ui-form-section__body formulario-elemento__campos'>
+          <div class='ui-field'>
+            <label class='ui-label' for='elemento-dependencias'>Dependencias</label>
+            <textarea id='elemento-dependencias' class='ui-control ui-textarea formulario-elemento__textarea' rows='5' formControlName='dependencias' [readOnly]='esSoloLectura()' placeholder='Describe bloqueos o tareas requeridas previamente'></textarea>
+          </div>
+        </div>
+      </section>
+    }
+    @case (tipos.ActividadRequisito) {
+      <section class='ui-form-section' aria-labelledby='elemento-definicion-actividad-requisito'>
+        <header class='ui-form-section__header'>
+          <span class='ui-form-section__icon' aria-hidden='true'><app-icono nombre='actividadRequisito' /></span>
+          <div>
+            <h3 id='elemento-definicion-actividad-requisito' class='ui-form-section__title'>Actividad del requisito</h3>
+            <p class='ui-form-section__description'>Clasificación, prioridad y responsable de la actividad.</p>
+          </div>
+        </header>
+        <div class='ui-form-section__body formulario-elemento__campos'>
+          <div class='ui-form-grid ui-form-grid--2'>
+            <div class='ui-field'>
+              <label id='elemento-actividad-label' class='ui-label' for='elemento-actividad-control'>Actividad</label>
+              <app-selector-campo id='elemento-actividad' etiquetadoPor='elemento-actividad-label' placeholder='Selecciona una actividad' [opciones]='opcionesActividadRequisito()' [soloLectura]='esSoloLectura()' formControlName='actividadCatalogoId' appErrorCampo />
+            </div>
+            <div class='ui-field'>
+              <label id='elemento-prioridad-requisito-label' class='ui-label' for='elemento-prioridad-requisito-control'>Prioridad</label>
+              <app-selector-campo id='elemento-prioridad-requisito' etiquetadoPor='elemento-prioridad-requisito-label' [opciones]='opcionesPrioridadRequisito' [soloLectura]='esSoloLectura()' formControlName='prioridad' appErrorCampo />
+            </div>
+          </div>
+          <div class='ui-field'>
+            <label class='ui-label' for='elemento-responsable'>Responsable</label>
+            <input id='elemento-responsable' class='ui-control' type='text' formControlName='responsable' [maxlength]='limites.responsable' [readOnly]='esSoloLectura()' autocomplete='off' appErrorCampo />
+          </div>
+          <div class='ui-field'>
+            <label class='ui-label' for='elemento-discusion'>Discusión</label>
+            <textarea id='elemento-discusion' class='ui-control ui-textarea formulario-elemento__textarea' rows='4' formControlName='discusion' [readOnly]='esSoloLectura()'></textarea>
+          </div>
+        </div>
+      </section>
+    }
+    @case (tipos.TareaRequisito) {
+      <section class='ui-form-section' aria-labelledby='elemento-definicion-tarea-requisito'>
+        <header class='ui-form-section__header'>
+          <span class='ui-form-section__icon' aria-hidden='true'><app-icono nombre='tareaRequisito' /></span>
+          <div>
+            <h3 id='elemento-definicion-tarea-requisito' class='ui-form-section__title'>Implementación del requisito</h3>
+            <p class='ui-form-section__description'>Referencia y responsable de la tarea.</p>
+          </div>
+        </header>
+        <div class='ui-form-section__body formulario-elemento__campos'>
+          <div class='ui-field'>
+            <label class='ui-label' for='elemento-requisito'>Requisito</label>
+            <textarea id='elemento-requisito' class='ui-control ui-textarea formulario-elemento__textarea' rows='3' formControlName='requisito' [maxlength]='limites.requisito' [readOnly]='esSoloLectura()' appErrorCampo></textarea>
+          </div>
+          <div class='ui-field'>
+            <label class='ui-label' for='elemento-responsable'>Responsable</label>
+            <input id='elemento-responsable' class='ui-control' type='text' formControlName='responsable' [maxlength]='limites.responsable' [readOnly]='esSoloLectura()' autocomplete='off' appErrorCampo />
+          </div>
+        </div>
+      </section>
+    }
+  }
+  </div>
+
+  <aside class='formulario-elemento__lateral'>
+  <section class='ui-form-section formulario-elemento__planificacion' aria-labelledby='elemento-planificacion'>
+    <header class='ui-form-section__header'>
+      <span class='ui-form-section__icon' aria-hidden='true'><app-icono nombre='calendario' /></span>
+      <div>
+        <h3 id='elemento-planificacion' class='ui-form-section__title'>Planificación</h3>
+        <p class='ui-form-section__description'>{{ tipo() === tipos.Epica || tipo() === tipos.Tarea ? 'Esfuerzo y periodo de ejecución.' : 'Estimación y periodo previsto para ejecutar el trabajo.' }}</p>
+      </div>
+    </header>
+    <div class='ui-form-section__body formulario-elemento__campos'>
+      @if (tipo() === tipos.Tarea) {
+        <div class='ui-field'>
+          <label id='elemento-actividad-label' class='ui-label' for='elemento-actividad-control'>Actividad</label>
+          <app-selector-campo id='elemento-actividad' etiquetadoPor='elemento-actividad-label' placeholder='Selecciona una actividad' [opciones]='opcionesActividadTarea()' [soloLectura]='esSoloLectura()' formControlName='actividadCatalogoId' appErrorCampo />
+        </div>
+        <div class='ui-field'>
+          <label class='ui-label' for='elemento-complejidad'>Complejidad</label>
+          <input id='elemento-complejidad' class='ui-control' type='number' [min]='limites.complejidadMinima' [max]='limites.complejidadMaxima' formControlName='complejidad' [readOnly]='esSoloLectura()' appErrorCampo />
+        </div>
+      }
+      @if (!esElementoRequisito()) {
+        <div class='ui-field formulario-elemento__estimacion'>
+          <label class='ui-label' for='elemento-estimacion'>Estimación</label>
+          <div class='ui-control-wrap'>
+            <input id='elemento-estimacion' class='ui-control ui-control--with-trailing-content' type='number' min='0.01' step='0.5' formControlName='estimacionHoras' [readOnly]='esSoloLectura()' appErrorCampo />
+            <span class='ui-control-suffix'>horas</span>
+          </div>
+        </div>
+      }
+      <div class='ui-form-grid formulario-elemento__fechas'>
+        <div class='ui-field'>
+          <label id='elemento-fecha-inicio-label' class='ui-label' for='elemento-fecha-inicio-control'>Fecha de inicio@if (esElementoRequisito()) { <span> (opcional)</span> }</label>
+          <app-selector-fecha id='elemento-fecha-inicio' etiquetadoPor='elemento-fecha-inicio-label' [soloLectura]='esSoloLectura()' formControlName='fechaInicio' appErrorCampo />
+        </div>
+        <div class='ui-field'>
+          <label id='elemento-fecha-final-label' class='ui-label' for='elemento-fecha-final-control'>Fecha final@if (esElementoRequisito()) { <span> (opcional)</span> }</label>
+          <app-selector-fecha id='elemento-fecha-final' etiquetadoPor='elemento-fecha-final-label' [soloLectura]='esSoloLectura()' formControlName='fechaFinal' appErrorCampo />
+        </div>
+      </div>
+      @if (formulario.hasError('rangoFechas') && (formulario.controls.fechaInicio.touched || formulario.controls.fechaFinal.touched)) {
+        <span class='ui-field-error formulario-elemento__error-rango' role='alert'>La fecha final debe ser igual o posterior a la fecha de inicio.</span>
+      }
+    </div>
+  </section>
+  @if (
+    tipo() === tipos.Epica ||
+    tipo() === tipos.Caracteristica ||
+    tipo() === tipos.Historia ||
+    tipo() === tipos.Tarea
+  ) {
+    @if (detalle(); as registro) {
+      <section class='formulario-elemento__registro' aria-labelledby='elemento-informacion-registro'>
+        <header class='formulario-elemento__registro-encabezado'>
+          <h3 id='elemento-informacion-registro'>Información del registro</h3>
+        </header>
+        <dl>
+          <div>
+            <dt>Versión actual</dt>
+            <dd>{{ registro.numeroVersion }}</dd>
+          </div>
+          <div>
+            <dt>Estado</dt>
+            <dd>
+              <span class='formulario-elemento__estado' [class.formulario-elemento__estado--inactivo]='!registro.activo'>
+                {{ registro.activo ? 'Activo' : 'Eliminado' }}
+              </span>
+            </dd>
+          </div>
+          <div>
+            <dt>Creado</dt>
+            <dd><time [attr.datetime]='registro.fechaCreacion'>{{ registro.fechaCreacion | fecha }}</time></dd>
+          </div>
+        </dl>
+      </section>
+    }
+  }
+  </aside>
+</form>

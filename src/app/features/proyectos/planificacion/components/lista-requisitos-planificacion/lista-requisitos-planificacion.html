@@ -1,0 +1,103 @@
+<section class='lista-requisitos' aria-labelledby='titulo-lista-requisitos'>
+  <header class='lista-requisitos__encabezado'>
+    <div class='lista-requisitos__titulo'>
+      <span class='lista-requisitos__icono'><app-icono nombre='listaRequisitos' /></span>
+      <div><h2 id='titulo-lista-requisitos'>Lista de requisitos</h2><p>Revisión de requisitos del proyecto.</p></div>
+    </div>
+    <div class='lista-requisitos__acciones'>
+      <button type='button' class='ui-button ui-button--primary ui-button--sm' [disabled]='guardando()' (click)='abrirCreacion()'><app-icono class='ui-button__icon' nombre='agregar' />Agregar requisito</button>
+      <button type='button' class='ui-button ui-button--secondary ui-button--sm' [disabled]='guardando()' (click)='solicitarVolver()'><app-icono class='ui-button__icon' nombre='volver' />{{ guardando() ? 'Guardando cambios…' : 'Volver al árbol del backlog' }}</button>
+    </div>
+  </header>
+
+  @if (cargando()) { <div class='lista-requisitos__estado' role='status'><span class='lista-requisitos__spinner'></span><strong>Cargando lista de requisitos</strong><p>Estamos consultando la información del proyecto.</p></div> }
+  @else if (errorCarga()) { <app-estado-error titulo='No fue posible cargar los requisitos' descripcion='Verifica la conexión e inténtalo nuevamente.' [reintentable]='true' (reintentar)='cargar()' /> }
+  @else if (!requisitos().length) { <app-estado-vacio icono='listaRequisitos' titulo='No hay requisitos disponibles' descripcion='Agrega el primer requisito para comenzar la revisión del proyecto.'><div estadoVacioAcciones><button type='button' class='ui-button ui-button--primary' (click)='abrirCreacion()'><app-icono nombre='agregar' />Agregar requisito</button></div></app-estado-vacio> }
+  @else {
+    <div class='lista-requisitos__tabla' role='table' aria-label='Lista general de requisitos'>
+      @for (area of grupos(); track area.nombre; let indiceArea = $index) {
+        <section class='area-requisitos' role='rowgroup'>
+          <button type='button' class='area-requisitos__encabezado' [attr.aria-expanded]='areaExpandida(area.nombre)' (click)='alternarArea(area.nombre)'>
+            <span class='area-requisitos__numero'>{{ (indiceArea + 1).toString().padStart(2, '0') }}</span>
+            <span class='area-requisitos__texto'><strong>{{ area.nombre }}</strong><small>{{ area.secciones[0].nombre }}</small></span>
+            <span class='area-requisitos__resumen'>{{ area.total }} requisitos <app-icono [nombre]='areaExpandida(area.nombre) ? "contraerElemento" : "expandirElemento"' /></span>
+          </button>
+          @if (areaExpandida(area.nombre)) {
+            @for (seccion of area.secciones; track seccion.nombre; let primera = $first) {
+              <div class='seccion-requisitos'>
+                @if (!primera) { <button type='button' class='seccion-requisitos__encabezado' [attr.aria-expanded]='seccionExpandida(area.nombre, seccion.nombre)' (click)='alternarSeccion(area.nombre, seccion.nombre)'><strong>{{ seccion.nombre }}</strong><app-icono [nombre]='seccionExpandida(area.nombre, seccion.nombre) ? "contraerElemento" : "expandirElemento"' /></button> }
+                @if (primera || seccionExpandida(area.nombre, seccion.nombre)) {
+                  @for (requisito of seccion.requisitos; track requisito.id) {
+                    <article class='fila-requisito' [class.fila-requisito--cumple]='estado(requisito.id).cumple' [attr.aria-busy]='guardandoIds().has(requisito.id)' role='row'>
+                      <span class='fila-requisito__numero'>{{ requisito.orden.toString().padStart(2, '0') }}</span>
+                      <button type='button' class='fila-requisito__contenido' (click)='abrirDetalle(requisito.id)'><small>{{ requisito.codigo }} · {{ requisito.tipo }}</small><strong>{{ requisito.titulo }}</strong></button>
+                      <div class='decision' role='group' [attr.aria-label]="'Cumplimiento de ' + requisito.titulo">
+                        <button type='button' [class.decision__opcion--activa]='estado(requisito.id).cumple' [disabled]='guardandoIds().has(requisito.id)' (click)='actualizarBinario(requisito.id, "cumple", true)'><app-icono nombre='confirmar' />Sí</button>
+                        <button type='button' [class.decision__opcion--activa]='!estado(requisito.id).cumple' [disabled]='guardandoIds().has(requisito.id)' (click)='actualizarBinario(requisito.id, "cumple", false)'><app-icono nombre='cerrar' />No</button>
+                      </div>
+                      <button type='button' class='fila-requisito__detalle' [attr.aria-label]="'Ver información de ' + requisito.titulo" (click)='abrirDetalle(requisito.id)'><app-icono nombre='informacion' /></button>
+                    </article>
+                  }
+                }
+              </div>
+            }
+          }
+        </section>
+      }
+    </div>
+  }
+</section>
+
+@if (modalCreacionAbierto()) {
+  <app-modal class='modal-requisito' etiqueta='Nuevo registro' titulo='Agregar requisito' descripcion='Completa la información esencial y ubícalo dentro de la lista del proyecto.' icono='catalogo' tamano='lg' [idFormulario]='idFormulario' [textoConfirmar]='creando() ? "Agregando requisito…" : "Agregar requisito"' [confirmacionDeshabilitada]='creando() || cargandoCatalogo() || errorCatalogo()' [descartable]='!creando()' (cerrar)='cerrarCreacion()'>
+    <form [id]='idFormulario' class='formulario-requisito' [formGroup]='formulario' (ngSubmit)='crear()' novalidate>
+      <section class='formulario-requisito__seccion' aria-labelledby='ubicacion-requisito'><header class='formulario-requisito__encabezado formulario-requisito__encabezado--ubicacion'><span>01</span><div><h3 id='ubicacion-requisito'>Ubicación en el documento</h3><p>Selecciona dónde debe aparecer el nuevo requisito.</p></div><div class='selector-modo' role='group' aria-label='Tipo de ubicación'><button type='button' [class.selector-modo__activo]='modoUbicacion() === modosUbicacion.Existente' (click)='cambiarModo(modosUbicacion.Existente)'>Existente</button><button type='button' [class.selector-modo__activo]='modoUbicacion() === modosUbicacion.NuevaSeccion' (click)='cambiarModo(modosUbicacion.NuevaSeccion)'>Nueva sección</button><button type='button' [class.selector-modo__activo]='modoUbicacion() === modosUbicacion.NuevaArea' (click)='cambiarModo(modosUbicacion.NuevaArea)'>Nueva área</button></div></header>
+        @if (errorCatalogo()) { <app-estado-error titulo='No fue posible cargar las opciones' descripcion='Reintenta para completar el requisito.' [reintentable]='true' (reintentar)='cargarCatalogo()' /> }
+        <div class='formulario-requisito__grilla formulario-requisito__grilla--tres'>
+          <label><span>Área</span>@if (creandoArea()) { <input type='text' formControlName='areaNombre' maxlength='200' placeholder='Nombre de la nueva área' /> } @else { <app-selector-campo id='requisito-area' etiquetadoPor='requisito-area-label' formControlName='areaId' [opciones]='opcionesArea()' [compacto]='true' placeholder='Selecciona el área' /> } @if (invalido(creandoArea() ? formulario.controls.areaNombre : formulario.controls.areaId)) { <small>Completa el área.</small> }</label>
+          <label><span>Sección</span>@if (creandoSeccion()) { <input type='text' formControlName='seccionNombre' maxlength='250' placeholder='Nombre de la nueva sección' /> } @else { <app-selector-campo id='requisito-seccion' etiquetadoPor='requisito-seccion-label' formControlName='seccionId' [opciones]='opcionesSeccion()' [compacto]='true' placeholder='Selecciona la sección' /> } @if (invalido(creandoSeccion() ? formulario.controls.seccionNombre : formulario.controls.seccionId)) { <small>Completa la sección.</small> }</label>
+          <label><span>Tipo</span><app-selector-campo id='requisito-tipo' etiquetadoPor='requisito-tipo-label' formControlName='tipoId' [opciones]='opcionesTipo()' [compacto]='true' placeholder='Selecciona el tipo' />@if (invalido(formulario.controls.tipoId)) { <small>Selecciona un tipo.</small> }</label>
+        </div>
+      </section>
+      <section class='formulario-requisito__seccion' aria-labelledby='definicion-requisito'><header><span>02</span><div><h3 id='definicion-requisito'>Definición del requisito</h3><p>Resume la necesidad y describe el resultado esperado.</p></div></header><div class='formulario-requisito__grilla'><label class='campo-ancho'><span>Título del requisito</span><input type='text' formControlName='titulo' maxlength='250' placeholder='Ej. Definir arquitectura de integración' />@if(invalido(formulario.controls.titulo)){<small>Escribe un título.</small>}</label><label class='campo-ancho'><span>Descripción</span><textarea formControlName='descripcion' rows='3' placeholder='Describe qué debe cumplir el proyecto y cuál es el resultado esperado.'></textarea>@if(invalido(formulario.controls.descripcion)){<small>La descripción es obligatoria.</small>}</label></div></section>
+      <section class='formulario-requisito__seccion' aria-labelledby='responsabilidad-requisito'><header><span>03</span><div><h3 id='responsabilidad-requisito'>Responsabilidad y clasificación</h3><p>Define quién lo ejecuta, quién lo valida y cómo se agrupa.</p></div></header><div class='formulario-requisito__grilla'><label><span>Responsable</span><app-selector-campo id='requisito-responsable' formControlName='responsable' [opciones]='opcionesResponsable()' [compacto]='true' /></label><label><span>Validador</span><app-selector-campo id='requisito-validador' formControlName='validador' [opciones]='opcionesValidador()' [compacto]='true' /></label><label><span>Agrupador</span><app-selector-campo id='requisito-agrupador' formControlName='agrupador' [opciones]='opcionesAgrupador()' [compacto]='true' /></label><label><span>Nombre del responsable</span><input type='text' formControlName='nombreResponsable' maxlength='250' /></label></div></section>
+      <section class='formulario-requisito__seccion' aria-labelledby='alcance-requisito'><header><span>04</span><div><h3 id='alcance-requisito'>Alcance inicial</h3><p>Configura el comportamiento con el que ingresará a la lista.</p></div></header><div class='decisiones-iniciales'>@for (item of [{campo: "transversal", titulo: "Transversal", texto: "¿Involucra varias áreas?"}, {campo: "aplica", titulo: "Aplica", texto: "¿Aplica para este proyecto?"}, {campo: "cumple", titulo: "¿Cumple?", texto: "Inicia en No y puedes cambiarlo."}]; track item.campo) { <fieldset><legend>{{ item.titulo }}</legend><p>{{ item.texto }}</p><div><button type='button' [class.decision__opcion--activa]='formulario.get(item.campo)?.value === true' [attr.aria-pressed]='formulario.get(item.campo)?.value === true' (click)='establecerInicial($any(item.campo), true)'>Sí</button><button type='button' [class.decision__opcion--activa]='formulario.get(item.campo)?.value === false' [attr.aria-pressed]='formulario.get(item.campo)?.value === false' (click)='establecerInicial($any(item.campo), false)'>No</button></div></fieldset> }</div></section>
+    </form>
+  </app-modal>
+}
+
+@if (requisitoAbierto(); as requisito) {
+  <app-modal class='modal-detalle-requisito' etiqueta='Información del requisito' [titulo]='requisito.titulo' [descripcion]='requisito.codigo + " · " + requisito.area' icono='historiaUsuario' tamano='lg' textoCancelar='Cerrar' [mostrarConfirmar]='false' (cerrar)='cerrarDetalle()'>
+    <div class='detalle-requisito'>
+      <section class='detalle-requisito__descripcion'>
+        <header>
+          <span aria-hidden='true'><app-icono nombre='actividadRequisito' /></span>
+          <div><small>Contenido principal</small><strong>Descripción</strong></div>
+        </header>
+        <p>{{ requisito.descripcion }}</p>
+      </section>
+      <div class='detalle-requisito__binarios'>
+        @for (item of [{campo: "transversal", titulo: "Transversal"}, {campo: "aplica", titulo: "Aplica"}]; track item.campo) {
+          <fieldset>
+            <legend>{{ item.titulo }}</legend>
+            <div class='decision' role='group' [attr.aria-label]='item.titulo + " para " + requisito.titulo'>
+              <button type='button' [class.decision__opcion--activa]='$any(estado(requisito.id))[item.campo]' [attr.aria-pressed]='$any(estado(requisito.id))[item.campo]' (click)='actualizarBinario(requisito.id, $any(item.campo), true)'>@if ($any(estado(requisito.id))[item.campo]) { <app-icono nombre='confirmar' /> } Sí</button>
+              <button type='button' [class.decision__opcion--activa]='!$any(estado(requisito.id))[item.campo]' [attr.aria-pressed]='!$any(estado(requisito.id))[item.campo]' (click)='actualizarBinario(requisito.id, $any(item.campo), false)'>@if (!$any(estado(requisito.id))[item.campo]) { <app-icono nombre='confirmar' /> } No</button>
+            </div>
+          </fieldset>
+        }
+      </div>
+      <label class='detalle-requisito__responsable'>
+        <span class='detalle-requisito__responsable-icono' aria-hidden='true'><app-icono nombre='equipo' /></span>
+        <span class='detalle-requisito__responsable-texto'><strong>Nombre del responsable</strong><small>Rol: {{ requisito.responsable || 'Sin definir' }}</small></span>
+        <input type='text' maxlength='250' [attr.aria-label]='"Nombre del responsable para " + requisito.titulo' [value]='estado(requisito.id).nombreResponsable' (input)='actualizarNombre(requisito.id, $event)' />
+      </label>
+      <dl>
+        <div class='detalle-requisito__metadato--destacado'><dt>Responsable</dt><dd>{{ requisito.responsable || 'Sin definir' }}</dd></div>
+        <div><dt>Validador</dt><dd>{{ requisito.validador || 'Sin definir' }}</dd></div>
+        <div><dt>Tipo</dt><dd>{{ requisito.tipo || 'Sin definir' }}</dd></div>
+        <div><dt>Agrupador</dt><dd>{{ requisito.agrupador || 'Sin definir' }}</dd></div>
+      </dl>
+    </div>
+  </app-modal>
+}

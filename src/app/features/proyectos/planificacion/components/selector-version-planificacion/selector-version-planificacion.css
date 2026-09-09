@@ -1,0 +1,16 @@
+:host {
+  display: block;
+  width: 13.5rem;
+  flex: 0 0 13.5rem;
+}
+
+.selector-version-planificacion {
+  min-width: 0;
+}
+
+@media (max-width: 768px) {
+  :host {
+    width: 100%;
+    flex-basis: auto;
+  }
+}

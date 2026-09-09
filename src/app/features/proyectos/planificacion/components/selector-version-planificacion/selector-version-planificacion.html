@@ -1,0 +1,13 @@
+<div class='selector-version-planificacion'>
+  <span id='etiqueta-selector-version-planificacion' class='ui-visually-hidden'>
+    Versión de la planificación consultada
+  </span>
+  <app-selector-campo
+    id='version-planificacion'
+    [formControl]='control'
+    [opciones]='opciones()'
+    [compacto]='aparienciaGantt()'
+    [aparienciaGantt]='aparienciaGantt()'
+    etiquetadoPor='etiqueta-selector-version-planificacion'
+  />
+</div>

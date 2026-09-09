@@ -4,6 +4,15 @@ import { EstadoAsistenteIAService } from '../inteligencia-artificial/asistente-i
 import { EstadoCreacionProyectoService } from './creacion/services/estado-creacion-proyecto.service';
 import { EstadoConsultaProyectosService } from './consulta/services/estado-consulta-proyectos.service';
 import { EstadoInformacionProyectoService } from './informacion/services/estado-informacion-proyecto.service';
+import { EstadoPlanificacionProyectoService } from './planificacion/services/estado-planificacion-proyecto.service';
+import { EstadoEditorElementoPlanificacionService } from './planificacion/services/estado-editor-elemento-planificacion.service';
+import { EstadoHistorialElementoPlanificacionService } from './planificacion/services/estado-historial-elemento-planificacion.service';
+import { EstadoGeneracionIaPlanificacionService } from './planificacion/services/estado-generacion-ia-planificacion.service';
+import { EstadoExploracionPlanificacionService } from './planificacion/services/estado-exploracion-planificacion.service';
+import { EstadoPublicacionAzurePlanificacionService } from './planificacion/services/estado-publicacion-azure-planificacion.service';
+import { EstadoSincronizacionEpicaAzurePlanificacionService } from './planificacion/services/estado-sincronizacion-epica-azure-planificacion.service';
+import { EstadoEliminacionRequisitosPlanificacionService } from './planificacion/services/estado-eliminacion-requisitos-planificacion.service';
+import { EstadoGanttPlanificacionService } from './planificacion/services/estado-gantt-planificacion.service';
 
 /** Define las rutas internas del dominio de Proyectos. */
 export const RUTAS_PROYECTOS: Routes = [
@@ -34,6 +43,17 @@ export const RUTAS_PROYECTOS: Routes = [
   },
   {
     path: `:${PARAMETROS_RUTA.proyectoId}/${SEGMENTOS_RUTA.planificacion}`,
+    providers: [
+      EstadoPlanificacionProyectoService,
+      EstadoEditorElementoPlanificacionService,
+      EstadoHistorialElementoPlanificacionService,
+      EstadoGeneracionIaPlanificacionService,
+      EstadoExploracionPlanificacionService,
+      EstadoPublicacionAzurePlanificacionService,
+      EstadoSincronizacionEpicaAzurePlanificacionService,
+      EstadoEliminacionRequisitosPlanificacionService,
+      EstadoGanttPlanificacionService,
+    ],
     loadComponent: () =>
       import(
         './planificacion/pages/pagina-planificacion-proyecto/pagina-planificacion-proyecto'

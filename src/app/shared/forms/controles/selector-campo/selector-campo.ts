@@ -42,9 +42,13 @@ export class SelectorCampo implements ControlValueAccessor, ControlCampoPersonal
   public readonly opciones = input<readonly OpcionSelector[]>([]);
   public readonly placeholder = input('Selecciona una opción');
   public readonly etiquetadoPor = input<string>();
+  public readonly contexto = input<string>();
 
   /** Reduce altura y tipografía para controles ubicados en encabezados compactos. */
   public readonly compacto = input(false);
+
+  /** Aplica la presentación compacta heredada por los selectores del Gantt. */
+  public readonly aparienciaGantt = input(false);
 
   /** Conserva el valor visible e impide abrir o modificar la selección. */
   public readonly soloLectura = input(false);

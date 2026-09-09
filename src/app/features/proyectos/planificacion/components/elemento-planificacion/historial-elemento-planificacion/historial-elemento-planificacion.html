@@ -1,0 +1,137 @@
+<section
+  class='historial-elemento'
+  aria-label='Historial de versiones del elemento'
+  [attr.aria-busy]='cargandoHistorial() || cargandoVersion()'
+>
+  @if (errorHistorial() && versiones().length === 0) {
+    <app-estado-error
+      titulo='No fue posible cargar el historial'
+      descripcion='Intenta consultar nuevamente las versiones anteriores.'
+      [reintentable]='true'
+      (reintentar)='reintentarHistorial.emit()'
+    />
+  } @else if (!cargandoHistorial() && versiones().length === 0) {
+    <app-estado-vacio
+      icono='historial'
+      titulo='Esta es la primera versión'
+      descripcion='Cuando guardes una modificación, la versión anterior aparecerá aquí.'
+    >
+      <div estadoVacioAcciones>
+        <button
+          type='button'
+          class='ui-button ui-button--secondary ui-button--md'
+          (click)='volverDetalle.emit()'
+        >
+          <app-icono class='ui-button__icon' nombre='volver' />
+          Volver al detalle
+        </button>
+      </div>
+    </app-estado-vacio>
+  } @else if (versiones().length > 0) {
+    <aside class='historial-elemento__linea' aria-label='Versiones anteriores'>
+      <header class='historial-elemento__encabezado-lista'>
+        <span>Línea de tiempo</span>
+        <strong>Versiones anteriores</strong>
+        <p>Selecciona un cambio para consultar el contenido guardado.</p>
+      </header>
+
+      <ol class='historial-elemento__lista'>
+        @for (version of versiones(); track version.versionId) {
+          <li>
+            <button
+              type='button'
+              class='historial-elemento__version'
+              [class.historial-elemento__version--activa]='versionSeleccionadaId() === version.versionId'
+              [attr.aria-current]='versionSeleccionadaId() === version.versionId ? true : null'
+              [disabled]='cargandoVersion()'
+              (click)='seleccionar.emit(version)'
+            >
+              <span class='historial-elemento__marca' aria-hidden='true'></span>
+              <span class='historial-elemento__version-texto'>
+                <strong>Versión {{ version.numeroVersion }}</strong>
+                <time [attr.datetime]='version.fechaCreacion'>{{ version.fechaCreacion | fecha }}</time>
+              </span>
+              <app-icono
+                class='historial-elemento__indicador'
+                [nombre]='obtenerIconoVersion(version.versionId)'
+              />
+            </button>
+          </li>
+        }
+      </ol>
+
+      @if (hayMas()) {
+        <button
+          type='button'
+          class='ui-button ui-button--secondary ui-button--md historial-elemento__cargar-mas'
+          [disabled]='cargandoHistorial()'
+          (click)='cargarMas.emit()'
+        >
+          <app-icono class='ui-button__icon' nombre='desplegar' />
+          Cargar más versiones
+        </button>
+      }
+    </aside>
+
+    <div class='historial-elemento__detalle'>
+      @if (errorVersion()) {
+        <app-estado-error
+          titulo='No fue posible cargar la versión'
+          descripcion='Intenta consultar nuevamente el contenido seleccionado.'
+          [reintentable]='true'
+          (reintentar)='reintentarVersion.emit()'
+        />
+      } @else if (versionSeleccionada(); as version) {
+        <article class='historial-elemento__contenido'>
+          <header class='historial-elemento__cabecera-version'>
+            <span>
+              <small>Contenido guardado</small>
+              <strong>Versión {{ version.numeroVersion }}</strong>
+            </span>
+            <time [attr.datetime]='version.fechaCreacion'>{{ version.fechaCreacion | fecha }}</time>
+          </header>
+
+          <section class='historial-elemento__seccion'>
+            <span>Información principal</span>
+            <h3>{{ version.titulo }}</h3>
+            <p>{{ version.descripcion }}</p>
+          </section>
+
+          <section class='historial-elemento__seccion'>
+            <span>Definición funcional</span>
+            <dl>
+              @switch (version.tipo) {
+                @case (tipos.Epica) {
+                  <div><dt>Alcance</dt><dd>{{ version.alcance || 'Sin alcance registrado' }}</dd></div>
+                  <div><dt>Riesgos</dt><dd>{{ version.riesgos || 'Sin riesgos registrados' }}</dd></div>
+                  <div><dt>Criterios de éxito</dt><dd>{{ version.criteriosExito || 'Sin criterios registrados' }}</dd></div>
+                  <div><dt>Prioridad</dt><dd>{{ obtenerNombreCatalogo(version.prioridadCatalogoId, catalogos().prioridades, 'Sin prioridad') }}</dd></div>
+                  <div><dt>Nivel de riesgo</dt><dd>{{ obtenerNombreCatalogo(version.riesgoCatalogoId, catalogos().riesgos, 'Sin nivel de riesgo') }}</dd></div>
+                }
+                @case (tipos.Caracteristica) {
+                  <div><dt>Alcance</dt><dd>{{ version.alcance || 'Sin alcance registrado' }}</dd></div>
+                }
+                @case (tipos.Historia) {
+                  <div><dt>Objetivo</dt><dd>{{ version.objetivo || 'Sin objetivo registrado' }}</dd></div>
+                  <div><dt>Alcance</dt><dd>{{ version.alcance || 'Sin alcance registrado' }}</dd></div>
+                  <div><dt>Criterios de aceptación</dt><dd>{{ version.criteriosAceptacion || 'Sin criterios registrados' }}</dd></div>
+                }
+                @case (tipos.Tarea) {
+                  <div><dt>Actividad</dt><dd>{{ obtenerNombreCatalogo(version.actividadCatalogoId, catalogos().actividadesTarea, 'Sin actividad') }}</dd></div>
+                  <div><dt>Complejidad</dt><dd>{{ version.complejidad }} de 5</dd></div>
+                  <div><dt>Dependencias</dt><dd>{{ version.dependencias || 'Sin dependencias' }}</dd></div>
+                }
+              }
+            </dl>
+          </section>
+
+          <dl class='historial-elemento__metadatos'>
+            <div><dt>Estimación</dt><dd>{{ version.estimacionHoras }} h</dd></div>
+            <div><dt>Fecha de inicio</dt><dd>{{ version.fechaInicio | fecha }}</dd></div>
+            <div><dt>Fecha final</dt><dd>{{ version.fechaFinal | fecha }}</dd></div>
+          </dl>
+        </article>
+      }
+    </div>
+  }
+</section>

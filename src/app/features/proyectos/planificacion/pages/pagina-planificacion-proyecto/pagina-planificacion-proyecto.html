@@ -1,20 +1,309 @@
 <section class='pagina-planificacion' aria-labelledby='titulo-planificacion-proyecto'>
-  <app-encabezado-pagina
-    idTitulo='titulo-planificacion-proyecto'
-    [titulo]='tituloEncabezado'
-    [etiqueta]='etiquetaEncabezado()'
-    [descripcion]='descripcionEncabezado'
-    icono='planificacion'
-  />
-
-  <section
-    class='ui-card pagina-planificacion__contenido'
-    aria-label='Estructura de planificación del proyecto'
-  >
-    <app-estado-vacio
-      icono='planificacion'
-      titulo='La estructura de planificación aún no está disponible'
-      descripcion='El árbol de elementos se incorporará en la siguiente etapa de la migración.'
+  @if (errorCarga()) {
+    <app-estado-error
+      [titulo]='mensajeError.titulo'
+      [descripcion]='mensajeError.descripcion'
+      [reintentable]='true'
+      (reintentar)='recargar()'
     />
-  </section>
+  } @else if (estado.planificacion(); as planificacion) {
+    <app-encabezado-pagina
+      idTitulo='titulo-planificacion-proyecto'
+      etiqueta='Planificación del proyecto'
+      [titulo]='planificacion.nombre'
+      descripcion='Administra y organiza los elementos que conforman la planificación del proyecto.'
+      icono='planificacion'
+    >
+      <span encabezadoPaginaMetadatos class='ui-page-header__meta-item'>
+        <strong>{{ planificacion.resumen.totalElementos }}</strong> elementos
+      </span>
+      <span encabezadoPaginaMetadatos class='ui-page-header__meta-item'>
+        Versión <strong>{{ planificacion.numeroVersion }}</strong>
+      </span>
+      <span encabezadoPaginaMetadatos class='ui-page-header__meta-item'>
+        @if (planificacion.esHistorica) {
+          <app-icono nombre='bloqueado' /> Solo lectura
+        } @else {
+          Versión vigente
+        }
+      </span>
+      @if (!planificacion.esHistorica) {
+        <div encabezadoPaginaAcciones class='pagina-planificacion__acciones-encabezado'>
+          <app-publicacion-azure-planificacion
+            [disponibilidad]='planificacion.publicacionAzure'
+            [procesando]='publicacionAzure.publicando()'
+            [deshabilitado]='generarConIA.procesando() || sincronizacionAzure.sincronizando() || eliminacionRequisitos.eliminando() || gantt.cargando() || estado.seleccionando()'
+            (publicar)='publicarEnAzure()'
+          />
+        </div>
+      }
+    </app-encabezado-pagina>
+
+    <section
+      class='ui-card pagina-planificacion__contenido'
+      [attr.aria-label]='listaRequisitosAbierta() ? "Lista de requisitos del proyecto" : gantt.abierto() ? "Diagrama de Gantt de la planificación" : "Planificación del proyecto"'
+      [attr.aria-busy]='gantt.cargando()'
+    >
+      @if (listaRequisitosAbierta()) {
+        <app-lista-requisitos-planificacion
+          [proyectoId]='proyectoId()!'
+          (volver)='cerrarListaRequisitos()'
+          (cambiosGuardados)='actualizarArbolDesdeLista()'
+        />
+      } @else if (gantt.abierto()) {
+        @if (gantt.error()) {
+          <div class='pagina-planificacion__error-gantt'>
+            <app-estado-error
+              [titulo]='mensajeErrorGantt.titulo'
+              [descripcion]='mensajeErrorGantt.descripcion'
+              [reintentable]='true'
+              (reintentar)='gantt.reintentar()'
+            />
+            <button
+              type='button'
+              class='ui-button ui-button--secondary ui-button--md'
+              (click)='cerrarGantt()'
+            >
+              <app-icono class='ui-button__icon' nombre='volver' />
+              Volver al árbol
+            </button>
+          </div>
+        } @else if (gantt.datos(); as datosGantt) {
+          <app-gantt-planificacion
+            [datos]='datosGantt'
+            [versiones]='estado.versiones()'
+            [versionSeleccionadaId]='planificacion.versionId'
+            [deshabilitado]='estado.seleccionando()'
+            (versionCambiada)='cambiarVersionPlanificacion($event)'
+            (volver)='cerrarGantt()'
+          />
+        }
+      } @else {
+      <app-controles-vista-planificacion
+        [terminoBusqueda]='exploracion.terminoBusqueda()'
+        [expansionCompleta]='exploracion.hayRamasExpandidas()'
+        [expansionDeshabilitada]='exploracion.hayBusqueda() || !exploracion.hayElementosExpandibles()'
+        [mostrarInclusionEliminados]='!planificacion.esHistorica'
+        [incluirEliminados]='estado.incluirEliminados()'
+        [mostrarGeneracion]='!planificacion.esHistorica'
+        [generacionAbierta]='generarConIA.panelAbierto()'
+        [versiones]='estado.versiones()'
+        [versionSeleccionadaId]='planificacion.versionId'
+        [deshabilitado]='estado.seleccionando() || generarConIA.procesando() || publicacionAzure.publicando() || sincronizacionAzure.sincronizando() || eliminacionRequisitos.eliminando()'
+        (busquedaCambiada)='exploracion.buscar($event)'
+        (expansionCompletaCambiada)='exploracion.actualizarExpansionCompleta($event)'
+        (inclusionEliminadosCambiada)='cambiarInclusionEliminados($event)'
+        (generacionAlternada)='generarConIA.alternarPanel()'
+        (versionCambiada)='cambiarVersionPlanificacion($event)'
+        (ganttSolicitado)='abrirGantt()'
+      />
+      @if (!planificacion.esHistorica) {
+        <app-generacion-ia-planificacion
+          [resumen]='planificacion.resumen'
+          [abierto]='generarConIA.panelAbierto()'
+          [procesando]='generarConIA.procesando() || publicacionAzure.publicando() || sincronizacionAzure.sincronizando() || eliminacionRequisitos.eliminando()'
+          (generar)='generarConIa($event)'
+        />
+      }
+      @if (planificacion.elementos.length) {
+        @if (exploracion.hayBusqueda()) {
+          <p class='pagina-planificacion__resultado-busqueda' role='status'>
+            <strong>{{ exploracion.cantidadResultados() }}</strong>
+            elementos visibles para “{{ exploracion.terminoPresentado() }}”.
+            Las ramas coincidentes se expanden automáticamente.
+          </p>
+        }
+        @if (exploracion.elementosVisibles().length) {
+          <app-arbol-planificacion-proyecto
+            [planificacion]='planificacion'
+            [elementos]='exploracion.elementosVisibles()'
+            [expandidos]='exploracion.expandidosPresentados()'
+            [expansionDeshabilitada]='exploracion.hayBusqueda()'
+            [accionesDeshabilitadas]='generarConIA.procesando() || publicacionAzure.publicando() || sincronizacionAzure.sincronizando() || eliminacionRequisitos.eliminando()'
+            (expansionAlternada)='exploracion.alternarRama($event)'
+            (crearEpica)='crearEpica()'
+            (crearElemento)='crearElemento($event)'
+            (consultarElemento)='consultarElemento($event)'
+            (editarElemento)='editarElemento($event)'
+            (sincronizarEpica)='sincronizarEpicaPrincipal()'
+            (eliminarElemento)='eliminarElemento($event)'
+          />
+        } @else {
+          <app-estado-vacio
+            icono='buscar'
+            titulo='No encontramos elementos'
+            descripcion='Prueba con otra palabra del título o limpia la búsqueda para ver el árbol completo.'
+          >
+            <div estadoVacioAcciones>
+              <button
+                type='button'
+                class='ui-button ui-button--secondary ui-button--md'
+                (click)='exploracion.limpiarBusqueda()'
+              >
+                <app-icono class='ui-button__icon' nombre='cerrar' />
+                Limpiar búsqueda
+              </button>
+            </div>
+          </app-estado-vacio>
+        }
+      } @else {
+        <app-estado-vacio
+          icono='planificacion'
+          titulo='La planificación todavía no contiene elementos'
+          descripcion='Las épicas, características, requisitos, historias y tareas aparecerán aquí.'
+        >
+          @if (!planificacion.esHistorica) {
+            <div estadoVacioAcciones>
+              <button
+                type='button'
+                class='ui-button ui-button--primary ui-button--md'
+                (click)='crearEpica()'
+              >
+                <app-icono class='ui-button__icon' nombre='agregar' />
+                Crear primera épica
+              </button>
+            </div>
+          }
+        </app-estado-vacio>
+      }
+      }
+    </section>
+  }
 </section>
+
+@if (editor.abierto() && editor.contexto(); as contexto) {
+  <app-modal
+    class='pagina-planificacion__modal-elemento'
+    [titulo]='tituloEditor()'
+    [etiqueta]='etiquetaEditor()'
+    [metadatos]='metadatosEditor()'
+    [descripcion]='descripcionEditor()'
+    [icono]='iconoEditor()'
+    tamano='xl'
+    [descartable]='!editor.guardando() && !sincronizacionAzure.sincronizando() && !eliminacionRequisitos.eliminando()'
+    [cierreExteriorHabilitado]='!editor.guardando() && !sincronizacionAzure.sincronizando() && !eliminacionRequisitos.eliminando()'
+    [idFormulario]='esConsultaElemento() || esHistorialElemento() ? null : idFormularioElemento'
+    [textoCancelar]='textoCancelarEditor()'
+    [textoConfirmar]='textoConfirmarEditor()'
+    [iconoConfirmar]='iconoConfirmarEditor()'
+    [mostrarConfirmar]='!esHistorialElemento() && !editor.cargando() && (!esConsultaElemento() || editor.puedeEditar() || puedeSincronizarEpicaSeleccionada())'
+    [confirmacionDeshabilitada]='editor.guardando() || sincronizacionAzure.sincronizando() || eliminacionRequisitos.eliminando()'
+    (cerrar)='cerrarEditor()'
+    (confirmar)='iniciarEdicionElemento()'
+  >
+    @if (puedeVerHistorial()) {
+      <nav class='pagina-planificacion__pestanas' role='tablist' aria-label='Vistas del elemento'>
+        <button
+          id='pestana-detalle-elemento'
+          type='button'
+          role='tab'
+          aria-controls='panel-detalle-elemento'
+          [attr.aria-selected]='pestanaElemento() === pestanasElemento.Detalle'
+          [class.pagina-planificacion__pestana--activa]='pestanaElemento() === pestanasElemento.Detalle'
+          (click)='cambiarPestanaElemento(pestanasElemento.Detalle)'
+        >
+          <app-icono nombre='informacion' />
+          Detalle
+        </button>
+        <button
+          id='pestana-historial-elemento'
+          type='button'
+          role='tab'
+          aria-controls='panel-historial-elemento'
+          [attr.aria-selected]='pestanaElemento() === pestanasElemento.Historial'
+          [class.pagina-planificacion__pestana--activa]='pestanaElemento() === pestanasElemento.Historial'
+          (click)='cambiarPestanaElemento(pestanasElemento.Historial)'
+        >
+          <app-icono nombre='historial' />
+          Historial
+        </button>
+      </nav>
+    }
+
+    @if (esHistorialElemento()) {
+      <div
+        id='panel-historial-elemento'
+        class='pagina-planificacion__panel-elemento'
+        role='tabpanel'
+        aria-labelledby='pestana-historial-elemento'
+      >
+        <app-historial-elemento-planificacion
+          [versiones]='historial.registros()'
+          [versionSeleccionadaId]='historial.versionSeleccionadaId()'
+          [versionSeleccionada]='historial.versionSeleccionada()'
+          [catalogos]='editor.catalogos()'
+          [hayMas]='historial.hayMas()'
+          [cargandoHistorial]='historial.cargandoHistorial()'
+          [cargandoVersion]='historial.cargandoVersion()'
+          [errorHistorial]='historial.errorHistorial()'
+          [errorVersion]='historial.errorVersion()'
+          (seleccionar)='historial.seleccionar($event)'
+          (cargarMas)='historial.cargarMas()'
+          (reintentarHistorial)='historial.reintentarHistorial()'
+          (reintentarVersion)='historial.reintentarVersion()'
+          (volverDetalle)='cambiarPestanaElemento(pestanasElemento.Detalle)'
+        />
+      </div>
+    } @else if (editor.valoresFormulario(); as valores) {
+      <div
+        id='panel-detalle-elemento'
+        class='pagina-planificacion__panel-elemento'
+        [attr.role]='rolPanelDetalle()'
+        [attr.aria-labelledby]='etiquetaPanelDetalle()'
+      >
+        @if (detalleEliminado(); as eliminado) {
+          <aside class='pagina-planificacion__elemento-eliminado' role='status'>
+            <app-icono nombre='eliminar' />
+            <span>
+              <strong>Elemento eliminado</strong>
+              <small>
+                @if (eliminado.fechaInactivacion) {
+                  <time [attr.datetime]='eliminado.fechaInactivacion'>
+                    {{ eliminado.fechaInactivacion | fecha }}
+                  </time>
+                  <span aria-hidden='true'> · </span>
+                }
+                {{ etiquetaMotivoInactivacion() }}
+              </small>
+            </span>
+          </aside>
+        }
+        <app-formulario-elemento-planificacion
+          [idFormulario]='idFormularioElemento'
+          [tipo]='contexto.tipo'
+          [modo]='contexto.modo'
+          [datosIniciales]='valores'
+          [detalle]='editor.detalle()'
+          [catalogos]='editor.catalogos()'
+          [procesando]='editor.guardando()'
+          (guardar)='guardarElemento($event)'
+        />
+      </div>
+    }
+    <div modalAcciones class='pagina-planificacion__acciones-modal'>
+      @if (esEpicaAzureSeleccionada()) {
+        @if (urlAzureEpicaSeleccionada(); as urlAzure) {
+          <a
+            class='ui-button ui-button--secondary'
+            [href]='urlAzure'
+            target='_blank'
+            rel='noopener noreferrer'
+          >
+            <app-icono class='ui-button__icon' nombre='abrirExterno' />
+            Abrir en Azure
+          </a>
+        } @else {
+          <button
+            class='ui-button ui-button--secondary'
+            type='button'
+            disabled
+            title='Azure DevOps no devolvió una URL para esta épica'
+          >
+            <app-icono class='ui-button__icon' nombre='abrirExterno' />
+            Abrir en Azure
+          </button>
+        }
+      }
+    </div>
+  </app-modal>
+}

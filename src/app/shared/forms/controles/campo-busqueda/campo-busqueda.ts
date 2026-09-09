@@ -30,6 +30,9 @@ export class CampoBusqueda implements ControlValueAccessor {
   /** Comunica al navegador la longitud mínima útil para el criterio. */
   public readonly longitudMinima = input<number>();
 
+  /** Ajusta la altura del buscador sin duplicar su estructura en cada feature. */
+  public readonly tamano = input<'md' | 'lg'>('md');
+
   protected readonly valor = signal('');
   protected readonly deshabilitado = signal(false);
 

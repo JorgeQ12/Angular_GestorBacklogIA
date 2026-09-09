@@ -53,6 +53,9 @@ export class Modal implements AfterViewInit, OnDestroy {
   /** Añade un contexto breve sobre la finalidad del diálogo. */
   public readonly etiqueta = input<string | null>(null);
 
+  /** Presenta metadatos compactos junto a la etiqueta del diálogo. */
+  public readonly metadatos = input<readonly string[]>([]);
+
   /** Proporciona información complementaria asociada al título. */
   public readonly descripcion = input<string | null>(null);
 

@@ -16,7 +16,7 @@
   background: var(--field-surface);
   color: var(--text-primary);
   font: inherit;
-  font-size: var(--font-size-sm);
+  font-size: var(--selector-fecha-font-size, var(--font-size-sm));
   text-align: left;
   transition:
     border-color var(--transition-base) var(--ease-standard),
@@ -46,7 +46,8 @@
 .selector-fecha__trigger--readonly,
 .selector-fecha__trigger--readonly:hover:not(:disabled) {
   border-color: var(--field-border);
-  background: var(--surface-default);
+  background: var(--field-surface-disabled);
+  color: var(--text-secondary);
   cursor: default;
 }
 

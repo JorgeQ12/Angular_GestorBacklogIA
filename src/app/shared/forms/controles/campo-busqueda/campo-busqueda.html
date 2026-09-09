@@ -1,4 +1,8 @@
-<label class="campo-busqueda" [for]="id()">
+<label
+  class="campo-busqueda"
+  [class.campo-busqueda--lg]="tamano() === 'lg'"
+  [for]="id()"
+>
   <span class="ui-visually-hidden">{{ etiqueta() }}</span>
   <app-icono nombre="buscar" aria-hidden="true" />
   <input

@@ -1,0 +1,35 @@
+/* Tooltip compacto para controles de solo icono, visible con mouse y teclado. */
+.ui-tooltip {
+  position: relative;
+}
+
+.ui-tooltip::after {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + var(--space-2));
+  z-index: var(--z-tooltip);
+  visibility: hidden;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--surface-inverse);
+  color: var(--text-inverse);
+  content: attr(data-tooltip);
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-snug);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(var(--space-1));
+  transition:
+    opacity var(--transition-fast),
+    transform var(--transition-fast),
+    visibility var(--transition-fast);
+}
+
+.ui-tooltip:hover::after,
+.ui-tooltip:focus-visible::after {
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(0);
+}
