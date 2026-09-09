@@ -30,18 +30,12 @@
               <span class="ui-card__icon" aria-hidden="true">
                 <app-icono nombre="catalogos" />
               </span>
-              <h2 id="titulo-lista-catalogos" class="ui-card__title">Catálogos</h2>
+              <div class="catalogos__maestro-identidad">
+                <h2 id="titulo-lista-catalogos" class="ui-card__title">Catálogos</h2>
+                <p class="catalogos__maestro-descripcion">Selecciona uno para administrarlo</p>
+              </div>
             </div>
-            <button
-              type="button"
-              class="ui-button ui-button--text ui-button--md catalogos__accion-icono"
-              aria-label="Actualizar catálogos"
-              title="Actualizar catálogos"
-              [disabled]="bloqueado()"
-              (click)="cargar()"
-            >
-              <app-icono nombre="reintentar" />
-            </button>
+            <span class="catalogos__total">{{ tipos().length }} en total</span>
           </div>
         </header>
 
@@ -67,12 +61,16 @@
                     <span class="catalogos__tipo-titulo">
                       <strong>{{ tipo.nombre }}</strong>
                       @if (!tipo.activo) {
-                        <span class="catalogos__estado-entidad catalogos__estado-entidad--inactivo">
-                          Inactivo
-                        </span>
+                        <app-indicador-estado
+                          texto="Inactivo"
+                          tono="advertencia"
+                          presentacion="etiqueta"
+                        />
                       }
                     </span>
-                    <span class="catalogos__tipo-descripcion">{{ tipo.descripcion }}</span>
+                    <span class="catalogos__tipo-resumen">
+                      {{ resumirOpcionesActivas(tipo.id) }}
+                    </span>
                   </span>
                   <app-icono class="catalogos__tipo-flecha" nombre="continuar" />
                 </button>
@@ -113,9 +111,11 @@
                 <h2 class="ui-card__title" [id]="'catalogo-' + tipo.id">{{ tipo.nombre }}</h2>
                 <p class="catalogos__detalle">
                   @if (!tipo.activo) {
-                    <span class="catalogos__estado-entidad catalogos__estado-entidad--inactivo">
-                      Inactivo
-                    </span>
+                    <app-indicador-estado
+                      texto="Inactivo"
+                      tono="advertencia"
+                      presentacion="etiqueta"
+                    />
                     <span aria-hidden="true">·</span>
                   }
                   <span>{{ tipo.descripcion }}</span>
@@ -123,13 +123,37 @@
               </div>
             </div>
 
-            <app-campo-busqueda
-              class="catalogos__busqueda-opciones"
-              id="buscar-opciones-catalogo"
-              [etiqueta]="'Buscar opciones en ' + tipo.nombre"
-              [placeholder]="'Buscar opciones en ' + tipo.nombre"
-              [formControl]="buscarValores"
-            />
+            <div class="catalogos__acciones-catalogo" aria-label="Acciones del catálogo">
+              <button
+                type="button"
+                class="ui-button ui-button--secondary ui-button--md"
+                [attr.aria-label]="'Editar catálogo ' + tipo.nombre"
+                [disabled]="bloqueado()"
+                (click)="abrirTipo(tipo)"
+              >
+                <app-icono class="ui-button__icon" nombre="editar" />
+                Editar
+              </button>
+              <button
+                type="button"
+                class="ui-button ui-button--secondary ui-button--md"
+                [attr.aria-label]="(tipo.activo ? 'Desactivar ' : 'Activar ') + tipo.nombre"
+                [disabled]="bloqueado()"
+                (click)="cambiarEstadoTipo(tipo)"
+              >
+                <app-icono class="ui-button__icon" [nombre]="tipo.activo ? 'ocultar' : 'mostrar'" />
+                {{ tipo.activo ? 'Desactivar' : 'Activar' }}
+              </button>
+              <button
+                type="button"
+                class="ui-button ui-button--primary ui-button--md catalogos__accion-crear"
+                [disabled]="bloqueado() || !tipo.activo"
+                (click)="abrirValor()"
+              >
+                <app-icono class="ui-button__icon" nombre="agregar" />
+                Crear opción
+              </button>
+            </div>
           </header>
 
           @if (!tipo.activo) {
@@ -140,9 +164,9 @@
           }
 
           <div class="ui-card__body catalogos__opciones-cuerpo">
-            @if (valoresVisibles().length) {
+            @if (valoresSeleccionados().length) {
               <app-tabla-opciones-catalogo
-                [opciones]="valoresVisibles()"
+                [opciones]="valoresSeleccionados()"
                 [bloqueado]="bloqueado()"
                 (editarOpcion)="abrirValor($event)"
                 (cambiarEstadoOpcion)="cambiarEstadoValor($event)"
@@ -152,42 +176,10 @@
                 class="catalogos__estado-vacio"
                 icono="catalogos"
                 titulo="Sin opciones"
-                descripcion="No hay opciones que coincidan con los filtros seleccionados."
+                descripcion="Este catálogo todavía no tiene opciones configuradas."
               />
             }
           </div>
-
-          <footer class="ui-card__footer catalogos__pie">
-            <button
-              type="button"
-              class="ui-button ui-button--text ui-button--md catalogos__accion-icono"
-              [attr.aria-label]="'Editar catálogo ' + tipo.nombre"
-              [attr.title]="'Editar catálogo ' + tipo.nombre"
-              [disabled]="bloqueado()"
-              (click)="abrirTipo(tipo)"
-            >
-              <app-icono class="ui-button__icon" nombre="editar" />
-            </button>
-            <button
-              type="button"
-              class="ui-button ui-button--text ui-button--md catalogos__accion-icono"
-              [attr.aria-label]="(tipo.activo ? 'Desactivar ' : 'Activar ') + tipo.nombre"
-              [attr.title]="(tipo.activo ? 'Desactivar ' : 'Activar ') + tipo.nombre"
-              [disabled]="bloqueado()"
-              (click)="cambiarEstadoTipo(tipo)"
-            >
-              <app-icono [nombre]="tipo.activo ? 'ocultar' : 'mostrar'" />
-            </button>
-            <button
-              type="button"
-              class="ui-button ui-button--primary ui-button--md catalogos__accion-crear"
-              [disabled]="bloqueado() || !tipo.activo"
-              (click)="abrirValor()"
-            >
-              <app-icono class="ui-button__icon" nombre="agregar" />
-              Crear opción
-            </button>
-          </footer>
         </section>
       } @else {
         <section class="ui-card catalogos__detalle-vacio" aria-label="Detalle del catálogo">

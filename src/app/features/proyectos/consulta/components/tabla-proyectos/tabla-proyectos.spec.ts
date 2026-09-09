@@ -25,6 +25,7 @@ describe('TablaProyectos', () => {
     expect(elemento.querySelectorAll('th[scope="col"]')).toHaveLength(6);
     expect(elemento.textContent).toContain('Portal de clientes');
     expect(elemento.textContent).toContain('30 de sept de 2026');
+    expect(elemento.querySelectorAll('.ui-table app-indicador-estado')).toHaveLength(2);
   });
 
   it('muestra el avance y emite la continuación únicamente para borradores', () => {

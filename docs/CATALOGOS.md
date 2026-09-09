@@ -77,25 +77,29 @@ semillas ni nombres reservados duplicados en Angular.
 
 ## Presentación y accesibilidad
 
-La página reutiliza `EncabezadoPagina`, `CampoBusqueda`, `Modal`, `EstadoVacio`, `EstadoError`,
-`app-icono`, `ui-button`, `ui-card` y `ui-checkbox`. Debajo del encabezado presenta dos tarjetas
+La página reutiliza `EncabezadoPagina`, `Modal`, `EstadoVacio`, `EstadoError`, `app-icono`,
+`ui-button` y `ui-card`. Debajo del encabezado presenta dos tarjetas
 hermanas, siguiendo la composición del flujo de creación. Cada tarjeta utiliza `ui-card__header`,
 `ui-card__heading` y `ui-card__icon` para mantener la misma jerarquía visual. El encabezado derecho
-integra la identidad y la búsqueda, mientras su pie reúne las acciones del catálogo. Editar y cambiar
-el estado se presentan como iconos con nombre accesible y ayuda contextual; crear opción conserva su
-texto por ser la acción principal. La tarjeta izquierda adopta la selección del recorrido de
-Creación mediante superficie blanca, borde, sombra, barra lateral e icono oscuro. Su pie contiene la
-creación de catálogo y la actualización permanece como una acción de icono en el encabezado.
+integra la identidad y las acciones de edición, cambio de estado y creación de opciones. Todas las
+acciones combinan icono y texto; crear opción mantiene la jerarquía principal. El detalle no presenta
+un pie de acciones. La tarjeta izquierda adopta la selección del recorrido de Creación mediante
+superficie blanca, borde, sombra, barra lateral e icono oscuro. Su encabezado orienta la selección con
+un texto auxiliar discreto y muestra el total disponible; cada elemento presenta su nombre y resume
+cuántas opciones activas contiene, sin repetir la descripción. Su pie contiene la creación de catálogo
+y la carga de información ocurre al entrar en la página.
 
-El estado activo es implícito y no utiliza el verde reservado para la validación del flujo de
-Creación. Solo las entidades inactivas muestran una etiqueta de advertencia. Las acciones repetidas
-de las opciones se presentan como iconos accesibles para reducir ruido. Los cuerpos quedan dedicados
-a sus respectivos listados y la interfaz no presenta conteos redundantes.
+El estado activo no utiliza el verde reservado para la validación del flujo de Creación.
+`IndicadorEstado` lo presenta de forma discreta y reserva la etiqueta de advertencia para entidades
+inactivas. Las acciones repetidas de las opciones se presentan como botones secundarios delimitados,
+con iconos y nombres accesibles.
+Los cuerpos quedan dedicados a sus respectivos listados y la interfaz no presenta conteos
+redundantes.
 
 El editor acompaña el título con una descripción específica para la creación o edición vigente y
 utiliza un icono de agregar o editar según el contexto.
 
-Las opciones se presentan como una tabla administrativa con las columnas Título, Descripción,
+Las opciones se presentan mediante la primitiva `ui-table`, con las columnas Título, Descripción,
 Estado y Acciones. El encabezado permanece visible durante el desplazamiento y cada fila conserva
 las acciones de icono con sus nombres accesibles. La tabla utiliza distribución fija y truncamiento
 para adaptarse sin imponer un ancho mínimo ni desplazamiento horizontal. Sus filas ocupan todo el

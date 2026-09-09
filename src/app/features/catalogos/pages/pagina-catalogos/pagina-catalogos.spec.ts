@@ -44,7 +44,7 @@ describe('Página de catálogos', () => {
     fixture.detectChanges();
     return fixture;
   };
-  it('presenta catálogos de ambos estados y permite buscar sus opciones', () => {
+  it('presenta los catálogos de ambos estados y sus opciones', () => {
     const f = crear();
     const root = f.nativeElement as HTMLElement;
     const columnas = Array.from(root.querySelectorAll<HTMLTableCellElement>('th')).map(
@@ -53,12 +53,41 @@ describe('Página de catálogos', () => {
     expect(columnas).toEqual(['Título', 'Descripción', 'Estado', 'Acciones']);
     expect(f.nativeElement.textContent).toContain('Logística');
     expect(f.nativeElement.textContent).toContain('Archivados');
-    escribir(f.nativeElement, 'app-campo-busqueda input', 'no existe');
-    f.detectChanges();
-    expect(f.nativeElement.textContent).toContain('Sin opciones');
-    expect(f.nativeElement.textContent).toContain('Archivados');
-    expect(f.nativeElement.textContent).not.toContain('Logística');
+    expect(root.querySelectorAll('.ui-table__action-group .ui-button--secondary')).toHaveLength(2);
+    expect(root.querySelector('.ui-table app-indicador-estado')).not.toBeNull();
   });
+
+  it('resume el contenido del aside sin una acción manual de actualización', () => {
+    const f = crear();
+    const root = f.nativeElement as HTMLElement;
+    const resumenes = Array.from(root.querySelectorAll('.catalogos__tipo-resumen')).map(
+      (elemento) => elemento.textContent?.trim(),
+    );
+
+    expect(root.querySelector('.catalogos__total')?.textContent?.trim()).toBe('2 en total');
+    expect(root.textContent).toContain('Selecciona uno para administrarlo');
+    expect(resumenes).toEqual(expect.arrayContaining(['1 opción activa', '0 opciones activas']));
+    expect(root.querySelector('.catalogos__tipo-descripcion')).toBeNull();
+    expect(root.querySelector('[aria-label="Actualizar catálogos"]')).toBeNull();
+  });
+
+  it('reúne las acciones con texto en el encabezado y no presenta footer en el detalle', () => {
+    const f = crear();
+    const encabezado = f.nativeElement.querySelector('.catalogos__encabezado') as HTMLElement;
+    const acciones = encabezado.querySelectorAll('.catalogos__acciones-catalogo button');
+    const pie = f.nativeElement.querySelector('.catalogos__detalle-panel .catalogos__pie');
+
+    expect(encabezado.querySelector('app-campo-busqueda')).toBeNull();
+    expect(acciones).toHaveLength(3);
+    expect(Array.from(acciones).map((accion) => accion.textContent?.trim())).toEqual([
+      'Editar',
+      'Desactivar',
+      'Crear opción',
+    ]);
+    expect(acciones[1].classList).toContain('ui-button--secondary');
+    expect(pie).toBeNull();
+  });
+
   it('distingue error de consulta y permite reintentar', () => {
     api.obtenerTipos.mockReturnValueOnce(throwError(() => new Error('fallo')));
     const f = crear();

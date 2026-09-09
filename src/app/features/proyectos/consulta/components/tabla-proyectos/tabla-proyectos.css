@@ -3,51 +3,12 @@
   min-width: 0;
 }
 
-.tabla-proyectos__desplazamiento {
-  overflow-x: auto;
-}
-
-.tabla-proyectos__desplazamiento:focus-visible {
-  outline: 0;
-  box-shadow: inset var(--shadow-focus);
-}
-
 .tabla-proyectos {
-  width: 100%;
   min-width: 56rem;
-  border-collapse: collapse;
-}
-
-.tabla-proyectos th,
-.tabla-proyectos td {
-  padding: var(--space-3) var(--space-4);
-  border-bottom: var(--border-width) solid var(--card-divider);
-  color: var(--text-secondary);
-  font-size: var(--font-size-sm);
-  text-align: left;
-  vertical-align: middle;
-}
-
-.tabla-proyectos th {
-  background: var(--card-header-surface);
-  color: var(--text-muted);
-  font-size: var(--font-size-2xs);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--tracking-wide);
-  text-transform: uppercase;
-}
-
-.tabla-proyectos tbody tr:last-child td {
-  border-bottom: 0;
-}
-
-.tabla-proyectos tbody tr:hover {
-  background: var(--surface-muted);
 }
 
 .tabla-proyectos__proyecto,
-.tabla-proyectos__fecha,
-.tabla-proyectos__estado {
+.tabla-proyectos__fecha {
   display: inline-flex;
   align-items: center;
 }
@@ -80,54 +41,9 @@
   gap: var(--space-1);
 }
 
-.tabla-proyectos__identidad strong {
-  overflow: hidden;
-  color: var(--text-primary);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .tabla-proyectos__identidad small {
   color: var(--text-muted);
   font-size: var(--font-size-xs);
-}
-
-.tabla-proyectos__estado {
-  min-height: var(--control-height-sm);
-  gap: var(--space-2);
-  padding-inline: var(--space-3);
-  border: var(--border-width) solid var(--card-border);
-  border-radius: var(--radius-pill);
-  background: var(--surface-muted);
-  color: var(--text-secondary);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-none);
-}
-
-.tabla-proyectos__estado > span {
-  width: var(--space-2);
-  height: var(--space-2);
-  border-radius: var(--radius-circle);
-  background: currentcolor;
-}
-
-.tabla-proyectos__estado.es-borrador,
-.tabla-proyectos__estado.es-cerrado,
-.tabla-proyectos__estado.es-desconocido {
-  color: var(--text-muted);
-}
-
-.tabla-proyectos__estado.es-en-progreso {
-  border-color: color-mix(in srgb, var(--color-info) 20%, transparent);
-  background: var(--color-info-surface);
-  color: var(--color-info);
-}
-
-.tabla-proyectos__estado.es-finalizado {
-  border-color: color-mix(in srgb, var(--color-success) 20%, transparent);
-  background: var(--color-success-surface);
-  color: var(--color-success);
 }
 
 .tabla-proyectos__fecha {
@@ -139,13 +55,6 @@
   width: var(--font-size-base);
   height: var(--font-size-base);
   color: var(--text-muted);
-}
-
-.tabla-proyectos td.tabla-proyectos__acciones,
-.tabla-proyectos th.tabla-proyectos__acciones-titulo {
-  width: 1%;
-  text-align: right;
-  white-space: nowrap;
 }
 
 .tabla-proyectos__paginacion {

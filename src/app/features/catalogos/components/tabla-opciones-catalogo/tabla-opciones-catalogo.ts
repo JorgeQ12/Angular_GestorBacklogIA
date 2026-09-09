@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { IconoComponent } from '../../../../shared/components/icono/icono.component';
+import { IndicadorEstado } from '../../../../shared/components/indicador-estado/indicador-estado';
 import { RegionDesplazable } from '../../../../shared/components/region-desplazable/region-desplazable';
 import type { ValorCatalogo } from '../../models/catalogo.model';
 
@@ -7,7 +8,7 @@ import type { ValorCatalogo } from '../../models/catalogo.model';
 @Component({
   selector: 'app-tabla-opciones-catalogo',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IconoComponent, RegionDesplazable],
+  imports: [IconoComponent, IndicadorEstado, RegionDesplazable],
   templateUrl: './tabla-opciones-catalogo.html',
   styleUrl: './tabla-opciones-catalogo.css',
 })

@@ -1,18 +1,19 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { IconoComponent } from '../../../../../shared/components/icono/icono.component';
+import {
+  IndicadorEstado,
+  type TonoIndicadorEstado,
+} from '../../../../../shared/components/indicador-estado/indicador-estado';
 import { FechaPipe } from '../../../../../shared/fechas/pipes/fecha.pipe';
 import { EstadoCatalogoProyecto } from '../../../models/estado-catalogo-proyecto.model';
 import type { CambioPaginaProyectos } from '../../models/consulta-proyectos.model';
 import type { ResumenProyecto } from '../../models/resumen-proyecto.model';
 
-type ClaseEstadoProyecto =
-  'es-borrador' | 'es-en-progreso' | 'es-finalizado' | 'es-cerrado' | 'es-desconocido';
-
 /** Presenta los proyectos y emite únicamente las interacciones de sus filas. */
 @Component({
   selector: 'app-tabla-proyectos',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IconoComponent, FechaPipe],
+  imports: [IconoComponent, IndicadorEstado, FechaPipe],
   templateUrl: './tabla-proyectos.html',
   styleUrl: './tabla-proyectos.css',
 })
@@ -35,21 +36,17 @@ export class TablaProyectos {
   /** Solicita otra página sin conocer la URL que la representa. */
   public readonly paginaCambiada = output<CambioPaginaProyectos>();
 
-  /** Deriva el tratamiento semántico sin comparar literales desde la plantilla. */
-  protected obtenerClaseEstado(proyecto: ResumenProyecto): ClaseEstadoProyecto {
-    if (proyecto.esBorrador) return 'es-borrador';
+  /** Traduce el estado del dominio al tono visual compartido. */
+  protected obtenerTonoEstado(proyecto: ResumenProyecto): TonoIndicadorEstado {
+    if (proyecto.esBorrador) return 'neutral';
 
     switch (proyecto.estado) {
-      case EstadoCatalogoProyecto.Borrador:
-        return 'es-borrador';
       case EstadoCatalogoProyecto.EnProgreso:
-        return 'es-en-progreso';
+        return 'informativo';
       case EstadoCatalogoProyecto.Finalizado:
-        return 'es-finalizado';
-      case EstadoCatalogoProyecto.Cerrado:
-        return 'es-cerrado';
+        return 'positivo';
       default:
-        return 'es-desconocido';
+        return 'neutral';
     }
   }
 
