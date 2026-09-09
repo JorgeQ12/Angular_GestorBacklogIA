@@ -4,12 +4,10 @@ import {
   DestroyRef,
   OnInit,
   computed,
-  effect,
   inject,
   signal,
 } from '@angular/core';
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Observable, finalize, forkJoin } from 'rxjs';
 import { MensajesService } from '../../../../core/mensajes/services/mensajes.service';
 import { NotificadorErroresApiService } from '../../../../core/mensajes/services/notificador-errores-api.service';
@@ -17,8 +15,8 @@ import { EncabezadoPagina } from '../../../../shared/components/encabezado-pagin
 import { EstadoError } from '../../../../shared/components/estado-error/estado-error';
 import { EstadoVacio } from '../../../../shared/components/estado-vacio/estado-vacio';
 import { IconoComponent } from '../../../../shared/components/icono/icono.component';
+import { IndicadorEstado } from '../../../../shared/components/indicador-estado/indicador-estado';
 import { RegionDesplazable } from '../../../../shared/components/region-desplazable/region-desplazable';
-import { CampoBusqueda } from '../../../../shared/forms/controles/campo-busqueda/campo-busqueda';
 import { EditorCatalogo } from '../../components/editor-catalogo/editor-catalogo';
 import { TablaOpcionesCatalogo } from '../../components/tabla-opciones-catalogo/tabla-opciones-catalogo';
 import { ERRORES_CATALOGOS } from '../../config/catalogos.config';
@@ -36,13 +34,12 @@ import { AdministracionCatalogosService } from '../../services/administracion-ca
   selector: 'app-pagina-catalogos',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    ReactiveFormsModule,
     EncabezadoPagina,
     EstadoError,
     EstadoVacio,
     IconoComponent,
+    IndicadorEstado,
     RegionDesplazable,
-    CampoBusqueda,
     EditorCatalogo,
     TablaOpcionesCatalogo,
   ],
@@ -61,8 +58,6 @@ export class PaginaCatalogos implements OnInit {
   protected readonly ocupado = signal(false);
   protected readonly errorCarga = signal(false);
   protected readonly editor = signal<ContextoEditor | null>(null);
-  protected readonly buscarValores = new FormControl('', { nonNullable: true });
-  private readonly terminoValor = toSignal(this.buscarValores.valueChanges, { initialValue: '' });
   protected readonly bloqueado = computed(() => this.cargando() || this.ocupado());
   protected readonly seleccionado = computed<Catalogo | null>(
     () =>
@@ -71,22 +66,18 @@ export class PaginaCatalogos implements OnInit {
       this.tipos()[0] ??
       null,
   );
-  protected readonly valoresVisibles = computed(() =>
-    this.valores().filter(
-      (v) => v.catalogoTipoId === this.seleccionado()?.id && this.coincide(v, this.terminoValor()),
-    ),
+  protected readonly valoresSeleccionados = computed(() =>
+    this.valores().filter((valor) => valor.catalogoTipoId === this.seleccionado()?.id),
   );
-
-  constructor() {
-    effect(() => {
-      const opciones = { emitEvent: false };
-      if (this.bloqueado()) {
-        this.buscarValores.disable(opciones);
-      } else {
-        this.buscarValores.enable(opciones);
+  private readonly opcionesActivasPorTipo = computed(() => {
+    const cantidades = new Map<number, number>();
+    for (const valor of this.valores()) {
+      if (valor.activo) {
+        cantidades.set(valor.catalogoTipoId, (cantidades.get(valor.catalogoTipoId) ?? 0) + 1);
       }
-    });
-  }
+    }
+    return cantidades;
+  });
 
   /** Recupera la fotografía inicial cuando el router activa la página. */
   public ngOnInit(): void {
@@ -121,11 +112,16 @@ export class PaginaCatalogos implements OnInit {
       });
   }
 
-  /** Cambia el catálogo en contexto y reinicia los filtros de sus opciones. */
+  /** Cambia el catálogo utilizado como contexto del panel de opciones. */
   protected seleccionar(tipo: Catalogo): void {
     if (this.bloqueado() || this.editor()) return;
     this.seleccionadoId.set(tipo.id);
-    this.buscarValores.setValue('');
+  }
+
+  /** Resume las opciones disponibles con la concordancia correspondiente. */
+  protected resumirOpcionesActivas(tipoId: number): string {
+    const cantidad = this.opcionesActivasPorTipo().get(tipoId) ?? 0;
+    return cantidad === 1 ? '1 opción activa' : `${cantidad} opciones activas`;
   }
 
   /** Abre la creación o edición de un tipo con su fotografía confirmada. */
@@ -163,7 +159,6 @@ export class PaginaCatalogos implements OnInit {
     } else {
       this.mutar(this.api.guardarValor(datos, contexto.padre.id, contexto.entidad), (entidad) => {
         this.valores.update((lista) => this.reemplazar(lista, entidad));
-        this.buscarValores.setValue('');
       });
     }
   }
@@ -230,14 +225,6 @@ export class PaginaCatalogos implements OnInit {
         },
         error: (error) => this.errores.comunicar(error, ERRORES_CATALOGOS.guardado),
       });
-  }
-
-  /** Evalúa nombre y descripción para localizar opciones del catálogo seleccionado. */
-  private coincide(entidad: Catalogo, termino: string): boolean {
-    const consulta = termino.trim().toLocaleLowerCase('es');
-    return [entidad.nombre, entidad.descripcion].some((texto) =>
-      texto.toLocaleLowerCase('es').includes(consulta),
-    );
   }
 
   /** Mantiene las colecciones en orden alfabético estable para su presentación. */

@@ -1,5 +1,10 @@
-<div class="tabla-proyectos__desplazamiento" tabindex="0" role="region" aria-label="Proyectos">
-  <table class="tabla-proyectos">
+<div
+  class="ui-table-region tabla-proyectos__desplazamiento"
+  tabindex="0"
+  role="region"
+  aria-label="Proyectos"
+>
+  <table class="ui-table tabla-proyectos">
     <caption class="ui-visually-hidden">
       Proyectos disponibles en el portafolio
     </caption>
@@ -10,7 +15,7 @@
         <th scope="col">Estado</th>
         <th scope="col">Prioridad</th>
         <th scope="col">Fecha objetivo</th>
-        <th scope="col" class="tabla-proyectos__acciones-titulo">Acción</th>
+        <th scope="col" class="ui-table__actions">Acción</th>
       </tr>
     </thead>
     <tbody>
@@ -22,7 +27,7 @@
                 <app-icono nombre="proyectos" />
               </span>
               <span class="tabla-proyectos__identidad">
-                <strong>{{ proyecto.nombre }}</strong>
+                <strong class="ui-table__primary-text">{{ proyecto.nombre }}</strong>
                 @if (proyecto.progresoCreacion; as progreso) {
                   <small>Paso {{ progreso.posicion }} de {{ progreso.total }}</small>
                 }
@@ -31,10 +36,11 @@
           </td>
           <td>{{ proyecto.responsable }}</td>
           <td>
-            <span [class]="'tabla-proyectos__estado ' + obtenerClaseEstado(proyecto)">
-              <span aria-hidden="true"></span>
-              {{ proyecto.estado }}
-            </span>
+            <app-indicador-estado
+              [texto]="proyecto.estado"
+              [tono]="obtenerTonoEstado(proyecto)"
+              presentacion="etiqueta"
+            />
           </td>
           <td>{{ proyecto.prioridad }}</td>
           <td>
@@ -43,7 +49,7 @@
               {{ proyecto.fechaObjetivo | fecha: 'breve' }}
             </span>
           </td>
-          <td class="tabla-proyectos__acciones">
+          <td class="ui-table__actions">
             @if (proyecto.esBorrador) {
               <button
                 type="button"

@@ -1,0 +1,87 @@
+/* Primitivas compartidas para tablas de datos con contenido y acciones específicas por feature. */
+.ui-table-region {
+  min-width: 0;
+  overflow-x: auto;
+}
+
+.ui-table-region:focus-visible {
+  outline: 0;
+  box-shadow: inset var(--shadow-focus);
+}
+
+.ui-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ui-table th,
+.ui-table td {
+  height: var(--ui-table-row-height, 3.5rem);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: var(--border-width) solid var(--card-divider);
+  color: var(--text-secondary);
+  font-size: var(--font-size-xs);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.ui-table th {
+  background: var(--card-header-surface);
+  color: var(--text-muted);
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+}
+
+.ui-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.ui-table tbody tr:hover,
+.ui-table tbody tr:focus-within {
+  background: var(--surface-muted);
+}
+
+.ui-table__primary-text,
+.ui-table__secondary-text {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ui-table__primary-text {
+  color: var(--text-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+.ui-table__secondary-text {
+  color: var(--text-secondary);
+}
+
+.ui-table th.ui-table__actions,
+.ui-table td.ui-table__actions {
+  width: 1%;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.ui-table__action-group {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-1);
+}
+
+.ui-table__icon-action {
+  width: var(--control-height-md);
+  min-height: var(--control-height-md);
+  flex: 0 0 var(--control-height-md);
+  padding: 0;
+}
+
+.ui-table__icon-action app-icono {
+  width: var(--font-size-base);
+  height: var(--font-size-base);
+}

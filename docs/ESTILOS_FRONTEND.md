@@ -220,6 +220,37 @@ Los modificadores se combinan por responsabilidad:
 - Al deshabilitarse, las acciones `text` conservan el fondo y el borde transparentes para evitar
   que los iconos o enlaces cambien visualmente a botones sólidos durante operaciones bloqueantes.
 
+### Tablas e indicadores de estado
+
+`primitives/tables.css` unifica la estructura visual de tablas semánticas sin definir sus columnas,
+acciones ni reglas de negocio:
+
+```html
+<div class="ui-table-region" tabindex="0" role="region" aria-label="Resultados">
+  <table class="ui-table">
+    <thead></thead>
+    <tbody>
+      <tr>
+        <td><strong class="ui-table__primary-text">Registro</strong></td>
+        <td class="ui-table__actions">
+          <div class="ui-table__action-group"></div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+```
+
+- `ui-table` controla densidad, encabezados, divisores y estados de interacción.
+- La feature conserva el HTML nativo, los anchos especiales y el contenido de cada celda.
+- `ui-table__icon-action` mantiene dimensiones consistentes para acciones representadas por iconos.
+- `RegionDesplazable` puede sustituir la región exterior cuando la tabla requiere scroll vertical
+  superpuesto.
+
+`IndicadorEstado` representa estados sin conocer su significado en el dominio. La feature proporciona
+el texto y traduce su estado a un tono `neutral`, `informativo`, `positivo`, `advertencia` o `critico`.
+La presentación `discreta` utiliza punto y texto; `etiqueta` agrega superficie y borde.
+
 ### Iconografía
 
 `ICONOS_APLICACION` es el único catálogo de iconos permitido. Las plantillas los representan
