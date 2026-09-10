@@ -270,6 +270,22 @@ mediante `app-icono` y utilizan nombres semánticos como `editar`, `volver` o `e
   `ui-button__icon--trailing`.
 - Un botón compuesto únicamente por un icono conserva un `aria-label` que nombre la acción.
 
+### Ayuda contextual
+
+`shared/components/tooltip` presenta explicaciones breves asociadas a un control o una acción. Se
+activa mediante puntero o foco, se descarta con `Escape` y utiliza `app-icono` para representar la
+acción informativa. El disparador y el contenido se relacionan mediante `aria-describedby` y
+`role="tooltip"`.
+
+- La feature proporciona el texto y selecciona una de las posiciones `superior`, `inferior`,
+  `derecha` o `izquierda`.
+- La burbuja reutiliza superficies, bordes, sombras, tipografía, movimiento y `--z-tooltip` del
+  sistema visual; no se copian atributos `data-tooltip` ni pseudoelementos globales en cada feature.
+- El texto debe ser breve y complementario. La etiqueta visible, las instrucciones indispensables
+  y los errores de validación no se reemplazan por un tooltip.
+- `ui-field__label-group` alinea el tooltip con la etiqueta de un campo sin introducir reglas de
+  layout particulares en cada formulario.
+
 ### Tarjetas
 
 `primitives/cards.css` proporciona la superficie y las regiones estructurales compartidas:

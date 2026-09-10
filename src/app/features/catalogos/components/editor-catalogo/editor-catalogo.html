@@ -19,7 +19,16 @@
     class="ui-form-grid"
   >
     <div class="ui-field">
-      <label class="ui-label" for="catalogo-codigo">Código</label>
+      <div class="ui-field__label-group">
+        <label class="ui-label" for="catalogo-codigo">Código</label>
+        @if (!esEdicion()) {
+          <app-tooltip
+            [texto]="ayudaCodigo()"
+            posicion="derecha"
+            etiqueta="Ayuda para definir el código"
+          />
+        }
+      </div>
       <input
         class="ui-control"
         id="catalogo-codigo"
@@ -37,7 +46,7 @@
         @if (esEdicion()) {
           Identificador técnico inmutable.
         } @else {
-          Usa snake_case; después de crear el registro no podrá modificarse.
+          Después de crear el registro, el código no podrá modificarse.
         }
       </span>
     </div>

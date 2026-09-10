@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Modal } from '../../../../shared/components/modal/modal';
+import { Tooltip } from '../../../../shared/components/tooltip/tooltip';
 import {
   ErrorCampoDirective,
   MensajesFormularioDirective,
@@ -18,6 +19,7 @@ import {
 import { ControlesFormularioPlano } from '../../../../shared/forms/models';
 import { validarTextoRequerido } from '../../../../shared/forms/validadores';
 import {
+  AYUDAS_CODIGO_CATALOGO,
   LIMITES_CATALOGO,
   MENSAJES_CATALOGO,
   PATRON_CODIGO_CATALOGO,
@@ -35,6 +37,7 @@ import {
   imports: [
     ReactiveFormsModule,
     Modal,
+    Tooltip,
     ErrorCampoDirective,
     MensajesFormularioDirective,
     EnfocarPrimerControlInvalidoDirective,
@@ -61,6 +64,9 @@ export class EditorCatalogo {
       `${this.contexto().entidad ? 'Editar' : 'Crear'} ${this.contexto().clase === ClaseCatalogo.Tipo ? 'catálogo' : 'opción'}`,
   );
   protected readonly esEdicion = computed(() => this.contexto().entidad !== null);
+  protected readonly ayudaCodigo = computed(
+    () => AYUDAS_CODIGO_CATALOGO[this.contexto().clase],
+  );
 
   /** Explica el alcance concreto de la creación o edición presentada. */
   protected readonly descripcion = computed(() => {

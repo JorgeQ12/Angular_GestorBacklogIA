@@ -15,8 +15,8 @@
     </colgroup>
     <thead>
       <tr>
-        <th scope="col">Título</th>
         <th scope="col">Código</th>
+        <th scope="col">Título</th>
         <th scope="col">Descripción</th>
         <th scope="col">Estado</th>
         <th scope="col" class="ui-table__actions">Acciones</th>
@@ -26,12 +26,12 @@
       @for (opcion of opciones(); track opcion.id) {
         <tr>
           <td>
-            <strong class="ui-table__primary-text">{{ opcion.nombre }}</strong>
-          </td>
-          <td>
             <span class="ui-table__secondary-text" [title]="opcion.codigo">
               {{ opcion.codigo }}
             </span>
+          </td>
+          <td>
+            <strong class="ui-table__primary-text">{{ opcion.nombre }}</strong>
           </td>
           <td>
             <span class="ui-table__secondary-text">{{ opcion.descripcion }}</span>

@@ -85,8 +85,8 @@ semillas ni nombres reservados duplicados en Angular.
 
 ## Presentación y accesibilidad
 
-La página reutiliza `EncabezadoPagina`, `Modal`, `EstadoVacio`, `EstadoError`, `app-icono`,
-`ui-button` y `ui-card`. Debajo del encabezado presenta dos tarjetas
+La página reutiliza `EncabezadoPagina`, `Modal`, `Tooltip`, `EstadoVacio`, `EstadoError`,
+`app-icono`, `ui-button` y `ui-card`. Debajo del encabezado presenta dos tarjetas
 hermanas, siguiendo la composición del flujo de creación. Cada tarjeta utiliza `ui-card__header`,
 `ui-card__heading` y `ui-card__icon` para mantener la misma jerarquía visual. El encabezado derecho
 integra la identidad y las acciones de edición, cambio de estado y creación de opciones. Todas las
@@ -106,7 +106,11 @@ Los cuerpos quedan dedicados a sus respectivos listados y la interfaz no present
 redundantes.
 
 El editor acompaña el título con una descripción específica para la creación o edición vigente y
-utiliza un icono de agregar o editar según el contexto.
+utiliza un icono de agregar o editar según el contexto. Durante la creación, el campo Código
+presenta ayuda contextual: los tipos anteponen el módulo, por ejemplo
+`gestion_producto_prioridad`, y los valores anteponen el nombre del catálogo padre, por ejemplo
+`prioridad_alta`. En edición no presenta esa ayuda porque el código permanece visible como solo
+lectura.
 
 Las opciones se presentan mediante la primitiva `ui-table`, con las columnas Código, Título,
 Descripción, Estado y Acciones. El encabezado permanece visible durante el desplazamiento y cada

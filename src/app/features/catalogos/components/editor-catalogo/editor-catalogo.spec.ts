@@ -21,6 +21,9 @@ describe('Editor de catálogo', () => {
     expect(fixture.nativeElement.textContent).toContain(
       'Define el código, el nombre y la descripción del nuevo catálogo.',
     );
+    expect(fixture.nativeElement.textContent).toContain(
+      'Usa snake_case y antepone el nombre del módulo. Ejemplo: gestion_producto_prioridad.',
+    );
     expect(fixture.nativeElement.textContent).toContain('El código es obligatorio.');
     expect(fixture.nativeElement.textContent).toContain('El nombre es obligatorio.');
     expect(fixture.nativeElement.textContent).toContain('La descripción es obligatoria.');
@@ -58,6 +61,9 @@ describe('Editor de catálogo', () => {
 
     expect(fixture.nativeElement.textContent).toContain(
       'Agrega una opción reutilizable al catálogo Área y asígnale un código.',
+    );
+    expect(fixture.nativeElement.textContent).toContain(
+      'Usa snake_case y antepone el nombre del catálogo padre. Ejemplo: prioridad_alta.',
     );
     escribir(fixture.nativeElement, '#catalogo-codigo', 'area_logistica');
     escribir(fixture.nativeElement, '#catalogo-nombre', 'Logística');
@@ -106,6 +112,7 @@ describe('Editor de catálogo', () => {
     expect(fixture.nativeElement.textContent).toContain(
       'Actualiza el nombre y la descripción de Área. El código es inmutable.',
     );
+    expect(fixture.nativeElement.querySelector('app-tooltip')).toBeNull();
     fixture.componentRef.setInput('ocupado', true);
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('#catalogo-codigo').disabled).toBe(true);
