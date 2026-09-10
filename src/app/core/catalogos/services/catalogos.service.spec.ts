@@ -40,7 +40,9 @@ describe('CatalogosService', () => {
 function crearValor(id: number, nombre: string, activo: boolean): CatalogoValorDto {
   return {
     id,
+    codigo: `prioridad_${nombre.toLowerCase()}`,
     catalogoTipoId: 3,
+    catalogoTipoCodigo: 'proyectos_prioridad',
     catalogoTipoNombre: 'Prioridad',
     nombre,
     descripcion: `Prioridad ${nombre}`,

@@ -7,12 +7,20 @@ import { AdministracionCatalogosService } from '../../services/administracion-ca
 import { PaginaCatalogos } from './pagina-catalogos';
 
 describe('Página de catálogos', () => {
-  const tipo = { id: 51, nombre: 'Áreas', descripcion: 'Áreas de operación', activo: true };
+  const tipo = {
+    id: 51,
+    codigo: 'gestion_areas',
+    nombre: 'Áreas',
+    descripcion: 'Áreas de operación',
+    activo: true,
+  };
   const valor = {
     ...tipo,
     id: 83,
+    codigo: 'areas_logistica',
     nombre: 'Logística',
     catalogoTipoId: 51,
+    catalogoTipoCodigo: 'gestion_areas',
     catalogoTipoNombre: 'Áreas',
   };
   const api = {
@@ -50,7 +58,9 @@ describe('Página de catálogos', () => {
     const columnas = Array.from(root.querySelectorAll<HTMLTableCellElement>('th')).map(
       (encabezado) => encabezado.textContent?.trim(),
     );
-    expect(columnas).toEqual(['Título', 'Descripción', 'Estado', 'Acciones']);
+    expect(columnas).toEqual(['Código', 'Título', 'Descripción', 'Estado', 'Acciones']);
+    expect(f.nativeElement.textContent).toContain('gestion_areas');
+    expect(f.nativeElement.textContent).toContain('areas_logistica');
     expect(f.nativeElement.textContent).toContain('Logística');
     expect(f.nativeElement.textContent).toContain('Archivados');
     expect(root.querySelectorAll('.ui-table__action-group .ui-button--secondary')).toHaveLength(2);
@@ -113,6 +123,7 @@ describe('Página de catálogos', () => {
     const f = crear();
     pulsar(f.nativeElement, 'Crear catálogo');
     f.detectChanges();
+    escribir(f.nativeElement, '#catalogo-codigo', 'nuevo_catalogo');
     escribir(f.nativeElement, '#catalogo-nombre', 'Nuevo');
     escribir(f.nativeElement, '#catalogo-descripcion', 'Descripción');
     const form = f.nativeElement.querySelector('form') as HTMLFormElement;
@@ -132,6 +143,7 @@ describe('Página de catálogos', () => {
     const f = crear();
     pulsar(f.nativeElement, 'Crear catálogo');
     f.detectChanges();
+    escribir(f.nativeElement, '#catalogo-codigo', 'nuevo_catalogo');
     escribir(f.nativeElement, '#catalogo-nombre', 'Nuevo');
     escribir(f.nativeElement, '#catalogo-descripcion', 'Descripción');
     f.nativeElement.querySelector('form').dispatchEvent(new Event('submit', { cancelable: true }));

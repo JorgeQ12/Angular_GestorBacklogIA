@@ -7,6 +7,7 @@
       Opciones disponibles en el catálogo seleccionado
     </caption>
     <colgroup>
+      <col class="tabla-opciones__columna-codigo" />
       <col class="tabla-opciones__columna-titulo" />
       <col />
       <col class="tabla-opciones__columna-estado" />
@@ -15,6 +16,7 @@
     <thead>
       <tr>
         <th scope="col">Título</th>
+        <th scope="col">Código</th>
         <th scope="col">Descripción</th>
         <th scope="col">Estado</th>
         <th scope="col" class="ui-table__actions">Acciones</th>
@@ -25,6 +27,11 @@
         <tr>
           <td>
             <strong class="ui-table__primary-text">{{ opcion.nombre }}</strong>
+          </td>
+          <td>
+            <span class="ui-table__secondary-text" [title]="opcion.codigo">
+              {{ opcion.codigo }}
+            </span>
           </td>
           <td>
             <span class="ui-table__secondary-text">{{ opcion.descripcion }}</span>

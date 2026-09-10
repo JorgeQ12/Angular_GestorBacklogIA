@@ -68,8 +68,14 @@
                         />
                       }
                     </span>
-                    <span class="catalogos__tipo-resumen">
-                      {{ resumirOpcionesActivas(tipo.id) }}
+                    <span class="catalogos__tipo-meta">
+                      <span class="catalogos__tipo-codigo" [title]="tipo.codigo">
+                        {{ tipo.codigo }}
+                      </span>
+                      <span aria-hidden="true">·</span>
+                      <span class="catalogos__tipo-resumen">
+                        {{ resumirOpcionesActivas(tipo.id) }}
+                      </span>
                     </span>
                   </span>
                   <app-icono class="catalogos__tipo-flecha" nombre="continuar" />
@@ -110,6 +116,10 @@
               <div>
                 <h2 class="ui-card__title" [id]="'catalogo-' + tipo.id">{{ tipo.nombre }}</h2>
                 <p class="catalogos__detalle">
+                  <span class="catalogos__detalle-codigo" [title]="tipo.codigo">
+                    {{ tipo.codigo }}
+                  </span>
+                  <span aria-hidden="true">·</span>
                   @if (!tipo.activo) {
                     <app-indicador-estado
                       texto="Inactivo"
