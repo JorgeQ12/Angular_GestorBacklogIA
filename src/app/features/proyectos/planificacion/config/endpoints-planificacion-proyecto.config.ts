@@ -3,6 +3,7 @@ import { environment } from '../../../../../environments/environment';
 const RUTA_PLANIFICACION = '/Backlog';
 const RUTA_AZURE_DEVOPS = '/AzureDevOps';
 const RUTA_GENERACION_IA = '/GeneracionIA';
+const RUTA_REQUISITOS = '/Requisito';
 
 /** Centraliza las operaciones remotas de la planificación del proyecto. */
 export const ENDPOINTS_PLANIFICACION_PROYECTO = {
@@ -17,4 +18,15 @@ export const ENDPOINTS_PLANIFICACION_PROYECTO = {
   obtenerVersionElemento: `${environment.apiBaseUrl}${RUTA_PLANIFICACION}/ObtenerVersionWorkItem`,
   publicarEnAzure: `${environment.apiBaseUrl}${RUTA_AZURE_DEVOPS}/PublicarProyectoAzureDevOps`,
   sincronizarEpicaPrincipal: `${environment.apiBaseUrl}${RUTA_AZURE_DEVOPS}/SincronizarEpicaAzure`,
+  obtenerListaRequisitos: `${environment.apiBaseUrl}${RUTA_REQUISITOS}/ObtenerListaRequisitos`,
+  obtenerCatalogoRequisitos: `${environment.apiBaseUrl}${RUTA_REQUISITOS}/ObtenerCatalogoRequisitos`,
+  crearRequisito: (proyectoId: number) => {
+    const idProyecto = encodeURIComponent(proyectoId);
+    return `${environment.apiBaseUrl}${RUTA_REQUISITOS}/CrearRequisito/${idProyecto}`;
+  },
+  actualizarCumplimientoRequisito: (proyectoId: number, requisitoId: number) => {
+    const idProyecto = encodeURIComponent(proyectoId);
+    const idRequisito = encodeURIComponent(requisitoId);
+    return `${environment.apiBaseUrl}${RUTA_REQUISITOS}/ActualizarCumplimiento/${idProyecto}/${idRequisito}`;
+  },
 } as const;

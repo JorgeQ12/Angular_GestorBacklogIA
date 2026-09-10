@@ -24,8 +24,13 @@ const SELECTOR_ELEMENTO_ENFOCABLE = [
   '[tabindex]:not([tabindex="-1"])',
 ].join(',');
 
+/** Anchos disponibles para adaptar el diálogo a su contenido. */
 export type TamanoModal = 'sm' | 'md' | 'lg' | 'xl';
+
+/** Roles accesibles admitidos por el diálogo. */
 export type RolModal = 'dialog' | 'alertdialog';
+
+/** Intenciones visuales disponibles para la acción principal. */
 export type VarianteConfirmacionModal = 'primary' | 'danger';
 
 /** Presenta contenido de dominio dentro de un diálogo accesible y reutilizable. */

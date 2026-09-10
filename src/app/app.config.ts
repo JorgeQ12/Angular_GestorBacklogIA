@@ -7,6 +7,7 @@ import { cargaGlobalInterceptor } from './core/carga-global/interceptors/carga-g
 import { LOCALE_APLICACION } from './core/localizacion/config/localizacion.config';
 import { routes } from './app.routes';
 
+/** Registra los proveedores transversales utilizados por la aplicación raíz. */
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),

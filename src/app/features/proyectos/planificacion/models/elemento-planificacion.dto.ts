@@ -22,6 +22,7 @@ interface DetalleElementoPlanificacionBaseDto {
   readonly capacidades: CapacidadesElementoPlanificacionDto;
 }
 
+/** Refleja el detalle remoto de una épica. */
 export interface DetalleEpicaDto extends DetalleElementoPlanificacionBaseDto {
   readonly tipo: TipoElementoPlanificacionDto.Epica;
   readonly origen: OrigenEpicaDto;
@@ -35,11 +36,13 @@ export interface DetalleEpicaDto extends DetalleElementoPlanificacionBaseDto {
   readonly urlAzure: string | null;
 }
 
+/** Refleja el detalle remoto de una característica. */
 export interface DetalleCaracteristicaDto extends DetalleElementoPlanificacionBaseDto {
   readonly tipo: TipoElementoPlanificacionDto.Caracteristica;
   readonly alcance: string;
 }
 
+/** Refleja el detalle remoto de una historia de usuario. */
 export interface DetalleHistoriaDto extends DetalleElementoPlanificacionBaseDto {
   readonly tipo: TipoElementoPlanificacionDto.Historia;
   readonly caracteristicaId: number;
@@ -48,6 +51,7 @@ export interface DetalleHistoriaDto extends DetalleElementoPlanificacionBaseDto 
   readonly criteriosAceptacion: string;
 }
 
+/** Refleja el detalle remoto de una tarea. */
 export interface DetalleTareaDto extends DetalleElementoPlanificacionBaseDto {
   readonly tipo: TipoElementoPlanificacionDto.Tarea;
   readonly historiaUsuarioId: number;
@@ -56,6 +60,7 @@ export interface DetalleTareaDto extends DetalleElementoPlanificacionBaseDto {
   readonly complejidad: number;
 }
 
+/** Refleja el detalle remoto de una actividad asociada a requisitos. */
 export interface DetalleActividadRequisitoDto extends DetalleElementoPlanificacionBaseDto {
   readonly tipo: TipoElementoPlanificacionDto.ActividadRequisito;
   readonly listaRequisitosId: number;
@@ -65,6 +70,7 @@ export interface DetalleActividadRequisitoDto extends DetalleElementoPlanificaci
   readonly responsable: string | null;
 }
 
+/** Refleja el detalle remoto de una tarea asociada a requisitos. */
 export interface DetalleTareaRequisitoDto extends DetalleElementoPlanificacionBaseDto {
   readonly tipo: TipoElementoPlanificacionDto.TareaRequisito;
   readonly actividadRequisitoId: number;
@@ -89,6 +95,7 @@ interface SolicitudElementoBaseDto {
   readonly fechaFinal: string | null;
 }
 
+/** Define las solicitudes discriminadas admitidas al crear elementos. */
 export type CrearElementoPlanificacionDto =
   | (SolicitudElementoBaseDto & {
       readonly tipo: TipoElementoPlanificacionDto.Epica;
@@ -134,9 +141,18 @@ export type CrearElementoPlanificacionDto =
       readonly responsable: string | null;
     });
 
+/** Deriva las solicitudes de actualización con identidad y control de concurrencia. */
 export type ActualizarElementoPlanificacionDto = CrearElementoPlanificacionDto extends infer T
   ? T extends CrearElementoPlanificacionDto
-    ? Omit<T, 'proyectoId' | 'epicaId' | 'caracteristicaId' | 'historiaUsuarioId' | 'listaRequisitosId' | 'actividadRequisitoId'> & {
+    ? Omit<
+        T,
+        | 'proyectoId'
+        | 'epicaId'
+        | 'caracteristicaId'
+        | 'historiaUsuarioId'
+        | 'listaRequisitosId'
+        | 'actividadRequisitoId'
+      > & {
         readonly itemTrabajoId: number;
         readonly numeroVersionEsperada: number;
       }

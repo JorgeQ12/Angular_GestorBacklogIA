@@ -7,6 +7,7 @@ import { FormateadorFechaService, ValorFecha } from '../services/formateador-fec
 export class FechaPipe implements PipeTransform {
   private readonly formateador = inject(FormateadorFechaService);
 
+  /** Representa un valor mediante el formato y alternativa solicitados. */
   public transform(
     valor: ValorFecha,
     formato: FormatoFecha = 'breve',

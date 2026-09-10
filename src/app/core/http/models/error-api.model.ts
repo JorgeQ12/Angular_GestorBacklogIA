@@ -6,6 +6,7 @@ export enum OrigenErrorApi {
   Desconocido = 'desconocido',
 }
 
+/** Reúne los datos normalizados necesarios para construir un error de integración. */
 export interface ConfiguracionErrorApi {
   readonly estadoHttp: number | null;
   readonly codigo: string | null;

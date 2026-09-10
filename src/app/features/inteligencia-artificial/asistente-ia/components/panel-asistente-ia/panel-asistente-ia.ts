@@ -12,36 +12,24 @@ import {
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IconoComponent } from '../../../../../shared/components/icono/icono.component';
 import { FechaPipe } from '../../../../../shared/fechas/pipes/fecha.pipe';
+import { ErrorCampoDirective } from '../../../../../shared/forms/errores-validacion';
 import { validarTextoRequerido } from '../../../../../shared/forms/validadores/texto-requerido.validator';
+import {
+  ACCIONES_RAPIDAS_ASISTENTE_IA,
+  LIMITE_MENSAJE_ASISTENTE_IA,
+  MENSAJES_CAMPO_MENSAJE_ASISTENTE_IA,
+} from '../../config/panel-asistente-ia.config';
 import {
   EstadoPropuestaAsistenteIA,
   RolMensajeAsistenteIA,
   type MensajeAsistenteIA,
 } from '../../models/asistente-ia.model';
 
-const ACCIONES_RAPIDAS = [
-  {
-    etiqueta: 'Detectar vacíos',
-    icono: 'buscar',
-    mensaje: 'Detecta vacíos en esta sección y hazme preguntas concretas para completarla.',
-  },
-  {
-    etiqueta: 'Mejorar claridad',
-    icono: 'editar',
-    mensaje: 'Ayúdame a mejorar la claridad y precisión de esta sección.',
-  },
-  {
-    etiqueta: 'Crear propuestas',
-    icono: 'asistenteIA',
-    mensaje: 'Crea una propuesta completa para esta sección con el contexto disponible.',
-  },
-] as const;
-
 /** Presenta el historial y emite acciones sin conocer HTTP ni modelos de Proyectos. */
 @Component({
   selector: 'app-panel-asistente-ia',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, IconoComponent, FechaPipe],
+  imports: [ReactiveFormsModule, ErrorCampoDirective, IconoComponent, FechaPipe],
   templateUrl: './panel-asistente-ia.html',
   styleUrl: './panel-asistente-ia.css',
 })
@@ -85,8 +73,9 @@ export class PanelAsistenteIA {
   /** Solicita rechazar una propuesta identificada por su mensaje. */
   public readonly propuestaRechazada = output<number>();
 
-  protected readonly limiteMensaje = 4000;
-  protected readonly accionesRapidas = ACCIONES_RAPIDAS;
+  protected readonly limiteMensaje = LIMITE_MENSAJE_ASISTENTE_IA;
+  protected readonly accionesRapidas = ACCIONES_RAPIDAS_ASISTENTE_IA;
+  protected readonly mensajesCampoMensaje = MENSAJES_CAMPO_MENSAJE_ASISTENTE_IA;
   protected readonly roles = RolMensajeAsistenteIA;
   protected readonly estadosPropuesta = EstadoPropuestaAsistenteIA;
   protected readonly formulario = this.constructorFormulario.group({

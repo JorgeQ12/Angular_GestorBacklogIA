@@ -61,7 +61,9 @@ export class CampoBusqueda implements ControlValueAccessor {
 
   /** Mantiene el formulario alineado con el término escrito. */
   protected actualizarValor(evento: Event): void {
-    const valor = (evento.target as HTMLInputElement).value;
+    if (!(evento.target instanceof HTMLInputElement)) return;
+
+    const valor = evento.target.value;
     this.valor.set(valor);
     this.notificarCambio(valor);
   }

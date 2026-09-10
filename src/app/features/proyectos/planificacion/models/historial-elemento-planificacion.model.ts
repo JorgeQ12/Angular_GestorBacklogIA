@@ -13,12 +13,14 @@ export type TipoElementoVersionable =
   | TipoElementoPlanificacion.Historia
   | TipoElementoPlanificacion.Tarea;
 
+/** Resume una versión disponible para selección en el historial. */
 export interface VersionElementoResumen {
   readonly versionId: number;
   readonly numeroVersion: number;
   readonly fechaCreacion: string;
 }
 
+/** Representa una página normalizada del historial de un elemento. */
 export interface HistorialElementoPlanificacion {
   readonly registros: readonly VersionElementoResumen[];
   readonly siguienteCursor: number | null;
@@ -38,6 +40,7 @@ interface VersionElementoBase {
   readonly fechaCreacion: string;
 }
 
+/** Representa el contenido de interfaz de una versión de épica. */
 export interface VersionEpica extends VersionElementoBase {
   readonly tipo: TipoElementoPlanificacion.Epica;
   readonly alcance: string;
@@ -47,11 +50,13 @@ export interface VersionEpica extends VersionElementoBase {
   readonly riesgoCatalogoId: number | null;
 }
 
+/** Representa el contenido de interfaz de una versión de característica. */
 export interface VersionCaracteristica extends VersionElementoBase {
   readonly tipo: TipoElementoPlanificacion.Caracteristica;
   readonly alcance: string;
 }
 
+/** Representa el contenido de interfaz de una versión de historia. */
 export interface VersionHistoria extends VersionElementoBase {
   readonly tipo: TipoElementoPlanificacion.Historia;
   readonly objetivo: string;
@@ -59,6 +64,7 @@ export interface VersionHistoria extends VersionElementoBase {
   readonly criteriosAceptacion: string;
 }
 
+/** Representa el contenido de interfaz de una versión de tarea. */
 export interface VersionTarea extends VersionElementoBase {
   readonly tipo: TipoElementoPlanificacion.Tarea;
   readonly dependencias: string;
@@ -68,10 +74,7 @@ export interface VersionTarea extends VersionElementoBase {
 
 /** Contiene el contenido inmutable de una versión anterior. */
 export type VersionElementoPlanificacion =
-  | VersionEpica
-  | VersionCaracteristica
-  | VersionHistoria
-  | VersionTarea;
+  VersionEpica | VersionCaracteristica | VersionHistoria | VersionTarea;
 
 /** Restringe la consulta histórica a los tipos soportados por el contrato vigente. */
 export function esTipoElementoVersionable(

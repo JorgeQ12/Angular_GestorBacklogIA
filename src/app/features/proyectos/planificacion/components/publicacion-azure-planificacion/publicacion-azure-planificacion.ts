@@ -16,9 +16,13 @@ import type { DisponibilidadPublicacionAzure } from '../../models/planificacion-
   styleUrl: './publicacion-azure-planificacion.css',
 })
 export class PublicacionAzurePlanificacionComponent {
+  /** Capacidades y bloqueos funcionales informados por el backend. */
   public readonly disponibilidad = input.required<DisponibilidadPublicacionAzure>();
+  /** Indica que la publicación está en curso. */
   public readonly procesando = input(false);
+  /** Aplica un bloqueo adicional decidido por el contenedor. */
   public readonly deshabilitado = input(false);
+  /** Solicita publicar la planificación en Azure DevOps. */
   public readonly publicar = output<void>();
 
   protected readonly textos = TEXTOS_PUBLICACION_AZURE_PLANIFICACION;

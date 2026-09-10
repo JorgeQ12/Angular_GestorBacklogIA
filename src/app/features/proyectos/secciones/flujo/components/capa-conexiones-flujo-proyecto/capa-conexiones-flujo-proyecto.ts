@@ -28,6 +28,7 @@ export enum ModoCapaConexionesFlujo {
 })
 export class CapaConexionesFlujoProyecto {
   protected readonly estadoEditor = inject(EstadoEditorFlujoProyectoService);
+  /** Selecciona la superficie visual de conexiones que debe representarse. */
   public readonly modo = input<ModoCapaConexionesFlujo>(ModoCapaConexionesFlujo.Lineas);
   protected readonly modosCapa = ModoCapaConexionesFlujo;
 
@@ -51,8 +52,7 @@ export class CapaConexionesFlujoProyecto {
         const ladoDestino =
           (conexion.ladoDestino === LadoConexionFlujo.Derecha
             ? LadoConexionFlujo.Izquierda
-            : conexion.ladoDestino) ??
-          resolverLadoDestinoMasCercano(destino, puntoOrigen);
+            : conexion.ladoDestino) ?? resolverLadoDestinoMasCercano(destino, puntoOrigen);
         const puntoDestino = obtenerPuntoAnclajeBloque(destino, ladoDestino);
         const esRamaDecision = esEtiquetaRamaDecision(conexion.etiqueta);
         const anchoEtiqueta = Math.max(

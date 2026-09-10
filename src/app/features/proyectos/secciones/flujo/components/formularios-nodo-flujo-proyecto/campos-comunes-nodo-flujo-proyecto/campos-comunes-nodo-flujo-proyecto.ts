@@ -1,13 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
-import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { IconoComponent } from '../../../../../../../shared/components/icono/icono.component';
-import {
-  FilaFormulario,
-} from '../../../../../../../shared/forms/components/fila-formulario/fila-formulario';
+import { FilaFormulario } from '../../../../../../../shared/forms/components/fila-formulario/fila-formulario';
 import {
   ErrorCampoDirective,
   MensajesError,
 } from '../../../../../../../shared/forms/errores-validacion';
+import { validarTextoRequerido } from '../../../../../../../shared/forms/validadores';
 import { ACCIONES_PERMISO_MODULO } from '../../../config/flujo-proyecto.config';
 import { FormularioNodoFlujoProyecto } from '../../../models/formulario-nodo-flujo-proyecto.model';
 import {
@@ -29,19 +28,34 @@ import { EstadoEditorFlujoProyectoService } from '../../../services/estado-edito
 export class CamposComunesNodoFlujoProyecto {
   private readonly estadoEditor = inject(EstadoEditorFlujoProyectoService);
 
+  /** Formulario de nodo compartido por todos los editores especializados. */
   public readonly formulario = input.required<FormularioNodoFlujoProyecto>();
+
+  /** Texto visible asociado al campo de descripción. */
   public readonly etiquetaDescripcion = input('Descripción funcional');
+
+  /** Ejemplo contextual mostrado en la descripción. */
   public readonly marcadorDescripcion = input(
     'Describe brevemente para qué sirve este paso dentro del flujo.',
   );
+
+  /** Ejemplo contextual mostrado al crear un criterio. */
   public readonly marcadorCriterio = input(
     'Ej.: El usuario puede completar este paso sin errores y continuar al siguiente punto.',
   );
+
+  /** Texto visible asociado a la selección de roles. */
   public readonly etiquetaRoles = input('Roles involucrados');
+
+  /** Explicación complementaria para la selección de roles. */
   public readonly ayudaRoles = input(
     'Selecciona los roles ya creados que participan en este bloque.',
   );
+
+  /** Controla si la sección de roles forma parte del editor. */
   public readonly mostrarRoles = input(true);
+
+  /** Cambia la selección simple por la matriz de permisos por rol. */
   public readonly usarPermisosRoles = input(false);
 
   protected readonly rolesDisponibles = computed(() => this.estadoEditor.roles());
@@ -55,7 +69,7 @@ export class CamposComunesNodoFlujoProyecto {
 
   protected agregarCriterioAceptacion(): void {
     this.formulario().controls.criteriosAceptacion.push(
-      new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+      new FormControl('', { nonNullable: true, validators: [validarTextoRequerido] }),
     );
     this.formulario().controls.criteriosAceptacion.markAsDirty();
   }
@@ -78,9 +92,9 @@ export class CamposComunesNodoFlujoProyecto {
 
   protected tienePermiso(idRol: string, permiso: AccionPermisoModulo): boolean {
     return (
-      this.obtenerPermisosRoles().find((permisoRol) => permisoRol.idRol === idRol)?.permisos.includes(
-        permiso,
-      ) ?? false
+      this.obtenerPermisosRoles()
+        .find((permisoRol) => permisoRol.idRol === idRol)
+        ?.permisos.includes(permiso) ?? false
     );
   }
 
@@ -91,10 +105,7 @@ export class CamposComunesNodoFlujoProyecto {
     if (this.usarPermisosRoles()) {
       const permisosActuales = this.obtenerPermisosRoles();
       const permisosSiguientes: PermisoRolModulo[] = control.checked
-        ? [
-            ...permisosActuales,
-            { idRol: rol.id, permisos: [AccionPermisoModulo.Ver] },
-          ]
+        ? [...permisosActuales, { idRol: rol.id, permisos: [AccionPermisoModulo.Ver] }]
         : permisosActuales.filter((permisoRol) => permisoRol.idRol !== rol.id);
       this.actualizarPermisosRoles(permisosSiguientes);
       return;
@@ -121,8 +132,8 @@ export class CamposComunesNodoFlujoProyecto {
   }
 
   private obtenerIdsRolesSeleccionados(): string[] {
-    const nombresSeleccionados = this.formulario().controls.nombresRoles.value
-      .split(/[\n,]/)
+    const nombresSeleccionados = this.formulario()
+      .controls.nombresRoles.value.split(/[\n,]/)
       .map((nombre) => nombre.trim().toLowerCase())
       .filter(Boolean);
     return this.rolesDisponibles()

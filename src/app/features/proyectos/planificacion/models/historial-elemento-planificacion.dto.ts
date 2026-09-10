@@ -1,7 +1,4 @@
-import {
-  OrigenEpicaDto,
-  TipoElementoPlanificacionDto,
-} from './planificacion-proyecto.dto';
+import { OrigenEpicaDto, TipoElementoPlanificacionDto } from './planificacion-proyecto.dto';
 
 /** Resume una versión anterior dentro de la página de historial. */
 export interface VersionElementoResumenDto {
@@ -31,6 +28,7 @@ interface VersionElementoBaseDto {
   readonly esActual: boolean;
 }
 
+/** Refleja una versión histórica de épica entregada por el backend. */
 export interface VersionEpicaDto extends VersionElementoBaseDto {
   readonly tipo: TipoElementoPlanificacionDto.Epica;
   readonly origen: OrigenEpicaDto;
@@ -47,11 +45,13 @@ export interface VersionEpicaDto extends VersionElementoBaseDto {
   readonly fechaEfectiva: string | null;
 }
 
+/** Refleja una versión histórica de característica entregada por el backend. */
 export interface VersionCaracteristicaDto extends VersionElementoBaseDto {
   readonly tipo: TipoElementoPlanificacionDto.Caracteristica;
   readonly alcance: string;
 }
 
+/** Refleja una versión histórica de historia entregada por el backend. */
 export interface VersionHistoriaDto extends VersionElementoBaseDto {
   readonly tipo: TipoElementoPlanificacionDto.Historia;
   readonly objetivo: string;
@@ -59,6 +59,7 @@ export interface VersionHistoriaDto extends VersionElementoBaseDto {
   readonly criteriosAceptacion: string;
 }
 
+/** Refleja una versión histórica de tarea entregada por el backend. */
 export interface VersionTareaDto extends VersionElementoBaseDto {
   readonly tipo: TipoElementoPlanificacionDto.Tarea;
   readonly dependencias: string;
@@ -68,7 +69,4 @@ export interface VersionTareaDto extends VersionElementoBaseDto {
 
 /** Refleja las cuatro variantes históricas admitidas actualmente por el backend. */
 export type VersionElementoPlanificacionDto =
-  | VersionEpicaDto
-  | VersionCaracteristicaDto
-  | VersionHistoriaDto
-  | VersionTareaDto;
+  VersionEpicaDto | VersionCaracteristicaDto | VersionHistoriaDto | VersionTareaDto;

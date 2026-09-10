@@ -38,10 +38,15 @@ import { OpcionSelector } from './models/opcion-selector.model';
   styleUrl: './selector-campo.css',
 })
 export class SelectorCampo implements ControlValueAccessor, ControlCampoPersonalizado {
+  /** Identificador único utilizado por relaciones accesibles y formularios. */
   public readonly id = input.required<string>();
+  /** Opciones normalizadas disponibles para selección. */
   public readonly opciones = input<readonly OpcionSelector[]>([]);
+  /** Texto presentado cuando todavía no existe una selección. */
   public readonly placeholder = input('Selecciona una opción');
+  /** Identificador del elemento externo que etiqueta el control. */
   public readonly etiquetadoPor = input<string>();
+  /** Texto secundario opcional presentado en variantes compactas. */
   public readonly contexto = input<string>();
 
   /** Reduce altura y tipografía para controles ubicados en encabezados compactos. */

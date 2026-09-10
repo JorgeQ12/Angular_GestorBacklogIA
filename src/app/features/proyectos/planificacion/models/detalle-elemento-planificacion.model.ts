@@ -22,6 +22,7 @@ export type TipoItemPlanificacion = Exclude<
   TipoElementoPlanificacion.ListaRequisitos
 >;
 
+/** Describe las operaciones permitidas sobre el detalle consultado. */
 export interface CapacidadesDetalleElementoPlanificacion {
   readonly puedeEditar: boolean;
   readonly puedeVerHistorial: boolean;
@@ -47,6 +48,7 @@ interface DetalleElementoBase {
   readonly capacidades: CapacidadesDetalleElementoPlanificacion;
 }
 
+/** Representa el detalle normalizado que consume el editor de planificación. */
 export interface DetalleElementoPlanificacion extends DetalleElementoBase {
   readonly alcance: string;
   readonly riesgos: string;
@@ -87,7 +89,11 @@ export interface ValoresFormularioElementoPlanificacion {
   readonly fechaFinal: string;
 }
 
-export type FormularioElementoPlanificacion = ControlesFormularioPlano<ValoresFormularioElementoPlanificacion>;
+/** Define el grupo de controles estrictamente tipado del editor de elementos. */
+export type FormularioElementoPlanificacion =
+  ControlesFormularioPlano<ValoresFormularioElementoPlanificacion>;
+
+/** Identifica los campos válidos para configurar mensajes de validación. */
 export type CampoFormularioElementoPlanificacion = keyof FormularioElementoPlanificacion;
 
 /** Agrupa únicamente los catálogos que puede necesitar el tipo presentado. */

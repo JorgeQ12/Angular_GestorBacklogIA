@@ -138,19 +138,19 @@
   font-size: var(--font-size-xs);
 }
 
-.selector-fecha__dia--otro-mes {
-  color: var(--text-disabled) !important;
+.selector-fecha__dias button.selector-fecha__dia--otro-mes {
+  color: var(--text-disabled);
 }
 
-.selector-fecha__dia--hoy {
+.selector-fecha__dias button.selector-fecha__dia--hoy {
   box-shadow: inset 0 0 0 var(--border-width) var(--border-strong);
-  font-weight: var(--font-weight-semibold) !important;
+  font-weight: var(--font-weight-semibold);
 }
 
-.selector-fecha__dia--seleccionado {
-  background: var(--action-primary-bg) !important;
-  color: var(--action-primary-text) !important;
-  font-weight: var(--font-weight-semibold) !important;
+.selector-fecha__dias button.selector-fecha__dia--seleccionado {
+  background: var(--action-primary-bg);
+  color: var(--action-primary-text);
+  font-weight: var(--font-weight-semibold);
 }
 
 .selector-fecha__dias button:disabled {

@@ -1,8 +1,10 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
+/** Tonos semánticos disponibles para representar un estado. */
 export type TonoIndicadorEstado =
   'neutral' | 'informativo' | 'positivo' | 'advertencia' | 'critico';
 
+/** Variantes visuales admitidas por el indicador de estado. */
 export type PresentacionIndicadorEstado = 'discreta' | 'etiqueta';
 
 /** Representa un estado mediante una apariencia semántica independiente del dominio. */

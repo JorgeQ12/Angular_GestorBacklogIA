@@ -6,6 +6,7 @@ import { FormateadorFechaService, ValorFecha } from '../services/formateador-fec
 export class TiempoRelativoPipe implements PipeTransform {
   private readonly formateador = inject(FormateadorFechaService);
 
+  /** Representa el tiempo transcurrido o la alternativa indicada. */
   public transform(valor: ValorFecha, alternativa = 'Sin actividad reciente'): string {
     return this.formateador.formatearTiempoRelativo(valor, alternativa);
   }

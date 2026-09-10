@@ -43,10 +43,15 @@ const PATRON_FECHA = /^(\d{4})-(\d{2})-(\d{2})$/;
   styleUrl: './selector-fecha.css',
 })
 export class SelectorFecha implements ControlValueAccessor, ControlCampoPersonalizado {
+  /** Identificador único utilizado por relaciones accesibles y formularios. */
   public readonly id = input.required<string>();
+  /** Texto presentado cuando todavía no existe una fecha. */
   public readonly placeholder = input('Selecciona una fecha');
+  /** Identificador del elemento externo que etiqueta el control. */
   public readonly etiquetadoPor = input<string>();
+  /** Límite inferior inclusivo expresado como fecha ISO. */
   public readonly fechaMinima = input<string>();
+  /** Límite superior inclusivo expresado como fecha ISO. */
   public readonly fechaMaxima = input<string>();
 
   /** Conserva la fecha visible e impide abrir o modificar el calendario. */

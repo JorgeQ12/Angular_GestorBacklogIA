@@ -242,26 +242,30 @@
     <label class="ui-visually-hidden" for="mensaje-asistente-ia">
       Mensaje para el Asistente IA
     </label>
-    <div class="panel-asistente__compositor">
-      <textarea
-        id="mensaje-asistente-ia"
-        class="ui-control panel-asistente__entrada"
-        formControlName="mensaje"
-        rows="2"
-        [maxlength]="limiteMensaje"
-        aria-describedby="atajo-mensaje-asistente-ia"
-        placeholder="Pregunta, pide una revisión o solicita una propuesta…"
-        (keydown)="manejarTeclado($event)"
-        required
-      ></textarea>
-      <button
-        type="submit"
-        class="panel-asistente__enviar"
-        aria-label="Enviar mensaje"
-        [disabled]="formulario.invalid || operacionBloqueada()"
-      >
-        <app-icono nombre="enviar" />
-      </button>
+    <div class="ui-field">
+      <div class="panel-asistente__compositor">
+        <textarea
+          id="mensaje-asistente-ia"
+          class="ui-control panel-asistente__entrada"
+          formControlName="mensaje"
+          rows="2"
+          [maxlength]="limiteMensaje"
+          [appMensajesError]="mensajesCampoMensaje"
+          aria-describedby="atajo-mensaje-asistente-ia"
+          placeholder="Pregunta, pide una revisión o solicita una propuesta…"
+          (keydown)="manejarTeclado($event)"
+          required
+          appErrorCampo
+        ></textarea>
+        <button
+          type="submit"
+          class="panel-asistente__enviar"
+          aria-label="Enviar mensaje"
+          [disabled]="formulario.invalid || operacionBloqueada()"
+        >
+          <app-icono nombre="enviar" />
+        </button>
+      </div>
     </div>
     <div class="panel-asistente__formulario-meta">
       <span id="atajo-mensaje-asistente-ia">

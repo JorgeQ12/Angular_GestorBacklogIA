@@ -18,7 +18,7 @@ export const routes: Routes = [
   },
   {
     path: RUTA_PANEL,
-    // canActivate: [sesionGuard],
+    canActivate: [sesionGuard],
     loadComponent: () =>
       import('./layouts/panel/panel-layout').then((modulo) => modulo.PanelLayout),
     children: [

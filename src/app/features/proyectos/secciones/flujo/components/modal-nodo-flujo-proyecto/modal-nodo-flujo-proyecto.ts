@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
 import {
   FormArray,
   FormControl,
@@ -12,6 +19,7 @@ import {
   EnfocarPrimerControlInvalidoDirective,
   MensajesFormularioDirective,
 } from '../../../../../../shared/forms/errores-validacion';
+import { validarTextoRequerido } from '../../../../../../shared/forms/validadores';
 import {
   DESCRIPCIONES_TIPO_BLOQUE_FLUJO,
   ETIQUETAS_TIPO_BLOQUE_FLUJO,
@@ -82,9 +90,7 @@ export class ModalNodoFlujoProyecto {
         : 'Edición del bloque',
   );
   protected readonly textoAccionPrincipal = computed(() =>
-    this.estadoModal()?.modo === ModoEditorNodoFlujo.Crear
-      ? 'Crear bloque'
-      : 'Guardar cambios',
+    this.estadoModal()?.modo === ModoEditorNodoFlujo.Crear ? 'Crear bloque' : 'Guardar cambios',
   );
   protected readonly etiquetaTipo = computed(() => {
     const tipo = this.estadoModal()?.tipo;
@@ -163,8 +169,8 @@ export class ModalNodoFlujoProyecto {
     const rolesObligatorios = politicaRoles === PoliticaRolesBloqueFlujo.Obligatoria;
 
     return this.constructorFormulario.group({
-      titulo: this.constructorFormulario.control(borrador.titulo, Validators.required),
-      descripcion: this.constructorFormulario.control(borrador.descripcion, Validators.required),
+      titulo: this.constructorFormulario.control(borrador.titulo, validarTextoRequerido),
+      descripcion: this.constructorFormulario.control(borrador.descripcion, validarTextoRequerido),
       criteriosAceptacion: this.crearCriteriosAceptacion(borrador.criteriosAceptacion),
       nombresRoles: this.constructorFormulario.control(
         rolesAplican ? borrador.nombresRoles.join(', ') : '',
@@ -182,15 +188,15 @@ export class ModalNodoFlujoProyecto {
       ),
       datosCapturados: this.constructorFormulario.control(
         esComponente ? borrador.datos.datosCapturados : '',
-        esComponente ? Validators.required : [],
+        esComponente ? validarTextoRequerido : [],
       ),
       camposObligatorios: this.constructorFormulario.control(
         esComponente ? borrador.datos.camposObligatorios : '',
-        esComponente ? Validators.required : [],
+        esComponente ? validarTextoRequerido : [],
       ),
       resultadoCompletado: this.constructorFormulario.control(
         esComponente ? borrador.datos.resultadoCompletado : '',
-        esComponente ? Validators.required : [],
+        esComponente ? validarTextoRequerido : [],
       ),
     });
   }
@@ -251,7 +257,7 @@ export class ModalNodoFlujoProyecto {
 
   private crearCriteriosAceptacion(criterios: string[]): FormArray<FormControl<string>> {
     const controles = (criterios.length ? criterios : ['']).map((criterio) =>
-      this.constructorFormulario.control(criterio, Validators.required),
+      this.constructorFormulario.control(criterio, validarTextoRequerido),
     );
     return this.constructorFormulario.array(controles);
   }
