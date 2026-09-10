@@ -30,7 +30,8 @@ environment
 ```
 
 - `PaginaCatalogos` conserva la fotografía confirmada, coordina consultas, mensajes y mutaciones.
-- `EditorCatalogo` es presentacional: mantiene el formulario tipado y emite nombre y descripción.
+- `EditorCatalogo` es presentacional: mantiene el formulario tipado y emite código, nombre y
+  descripción. En edición presenta el código como solo lectura.
 - `AdministracionCatalogosService` encapsula las ocho operaciones HTTP y exige datos funcionales.
 - `core/catalogos` conserva la consulta transversal de opciones activas para otras features. La
   administración reutiliza su endpoint y DTO de valores; no crea otra fuente para ese contrato.
@@ -41,21 +42,28 @@ environment
 
 Todas las operaciones viven bajo `${environment.apiBaseUrl}/Catalogo`.
 
-| Operación                 | Método | Entrada                                       |
-| ------------------------- | ------ | --------------------------------------------- |
-| `ObtenerCatalogosTipo`    | GET    | `IncluirInactivos=true`                       |
-| `ObtenerCatalogosValor`   | GET    | `IncluirInactivos=true`                       |
-| `CrearCatalogoTipo`       | POST   | nombre, descripción y activo                  |
-| `ActualizarCatalogoTipo`  | PUT    | ID, nombre, descripción y activo              |
-| `InactivarCatalogoTipo`   | PATCH  | `Id` como query param y cuerpo nulo           |
-| `CrearCatalogoValor`      | POST   | ID del tipo, nombre, descripción y activo     |
-| `ActualizarCatalogoValor` | PUT    | ID, ID del tipo, nombre, descripción y activo |
-| `InactivarCatalogoValor`  | PATCH  | `Id` como query param y cuerpo nulo           |
+| Operación                 | Método | Entrada                                           |
+| ------------------------- | ------ | ------------------------------------------------- |
+| `ObtenerCatalogosTipo`    | GET    | `IncluirInactivos=true`                           |
+| `ObtenerCatalogosValor`   | GET    | `IncluirInactivos=true`                           |
+| `CrearCatalogoTipo`       | POST   | código, nombre, descripción y activo               |
+| `ActualizarCatalogoTipo`  | PUT    | ID, nombre, descripción y activo                  |
+| `InactivarCatalogoTipo`   | PATCH  | `Id` como query param y cuerpo nulo               |
+| `CrearCatalogoValor`      | POST   | ID del tipo, código, nombre, descripción y activo |
+| `ActualizarCatalogoValor` | PUT    | ID, ID del tipo, nombre, descripción y activo     |
+| `InactivarCatalogoValor`  | PATCH  | `Id` como query param y cuerpo nulo               |
 
-Los DTO reflejan el contrato vigente y no contienen código técnico. El frontend no solicita ni
-deriva códigos a partir del nombre. Nombre y descripción son obligatorios y admiten 100 y 500
-caracteres respectivamente. El estado activo no aparece en el formulario: se conserva al editar y
-se modifica mediante su acción independiente.
+Los DTO reflejan el contrato vigente y conservan el código técnico de tipos y valores. El código es
+obligatorio al crear, admite hasta 150 caracteres y usa `snake_case`: comienza con una letra
+minúscula ASCII, solo contiene letras minúsculas, números y guion bajo, no termina en guion bajo ni
+admite dos consecutivos. Para tipos sigue la convención `<modulo>_<nombre_tipo>` y para valores
+`<nombre_tipo>_<valor>`. Es globalmente único e inmutable: el frontend lo muestra como solo lectura
+al editar y no lo incluye en las solicitudes de actualización. No se deriva automáticamente desde
+el nombre.
+
+Nombre y descripción son obligatorios y admiten 100 y 500 caracteres respectivamente. El estado
+activo no aparece en el formulario: se conserva al editar y se modifica mediante su acción
+independiente.
 
 ## Estado y errores
 
@@ -77,16 +85,17 @@ semillas ni nombres reservados duplicados en Angular.
 
 ## Presentación y accesibilidad
 
-La página reutiliza `EncabezadoPagina`, `Modal`, `EstadoVacio`, `EstadoError`, `app-icono`,
-`ui-button` y `ui-card`. Debajo del encabezado presenta dos tarjetas
+La página reutiliza `EncabezadoPagina`, `Modal`, `Tooltip`, `EstadoVacio`, `EstadoError`,
+`app-icono`, `ui-button` y `ui-card`. Debajo del encabezado presenta dos tarjetas
 hermanas, siguiendo la composición del flujo de creación. Cada tarjeta utiliza `ui-card__header`,
 `ui-card__heading` y `ui-card__icon` para mantener la misma jerarquía visual. El encabezado derecho
 integra la identidad y las acciones de edición, cambio de estado y creación de opciones. Todas las
 acciones combinan icono y texto; crear opción mantiene la jerarquía principal. El detalle no presenta
 un pie de acciones. La tarjeta izquierda adopta la selección del recorrido de Creación mediante
 superficie blanca, borde, sombra, barra lateral e icono oscuro. Su encabezado orienta la selección con
-un texto auxiliar discreto y muestra el total disponible; cada elemento presenta su nombre y resume
-cuántas opciones activas contiene, sin repetir la descripción. Su pie contiene la creación de catálogo
+un texto auxiliar discreto y muestra el total disponible; cada elemento presenta nombre, código y
+resume cuántas opciones activas contiene, sin repetir la descripción. El encabezado del detalle
+también conserva visible el código del tipo. Su pie contiene la creación de catálogo
 y la carga de información ocurre al entrar en la página.
 
 El estado activo no utiliza el verde reservado para la validación del flujo de Creación.
@@ -97,17 +106,21 @@ Los cuerpos quedan dedicados a sus respectivos listados y la interfaz no present
 redundantes.
 
 El editor acompaña el título con una descripción específica para la creación o edición vigente y
-utiliza un icono de agregar o editar según el contexto.
+utiliza un icono de agregar o editar según el contexto. Durante la creación, el campo Código
+presenta ayuda contextual: los tipos anteponen el módulo, por ejemplo
+`gestion_producto_prioridad`, y los valores anteponen el nombre del catálogo padre, por ejemplo
+`prioridad_alta`. En edición no presenta esa ayuda porque el código permanece visible como solo
+lectura.
 
-Las opciones se presentan mediante la primitiva `ui-table`, con las columnas Título, Descripción,
-Estado y Acciones. El encabezado permanece visible durante el desplazamiento y cada fila conserva
-las acciones de icono con sus nombres accesibles. La tabla utiliza distribución fija y truncamiento
-para adaptarse sin imponer un ancho mínimo ni desplazamiento horizontal. Sus filas ocupan todo el
-ancho del cuerpo, sin padding exterior. Ambas colecciones muestran hasta siete registros y habilitan
-desplazamiento vertical interno a partir del octavo. El recorrido separa sus elementos con el mismo
-ritmo espacial utilizado durante la Creación y replica la altura, padding, iconos, tipografía,
-dirección y movimiento de sus elementos. La selección utiliza colores neutrales y omite la
-confirmación verde propia de los pasos validados.
+Las opciones se presentan mediante la primitiva `ui-table`, con las columnas Código, Título,
+Descripción, Estado y Acciones. El encabezado permanece visible durante el desplazamiento y cada
+fila conserva las acciones de icono con sus nombres accesibles. La tabla utiliza distribución fija
+y truncamiento para adaptarse sin imponer un ancho mínimo ni desplazamiento horizontal. Sus filas
+ocupan todo el ancho del cuerpo, sin padding exterior. Ambas colecciones muestran hasta siete
+registros y habilitan desplazamiento vertical interno a partir del octavo. El recorrido separa sus
+elementos con el mismo ritmo espacial utilizado durante la Creación y replica la altura, padding,
+iconos, tipografía, dirección y movimiento de sus elementos. La selección utiliza colores neutrales
+y omite la confirmación verde propia de los pasos validados.
 
 El CSS de la feature contiene únicamente esa distribución maestro-detalle, la separación entre
 tarjetas y la adaptación a una columna desde 1024 px. Colores, tipografía, controles, foco y
@@ -120,7 +133,8 @@ entidades inactivas mediante texto, además del tratamiento visual.
 
 ## Verificación
 
-Las pruebas cubren mapeo, las ocho operaciones HTTP, errores funcionales, límites del formulario,
+Las pruebas cubren mapeo, las ocho operaciones HTTP, la inclusión del código solo en altas, su
+inmutabilidad durante la edición, errores funcionales, límites del formulario, formato `snake_case`,
 envío válido e inválido, bloqueo remoto, búsqueda de opciones, presentación de ambos estados, error y
 reintento, conservación de la edición ante fallos, cancelación al destruir la página, ruta diferida y
 navegación canónica.

@@ -1,0 +1,14 @@
+<span class="ui-tooltip" [attr.data-posicion]="posicion()">
+  <button
+    type="button"
+    class="ui-tooltip__trigger"
+    [attr.aria-label]="etiqueta()"
+    [attr.aria-describedby]="idTooltip"
+    (keydown.escape)="cerrarConEscape($event)"
+  >
+    <app-icono nombre="informacion" />
+  </button>
+  <span [id]="idTooltip" class="ui-tooltip__contenido" role="tooltip">
+    {{ texto() }}
+  </span>
+</span>

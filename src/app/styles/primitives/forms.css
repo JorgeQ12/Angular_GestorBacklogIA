@@ -143,6 +143,14 @@
   line-height: var(--line-height-tight);
 }
 
+.ui-field__label-group {
+  display: flex;
+  width: max-content;
+  max-width: 100%;
+  align-items: center;
+  gap: var(--space-1);
+}
+
 .ui-control-wrap {
   position: relative;
   display: flex;

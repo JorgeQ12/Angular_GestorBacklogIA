@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Modal } from '../../../../shared/components/modal/modal';
+import { Tooltip } from '../../../../shared/components/tooltip/tooltip';
 import {
   ErrorCampoDirective,
   MensajesFormularioDirective,
@@ -17,20 +18,26 @@ import {
 } from '../../../../shared/forms/errores-validacion';
 import { ControlesFormularioPlano } from '../../../../shared/forms/models';
 import { validarTextoRequerido } from '../../../../shared/forms/validadores';
-import { LIMITES_CATALOGO, MENSAJES_CATALOGO } from '../../config/catalogos.config';
+import {
+  AYUDAS_CODIGO_CATALOGO,
+  LIMITES_CATALOGO,
+  MENSAJES_CATALOGO,
+  PATRON_CODIGO_CATALOGO,
+} from '../../config/catalogos.config';
 import {
   ClaseCatalogo,
   DatosCatalogo,
   EditorCatalogo as ContextoEditor,
 } from '../../models/catalogo.model';
 
-/** Edita nombre y descripción sin conocer transporte, sesión ni navegación. */
+/** Administra los campos del catálogo sin conocer transporte, sesión ni navegación. */
 @Component({
   selector: 'app-editor-catalogo',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ReactiveFormsModule,
     Modal,
+    Tooltip,
     ErrorCampoDirective,
     MensajesFormularioDirective,
     EnfocarPrimerControlInvalidoDirective,
@@ -44,7 +51,7 @@ export class EditorCatalogo {
   /** Bloquea el formulario mientras la página confirma una operación remota. */
   public readonly ocupado = input(false);
 
-  /** Entrega exclusivamente los campos editables normalizados. */
+  /** Entrega los datos normalizados; la página decide el contrato de creación o edición. */
   public readonly guardar = output<DatosCatalogo>();
 
   /** Solicita cerrar el editor sin alterar datos persistidos. */
@@ -56,16 +63,20 @@ export class EditorCatalogo {
     () =>
       `${this.contexto().entidad ? 'Editar' : 'Crear'} ${this.contexto().clase === ClaseCatalogo.Tipo ? 'catálogo' : 'opción'}`,
   );
+  protected readonly esEdicion = computed(() => this.contexto().entidad !== null);
+  protected readonly ayudaCodigo = computed(
+    () => AYUDAS_CODIGO_CATALOGO[this.contexto().clase],
+  );
 
   /** Explica el alcance concreto de la creación o edición presentada. */
   protected readonly descripcion = computed(() => {
     const contexto = this.contexto();
     if (contexto.entidad) {
-      return `Actualiza el nombre y la descripción de ${contexto.entidad.nombre}.`;
+      return `Actualiza el nombre y la descripción de ${contexto.entidad.nombre}. El código es inmutable.`;
     }
     return contexto.clase === ClaseCatalogo.Tipo
-      ? 'Define el nombre y la descripción del nuevo catálogo.'
-      : `Agrega una opción reutilizable al catálogo ${contexto.padre.nombre}.`;
+      ? 'Define el código, el nombre y la descripción del nuevo catálogo.'
+      : `Agrega una opción reutilizable al catálogo ${contexto.padre.nombre} y asígnale un código.`;
   });
 
   /** Distingue visualmente una creación de una edición existente. */
@@ -74,6 +85,14 @@ export class EditorCatalogo {
   protected readonly formulario: FormGroup<ControlesFormularioPlano<DatosCatalogo>> = inject(
     FormBuilder,
   ).nonNullable.group({
+    codigo: [
+      '',
+      [
+        validarTextoRequerido,
+        Validators.maxLength(LIMITES_CATALOGO.codigo),
+        Validators.pattern(PATRON_CODIGO_CATALOGO),
+      ],
+    ],
     nombre: ['', [validarTextoRequerido, Validators.maxLength(LIMITES_CATALOGO.nombre)]],
     descripcion: ['', [validarTextoRequerido, Validators.maxLength(LIMITES_CATALOGO.descripcion)]],
   });
@@ -83,6 +102,7 @@ export class EditorCatalogo {
       const entidad = this.contexto().entidad;
       untracked(() =>
         this.formulario.reset({
+          codigo: entidad?.codigo ?? '',
           nombre: entidad?.nombre ?? '',
           descripcion: entidad?.descripcion ?? '',
         }),
@@ -102,6 +122,10 @@ export class EditorCatalogo {
       return;
     }
     const datos = this.formulario.getRawValue();
-    this.guardar.emit({ nombre: datos.nombre.trim(), descripcion: datos.descripcion.trim() });
+    this.guardar.emit({
+      codigo: datos.codigo.trim(),
+      nombre: datos.nombre.trim(),
+      descripcion: datos.descripcion.trim(),
+    });
   }
 }
