@@ -1,0 +1,126 @@
+<section class='controles-vista-planificacion' aria-label='Herramientas de planificación'>
+  <div class='controles-vista-planificacion__busqueda'>
+    <app-campo-busqueda
+      [id]='idBusqueda'
+      etiqueta='Buscar elementos por título o contenido'
+      placeholder='Buscar en el árbol por título'
+      tamano='lg'
+      [formControl]='busquedaControl'
+    />
+  </div>
+
+  @if (mostrarGeneracion()) {
+    <button
+      type='button'
+      class='ui-button ui-button--primary controles-vista-planificacion__generacion'
+      [class.controles-vista-planificacion__generacion--abierta]='generacionAbierta()'
+      aria-controls='opciones-generacion-ia'
+      [attr.aria-expanded]='generacionAbierta()'
+      [disabled]='deshabilitado()'
+      (click)='generacionAlternada.emit()'
+    >
+      <span class='controles-vista-planificacion__icono-generacion' aria-hidden='true'>
+        <app-icono nombre='generarConIA' />
+      </span>
+      {{ generacionAbierta() ? 'Cerrar generación' : 'Generar con IA' }}
+    </button>
+  }
+
+  @if (versionSeleccionadaId() !== null && versiones().length) {
+    <app-selector-version-planificacion
+      [versiones]='versiones()'
+      [versionSeleccionadaId]='versionSeleccionadaId()!'
+      [deshabilitado]='deshabilitado()'
+      (versionCambiada)='versionCambiada.emit($event)'
+    />
+  }
+
+  <div
+    class='controles-vista-planificacion__menu'
+    (click)='$event.stopPropagation()'
+  >
+    <button
+      type='button'
+      class='ui-button ui-button--secondary controles-vista-planificacion__vista'
+      [class.controles-vista-planificacion__vista--abierta]='panelVistaAbierto()'
+      [attr.aria-expanded]='panelVistaAbierto()'
+      aria-haspopup='true'
+      aria-controls='opciones-vista-planificacion'
+      [disabled]='deshabilitado()'
+      (click)='alternarPanelVista($event)'
+    >
+      <app-icono class='ui-button__icon' nombre='ajustesVista' />
+      Vista
+      @if (incluirEliminados()) {
+        <span class='controles-vista-planificacion__filtro-activo' aria-label='Filtro activo'></span>
+      }
+      <app-icono
+        class='ui-button__icon controles-vista-planificacion__desplegar'
+        nombre='desplegar'
+      />
+    </button>
+
+    @if (panelVistaAbierto()) {
+      <div
+        id='opciones-vista-planificacion'
+        class='controles-vista-planificacion__panel'
+        aria-label='Configuración de la vista del árbol'
+      >
+        <header>
+          <strong>Vista</strong>
+          <small>Configura cómo explorar la planificación.</small>
+        </header>
+        <div class='controles-vista-planificacion__opciones'>
+          <label class='controles-vista-planificacion__opcion'>
+            <span>
+              <strong>{{ expansionCompleta() ? 'Contraer todo' : 'Expandir todo' }}</strong>
+              <small>Controla todos los niveles del árbol.</small>
+            </span>
+            <input
+              id='expandir-planificacion'
+              class='ui-checkbox'
+              type='checkbox'
+              [checked]='expansionCompleta()'
+              [disabled]='deshabilitado() || expansionDeshabilitada()'
+              (change)='cambiarExpansion($event)'
+            />
+          </label>
+
+          @if (mostrarInclusionEliminados()) {
+            <label class='controles-vista-planificacion__opcion'>
+              <span>
+                <strong>Mostrar eliminados</strong>
+                <small>Incluye elementos históricos en modo de solo lectura.</small>
+              </span>
+              <input
+                id='incluir-eliminados-planificacion'
+                class='ui-checkbox'
+                type='checkbox'
+                [checked]='incluirEliminados()'
+                [disabled]='deshabilitado()'
+                (change)='cambiarInclusion($event)'
+              />
+            </label>
+          }
+
+          <div class='controles-vista-planificacion__divisor' aria-hidden='true'></div>
+          <button
+            type='button'
+            class='controles-vista-planificacion__opcion controles-vista-planificacion__opcion--navegacion'
+            [disabled]='deshabilitado()'
+            (click)='abrirGantt()'
+          >
+            <span class='controles-vista-planificacion__icono-opcion' aria-hidden='true'>
+              <app-icono nombre='gantt' />
+            </span>
+            <span>
+              <strong>Vista Gantt</strong>
+              <small>Planificación temporal del proyecto.</small>
+            </span>
+            <app-icono class='controles-vista-planificacion__continuar' nombre='continuar' />
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+</section>

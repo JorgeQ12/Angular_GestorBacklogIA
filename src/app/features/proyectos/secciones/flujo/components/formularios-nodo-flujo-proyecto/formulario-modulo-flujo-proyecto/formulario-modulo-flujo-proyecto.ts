@@ -29,6 +29,7 @@ import { CamposComunesNodoFlujoProyecto } from '../campos-comunes-nodo-flujo-pro
   styleUrl: './formulario-modulo-flujo-proyecto.css',
 })
 export class FormularioModuloFlujoProyecto {
+  /** Formulario tipado administrado por el modal contenedor. */
   public readonly formulario = input.required<FormularioNodoFlujoProyecto>();
   protected readonly diasSemana = DIAS_SEMANA_FLUJO;
   protected readonly opcionesHora: readonly OpcionSelector[] = this.construirOpcionesHora();

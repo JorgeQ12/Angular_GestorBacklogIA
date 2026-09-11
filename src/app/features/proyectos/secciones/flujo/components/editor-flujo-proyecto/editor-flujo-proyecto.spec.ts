@@ -328,6 +328,22 @@ describe('EditorFlujoProyecto', () => {
     ).toBe(true);
   });
 
+  it('rechaza textos obligatorios compuestos únicamente por espacios', () => {
+    estadoEditor.iniciarCreacionNodo(TipoBloqueFlujo.Decision);
+    fixture.detectChanges();
+
+    escribirCampo('#flujo-decision-titulo', '   ');
+    escribirCampo('#flujo-descripcion', 'Evalúa si el recorrido puede continuar.');
+    escribirCampo('#flujo-criterio-0', 'La condición tiene un resultado definido.');
+    fixture.detectChanges();
+
+    const botonGuardar = (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>(
+      'button[form="formulario-nodo-flujo-proyecto"]',
+    );
+
+    expect(botonGuardar?.disabled).toBe(true);
+  });
+
   function crearNodo(tipo: TipoBloqueFlujo): void {
     estadoEditor.iniciarCreacionNodo(tipo);
     estadoEditor.confirmarBorradorNodo({

@@ -27,19 +27,33 @@ import { TarjetaPasoProyecto } from '../../tarjeta-paso-proyecto/tarjeta-paso-pr
 })
 export class PasoFlujoProyecto {
   private readonly mensajes = inject(MensajesService);
+  /** Fotografía del flujo que debe presentar o editar el paso. */
   public readonly datos = input.required<FlujoProyecto>();
+  /** Modo de interacción vigente para el editor. */
   public readonly modo = input(ModoFormularioProyecto.Lectura);
+  /** Indica si el consumidor permite iniciar una edición. */
   public readonly editable = input(false);
+  /** Bloquea acciones mientras se persiste el flujo. */
   public readonly procesando = input(false);
+  /** Indica que existe una generación remota en curso. */
   public readonly generandoConIA = input(false);
+  /** Señala cambios del borrador todavía no confirmados en esta instancia. */
   public readonly cambioInicialPendiente = input(false);
+  /** Configura las acciones visibles en el pie de la tarjeta. */
   public readonly acciones = input<ConfiguracionAccionesPasoProyecto | null>(null);
+  /** Configura la selección de versiones cuando el caso de uso la ofrece. */
   public readonly versionamiento = input<VersionamientoPasoProyecto | null>(null);
+  /** Solicita iniciar la edición del flujo. */
   public readonly editar = output<void>();
+  /** Solicita descartar los cambios locales. */
   public readonly cancelar = output<void>();
+  /** Entrega el flujo validado para finalizar el guardado del paso. */
   public readonly guardar = output<FlujoProyecto>();
+  /** Entrega el flujo para una persistencia intermedia del borrador. */
   public readonly guardarBorrador = output<FlujoProyecto>();
+  /** Solicita generar una propuesta de flujo mediante IA. */
   public readonly generarConIA = output<void>();
+  /** Comunica la versión seleccionada por el usuario. */
   public readonly versionCambiada = output<number>();
   protected readonly flujoTemporal = signal<FlujoProyecto | null>(null);
   protected readonly paso = ClaveSeccionProyecto.Flujo;

@@ -4,6 +4,7 @@ import {
   URL_CATALOGOS,
   URL_PROYECTOS,
   crearUrlInformacionProyecto,
+  crearUrlPlanificacionProyecto,
 } from '../../../core/navegacion/rutas';
 import {
   ClaveItemNavegacionPanel,
@@ -47,6 +48,14 @@ export function construirSubitemsProyecto(proyectoId: number): readonly ItemNave
       descripcion: 'Consultar la definición integral y las versiones del proyecto',
       icono: 'informacion',
       ruta: crearUrlInformacionProyecto(proyectoId),
+      coincidenciaExacta: true,
+    },
+    {
+      id: ClaveItemNavegacionPanel.PlanificacionProyecto,
+      etiqueta: 'Planificación',
+      descripcion: 'Consultar y administrar la planificación del proyecto',
+      icono: 'planificacion',
+      ruta: crearUrlPlanificacionProyecto(proyectoId),
       coincidenciaExacta: true,
     },
   ];

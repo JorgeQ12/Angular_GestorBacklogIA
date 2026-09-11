@@ -1,5 +1,5 @@
 import { ResultadoApi } from '../models/resultado-api.model';
-import { exigirDatosResultadoApi } from './resultado-api.mapper';
+import { exigirDatosResultadoApi, exigirExitoResultadoApi } from './resultado-api.mapper';
 
 describe('mapeador de ResultadoApi', () => {
   it.each([0, false, ''])('conserva un dato válido aunque sea falsy: %s', (datos) => {
@@ -23,6 +23,18 @@ describe('mapeador de ResultadoApi', () => {
   it('describe el recurso cuando el API no proporciona un detalle', () => {
     expect(() => exigirDatosResultadoApi(crearResultado(null), 'el resumen')).toThrow(
       'El backend no proporcionó el resumen.',
+    );
+  });
+
+  it('acepta una operación exitosa aunque no devuelva datos', () => {
+    expect(() => exigirExitoResultadoApi(crearResultado(null), 'la actualización')).not.toThrow();
+  });
+
+  it('rechaza una operación sin datos cuando el API informa un error funcional', () => {
+    const resultado = crearResultado(null, false, ['No fue posible actualizar']);
+
+    expect(() => exigirExitoResultadoApi(resultado, 'la actualización')).toThrow(
+      'No fue posible actualizar',
     );
   });
 });

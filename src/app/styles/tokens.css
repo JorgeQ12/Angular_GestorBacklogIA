@@ -99,6 +99,24 @@
   --color-category-orange: #c2410c;
   --color-category-magenta: #be185d;
 
+  /* Paleta de entidades Azure DevOps usada por la planificación. */
+  --azure-epic-color: #ff7b00;
+  --azure-feature-color: #773b93;
+  --azure-story-color: #009ccc;
+  --azure-task-color: #f2cb1d;
+  --azure-epic-surface: #fff3e8;
+  --azure-epic-border: #edc6a2;
+  --azure-epic-ink: #a9570c;
+  --azure-feature-surface: #f5f0f7;
+  --azure-feature-border: #d7c7dd;
+  --azure-feature-ink: #684078;
+  --azure-story-surface: #edf7fa;
+  --azure-story-border: #c0dce4;
+  --azure-story-ink: #28788f;
+  --azure-task-surface: #fff9df;
+  --azure-task-border: #e5da9f;
+  --azure-task-ink: #75651e;
+
   /* --------------------------------------------------------------------------
      4. TOKENS SEMÁNTICOS (usar ESTOS en los componentes, no la escala cruda)
      -------------------------------------------------------------------------- */

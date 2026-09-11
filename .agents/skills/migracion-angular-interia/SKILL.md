@@ -27,7 +27,8 @@ del proyecto sin extender el alcance autorizado.
    - Información de proyectos, pasos de consulta, modos de formulario o versionamiento:
      [información y versiones de proyectos](../../../docs/INFORMACION_PROYECTOS.md).
    - Portafolio, listado, filtros, paginación o acciones sobre proyectos:
-     [listado de proyectos](../../../docs/LISTADO_PROYECTOS.md).
+     [consulta de proyectos](../../../docs/CONSULTA_PROYECTOS.md) y
+     [planificación de proyectos](../../../docs/PLANIFICACION_PROYECTOS.md).
 3. Inspecciona el código origen y el destino antes de proponer la estructura. Si el usuario excluye
    servicios, integración u otra parte, conserva el punto de extensión sin implementarla.
 4. Si el cambio incluye decisiones de composición o presentación, aplica también la skill

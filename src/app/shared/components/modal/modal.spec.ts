@@ -10,6 +10,7 @@ import { Modal } from './modal';
       <app-modal
         titulo="Confirmar vinculación"
         etiqueta="Nuevo proyecto"
+        [metadatos]="['Versión 1', 'Solo lectura']"
         descripcion="Revisa los datos antes de continuar."
         icono="proyectos"
         [descartable]="descartable"
@@ -21,6 +22,9 @@ import { Modal } from './modal';
       >
         <p class="contenido-proyectado">Información de Azure</p>
         <button type="button" class="accion-contenido">Acción interna</button>
+        <a modalAcciones class="ui-button ui-button--secondary accion-adicional" href="/azure">
+          Abrir en Azure
+        </a>
       </app-modal>
     }
   `,
@@ -73,6 +77,10 @@ describe('Modal', () => {
     expect(dialogo.querySelector('.contenido-proyectado')?.textContent).toContain(
       'Información de Azure',
     );
+    expect(dialogo.querySelectorAll('.ui-modal__badge')).toHaveLength(2);
+    expect(dialogo.querySelector('.ui-modal__eyebrow')?.textContent).toContain('Solo lectura');
+    expect(dialogo.querySelector('.ui-modal__actions .accion-adicional')).not.toBeNull();
+    expect(dialogo.querySelector('.ui-modal__body .accion-adicional')).toBeNull();
     expect(document.activeElement).toBe(dialogo);
   });
 

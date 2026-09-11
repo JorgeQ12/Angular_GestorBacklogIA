@@ -20,6 +20,8 @@ específicas se mantienen en documentos separados para evitar un archivo único 
   modos de formulario y versionamiento.
 - [Integración con el backend](INTEGRACION_BACKEND.md): environments, DTO, mappers, servicios y
   errores.
+- [Planificación de proyectos](PLANIFICACION_PROYECTOS.md): backlog, requisitos, versiones, Gantt,
+  IA y publicación en Azure.
 - [Consulta de proyectos](CONSULTA_PROYECTOS.md): filtros, paginación y acciones por
   proyecto.
 

@@ -7,6 +7,7 @@ import {
 import { TipoBloqueFlujo } from '../../models/flujo-proyecto.model';
 import { EstadoEditorFlujoProyectoService } from '../../services/estado-editor-flujo-proyecto.service';
 
+/** Presenta los tipos de bloque disponibles para incorporarlos al lienzo. */
 @Component({
   selector: 'app-paleta-bloques-flujo-proyecto',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -25,4 +26,3 @@ export class PaletaBloquesFlujoProyecto {
     this.estadoEditor.iniciarCreacionNodo(tipo);
   }
 }
-

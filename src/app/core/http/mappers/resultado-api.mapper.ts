@@ -9,3 +9,12 @@ export function exigirDatosResultadoApi<T>(resultado: ResultadoApi<T>, recurso: 
 
   throw crearErrorApiDesdeResultado(resultado, `El backend no proporcionó ${recurso}.`);
 }
+
+/** Exige que una operación sin datos haya finalizado correctamente. */
+export function exigirExitoResultadoApi(resultado: ResultadoApi<unknown>, operacion: string): void {
+  if (resultado.exitoso) {
+    return;
+  }
+
+  throw crearErrorApiDesdeResultado(resultado, `El backend no pudo completar ${operacion}.`);
+}

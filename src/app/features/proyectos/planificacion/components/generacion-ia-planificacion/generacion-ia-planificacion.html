@@ -1,0 +1,42 @@
+@if (abierto()) {
+  <section
+    id='opciones-generacion-ia'
+    class='generacion-ia'
+    aria-labelledby='titulo-generacion-ia'
+  >
+    <div class='generacion-ia__panel'>
+      <div class='generacion-ia__introduccion'>
+        <span class='generacion-ia__icono' aria-hidden='true'>
+          <app-icono nombre='generarConIA' />
+        </span>
+        <span>
+          <small>Asistente de generación</small>
+          <strong id='titulo-generacion-ia'>Genera una nueva propuesta con IA</strong>
+          <p>
+            Elige un nivel. Antes de reemplazar los elementos vigentes, te pediremos confirmación.
+          </p>
+        </span>
+      </div>
+
+      <div class='generacion-ia__opciones' aria-label='Niveles disponibles para generación'>
+        @for (opcion of opciones; track opcion.nivel) {
+          <button
+            type='button'
+            class='generacion-ia__opcion'
+            [disabled]='estaDeshabilitada(opcion)'
+            (click)='generar.emit(opcion.nivel)'
+          >
+            <span class='generacion-ia__icono-nivel' aria-hidden='true'>
+              <app-icono [nombre]='opcion.icono' />
+            </span>
+            <span class='generacion-ia__texto-nivel'>
+              <strong>{{ opcion.nombre }}</strong>
+              <small>{{ obtenerResumen(opcion) }}</small>
+            </span>
+            <app-icono class='generacion-ia__continuar' nombre='continuar' />
+          </button>
+        }
+      </div>
+    </div>
+  </section>
+}

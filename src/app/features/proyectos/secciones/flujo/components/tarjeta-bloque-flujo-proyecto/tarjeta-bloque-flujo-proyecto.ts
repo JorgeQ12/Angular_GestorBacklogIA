@@ -36,6 +36,7 @@ export class TarjetaBloqueFlujoProyecto {
   private readonly mensajes = inject(MensajesService);
   protected readonly estadoEditor = inject(EstadoEditorFlujoProyectoService);
 
+  /** Bloque normalizado que debe representarse y manipularse en el lienzo. */
   public readonly bloque = input.required<NodoFlujoProyecto>();
   private seMovioDuranteArrastre = false;
   protected readonly accionesAbiertas = signal(false);
@@ -131,12 +132,13 @@ export class TarjetaBloqueFlujoProyecto {
   protected iniciarArrastreBloque(evento: PointerEvent): void {
     if (this.estadoEditor.soloLectura()) return;
 
-    const objetivo = evento.target as HTMLElement | null;
-    if (objetivo?.closest('button')) return;
+    const objetivo = evento.target;
+    if (objetivo instanceof Element && objetivo.closest('button')) return;
 
     evento.preventDefault();
     evento.stopPropagation();
-    const elemento = evento.currentTarget as HTMLElement;
+    const elemento = evento.currentTarget;
+    if (!(elemento instanceof HTMLElement)) return;
     const punteroId = evento.pointerId;
     this.estadoEditor.seleccionarBloque(this.bloque().id);
     const clienteXInicial = evento.clientX;

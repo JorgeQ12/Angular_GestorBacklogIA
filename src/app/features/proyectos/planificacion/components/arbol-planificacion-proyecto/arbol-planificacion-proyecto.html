@@ -1,0 +1,79 @@
+<section
+  class='arbol-planificacion'
+  [class.arbol-planificacion--menu-abierto]='hayMenuAccionesAbierto()'
+>
+  <header class='arbol-planificacion__proyecto'>
+    <span class='arbol-planificacion__icono-proyecto' aria-hidden='true'>
+      <app-icono nombre='proyectos' />
+    </span>
+    <span class='arbol-planificacion__identidad'>
+      <small>Proyecto</small>
+      <strong>{{ planificacion().nombre }}</strong>
+      <span>Planificación del proyecto · {{ resumenProyecto() }}</span>
+    </span>
+    @if (!planificacion().esHistorica) {
+      <button
+        type='button'
+        class='arbol-planificacion__crear-epica ui-tooltip'
+        data-tooltip='Nueva épica'
+        aria-label='Nueva épica'
+        [disabled]='accionesDeshabilitadas()'
+        (click)='crearEpica.emit()'
+      >
+        <span class='ui-create-icon' aria-hidden='true'>
+          <app-icono nombre='epica' />
+          <span><app-icono nombre='agregar' /></span>
+        </span>
+      </button>
+    }
+  </header>
+
+  <div role='tree' aria-label='Árbol de planificación del proyecto'>
+    <ng-container
+      [ngTemplateOutlet]='rama'
+      [ngTemplateOutletContext]='{ $implicit: elementos(), nivel: 1 }'
+    />
+  </div>
+</section>
+
+<ng-template #rama let-elementos let-nivel='nivel'>
+  <ul
+    class='arbol-planificacion__lista'
+    [class.arbol-planificacion__lista--raiz]='nivel === 1'
+    role='group'
+  >
+    @for (elemento of elementos; track elemento.clave) {
+      <li
+        class='arbol-planificacion__rama'
+        [class.arbol-planificacion__rama--terminal]='esRamaTerminal(elemento)'
+        [class.arbol-planificacion__rama--menu-abierto]='estaAbiertoMenuAcciones(elemento.clave)'
+        role='treeitem'
+        [attr.aria-level]='nivel'
+        [attr.aria-expanded]='elemento.hijos.length ? estaExpandido(elemento.clave) : null'
+      >
+        <app-elemento-planificacion
+          [elemento]='elemento'
+          [expandido]='estaExpandido(elemento.clave)'
+          [expansionDeshabilitada]='expansionDeshabilitada()'
+          [accionesDeshabilitadas]='accionesDeshabilitadas()'
+          [menuAccionesAbierto]='estaAbiertoMenuAcciones(elemento.clave)'
+          (alternar)='alternar(elemento.clave)'
+          (consultar)='consultarElemento.emit(elemento)'
+          (editar)='editarElemento.emit(elemento)'
+          (alternarMenuAcciones)='alternarMenuAcciones(elemento.clave)'
+          (cerrarMenuAcciones)='cerrarMenuAcciones()'
+          (crearHijo)='solicitarCreacion(elemento)'
+          (sincronizar)='sincronizarEpica.emit()'
+          (eliminar)='eliminarElemento.emit(elemento)'
+        />
+
+        @if (elemento.hijos.length && estaExpandido(elemento.clave)) {
+          <ng-container
+            [ngTemplateOutlet]='rama'
+            [ngTemplateOutletContext]='{ $implicit: elemento.hijos, nivel: nivel + 1 }'
+          />
+        }
+      </li>
+    }
+  </ul>
+</ng-template>

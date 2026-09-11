@@ -1,6 +1,7 @@
 import { Injectable, LOCALE_ID, inject } from '@angular/core';
 import { FORMATOS_FECHA, FormatoFecha } from '../config/formatos-fecha.config';
 
+/** Valores que la infraestructura compartida puede interpretar como fecha. */
 export type ValorFecha = Date | string | number | null | undefined;
 
 const PATRON_FECHA_SIN_HORA = /^(\d{4})-(\d{2})-(\d{2})$/;

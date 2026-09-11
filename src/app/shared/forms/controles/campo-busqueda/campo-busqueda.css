@@ -35,6 +35,11 @@
     box-shadow var(--transition-base) var(--ease-standard);
 }
 
+.campo-busqueda--lg input {
+  min-height: var(--control-height-lg);
+  font-size: var(--font-size-base);
+}
+
 .campo-busqueda input:hover:not(:disabled) {
   border-color: var(--field-border-hover);
   background: var(--field-surface-hover);

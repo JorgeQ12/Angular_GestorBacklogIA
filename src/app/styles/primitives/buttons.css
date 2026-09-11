@@ -151,6 +151,19 @@
   width: 100%;
 }
 
+.ui-button--sm {
+  min-height: var(--control-height-sm);
+  gap: var(--space-1);
+  padding-inline: var(--space-2);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-2xs);
+}
+
+.ui-button--sm .ui-button__icon {
+  width: var(--font-size-sm);
+  height: var(--font-size-sm);
+}
+
 .ui-button--md {
   min-height: var(--control-height-md);
   padding-inline: var(--space-3);
@@ -176,6 +189,37 @@
 
 .ui-button__icon--trailing {
   transition: transform var(--transition-slow) var(--ease-standard);
+}
+
+.ui-create-icon {
+  position: relative;
+  display: inline-grid;
+  width: var(--space-6);
+  height: var(--space-6);
+  place-items: center;
+}
+
+.ui-create-icon > app-icono {
+  width: var(--font-size-sm);
+  height: var(--font-size-sm);
+}
+
+.ui-create-icon > span {
+  position: absolute;
+  right: calc(var(--space-1) * -1);
+  bottom: calc(var(--space-1) * -1);
+  display: inline-grid;
+  width: var(--space-3);
+  height: var(--space-3);
+  border-radius: var(--radius-circle);
+  place-items: center;
+  background: var(--text-secondary);
+  color: var(--text-inverse);
+}
+
+.ui-create-icon > span app-icono {
+  width: var(--space-2);
+  height: var(--space-2);
 }
 
 .ui-button:hover:not(:disabled) .ui-button__icon--trailing {

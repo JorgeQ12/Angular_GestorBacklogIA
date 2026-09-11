@@ -24,8 +24,13 @@ const SELECTOR_ELEMENTO_ENFOCABLE = [
   '[tabindex]:not([tabindex="-1"])',
 ].join(',');
 
+/** Anchos disponibles para adaptar el diálogo a su contenido. */
 export type TamanoModal = 'sm' | 'md' | 'lg' | 'xl';
+
+/** Roles accesibles admitidos por el diálogo. */
 export type RolModal = 'dialog' | 'alertdialog';
+
+/** Intenciones visuales disponibles para la acción principal. */
 export type VarianteConfirmacionModal = 'primary' | 'danger';
 
 /** Presenta contenido de dominio dentro de un diálogo accesible y reutilizable. */
@@ -52,6 +57,9 @@ export class Modal implements AfterViewInit, OnDestroy {
 
   /** Añade un contexto breve sobre la finalidad del diálogo. */
   public readonly etiqueta = input<string | null>(null);
+
+  /** Presenta metadatos compactos junto a la etiqueta del diálogo. */
+  public readonly metadatos = input<readonly string[]>([]);
 
   /** Proporciona información complementaria asociada al título. */
   public readonly descripcion = input<string | null>(null);

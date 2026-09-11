@@ -28,18 +28,19 @@ tener un consumidor y una responsabilidad estable dentro del alcance actual.
 
 Leer completo cada documento aplicable antes de implementar:
 
-| Alcance | Documento |
-|---|---|
-| Interfaz, responsive, accesibilidad visual, iconos o CSS | `docs/ESTILOS_FRONTEND.md` |
-| Formularios, validaciones o controles | `docs/FORMULARIOS_REACTIVOS.md` |
-| Endpoints, DTO, mappers, errores o environments | `docs/INTEGRACION_BACKEND.md` |
-| Carga HTTP global o local | `docs/CARGA_GLOBAL.md` |
-| Sesion, guards, permisos o Kong | `docs/AUTENTICACION_KONG.md` |
-| Inicio del panel | `docs/INICIO_PANEL.md` |
-| Creacion y borrador de proyectos | `docs/CREACION_PROYECTOS.md` |
-| Consulta, edicion o versiones de proyectos | `docs/INFORMACION_PROYECTOS.md` |
-| Portafolio, filtros o paginacion | `docs/LISTADO_PROYECTOS.md` |
-| Asistente conversacional y propuestas | `docs/ASISTENTE_IA.md` |
+| Alcance                                                  | Documento                         |
+| -------------------------------------------------------- | --------------------------------- |
+| Interfaz, responsive, accesibilidad visual, iconos o CSS | `docs/ESTILOS_FRONTEND.md`        |
+| Formularios, validaciones o controles                    | `docs/FORMULARIOS_REACTIVOS.md`   |
+| Endpoints, DTO, mappers, errores o environments          | `docs/INTEGRACION_BACKEND.md`     |
+| Carga HTTP global o local                                | `docs/CARGA_GLOBAL.md`            |
+| Sesion, guards, permisos o Kong                          | `docs/AUTENTICACION_KONG.md`      |
+| Inicio del panel                                         | `docs/INICIO_PANEL.md`            |
+| Creacion y borrador de proyectos                         | `docs/CREACION_PROYECTOS.md`      |
+| Consulta, edicion o versiones de proyectos               | `docs/INFORMACION_PROYECTOS.md`   |
+| Portafolio, filtros o paginacion                         | `docs/CONSULTA_PROYECTOS.md`      |
+| Backlog, requisitos, versiones, Gantt, IA o Azure        | `docs/PLANIFICACION_PROYECTOS.md` |
+| Asistente conversacional y propuestas                    | `docs/ASISTENTE_IA.md`            |
 
 Si no existe un documento especifico, localizar primero el documento del dominio o de la
 infraestructura que sera propietario de la nueva decision. No asumir que la ausencia de una regla
@@ -100,7 +101,7 @@ precondiciones.
 ### Integracion HTTP y estado
 
 - Seguir el flujo `environment -> endpoint -> servicio HTTP -> ResultadoApi/DTO -> mapper -> modelo
-  de UI -> estado/pagina -> componente`.
+de UI -> estado/pagina -> componente`.
 - Tipar nulabilidad y nombres reales del contrato. Verificar el backend o Swagger; no inventar
   respuestas ni endpoints temporales.
 - Mapear explicitamente enumeraciones, fechas y formas externas. Un valor desconocido no debe

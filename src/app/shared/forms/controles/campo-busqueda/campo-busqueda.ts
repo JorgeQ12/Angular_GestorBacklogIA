@@ -30,6 +30,9 @@ export class CampoBusqueda implements ControlValueAccessor {
   /** Comunica al navegador la longitud mínima útil para el criterio. */
   public readonly longitudMinima = input<number>();
 
+  /** Ajusta la altura del buscador sin duplicar su estructura en cada feature. */
+  public readonly tamano = input<'md' | 'lg'>('md');
+
   protected readonly valor = signal('');
   protected readonly deshabilitado = signal(false);
 
@@ -58,7 +61,9 @@ export class CampoBusqueda implements ControlValueAccessor {
 
   /** Mantiene el formulario alineado con el término escrito. */
   protected actualizarValor(evento: Event): void {
-    const valor = (evento.target as HTMLInputElement).value;
+    if (!(evento.target instanceof HTMLInputElement)) return;
+
+    const valor = evento.target.value;
     this.valor.set(valor);
     this.notificarCambio(valor);
   }

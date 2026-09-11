@@ -10,6 +10,7 @@ export const SEGMENTOS_RUTA = {
   inicio: 'inicio',
   informacion: 'informacion',
   panel: 'panel',
+  planificacion: 'planificacion',
   proyectos: 'proyectos',
 } as const;
 
@@ -85,4 +86,10 @@ export function crearUrlCreacionProyecto(proyectoId: number | string): string {
 /** Construye la URL canónica de información de un proyecto publicado. */
 export function crearUrlInformacionProyecto(proyectoId: number | string): string {
   return `${URL_PROYECTOS}/${encodeURIComponent(String(proyectoId))}/${SEGMENTOS_RUTA.informacion}`;
+}
+
+/** Construye la URL de planificación de un proyecto. */
+export function crearUrlPlanificacionProyecto(proyectoId: number | string): string {
+  const idCodificado = encodeURIComponent(String(proyectoId));
+  return `${URL_PROYECTOS}/${idCodificado}/${SEGMENTOS_RUTA.planificacion}`;
 }

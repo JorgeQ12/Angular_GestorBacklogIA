@@ -19,6 +19,10 @@ describe('BarraLateralPanel', () => {
             path: 'panel/proyectos/:proyectoId/informacion',
             component: PaginaInformacionPrueba,
           },
+          {
+            path: 'panel/proyectos/:proyectoId/planificacion',
+            component: PaginaPlanificacionPrueba,
+          },
         ]),
       ],
     }).compileComponents();
@@ -30,12 +34,14 @@ describe('BarraLateralPanel', () => {
 
   it('presenta los subitems recibidos debajo de su opción principal', () => {
     const elemento = fixture.nativeElement as HTMLElement;
-    const subitem = elemento.querySelector<HTMLAnchorElement>('.navegacion-panel__subenlace');
+    const subitems = elemento.querySelectorAll<HTMLAnchorElement>('.navegacion-panel__subenlace');
 
     expect(elemento.textContent).toContain('Proyectos');
-    expect(subitem?.textContent).toContain('Información');
-    expect(subitem?.getAttribute('href')).toBe('/panel/proyectos/42/informacion');
-    expect(subitem?.closest('.navegacion-panel__subnavegacion')).not.toBeNull();
+    expect(subitems[0]?.textContent).toContain('Información');
+    expect(subitems[0]?.getAttribute('href')).toBe('/panel/proyectos/42/informacion');
+    expect(subitems[1]?.textContent).toContain('Planificación');
+    expect(subitems[1]?.getAttribute('href')).toBe('/panel/proyectos/42/planificacion');
+    expect(subitems[1]?.closest('.navegacion-panel__subnavegacion')).not.toBeNull();
   });
 
   it('mantiene activo el subitem al navegar entre pasos por parámetros de consulta', async () => {
@@ -57,6 +63,9 @@ describe('BarraLateralPanel', () => {
 @Component({ template: '' })
 class PaginaInformacionPrueba {}
 
+@Component({ template: '' })
+class PaginaPlanificacionPrueba {}
+
 const ITEMS: readonly ItemNavegacionPanel[] = [
   {
     id: ClaveItemNavegacionPanel.Proyectos,
@@ -71,6 +80,14 @@ const ITEMS: readonly ItemNavegacionPanel[] = [
         descripcion: 'Consultar información',
         icono: 'informacion',
         ruta: '/panel/proyectos/42/informacion',
+        coincidenciaExacta: true,
+      },
+      {
+        id: ClaveItemNavegacionPanel.PlanificacionProyecto,
+        etiqueta: 'Planificación',
+        descripcion: 'Consultar planificación',
+        icono: 'planificacion',
+        ruta: '/panel/proyectos/42/planificacion',
         coincidenciaExacta: true,
       },
     ],

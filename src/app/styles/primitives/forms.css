@@ -231,13 +231,14 @@
 
 .ui-control[readonly] {
   border-color: var(--field-border);
-  background: var(--surface-default);
+  background: var(--field-surface-disabled);
+  color: var(--text-secondary);
   cursor: default;
 }
 
 .ui-control[readonly]:hover {
   border-color: var(--field-border);
-  background: var(--surface-default);
+  background: var(--field-surface-disabled);
 }
 
 .ui-control-icon {

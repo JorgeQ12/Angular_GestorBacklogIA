@@ -54,7 +54,7 @@ enum PrefijoIdentificadorFlujo {
 const VISTA_PREDETERMINADA: VistaLienzoFlujo = {
   desplazamientoX: 0,
   desplazamientoY: 0,
-  escala: 1
+  escala: 1,
 };
 
 /** Administra el estado local y las operaciones del editor visual del flujo. */
@@ -79,8 +79,8 @@ export class EstadoEditorFlujoProyectoService {
     TIPOS_BLOQUE_FLUJO_DISPONIBLES.map((tipo) => ({
       tipo,
       etiqueta: ETIQUETAS_TIPO_BLOQUE_FLUJO[tipo],
-      descripcion: DESCRIPCIONES_TIPO_BLOQUE_FLUJO[tipo]
-    }))
+      descripcion: DESCRIPCIONES_TIPO_BLOQUE_FLUJO[tipo],
+    })),
   );
   public readonly flujo = computed(() => this.flujoSenal());
   public readonly roles = computed(() => this.flujoSenal().roles);
@@ -109,7 +109,8 @@ export class EstadoEditorFlujoProyectoService {
     const idsBloquesVisibles = new Set(this.bloquesVisibles().map((bloque) => bloque.id));
     return this.flujoSenal().conexiones.filter(
       (conexion) =>
-        idsBloquesVisibles.has(conexion.idBloqueOrigen) && idsBloquesVisibles.has(conexion.idBloqueDestino)
+        idsBloquesVisibles.has(conexion.idBloqueOrigen) &&
+        idsBloquesVisibles.has(conexion.idBloqueDestino),
     );
   });
   public readonly soloLectura = computed(() => this.soloLecturaSenal());
@@ -140,14 +141,13 @@ export class EstadoEditorFlujoProyectoService {
     const ladoEnfocado = this.ladoDestinoConexionEnfocadoSenal();
     const puntero = this.punteroConexionSenal();
     const ladoDestino = nodoDestino
-      ? ladoEnfocado ??
+      ? (ladoEnfocado ??
         (puntero
           ? resolverLadoDestinoMasCercano(nodoDestino, puntero)
-          : LadoConexionFlujo.Izquierda)
+          : LadoConexionFlujo.Izquierda))
       : null;
-    const puntoDestino = nodoDestino && ladoDestino
-      ? obtenerPuntoAnclajeBloque(nodoDestino, ladoDestino)
-      : puntero;
+    const puntoDestino =
+      nodoDestino && ladoDestino ? obtenerPuntoAnclajeBloque(nodoDestino, ladoDestino) : puntero;
 
     if (!puntoDestino) {
       return null;
@@ -162,16 +162,18 @@ export class EstadoEditorFlujoProyectoService {
         puntoOrigen,
         puntoDestino,
         ladoDestino ?? LadoConexionFlujo.Izquierda,
-      )
+      ),
     };
   });
 
+  /** Reemplaza la fotografía del editor y normaliza sus identidades internas. */
   public hidratar(flujo: FlujoProyecto, proyectoId?: string, opciones?: OpcionesHidratacion): void {
     const flujoSiguiente = this.normalizarFlujo(flujo, proyectoId);
 
     this.establecerEstadoFlujo(flujoSiguiente, opciones);
   }
 
+  /** Aplica el modo consultivo y cierra interacciones incompatibles. */
   public establecerSoloLectura(soloLectura: boolean): void {
     this.soloLecturaSenal.set(soloLectura);
 
@@ -183,6 +185,7 @@ export class EstadoEditorFlujoProyectoService {
     }
   }
 
+  /** Abre un borrador nuevo del tipo seleccionado. */
   public iniciarCreacionNodo(tipo: TipoBloqueFlujo): void {
     if (this.soloLecturaSenal()) {
       return;
@@ -193,10 +196,11 @@ export class EstadoEditorFlujoProyectoService {
       modo: ModoEditorNodoFlujo.Crear,
       tipo,
       idNodo: null,
-      posicionSugerida: this.obtenerSiguientePosicionSugerida()
+      posicionSugerida: this.obtenerSiguientePosicionSugerida(),
     });
   }
 
+  /** Abre el bloque identificado para edición o consulta. */
   public abrirEditorNodo(idBloque: string): void {
     const bloque = this.flujoSenal().nodos.find((nodo) => nodo.id === idBloque);
 
@@ -210,14 +214,16 @@ export class EstadoEditorFlujoProyectoService {
       modo: ModoEditorNodoFlujo.Editar,
       tipo: bloque.tipo,
       idNodo: bloque.id,
-      posicionSugerida: bloque.posicion
+      posicionSugerida: bloque.posicion,
     });
   }
 
+  /** Descarta el borrador de nodo abierto. */
   public cancelarBorradorNodo(): void {
     this.estadoEditorNodoSenal.set(null);
   }
 
+  /** Incorpora los datos normalizados del borrador a la fotografía local. */
   public confirmarBorradorNodo(borrador: BorradorNodoFlujo): void {
     if (this.soloLecturaSenal()) {
       return;
@@ -247,13 +253,13 @@ export class EstadoEditorFlujoProyectoService {
         idsRoles,
         fechaCreacion: ahora,
         fechaActualizacion: ahora,
-        datos: borrador.datos as NodoFlujoProyecto['datos']
+        datos: borrador.datos as NodoFlujoProyecto['datos'],
       } as NodoFlujoProyecto;
 
       this.actualizarFlujo((flujo) => ({
         ...flujo,
         roles,
-        nodos: [...flujo.nodos, nodo]
+        nodos: [...flujo.nodos, nodo],
       }));
 
       this.seleccionarBloque(nodo.id);
@@ -273,16 +279,17 @@ export class EstadoEditorFlujoProyectoService {
               criteriosAceptacion: this.normalizarCriteriosAceptacion(borrador.criteriosAceptacion),
               idsRoles,
               datos: borrador.datos,
-              fechaActualizacion: new Date().toISOString()
+              fechaActualizacion: new Date().toISOString(),
             } as NodoFlujoProyecto)
-          : nodo
-      ) as NodoFlujoProyecto[]
+          : nodo,
+      ) as NodoFlujoProyecto[],
     }));
 
     this.seleccionarBloque(estadoEditor.idNodo);
     this.estadoEditorNodoSenal.set(null);
   }
 
+  /** Mueve un bloque sin permitir que abandone los límites del lienzo. */
   public moverBloque(idBloque: string, posicion: { x: number; y: number }): void {
     this.actualizarFlujo((flujo) => ({
       ...flujo,
@@ -292,22 +299,23 @@ export class EstadoEditorFlujoProyectoService {
               ...bloque,
               posicion: {
                 x: this.limitar(posicion.x, 0, this.tamanoLienzo.ancho - this.tamanoBloque.ancho),
-                y: this.limitar(posicion.y, 0, this.tamanoLienzo.alto - this.tamanoBloque.alto)
+                y: this.limitar(posicion.y, 0, this.tamanoLienzo.alto - this.tamanoBloque.alto),
               },
-              fechaActualizacion: new Date().toISOString()
+              fechaActualizacion: new Date().toISOString(),
             }
-          : bloque
-      )
+          : bloque,
+      ),
     }));
   }
 
+  /** Elimina un bloque junto con sus conexiones dependientes. */
   public eliminarBloque(idBloque: string): void {
     this.actualizarFlujo((flujo) => ({
       ...flujo,
       nodos: flujo.nodos.filter((bloque) => bloque.id !== idBloque),
       conexiones: flujo.conexiones.filter(
-        (conexion) => conexion.idBloqueOrigen !== idBloque && conexion.idBloqueDestino !== idBloque
-      )
+        (conexion) => conexion.idBloqueOrigen !== idBloque && conexion.idBloqueDestino !== idBloque,
+      ),
     }));
 
     if (this.idBloqueSeleccionadoSenal() === idBloque) {
@@ -319,7 +327,13 @@ export class EstadoEditorFlujoProyectoService {
     }
   }
 
-  public conectarBloques(idBloqueOrigen: string, idBloqueDestino: string, etiqueta?: string, ladoDestino?: LadoConexionFlujo): void {
+  /** Crea una conexión válida y evita duplicados o ramas repetidas. */
+  public conectarBloques(
+    idBloqueOrigen: string,
+    idBloqueDestino: string,
+    etiqueta?: string,
+    ladoDestino?: LadoConexionFlujo,
+  ): void {
     if (idBloqueOrigen === idBloqueDestino) {
       return;
     }
@@ -327,7 +341,7 @@ export class EstadoEditorFlujoProyectoService {
     const etiquetaNormalizada = etiqueta?.trim() || '';
     const yaExiste = this.flujoSenal().conexiones.some(
       (conexion) =>
-        conexion.idBloqueOrigen === idBloqueOrigen && conexion.idBloqueDestino === idBloqueDestino
+        conexion.idBloqueOrigen === idBloqueOrigen && conexion.idBloqueDestino === idBloqueDestino,
     );
 
     if (yaExiste) {
@@ -336,10 +350,12 @@ export class EstadoEditorFlujoProyectoService {
     }
 
     const nodoOrigen = this.flujoSenal().nodos.find((nodo) => nodo.id === idBloqueOrigen);
-    const ramaDecisionDuplicada = nodoOrigen?.tipo === TipoBloqueFlujo.Decision
-      && esEtiquetaRamaDecision(etiquetaNormalizada)
-      && this.flujoSenal().conexiones.some(
-        (conexion) => conexion.idBloqueOrigen === idBloqueOrigen && conexion.etiqueta === etiquetaNormalizada
+    const ramaDecisionDuplicada =
+      nodoOrigen?.tipo === TipoBloqueFlujo.Decision &&
+      esEtiquetaRamaDecision(etiquetaNormalizada) &&
+      this.flujoSenal().conexiones.some(
+        (conexion) =>
+          conexion.idBloqueOrigen === idBloqueOrigen && conexion.etiqueta === etiquetaNormalizada,
       );
 
     if (ramaDecisionDuplicada) {
@@ -353,12 +369,12 @@ export class EstadoEditorFlujoProyectoService {
       idBloqueDestino,
       etiqueta: etiquetaNormalizada,
       ladoDestino,
-      fechaCreacion: new Date().toISOString()
+      fechaCreacion: new Date().toISOString(),
     };
 
     this.actualizarFlujo((flujo) => ({
       ...flujo,
-      conexiones: [...flujo.conexiones, conexion]
+      conexiones: [...flujo.conexiones, conexion],
     }));
 
     this.idOrigenConexionSenal.set(null);
@@ -368,10 +384,11 @@ export class EstadoEditorFlujoProyectoService {
     this.seleccionarConexion(conexion.id);
   }
 
+  /** Retira una conexión de la fotografía local. */
   public eliminarConexion(idConexion: string): void {
     this.actualizarFlujo((flujo) => ({
       ...flujo,
-      conexiones: flujo.conexiones.filter((conexion) => conexion.id !== idConexion)
+      conexiones: flujo.conexiones.filter((conexion) => conexion.id !== idConexion),
     }));
 
     if (this.idConexionSeleccionadaSenal() === idConexion) {
@@ -379,25 +396,29 @@ export class EstadoEditorFlujoProyectoService {
     }
   }
 
+  /** Devuelve zoom y desplazamiento a sus valores iniciales. */
   public restablecerVista(): void {
     this.vistaSenal.set(VISTA_PREDETERMINADA);
   }
 
+  /** Ajusta el zoom dentro del intervalo permitido. */
   public ajustarEscala(delta: number): void {
     this.vistaSenal.update((vista) => ({
       ...vista,
-      escala: this.limitar(Number((vista.escala + delta).toFixed(2)), 0.2, 1.8)
+      escala: this.limitar(Number((vista.escala + delta).toFixed(2)), 0.2, 1.8),
     }));
   }
 
+  /** Traslada el lienzo por la distancia indicada. */
   public desplazarVista(deltaX: number, deltaY: number): void {
     this.vistaSenal.update((vista) => ({
       ...vista,
       desplazamientoX: vista.desplazamientoX + deltaX,
-      desplazamientoY: vista.desplazamientoY + deltaY
+      desplazamientoY: vista.desplazamientoY + deltaY,
     }));
   }
 
+  /** Inicia la previsualización de una conexión desde un bloque. */
   public iniciarArrastreConexion(idBloque: string, etiqueta?: EtiquetaRamaDecision): void {
     if (this.soloLecturaSenal()) {
       return;
@@ -411,6 +432,7 @@ export class EstadoEditorFlujoProyectoService {
     this.seleccionarBloque(idBloque);
   }
 
+  /** Actualiza el extremo libre de la conexión en curso. */
   public actualizarPunteroConexion(punto: PuntoPrevisualizacionConexion): void {
     if (!this.idOrigenConexionSenal()) {
       return;
@@ -419,6 +441,7 @@ export class EstadoEditorFlujoProyectoService {
     this.punteroConexionSenal.set(punto);
   }
 
+  /** Selecciona el destino potencial y calcula su lado de entrada. */
   public establecerDestinoConexionEnfocado(idBloque: string | null): void {
     const idOrigen = this.idOrigenConexionSenal();
     const puntero = this.punteroConexionSenal();
@@ -435,10 +458,11 @@ export class EstadoEditorFlujoProyectoService {
     this.ladoDestinoConexionEnfocadoSenal.set(
       nodoDestino && puntero
         ? resolverLadoDestinoMasCercano(nodoDestino, puntero)
-        : LadoConexionFlujo.Izquierda
+        : LadoConexionFlujo.Izquierda,
     );
   }
 
+  /** Confirma la conexión previsualizada cuando existe un destino válido. */
   public completarArrastreConexion(): void {
     const idOrigen = this.idOrigenConexionSenal();
     const idDestino = this.idDestinoConexionEnfocadoSenal();
@@ -452,10 +476,11 @@ export class EstadoEditorFlujoProyectoService {
       idOrigen,
       idDestino,
       this.etiquetaOrigenConexionSenal() ?? undefined,
-      this.ladoDestinoConexionEnfocadoSenal() ?? undefined
+      this.ladoDestinoConexionEnfocadoSenal() ?? undefined,
     );
   }
 
+  /** Limpia todo el estado transitorio de conexión. */
   public cancelarConexion(): void {
     this.idOrigenConexionSenal.set(null);
     this.etiquetaOrigenConexionSenal.set(null);
@@ -464,6 +489,7 @@ export class EstadoEditorFlujoProyectoService {
     this.ladoDestinoConexionEnfocadoSenal.set(null);
   }
 
+  /** Presenta la paleta cuando el editor admite cambios. */
   public abrirPaletaBloques(): void {
     if (this.soloLecturaSenal()) {
       return;
@@ -472,42 +498,51 @@ export class EstadoEditorFlujoProyectoService {
     this.paletaBloquesAbiertaSenal.set(true);
   }
 
+  /** Oculta la paleta de bloques. */
   public cerrarPaletaBloques(): void {
     this.paletaBloquesAbiertaSenal.set(false);
   }
 
+  /** Selecciona un bloque y limpia la selección de conexión. */
   public seleccionarBloque(idBloque: string | null): void {
     this.idBloqueSeleccionadoSenal.set(idBloque);
     this.idConexionSeleccionadaSenal.set(null);
   }
 
+  /** Selecciona una conexión y limpia la selección de bloque. */
   public seleccionarConexion(idConexion: string | null): void {
     this.idConexionSeleccionadaSenal.set(idConexion);
     this.idBloqueSeleccionadoSenal.set(null);
   }
 
+  /** Retira cualquier selección vigente del lienzo. */
   public limpiarSeleccion(): void {
     this.idBloqueSeleccionadoSenal.set(null);
     this.idConexionSeleccionadaSenal.set(null);
   }
 
+  /** Resuelve el nombre visible de un rol del flujo. */
   public obtenerNombreRol(idRol: string): string {
     return this.flujoSenal().roles.find((rol) => rol.id === idRol)?.nombre ?? 'Rol sin nombre';
   }
 
+  /** Indica si un bloque puede actuar como destino durante el arrastre. */
   public esDestinoConexion(idBloque: string): boolean {
     const idOrigen = this.idOrigenConexionSenal();
     return Boolean(idOrigen && idOrigen !== idBloque);
   }
 
+  /** Indica si un bloque es el destino actualmente enfocado. */
   public esDestinoConexionEnfocado(idBloque: string): boolean {
     return this.idDestinoConexionEnfocadoSenal() === idBloque;
   }
 
+  /** Traduce una colección de identidades de rol a nombres visibles. */
   public obtenerNombresRoles(idsRoles: string[]): string[] {
     return idsRoles.map((idRol) => this.obtenerNombreRol(idRol));
   }
 
+  /** Construye una copia editable a partir de un nodo confirmado. */
   public obtenerBorradorDesdeNodo(nodo: NodoFlujoProyecto): BorradorNodoFlujo {
     return {
       tipo: nodo.tipo,
@@ -515,10 +550,11 @@ export class EstadoEditorFlujoProyectoService {
       descripcion: nodo.descripcion,
       criteriosAceptacion: [...nodo.criteriosAceptacion],
       nombresRoles: this.obtenerNombresRoles(nodo.idsRoles),
-      datos: structuredClone(nodo.datos)
+      datos: structuredClone(nodo.datos),
     } as BorradorNodoFlujo;
   }
 
+  /** Construye el borrador inicial correspondiente a un tipo de bloque. */
   public obtenerBorradorPredeterminado(tipo: TipoBloqueFlujo): BorradorNodoFlujo {
     return {
       tipo,
@@ -526,7 +562,7 @@ export class EstadoEditorFlujoProyectoService {
       descripcion: '',
       criteriosAceptacion: [],
       nombresRoles: [],
-      datos: crearDatosNodoPredeterminados(tipo)
+      datos: crearDatosNodoPredeterminados(tipo),
     } as BorradorNodoFlujo;
   }
 
@@ -538,16 +574,13 @@ export class EstadoEditorFlujoProyectoService {
     const flujoSiguiente = proyectar(this.flujoSenal());
     const flujoFechado: FlujoProyecto = {
       ...flujoSiguiente,
-      fechaActualizacion: new Date().toISOString()
+      fechaActualizacion: new Date().toISOString(),
     };
 
     this.flujoSenal.set(flujoFechado);
   }
 
-  private establecerEstadoFlujo(
-    flujo: FlujoProyecto,
-    opciones?: OpcionesHidratacion,
-  ): void {
+  private establecerEstadoFlujo(flujo: FlujoProyecto, opciones?: OpcionesHidratacion): void {
     const conservarVista = opciones?.conservarVista ?? false;
     const conservarSeleccion = opciones?.conservarSeleccion ?? false;
     const idBloqueSeleccionado = conservarSeleccion ? this.idBloqueSeleccionadoSenal() : null;
@@ -560,12 +593,13 @@ export class EstadoEditorFlujoProyectoService {
     this.idBloqueSeleccionadoSenal.set(
       idBloqueSeleccionado && flujo.nodos.some((nodo) => nodo.id === idBloqueSeleccionado)
         ? idBloqueSeleccionado
-        : null
+        : null,
     );
     this.idConexionSeleccionadaSenal.set(
-      idConexionSeleccionada && flujo.conexiones.some((conexion) => conexion.id === idConexionSeleccionada)
+      idConexionSeleccionada &&
+        flujo.conexiones.some((conexion) => conexion.id === idConexionSeleccionada)
         ? idConexionSeleccionada
-        : null
+        : null,
     );
     this.idOrigenConexionSenal.set(null);
     this.etiquetaOrigenConexionSenal.set(null);
@@ -582,7 +616,7 @@ export class EstadoEditorFlujoProyectoService {
       roles: [],
       nodos: [],
       conexiones: [],
-      fechaActualizacion: new Date().toISOString()
+      fechaActualizacion: new Date().toISOString(),
     };
   }
 
@@ -603,7 +637,10 @@ export class EstadoEditorFlujoProyectoService {
     };
   }
 
-  private obtenerPuntoConectorSalida(idBloque: string, etiqueta?: string | null): PuntoPrevisualizacionConexion | null {
+  private obtenerPuntoConectorSalida(
+    idBloque: string,
+    etiqueta?: string | null,
+  ): PuntoPrevisualizacionConexion | null {
     const bloque = this.flujoSenal().nodos.find((nodo) => nodo.id === idBloque);
 
     if (!bloque) {
@@ -615,9 +652,7 @@ export class EstadoEditorFlujoProyectoService {
 
   private obtenerSiguientePosicionSugerida(): { x: number; y: number } {
     const nodos = this.flujoSenal().nodos;
-    const bloqueAncla =
-      this.bloqueSeleccionado() ??
-      nodos[nodos.length - 1];
+    const bloqueAncla = this.bloqueSeleccionado() ?? nodos[nodos.length - 1];
 
     if (bloqueAncla) {
       const separacionHorizontal = 296;
@@ -629,7 +664,7 @@ export class EstadoEditorFlujoProyectoService {
         xSiguiente = Math.max(40, bloqueAncla.posicion.x - separacionHorizontal);
         ySiguiente = Math.min(
           this.tamanoLienzo.alto - this.tamanoBloque.alto - 40,
-          bloqueAncla.posicion.y + separacionVertical
+          bloqueAncla.posicion.y + separacionVertical,
         );
       }
 
@@ -643,25 +678,29 @@ export class EstadoEditorFlujoProyectoService {
     const anclaY = 96;
     const x = Math.max(
       0,
-      (anclaX - vista.desplazamientoX + anchoVisible * 0.5) / vista.escala - this.tamanoBloque.ancho / 2
+      (anclaX - vista.desplazamientoX + anchoVisible * 0.5) / vista.escala -
+        this.tamanoBloque.ancho / 2,
     );
     const y = Math.max(
       0,
-      (anclaY - vista.desplazamientoY + altoVisible * 0.4) / vista.escala - this.tamanoBloque.alto / 2
+      (anclaY - vista.desplazamientoY + altoVisible * 0.4) / vista.escala -
+        this.tamanoBloque.alto / 2,
     );
 
     return { x, y };
   }
 
   private resolverRoles(nombresRoles: string[]): { idsRoles: string[]; roles: RolFlujoProyecto[] } {
-    const nombresRolesUnicos = [...new Set(nombresRoles.map((nombre) => nombre.trim()).filter(Boolean))];
+    const nombresRolesUnicos = [
+      ...new Set(nombresRoles.map((nombre) => nombre.trim()).filter(Boolean)),
+    ];
     const flujo = this.flujoSenal();
     const rolesConocidos = [...flujo.roles];
     const idsRolesResueltos: string[] = [];
 
     for (const nombreRol of nombresRolesUnicos) {
       const rolExistente = rolesConocidos.find(
-        (rol) => rol.nombre.toLowerCase() === nombreRol.toLowerCase()
+        (rol) => rol.nombre.toLowerCase() === nombreRol.toLowerCase(),
       );
 
       if (rolExistente) {
@@ -672,7 +711,7 @@ export class EstadoEditorFlujoProyectoService {
       const rolNuevo: RolFlujoProyecto = {
         id: this.crearId(PrefijoIdentificadorFlujo.Rol),
         nombre: nombreRol,
-        fechaCreacion: new Date().toISOString()
+        fechaCreacion: new Date().toISOString(),
       };
 
       rolesConocidos.push(rolNuevo);
@@ -681,7 +720,7 @@ export class EstadoEditorFlujoProyectoService {
 
     return {
       idsRoles: idsRolesResueltos,
-      roles: rolesConocidos
+      roles: rolesConocidos,
     };
   }
 
@@ -691,9 +730,7 @@ export class EstadoEditorFlujoProyectoService {
 
   private normalizarCriteriosAceptacion(valor: string[] | string | null | undefined): string[] {
     if (Array.isArray(valor)) {
-      return valor
-        .map((criterio) => String(criterio ?? '').trim())
-        .filter(Boolean);
+      return valor.map((criterio) => String(criterio ?? '').trim()).filter(Boolean);
     }
 
     return String(valor ?? '')
@@ -706,5 +743,3 @@ export class EstadoEditorFlujoProyectoService {
     return Math.min(maximo, Math.max(minimo, valor));
   }
 }
-
-

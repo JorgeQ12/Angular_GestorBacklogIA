@@ -5,6 +5,7 @@
   [id]="id() + '-control'"
   class="selector-campo__trigger"
   [class.selector-campo__trigger--compacto]="compacto()"
+  [class.selector-campo__trigger--gantt]="aparienciaGantt()"
   type="button"
   role="combobox"
   aria-haspopup="listbox"
@@ -18,8 +19,13 @@
   (click)="alternar()"
   (keydown)="manejarTeclaTrigger($event)"
 >
-  <span [class.selector-campo__placeholder]="!opcionSeleccionada()">
-    {{ opcionSeleccionada()?.etiqueta ?? placeholder() }}
+  <span class="selector-campo__copia" [class.selector-campo__copia--contexto]="contexto()">
+    @if (contexto(); as textoContexto) {
+      <small class="selector-campo__contexto">{{ textoContexto }}</small>
+    }
+    <span class="selector-campo__valor" [class.selector-campo__placeholder]="!opcionSeleccionada()">
+      {{ opcionSeleccionada()?.etiqueta ?? placeholder() }}
+    </span>
   </span>
   @if (!soloLectura()) {
     <app-icono class="selector-campo__icono" nombre="desplegar" />
@@ -44,6 +50,7 @@
     [id]="id() + '-lista'"
     class="selector-campo__lista"
     [class.selector-campo__lista--compacta]="compacto()"
+    [class.selector-campo__lista--gantt]="aparienciaGantt()"
     role="listbox"
     [attr.aria-labelledby]="etiquetadoPor()"
     (keydown)="manejarTeclaLista($event)"
@@ -52,6 +59,7 @@
       <button
         #opcionElemento
         class="selector-campo__opcion"
+        [class.selector-campo__opcion--gantt]="aparienciaGantt()"
         type="button"
         role="option"
         [class.selector-campo__opcion--activa]="indice === indiceActivo()"

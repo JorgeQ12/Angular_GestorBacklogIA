@@ -91,9 +91,10 @@ export class LienzoFlujoProyecto {
   }
 
   protected seleccionarSuperficie(evento: MouseEvent): void {
-    const objetivo = evento.target as HTMLElement | null;
+    const objetivo = evento.target;
     if (
-      objetivo?.closest(
+      objetivo instanceof Element &&
+      objetivo.closest(
         '[data-tarjeta-flujo], [data-interaccion-conexion="true"], button, input, textarea, label',
       )
     ) {
@@ -107,9 +108,10 @@ export class LienzoFlujoProyecto {
   protected iniciarDesplazamiento(evento: PointerEvent): void {
     if (this.estadoEditor.arrastrandoConexion()) return;
 
-    const objetivo = evento.target as HTMLElement | null;
+    const objetivo = evento.target;
     if (
-      objetivo?.closest(
+      objetivo instanceof Element &&
+      objetivo.closest(
         '[data-tarjeta-flujo], [data-interaccion-conexion="true"], button, input, textarea, label',
       )
     ) {

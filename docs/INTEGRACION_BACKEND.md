@@ -62,7 +62,8 @@ Cada servicio conserva el contrato explícito de sus operaciones.
 Los valores administrados por el backend no se replican como listas estáticas en las features.
 
 - `core/catalogos` centraliza endpoint, DTO, mapper y servicio de consulta.
-- La feature solicita el tipo mediante su nombre estable cuando el backend lo permite.
+- La feature solicita el tipo mediante `CatalogoTipoCodigo`; los códigos técnicos compartidos se
+  centralizan en `core/catalogos` y no se duplican entre features.
 - El control trabaja con el ID del valor y usa el nombre únicamente para presentación.
 - Los valores inactivos no se ofrecen en formularios nuevos.
 - No se queman IDs de tipos o valores provenientes de semillas de base de datos.

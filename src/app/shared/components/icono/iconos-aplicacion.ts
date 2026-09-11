@@ -1,7 +1,9 @@
 import {
   LucideArrowLeft,
   LucideAppWindow,
+  LucideAsterisk,
   LucideCalendarDays,
+  LucideChartGantt,
   LucideChartColumn,
   LucideCheck,
   LucideChevronDown,
@@ -9,12 +11,15 @@ import {
   LucideCircleCheck,
   LucideCircleX,
   LucideClipboardCheck,
+  LucideCrown,
   LucideEye,
   LucideEyeOff,
+  LucideExternalLink,
   LucideFileText,
   LucideFilePenLine,
   LucideFolderKanban,
   LucideHouse,
+  LucideHistory,
   LucideInfo,
   LucideLayoutDashboard,
   LucideLightbulb,
@@ -39,6 +44,7 @@ import {
   LucideScanText,
   LucideServerCog,
   LucideSmartphone,
+  LucideSlidersHorizontal,
   LucideSparkles,
   LucideTrendingUp,
   LucideTriangleAlert,
@@ -68,8 +74,50 @@ const ICONO_AZURE_DEVOPS = {
   ],
 } as const satisfies LucideIconData;
 
+/** Conserva la representación del catálogo de requisitos usada por el producto. */
+const ICONO_CATALOGO = {
+  name: 'Catalogo',
+  node: [
+    ['path', { d: 'M5 5h14v5H5zM5 14h14v5H5z' }],
+    ['path', { d: 'M8 7.5h.01M8 16.5h.01M12 7.5h5M12 16.5h5' }],
+  ],
+} as const satisfies LucideIconData;
+
+/** Conserva la representación de Característica usada por Azure DevOps. */
+const ICONO_CARACTERISTICA_AZURE = {
+  name: 'CaracteristicaAzure',
+  node: [
+    [
+      'path',
+      {
+        d: 'M8 4h8v4c0 3-1.8 5-4 5s-4-2-4-5V4Z',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M8 6H5v1c0 2 1.3 3.5 3.2 3.8M16 6h3v1c0 2-1.3 3.5-3.2 3.8M12 13v4M9 17h6M9 20h6',
+      },
+    ],
+  ],
+} as const satisfies LucideIconData;
+
+/** Representa la contracción de una rama sin acoplar el árbol a los cheurones del Gantt. */
+const ICONO_CONTRAER_RAMA = {
+  name: 'ContraerRama',
+  node: [
+    [
+      'path',
+      {
+        d: 'M5 12h14',
+      },
+    ],
+  ],
+} as const satisfies LucideIconData;
+
 /** Catálogo semántico inicial de iconos compartidos por la aplicación. */
 export const ICONOS_APLICACION = {
+  abrirExterno: LucideExternalLink.icon,
   catalogos: LucideListChecks.icon,
   agregar: LucidePlus.icon,
   asistenteIA: LucideSparkles.icon,
@@ -77,15 +125,18 @@ export const ICONOS_APLICACION = {
   aplicacionMovil: LucideSmartphone.icon,
   aplicacionWeb: LucideAppWindow.icon,
   alerta: LucideTriangleAlert.icon,
+  actividadRequisito: LucideListChecks.icon,
   azureDevOps: ICONO_AZURE_DEVOPS,
   backlog: LucideListTodo.icon,
   bloqueado: LucideLockKeyhole.icon,
   borrador: LucideFilePenLine.icon,
   calendario: LucideCalendarDays.icon,
+  catalogo: ICONO_CATALOGO,
   cerrar: LucideX.icon,
   cerrarSesion: LucideLogOut.icon,
   colapsarPanel: LucidePanelLeftClose.icon,
   completado: LucideCircleCheck.icon,
+  caracteristica: ICONO_CARACTERISTICA_AZURE,
   confirmar: LucideCheck.icon,
   contextoProyecto: LucideFileText.icon,
   continuar: LucideChevronRight.icon,
@@ -94,28 +145,41 @@ export const ICONOS_APLICACION = {
   enviar: LucideSend.icon,
   error: LucideCircleX.icon,
   editar: LucidePencilLine.icon,
+  epica: LucideCrown.icon,
+  expandirElemento: LucideChevronRight.icon,
+  expandirRama: LucidePlus.icon,
+  contraerRama: ICONO_CONTRAER_RAMA,
   expandirPanel: LucidePanelLeftOpen.icon,
   inicio: LucideHouse.icon,
   informacion: LucideInfo.icon,
+  historiaUsuario: LucideFileText.icon,
+  historial: LucideHistory.icon,
   enlace: LucideLink.icon,
   necesidadNegocio: LucideLightbulb.icon,
   mostrar: LucideEye.icon,
   masOpciones: LucideEllipsis.icon,
   ocultar: LucideEyeOff.icon,
+  listaRequisitos: LucideAsterisk.icon,
   objetivos: LucideListChecks.icon,
   panel: LucideLayoutDashboard.icon,
+  planificacion: LucideListTodo.icon,
   proyectos: LucideFolderKanban.icon,
   reintentar: LucideRefreshCw.icon,
   guardar: LucideSave.icon,
   buscar: LucideSearch.icon,
   resumen: LucideChartColumn.icon,
   alcance: LucideScanText.icon,
+  ajustesVista: LucideSlidersHorizontal.icon,
   equipo: LucideUsersRound.icon,
   flujo: LucideWorkflow.icon,
   generarConIA: LucideSparkles.icon,
+  gantt: LucideChartGantt.icon,
   roles: LucideUserRoundCog.icon,
   seguimiento: LucideTrendingUp.icon,
+  sincronizar: LucideRefreshCw.icon,
+  tarea: LucideClipboardCheck.icon,
   tareaCompletada: LucideClipboardCheck.icon,
+  tareaRequisito: LucideClipboardCheck.icon,
   tipoSolucion: LucideMonitorCog.icon,
   tipoSinInterfaz: LucideServerCog.icon,
   usuario: LucideUserRound.icon,
@@ -124,6 +188,7 @@ export const ICONOS_APLICACION = {
   alejar: LucideZoomOut.icon,
   ampliar: LucideMaximize2.icon,
   reducir: LucideMinimize2.icon,
+  contraerElemento: LucideChevronDown.icon,
 } as const satisfies Record<string, LucideIconData>;
 
 /** Limita los nombres permitidos a los iconos registrados. */

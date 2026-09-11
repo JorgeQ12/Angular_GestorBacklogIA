@@ -35,9 +35,13 @@ import {
   styleUrl: './selector-tarjetas.css',
 })
 export class SelectorTarjetas implements ControlValueAccessor, ControlCampoPersonalizado {
+  /** Identificador único utilizado por relaciones accesibles y formularios. */
   public readonly id = input.required<string>();
+  /** Opciones normalizadas que se presentan como tarjetas. */
   public readonly opciones = input<readonly OpcionSelectorTarjeta[]>([]);
+  /** Identificador del elemento externo que etiqueta el grupo. */
   public readonly etiquetadoPor = input<string>();
+  /** Cantidad de columnas utilizadas en la cuadrícula de opciones. */
   public readonly columnas = input<2 | 3>(2);
 
   /** Conserva la alternativa seleccionada sin permitir cambios. */

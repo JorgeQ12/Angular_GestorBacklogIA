@@ -115,7 +115,9 @@ export class RegionDesplazable implements AfterViewInit, OnDestroy {
     if (!this.controlVisible()) return;
 
     evento.preventDefault();
-    const control = evento.currentTarget as HTMLElement;
+    const control = evento.currentTarget;
+    if (!(control instanceof HTMLElement)) return;
+
     control.setPointerCapture(evento.pointerId);
     this.cancelarOcultamiento();
     this.arrastre = {
@@ -146,7 +148,9 @@ export class RegionDesplazable implements AfterViewInit, OnDestroy {
   protected finalizarArrastre(evento: PointerEvent): void {
     if (!this.arrastre || this.arrastre.punteroId !== evento.pointerId) return;
 
-    const control = evento.currentTarget as HTMLElement;
+    const control = evento.currentTarget;
+    if (!(control instanceof HTMLElement)) return;
+
     if (control.hasPointerCapture(evento.pointerId))
       control.releasePointerCapture(evento.pointerId);
     this.arrastre = null;

@@ -9,6 +9,7 @@ export enum ClaveItemNavegacionPanel {
   Inicio = 'inicio',
   Proyectos = 'proyectos',
   InformacionProyecto = 'informacion-proyecto',
+  PlanificacionProyecto = 'planificacion-proyecto',
 }
 
 /** Describe una opción renderizable dentro de la navegación del panel. */
