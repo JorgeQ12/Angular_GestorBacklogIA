@@ -52,10 +52,11 @@ Todas las operaciones viven bajo `${environment.apiBaseUrl}/Catalogo`.
 | `ActualizarCatalogoValor` | PUT    | ID, ID del tipo, nombre, descripción y activo |
 | `InactivarCatalogoValor`  | PATCH  | `Id` como query param y cuerpo nulo           |
 
-Los DTO reflejan el contrato vigente y no contienen código técnico. El frontend no solicita ni
-deriva códigos a partir del nombre. Nombre y descripción son obligatorios y admiten 100 y 500
-caracteres respectivamente. El estado activo no aparece en el formulario: se conserva al editar y
-se modifica mediante su acción independiente.
+El DTO de valores refleja el contrato vigente, incluidos los códigos técnicos asignados por el
+backend. La consulta transversal solicita opciones mediante `CatalogoTipoCodigo` y mantiene sus
+códigos centralizados; nunca los deriva del nombre ni utiliza IDs de semillas. Nombre y descripción
+son obligatorios y admiten 100 y 500 caracteres respectivamente. El estado activo no aparece en el
+formulario: se conserva al editar y se modifica mediante su acción independiente.
 
 ## Estado y errores
 

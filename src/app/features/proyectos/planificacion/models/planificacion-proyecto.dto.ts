@@ -1,12 +1,14 @@
-/** Valores serializados por el backend para identificar cada elemento de planificación. */
+/** Códigos técnicos del catálogo usados por el contrato HTTP de tipos de item de trabajo. */
 export enum TipoElementoPlanificacionDto {
-  Epica = 'epica',
-  Caracteristica = 'caracteristica',
-  Historia = 'historia',
-  Tarea = 'tarea',
-  ListaRequisitos = 'listarequisitos',
-  ActividadRequisito = 'actividadrequisito',
-  TareaRequisito = 'tarearequisito',
+  Epica = 'item_azure_epica',
+  Caracteristica = 'item_azure_caracteristica',
+  Historia = 'item_azure_historia_usuario',
+  Tarea = 'item_azure_tarea',
+  ListaRequisitos = 'item_azure_lista_requisitos',
+  ActividadRequisito = 'item_azure_actividad_requisito',
+  TareaRequisito = 'item_azure_tarea_requisito',
+  Actividad = 'item_azure_actividad',
+  Requisito = 'item_azure_requisito',
 }
 
 /** Motivos serializados por el backend para elementos inactivos. */

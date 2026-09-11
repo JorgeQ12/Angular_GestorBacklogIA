@@ -1,6 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
+import { CodigoTipoCatalogoGestionProducto } from '../../../../core/catalogos/models/codigo-tipo-catalogo-gestion-producto.enum';
 import { CatalogosService } from '../../../../core/catalogos/services/catalogos.service';
 import { NotificadorErroresApiService } from '../../../../core/mensajes/services/notificador-errores-api.service';
 import { MensajesService } from '../../../../core/mensajes/services/mensajes.service';
@@ -9,6 +10,7 @@ import {
   type DetalleElementoPlanificacion,
   type ValoresFormularioElementoPlanificacion,
 } from '../models/detalle-elemento-planificacion.model';
+import { TipoElementoPlanificacionDto } from '../models/planificacion-proyecto.dto';
 import { TipoElementoPlanificacion } from '../models/planificacion-proyecto.model';
 import { ElementoPlanificacionService } from './elemento-planificacion.service';
 import { EstadoEditorElementoPlanificacionService } from './estado-editor-elemento-planificacion.service';
@@ -49,7 +51,9 @@ describe('EstadoEditorElementoPlanificacionService', () => {
     estado.abrirConsulta(15, TipoElementoPlanificacion.Tarea, 783);
 
     expect(api.obtener).toHaveBeenCalledWith(TipoElementoPlanificacion.Tarea, 783, null);
-    expect(catalogosApi.obtenerOpciones).toHaveBeenCalledWith('ActividadTarea');
+    expect(catalogosApi.obtenerOpciones).toHaveBeenCalledWith(
+      CodigoTipoCatalogoGestionProducto.ActividadTarea,
+    );
     expect(estado.detalle()).toEqual(DETALLE_TAREA);
     expect(estado.contexto()?.modo).toBe(ModoEditorElementoPlanificacion.Consulta);
 
@@ -79,7 +83,7 @@ describe('EstadoEditorElementoPlanificacionService', () => {
 
     expect(api.crear).toHaveBeenCalledWith(
       expect.objectContaining({
-        tipo: 'tarea',
+        tipo: TipoElementoPlanificacionDto.Tarea,
         historiaUsuarioId: 736,
         titulo: 'Implementar servicio',
         actividadCatalogoId: 19,
@@ -162,7 +166,7 @@ describe('EstadoEditorElementoPlanificacionService', () => {
 
     expect(api.actualizar).toHaveBeenCalledWith(
       expect.objectContaining({
-        tipo: 'actividadrequisito',
+        tipo: TipoElementoPlanificacionDto.ActividadRequisito,
         itemTrabajoId: 501,
         numeroVersionEsperada: 2,
         titulo: 'Cambio pendiente',

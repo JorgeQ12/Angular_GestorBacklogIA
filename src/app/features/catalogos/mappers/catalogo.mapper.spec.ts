@@ -11,12 +11,21 @@ describe('Mapeo de catálogos', () => {
   it('conserva la relación remota de la opción', () => {
     const dto = {
       id: 83,
+      codigo: 'area_logistica',
+      nombre: 'Logística',
+      descripcion: 'Operación',
+      activo: true,
+      catalogoTipoId: 51,
+      catalogoTipoCodigo: 'areas',
+      catalogoTipoNombre: 'Áreas',
+    };
+    expect(mapearValorCatalogo(dto)).toEqual({
+      id: 83,
       nombre: 'Logística',
       descripcion: 'Operación',
       activo: true,
       catalogoTipoId: 51,
       catalogoTipoNombre: 'Áreas',
-    };
-    expect(mapearValorCatalogo(dto)).toEqual(dto);
+    });
   });
 });

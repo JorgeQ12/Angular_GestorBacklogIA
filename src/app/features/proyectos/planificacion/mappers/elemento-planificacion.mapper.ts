@@ -22,25 +22,24 @@ import {
 } from '../models/detalle-elemento-planificacion.model';
 import { TipoElementoPlanificacion } from '../models/planificacion-proyecto.model';
 
-const TIPO_CONSULTA: Readonly<Record<TipoItemPlanificacion, string>> = {
-  [TipoElementoPlanificacion.Epica]: 'Epica',
-  [TipoElementoPlanificacion.Caracteristica]: 'Caracteristica',
-  [TipoElementoPlanificacion.Historia]: 'Historia',
-  [TipoElementoPlanificacion.Tarea]: 'Tarea',
-  [TipoElementoPlanificacion.ActividadRequisito]: 'ActividadRequisito',
-  [TipoElementoPlanificacion.TareaRequisito]: 'TareaRequisito',
+const TIPO_DTO_POR_ELEMENTO: Readonly<
+  Record<TipoElementoPlanificacion, TipoElementoPlanificacionDto>
+> = {
+  [TipoElementoPlanificacion.Epica]: TipoElementoPlanificacionDto.Epica,
+  [TipoElementoPlanificacion.Caracteristica]: TipoElementoPlanificacionDto.Caracteristica,
+  [TipoElementoPlanificacion.Historia]: TipoElementoPlanificacionDto.Historia,
+  [TipoElementoPlanificacion.Tarea]: TipoElementoPlanificacionDto.Tarea,
+  [TipoElementoPlanificacion.ListaRequisitos]: TipoElementoPlanificacionDto.ListaRequisitos,
+  [TipoElementoPlanificacion.ActividadRequisito]:
+    TipoElementoPlanificacionDto.ActividadRequisito,
+  [TipoElementoPlanificacion.TareaRequisito]: TipoElementoPlanificacionDto.TareaRequisito,
 };
 
-/** Convierte el tipo interno al valor aceptado por el parámetro Tipo del backend. */
-export function serializarTipoElementoConsulta(tipo: TipoItemPlanificacion): string {
-  return TIPO_CONSULTA[tipo];
-}
-
-/** Convierte cualquier tipo eliminable, incluido el contenedor de requisitos. */
-export function serializarTipoElementoEliminacion(tipo: TipoElementoPlanificacion): string {
-  return tipo === TipoElementoPlanificacion.ListaRequisitos
-    ? 'ListaRequisitos'
-    : serializarTipoElementoConsulta(tipo);
+/** Convierte un tipo interno al código técnico exigido por el contrato HTTP. */
+export function serializarTipoElemento(
+  tipo: TipoElementoPlanificacion,
+): TipoElementoPlanificacionDto {
+  return TIPO_DTO_POR_ELEMENTO[tipo];
 }
 
 /** Adapta el resultado remoto de una eliminación lógica. */

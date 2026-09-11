@@ -1,3 +1,4 @@
+import { CodigoTipoCatalogoGestionProducto } from '../../../../core/catalogos/models/codigo-tipo-catalogo-gestion-producto.enum';
 import type { MensajesFormulario } from '../../../../shared/forms/errores-validacion';
 import type { CampoFormularioElementoPlanificacion } from '../models/detalle-elemento-planificacion.model';
 
@@ -13,12 +14,12 @@ export const LIMITES_FORMULARIO_ELEMENTO_PLANIFICACION = {
   prioridadMaxima: 4,
 } as const;
 
-/** Nombres estables administrados por el módulo transversal de catálogos. */
+/** Códigos técnicos administrados por el módulo transversal de catálogos. */
 export const CATALOGOS_ELEMENTO_PLANIFICACION = {
-  prioridad: 'Prioridad',
-  riesgo: 'Riesgo',
-  actividadTarea: 'ActividadTarea',
-  actividadRequisito: 'ActividadRequisito',
+  prioridad: CodigoTipoCatalogoGestionProducto.Prioridad,
+  riesgo: CodigoTipoCatalogoGestionProducto.Riesgo,
+  actividadTarea: CodigoTipoCatalogoGestionProducto.ActividadTarea,
+  actividadRequisito: CodigoTipoCatalogoGestionProducto.ActividadRequisito,
 } as const;
 
 /** Mensajes particulares presentados por las directivas compartidas. */

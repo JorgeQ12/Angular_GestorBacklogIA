@@ -72,6 +72,32 @@ La publicación del proyecto y la sincronización de la épica principal tienen 
 para evitar operaciones solapadas. Las credenciales y reglas de autorización pertenecen al backend;
 el frontend envía únicamente los identificadores y opciones definidos por el contrato.
 
+## Códigos de tipos de item de trabajo
+
+Los campos `tipo` y `tipoEntidad`, y el parámetro de consulta `Tipo`, usan exclusivamente el código
+técnico del catálogo. Los alias cortos y los nombres PascalCase no forman parte del contrato HTTP.
+
+| Tipo                   | Código técnico                   |
+| ---------------------- | -------------------------------- |
+| Épica                  | `item_azure_epica`               |
+| Característica         | `item_azure_caracteristica`      |
+| Historia de usuario    | `item_azure_historia_usuario`    |
+| Tarea                  | `item_azure_tarea`               |
+| Lista de requisitos    | `item_azure_lista_requisitos`    |
+| Actividad de requisito | `item_azure_actividad_requisito` |
+| Tarea de requisito     | `item_azure_tarea_requisito`     |
+| Actividad              | `item_azure_actividad`           |
+| Requisito              | `item_azure_requisito`           |
+
+El enum interno de presentación conserva identidades semánticas propias. El mapper de
+planificación es el único responsable de traducirlas al enum DTO y de rechazar discriminadores
+desconocidos recibidos desde el backend.
+
+En `ObtenerBacklog`, épicas, características, historias y tareas incluyen el discriminador
+`tipo`. Los nodos estructurales de requisitos (`listaRequisitos`, actividades y tareas de
+requisito) no lo incluyen en la respuesta vigente: el mapper determina su identidad por la
+posición tipada que ocupan dentro de la jerarquía.
+
 ## Pruebas y verificación
 
 Los cambios en esta capacidad deben cubrir, según su alcance:

@@ -5,6 +5,7 @@ import { firstValueFrom } from 'rxjs';
 import { ResultadoApi } from '../../http/models/resultado-api.model';
 import { ENDPOINTS_CATALOGOS } from '../config/endpoints-catalogos.config';
 import { CatalogoValorDto } from '../models/catalogo-valor.dto';
+import { CodigoTipoCatalogoGestionProducto } from '../models/codigo-tipo-catalogo-gestion-producto.enum';
 import { CatalogosService } from './catalogos.service';
 
 describe('CatalogosService', () => {
@@ -21,15 +22,24 @@ describe('CatalogosService', () => {
 
   afterEach(() => httpTesting.verify());
 
-  it('consulta por nombre y entrega únicamente opciones activas', async () => {
-    const respuesta = firstValueFrom(servicio.obtenerOpciones('Prioridad'));
+  it('consulta por código y entrega solo las opciones activas del catálogo solicitado', async () => {
+    const respuesta = firstValueFrom(
+      servicio.obtenerOpciones(CodigoTipoCatalogoGestionProducto.Prioridad),
+    );
     const solicitud = httpTesting.expectOne(
       (peticion) =>
         peticion.url === ENDPOINTS_CATALOGOS.obtenerValores &&
-        peticion.params.get('CatalogoTipoNombre') === 'Prioridad',
+        peticion.params.get('CatalogoTipoCodigo') === CodigoTipoCatalogoGestionProducto.Prioridad &&
+        !peticion.params.has('CatalogoTipoNombre'),
     );
 
-    solicitud.flush(crearResultado([crearValor(13, 'Alta', true), crearValor(14, 'Media', false)]));
+    solicitud.flush(
+      crearResultado([
+        crearValor(13, 'Alta', true),
+        crearValor(14, 'Media', false),
+        crearValor(21, 'Alto', true, CodigoTipoCatalogoGestionProducto.Riesgo, 'Riesgo'),
+      ]),
+    );
 
     await expect(respuesta).resolves.toEqual([
       { id: 13, nombre: 'Alta', descripcion: 'Prioridad Alta' },
@@ -37,11 +47,19 @@ describe('CatalogosService', () => {
   });
 });
 
-function crearValor(id: number, nombre: string, activo: boolean): CatalogoValorDto {
+function crearValor(
+  id: number,
+  nombre: string,
+  activo: boolean,
+  catalogoTipoCodigo = CodigoTipoCatalogoGestionProducto.Prioridad,
+  catalogoTipoNombre = 'Prioridad',
+): CatalogoValorDto {
   return {
     id,
+    codigo: `${catalogoTipoCodigo}_${nombre.toLowerCase()}`,
     catalogoTipoId: 3,
-    catalogoTipoNombre: 'Prioridad',
+    catalogoTipoCodigo,
+    catalogoTipoNombre,
     nombre,
     descripcion: `Prioridad ${nombre}`,
     activo,

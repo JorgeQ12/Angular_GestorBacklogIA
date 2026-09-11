@@ -1,3 +1,5 @@
+import type { TipoElementoPlanificacionDto } from './planificacion-proyecto.dto';
+
 /** Cuerpo contractual requerido para publicar la planificación en Azure DevOps. */
 export interface SolicitudPublicacionAzurePlanificacionDto {
   readonly proyectoId: number;
@@ -7,7 +9,7 @@ export interface SolicitudPublicacionAzurePlanificacionDto {
 
 /** Refleja un work item creado o actualizado durante la publicación. */
 export interface WorkItemPublicadoAzureDto {
-  readonly tipoEntidad: string;
+  readonly tipoEntidad: TipoElementoPlanificacionDto;
   readonly entidadId: number;
   readonly versionId: number;
   readonly titulo: string;

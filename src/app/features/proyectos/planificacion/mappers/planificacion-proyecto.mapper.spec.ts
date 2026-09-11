@@ -50,13 +50,11 @@ describe('mapearPlanificacionProyecto', () => {
 
     expect(resultado.publicacionAzure).toEqual({
       puedePublicar: false,
-      bloqueos: [
-        { motivo: MotivoBloqueoPublicacionAzure.HistoriasSinTareas, cantidad: 3 },
-      ],
+      bloqueos: [{ motivo: MotivoBloqueoPublicacionAzure.HistoriasSinTareas, cantidad: 3 }],
     });
   });
 
-  it('construye la jerarquía completa con claves y tipos estables', () => {
+  it('construye la jerarquía aunque los nodos de requisitos no incluyan discriminador', () => {
     const resultado = mapearPlanificacionProyecto(PLANIFICACION_JERARQUICA_DTO);
     const epica = resultado.elementos[0];
     const caracteristica = epica.hijos[0];
@@ -77,7 +75,13 @@ describe('mapearPlanificacionProyecto', () => {
     });
     expect(caracteristica.tipo).toBe(TipoElementoPlanificacion.Caracteristica);
     expect(listaRequisitos.tipo).toBe(TipoElementoPlanificacion.ListaRequisitos);
-    expect(listaRequisitos.capacidades).toMatchObject({ puedeConsultar: true, puedeEditar: true, puedeEliminar: true, puedeCrearHijo: true, soloLectura: false });
+    expect(listaRequisitos.capacidades).toMatchObject({
+      puedeConsultar: true,
+      puedeEditar: true,
+      puedeEliminar: true,
+      puedeCrearHijo: true,
+      soloLectura: false,
+    });
     expect(actividad.tipo).toBe(TipoElementoPlanificacion.ActividadRequisito);
     expect(actividad.capacidades.puedeEliminar).toBe(true);
     expect(actividad.hijos[0].tipo).toBe(TipoElementoPlanificacion.TareaRequisito);

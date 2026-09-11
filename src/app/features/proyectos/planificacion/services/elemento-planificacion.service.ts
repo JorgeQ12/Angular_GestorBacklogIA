@@ -7,8 +7,7 @@ import { ENDPOINTS_PLANIFICACION_PROYECTO } from '../config/endpoints-planificac
 import {
   mapearDetalleElementoPlanificacion,
   mapearResultadoEliminacionElemento,
-  serializarTipoElementoConsulta,
-  serializarTipoElementoEliminacion,
+  serializarTipoElemento,
 } from '../mappers/elemento-planificacion.mapper';
 import {
   mapearHistorialElementoPlanificacion,
@@ -48,7 +47,7 @@ export class ElementoPlanificacionService {
     versionPlanificacionId: number | null = null,
   ): Observable<DetalleElementoPlanificacion> {
     let params = new HttpParams()
-      .set('Tipo', serializarTipoElementoConsulta(tipo))
+      .set('Tipo', serializarTipoElemento(tipo))
       .set('ItemTrabajoId', elementoId);
     if (versionPlanificacionId !== null) {
       params = params.set('VersionBacklogId', versionPlanificacionId);
@@ -101,7 +100,7 @@ export class ElementoPlanificacionService {
     numeroVersionEsperada: number,
   ): Observable<ResultadoEliminacionElementoPlanificacion> {
     const params = new HttpParams()
-      .set('Tipo', serializarTipoElementoEliminacion(tipo))
+      .set('Tipo', serializarTipoElemento(tipo))
       .set('ItemTrabajoId', elementoId)
       .set('NumeroVersionEsperada', numeroVersionEsperada);
 
@@ -124,7 +123,7 @@ export class ElementoPlanificacionService {
     tamanoPagina = 20,
   ): Observable<HistorialElementoPlanificacion> {
     let params = new HttpParams()
-      .set('Tipo', serializarTipoElementoConsulta(tipo))
+      .set('Tipo', serializarTipoElemento(tipo))
       .set('ItemTrabajoId', elementoId)
       .set('TamanoPagina', tamanoPagina);
     if (cursor !== null) params = params.set('Cursor', cursor);
@@ -147,7 +146,7 @@ export class ElementoPlanificacionService {
     versionId: number,
   ): Observable<VersionElementoPlanificacion> {
     const params = new HttpParams()
-      .set('Tipo', serializarTipoElementoConsulta(tipo))
+      .set('Tipo', serializarTipoElemento(tipo))
       .set('ItemTrabajoId', elementoId)
       .set('VersionId', versionId);
 

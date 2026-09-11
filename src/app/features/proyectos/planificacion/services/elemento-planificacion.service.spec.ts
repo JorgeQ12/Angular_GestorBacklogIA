@@ -43,7 +43,7 @@ describe('ElementoPlanificacionService', () => {
     );
 
     expect(solicitud.request.method).toBe('GET');
-    expect(solicitud.request.params.get('Tipo')).toBe('Tarea');
+    expect(solicitud.request.params.get('Tipo')).toBe(TipoElementoPlanificacionDto.Tarea);
     expect(solicitud.request.params.get('ItemTrabajoId')).toBe('783');
     expect(solicitud.request.params.has('VersionBacklogId')).toBe(false);
     solicitud.flush(crearResultado(TAREA_DTO));
@@ -63,7 +63,7 @@ describe('ElementoPlanificacionService', () => {
       (request) => request.url === ENDPOINTS_PLANIFICACION_PROYECTO.obtenerElemento,
     );
 
-    expect(solicitud.request.params.get('Tipo')).toBe('Tarea');
+    expect(solicitud.request.params.get('Tipo')).toBe(TipoElementoPlanificacionDto.Tarea);
     expect(solicitud.request.params.get('ItemTrabajoId')).toBe('783');
     expect(solicitud.request.params.get('VersionBacklogId')).toBe('80');
     solicitud.flush(crearResultado({ ...TAREA_DTO, soloLectura: true }));
@@ -127,7 +127,9 @@ describe('ElementoPlanificacionService', () => {
     );
 
     expect(solicitud.request.method).toBe('DELETE');
-    expect(solicitud.request.params.get('Tipo')).toBe('ActividadRequisito');
+    expect(solicitud.request.params.get('Tipo')).toBe(
+      TipoElementoPlanificacionDto.ActividadRequisito,
+    );
     expect(solicitud.request.params.get('ItemTrabajoId')).toBe('501');
     expect(solicitud.request.params.get('NumeroVersionEsperada')).toBe('4');
     solicitud.flush(
@@ -146,7 +148,7 @@ describe('ElementoPlanificacionService', () => {
     );
 
     expect(solicitud.request.method).toBe('GET');
-    expect(solicitud.request.params.get('Tipo')).toBe('Tarea');
+    expect(solicitud.request.params.get('Tipo')).toBe(TipoElementoPlanificacionDto.Tarea);
     expect(solicitud.request.params.get('ItemTrabajoId')).toBe('783');
     expect(solicitud.request.params.get('TamanoPagina')).toBe('20');
     expect(solicitud.request.params.has('Cursor')).toBe(false);
@@ -170,7 +172,7 @@ describe('ElementoPlanificacionService', () => {
     );
 
     expect(solicitud.request.method).toBe('GET');
-    expect(solicitud.request.params.get('Tipo')).toBe('Tarea');
+    expect(solicitud.request.params.get('Tipo')).toBe(TipoElementoPlanificacionDto.Tarea);
     expect(solicitud.request.params.get('ItemTrabajoId')).toBe('783');
     expect(solicitud.request.params.get('VersionId')).toBe('91');
     solicitud.flush(crearResultadoGenerico(VERSION_TAREA_DTO));
@@ -185,7 +187,9 @@ describe('ElementoPlanificacionService', () => {
   it('serializa la eliminación del contenedor de requisitos', async () => {
     const respuesta = firstValueFrom(servicio.eliminar(TipoElementoPlanificacion.ListaRequisitos, 700, 2));
     const solicitud = httpTesting.expectOne(request => request.url === ENDPOINTS_PLANIFICACION_PROYECTO.eliminarElemento);
-    expect(solicitud.request.params.get('Tipo')).toBe('ListaRequisitos');
+    expect(solicitud.request.params.get('Tipo')).toBe(
+      TipoElementoPlanificacionDto.ListaRequisitos,
+    );
     expect(solicitud.request.params.get('ItemTrabajoId')).toBe('700');
     expect(solicitud.request.params.get('NumeroVersionEsperada')).toBe('2');
     solicitud.flush(crearResultadoGenerico({ itemTrabajoId: 700, totalInactivados: 5 }));

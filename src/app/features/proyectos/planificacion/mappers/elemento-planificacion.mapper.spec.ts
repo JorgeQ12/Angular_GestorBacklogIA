@@ -4,7 +4,7 @@ import {
   crearValoresFormularioElemento,
   mapearDetalleElementoPlanificacion,
   mapearResultadoEliminacionElemento,
-  serializarTipoElementoConsulta,
+  serializarTipoElemento,
 } from './elemento-planificacion.mapper';
 import type {
   DetalleEpicaDto,
@@ -23,21 +23,37 @@ import {
 import { TipoElementoPlanificacion } from '../models/planificacion-proyecto.model';
 
 describe('elementoPlanificacionMapper', () => {
-  it('serializa los seis tipos persistibles con el contrato del backend', () => {
+  it('declara exactamente los nueve códigos técnicos del catálogo', () => {
+    expect(Object.values(TipoElementoPlanificacionDto)).toEqual([
+      'item_azure_epica',
+      'item_azure_caracteristica',
+      'item_azure_historia_usuario',
+      'item_azure_tarea',
+      'item_azure_lista_requisitos',
+      'item_azure_actividad_requisito',
+      'item_azure_tarea_requisito',
+      'item_azure_actividad',
+      'item_azure_requisito',
+    ]);
+  });
+
+  it('serializa todos los tipos del árbol con el código técnico del catálogo', () => {
     expect([
-      serializarTipoElementoConsulta(TipoElementoPlanificacion.Epica),
-      serializarTipoElementoConsulta(TipoElementoPlanificacion.Caracteristica),
-      serializarTipoElementoConsulta(TipoElementoPlanificacion.Historia),
-      serializarTipoElementoConsulta(TipoElementoPlanificacion.Tarea),
-      serializarTipoElementoConsulta(TipoElementoPlanificacion.ActividadRequisito),
-      serializarTipoElementoConsulta(TipoElementoPlanificacion.TareaRequisito),
+      serializarTipoElemento(TipoElementoPlanificacion.Epica),
+      serializarTipoElemento(TipoElementoPlanificacion.Caracteristica),
+      serializarTipoElemento(TipoElementoPlanificacion.Historia),
+      serializarTipoElemento(TipoElementoPlanificacion.Tarea),
+      serializarTipoElemento(TipoElementoPlanificacion.ListaRequisitos),
+      serializarTipoElemento(TipoElementoPlanificacion.ActividadRequisito),
+      serializarTipoElemento(TipoElementoPlanificacion.TareaRequisito),
     ]).toEqual([
-      'Epica',
-      'Caracteristica',
-      'Historia',
-      'Tarea',
-      'ActividadRequisito',
-      'TareaRequisito',
+      TipoElementoPlanificacionDto.Epica,
+      TipoElementoPlanificacionDto.Caracteristica,
+      TipoElementoPlanificacionDto.Historia,
+      TipoElementoPlanificacionDto.Tarea,
+      TipoElementoPlanificacionDto.ListaRequisitos,
+      TipoElementoPlanificacionDto.ActividadRequisito,
+      TipoElementoPlanificacionDto.TareaRequisito,
     ]);
   });
 

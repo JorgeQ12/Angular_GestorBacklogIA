@@ -20,9 +20,7 @@ import {
 } from '../models/planificacion-proyecto.model';
 
 /** Adapta la respuesta del backend al resumen utilizado por la página de planificación. */
-export function mapearPlanificacionProyecto(
-  dto: PlanificacionProyectoDto,
-): PlanificacionProyecto {
+export function mapearPlanificacionProyecto(dto: PlanificacionProyectoDto): PlanificacionProyecto {
   const resumen = {
     epicas: dto.resumen.totalEpicas,
     caracteristicas: dto.resumen.totalCaracteristicas,
@@ -123,7 +121,10 @@ function mapearListaRequisitos(dto: ListaRequisitosDto): ElementoPlanificacion {
       puedeEliminar: dto.capacidades.puedeEliminar,
       puedeCrearHijo: dto.capacidades.puedeCrearActividad,
       puedeSincronizar: false,
-      soloLectura: !dto.capacidades.puedeEditar && !dto.capacidades.puedeEliminar && !dto.capacidades.puedeCrearActividad,
+      soloLectura:
+        !dto.capacidades.puedeEditar &&
+        !dto.capacidades.puedeEliminar &&
+        !dto.capacidades.puedeCrearActividad,
     },
     dto.actividades.map(mapearActividadRequisito),
   );
