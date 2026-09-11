@@ -1,4 +1,5 @@
 import { mapearCatalogo, mapearValorCatalogo } from './catalogo.mapper';
+
 describe('Mapeo de catálogos', () => {
   it('conserva las identidades, el nombre y el estado inactivo', () => {
     expect(
@@ -30,10 +31,12 @@ describe('Mapeo de catálogos', () => {
     };
     expect(mapearValorCatalogo(dto)).toEqual({
       id: 83,
+      codigo: 'area_logistica',
       nombre: 'Logística',
       descripcion: 'Operación',
       activo: true,
       catalogoTipoId: 51,
+      catalogoTipoCodigo: 'areas',
       catalogoTipoNombre: 'Áreas',
     });
   });

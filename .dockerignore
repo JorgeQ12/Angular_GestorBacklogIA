@@ -1,0 +1,16 @@
+node_modules
+dist
+.angular
+.git
+.vscode
+.idea
+coverage
+*.log
+npm-debug.log
+Dockerfile
+.dockerignore
+.editorconfig
+.prettierrc
+README.md
+docs
+.agents

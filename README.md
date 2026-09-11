@@ -1,67 +1,42 @@
-# AngularGestorBacklogIA
+# Frontend de InterIA
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.1.0.
+Aplicación Angular para crear, consultar y planificar proyectos, administrar catálogos y trabajar
+con el asistente de IA de InterIA.
 
-## Convenciones del proyecto
+## Requisitos
 
-- [Convenciones generales del frontend](docs/CONVENCIONES_FRONTEND.md)
-- [Autenticación mediante Kong y Microsoft](docs/AUTENTICACION_KONG.md)
-- [Carga global](docs/CARGA_GLOBAL.md)
-- [Estándar de formularios reactivos](docs/FORMULARIOS_REACTIVOS.md)
-- [Estándar de estilos del frontend](docs/ESTILOS_FRONTEND.md)
+- Node.js compatible con Angular 21.
+- npm 11, según el campo `packageManager`.
+- Backend disponible en la URL configurada por el environment correspondiente.
 
-## Development server
+## Ejecución local
 
-To start a local development server, run:
-
-```bash
-ng serve
+```powershell
+npm install
+npm start
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+La aplicación queda disponible en `http://localhost:4200/`. La API funcional y Kong se configuran
+en `src/environments`; si la API local usa HTTPS, su certificado debe ser confiable para el
+navegador.
 
-## Code scaffolding
+## Verificación
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
+```powershell
+npm run build
+npm run build:development
+npm run test:ci
+npm run verify
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Las pruebas unitarias usan Vitest mediante el builder oficial de Angular. `npm test` conserva el
+modo interactivo y `npm run test:ci` ejecuta la suite una sola vez. El proyecto todavía no declara
+un runner E2E; no se debe usar `ng e2e` hasta incorporar esa infraestructura explícitamente.
 
-```bash
-ng generate --help
-```
+## Documentación
 
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+El índice completo de arquitectura, integración, interfaz, formularios y dominios se encuentra en
+[Convenciones del frontend](docs/CONVENCIONES_FRONTEND.md). Toda modificación debe leer además el
+documento especializado de la capacidad afectada y actualizarlo cuando cambie una decisión
+estable. El estado del cierre actual y los riesgos pendientes están en la
+[auditoría del frontend](docs/AUDITORIA_FRONTEND.md).

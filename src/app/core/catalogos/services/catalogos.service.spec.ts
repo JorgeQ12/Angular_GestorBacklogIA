@@ -5,6 +5,7 @@ import { firstValueFrom } from 'rxjs';
 import { ResultadoApi } from '../../http/models/resultado-api.model';
 import { ENDPOINTS_CATALOGOS } from '../config/endpoints-catalogos.config';
 import { CatalogoValorDto } from '../models/catalogo-valor.dto';
+import { CodigoTipoCatalogoIdentidad } from '../models/codigo-tipo-catalogo-identidad.enum';
 import { CodigoTipoCatalogoGestionProducto } from '../models/codigo-tipo-catalogo-gestion-producto.enum';
 import { CatalogosService } from './catalogos.service';
 
@@ -45,13 +46,40 @@ describe('CatalogosService', () => {
       { id: 13, nombre: 'Alta', descripcion: 'Prioridad Alta' },
     ]);
   });
+
+  it('permite consultar catálogos de identidad sin quemar sus valores', async () => {
+    const respuesta = firstValueFrom(
+      servicio.obtenerOpciones(CodigoTipoCatalogoIdentidad.PerfilTecnico),
+    );
+    const solicitud = httpTesting.expectOne(
+      (peticion) =>
+        peticion.url === ENDPOINTS_CATALOGOS.obtenerValores &&
+        peticion.params.get('CatalogoTipoCodigo') === CodigoTipoCatalogoIdentidad.PerfilTecnico,
+    );
+
+    solicitud.flush(
+      crearResultado([
+        crearValor(
+          32,
+          'Ingeniero senior cloud',
+          true,
+          CodigoTipoCatalogoIdentidad.PerfilTecnico,
+          'Perfil técnico',
+        ),
+      ]),
+    );
+
+    await expect(respuesta).resolves.toEqual([
+      { id: 32, nombre: 'Ingeniero senior cloud', descripcion: 'Prioridad Ingeniero senior cloud' },
+    ]);
+  });
 });
 
 function crearValor(
   id: number,
   nombre: string,
   activo: boolean,
-  catalogoTipoCodigo = CodigoTipoCatalogoGestionProducto.Prioridad,
+  catalogoTipoCodigo: string = CodigoTipoCatalogoGestionProducto.Prioridad,
   catalogoTipoNombre = 'Prioridad',
 ): CatalogoValorDto {
   return {

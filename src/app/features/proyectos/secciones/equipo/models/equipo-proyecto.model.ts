@@ -4,6 +4,7 @@ export interface IntegranteOrigenEquipoAzureProyecto {
   readonly nombre: string;
   readonly correo: string | null;
   readonly esAdministradorAzure: boolean;
+  readonly perfilTecnicoId: number | null;
 }
 
 /** Conserva el origen vigente utilizado para configurar el equipo del proyecto. */
@@ -16,7 +17,6 @@ export interface OrigenEquipoAzureProyecto {
 
 /** Describe la configuración asignada a un integrante importado desde Azure. */
 export interface IntegranteEquipoProyecto extends IntegranteOrigenEquipoAzureProyecto {
-  readonly perfilTecnicoCodigo: string;
   readonly dedicacionCodigo: string;
 }
 

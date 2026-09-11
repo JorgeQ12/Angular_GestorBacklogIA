@@ -364,7 +364,7 @@ const EQUIPO_CONFIGURADO: EquipoProyecto = {
   integrantes: [
     {
       ...ORIGEN_EQUIPO.integrantes[0],
-      perfilTecnicoCodigo: 'qa',
+      perfilTecnicoId: 36,
       dedicacionCodigo: '75',
     },
   ],

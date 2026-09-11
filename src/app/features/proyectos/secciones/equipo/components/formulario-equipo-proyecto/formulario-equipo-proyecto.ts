@@ -23,7 +23,6 @@ import {
 import {
   MENSAJES_ASIGNACION_EQUIPO,
   OPCIONES_DEDICACION_EQUIPO,
-  OPCIONES_PERFIL_TECNICO_EQUIPO,
 } from '../../config/equipo-proyecto.config';
 import {
   ControlesIntegranteEquipoProyecto,
@@ -76,9 +75,7 @@ export class FormularioEquipoProyecto {
   public readonly sincronizando = input(false);
 
   /** Proporciona los perfiles técnicos disponibles para asignación. */
-  public readonly perfilesTecnicos = input<readonly OpcionSelector[]>(
-    OPCIONES_PERFIL_TECNICO_EQUIPO,
-  );
+  public readonly perfilesTecnicos = input<readonly OpcionSelector[]>([]);
 
   /** Proporciona las dedicaciones disponibles para asignación. */
   public readonly dedicaciones = input<readonly OpcionSelector[]>(OPCIONES_DEDICACION_EQUIPO);
@@ -99,7 +96,7 @@ export class FormularioEquipoProyecto {
     integrantes: this.constructorFormulario.array<FormGroup<ControlesIntegranteEquipoProyecto>>([]),
   });
   protected readonly asignacionMasiva = this.constructorFormulario.group({
-    perfilTecnicoCodigo: [''],
+    perfilTecnicoId: this.constructorFormulario.control<number | null>(null),
     dedicacionCodigo: [''],
   });
   private readonly busqueda = toSignal(this.controlBusqueda.valueChanges, { initialValue: '' });
@@ -149,7 +146,7 @@ export class FormularioEquipoProyecto {
     const asignacion = this.asignacionMasiva.getRawValue();
     return (
       this.seleccionados().size > 0 &&
-      Boolean(asignacion.perfilTecnicoCodigo || asignacion.dedicacionCodigo)
+      Boolean(asignacion.perfilTecnicoId || asignacion.dedicacionCodigo)
     );
   });
 
@@ -232,8 +229,8 @@ export class FormularioEquipoProyecto {
     const asignacion = this.asignacionMasiva.getRawValue();
     this.controlesIntegrantes().forEach((grupo) => {
       if (!seleccionados.has(grupo.controls.idAzure.value)) return;
-      if (asignacion.perfilTecnicoCodigo) {
-        grupo.controls.perfilTecnicoCodigo.setValue(asignacion.perfilTecnicoCodigo);
+      if (asignacion.perfilTecnicoId !== null) {
+        grupo.controls.perfilTecnicoId.setValue(asignacion.perfilTecnicoId);
       }
       if (asignacion.dedicacionCodigo) {
         grupo.controls.dedicacionCodigo.setValue(asignacion.dedicacionCodigo);
@@ -286,7 +283,10 @@ export class FormularioEquipoProyecto {
       nombre: [integrante.nombre],
       correo: this.constructorFormulario.control<string | null>(integrante.correo),
       esAdministradorAzure: [integrante.esAdministradorAzure],
-      perfilTecnicoCodigo: [integrante.perfilTecnicoCodigo, [Validators.required]],
+      perfilTecnicoId: this.constructorFormulario.control<number | null>(
+        integrante.perfilTecnicoId,
+        [Validators.required],
+      ),
       dedicacionCodigo: [integrante.dedicacionCodigo, [Validators.required]],
     });
   }
@@ -294,7 +294,7 @@ export class FormularioEquipoProyecto {
   /** Evita combinar la edición por fila con una asignación masiva en curso. */
   private actualizarAsignacionesIndividuales(deshabilitar: boolean): void {
     this.formulario.controls.integrantes.controls.forEach((grupo) => {
-      const controles = [grupo.controls.perfilTecnicoCodigo, grupo.controls.dedicacionCodigo];
+      const controles = [grupo.controls.perfilTecnicoId, grupo.controls.dedicacionCodigo];
       controles.forEach((control) => {
         if (deshabilitar && control.enabled) control.disable({ emitEvent: false });
         if (!deshabilitar && control.disabled) control.enable({ emitEvent: false });
@@ -310,7 +310,6 @@ export class FormularioEquipoProyecto {
         idAzure: integrante.idAzure.trim(),
         nombre: integrante.nombre.trim(),
         correo: integrante.correo?.trim() || null,
-        perfilTecnicoCodigo: integrante.perfilTecnicoCodigo.trim(),
         dedicacionCodigo: integrante.dedicacionCodigo.trim(),
       })),
     };
@@ -329,7 +328,7 @@ export class FormularioEquipoProyecto {
 }
 
 function estaConfigurado(integrante: IntegranteEquipoProyecto): boolean {
-  return Boolean(integrante.perfilTecnicoCodigo && integrante.dedicacionCodigo);
+  return integrante.perfilTecnicoId !== null && Boolean(integrante.dedicacionCodigo);
 }
 
 function normalizarBusqueda(valor: string): string {

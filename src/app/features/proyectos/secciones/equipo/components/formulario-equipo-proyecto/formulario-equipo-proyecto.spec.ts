@@ -14,6 +14,7 @@ describe('FormularioEquipoProyecto', () => {
     }).compileComponents();
     fixture = TestBed.createComponent(FormularioEquipoProyecto);
     overlay = TestBed.inject(OverlayContainer).getContainerElement();
+    fixture.componentRef.setInput('perfilesTecnicos', PERFILES_TECNICOS);
     fixture.componentRef.setInput('datosIniciales', EQUIPO);
     fixture.detectChanges();
   });
@@ -143,8 +144,8 @@ describe('FormularioEquipoProyecto', () => {
     enviarFormulario();
     expect(guardar).toHaveBeenCalledWith({
       integrantes: [
-        expect.objectContaining({ perfilTecnicoCodigo: 'qa', dedicacionCodigo: '75' }),
-        expect.objectContaining({ perfilTecnicoCodigo: 'qa', dedicacionCodigo: '75' }),
+        expect.objectContaining({ perfilTecnicoId: 36, dedicacionCodigo: '75' }),
+        expect.objectContaining({ perfilTecnicoId: 36, dedicacionCodigo: '75' }),
       ],
     });
   });
@@ -247,7 +248,7 @@ const EQUIPO: EquipoProyecto = {
       nombre: 'Jorge Quintero',
       correo: 'jorge@interia.co',
       esAdministradorAzure: true,
-      perfilTecnicoCodigo: 'devops',
+      perfilTecnicoId: 32,
       dedicacionCodigo: '100',
     },
     {
@@ -255,8 +256,13 @@ const EQUIPO: EquipoProyecto = {
       nombre: 'María Gómez',
       correo: 'maria@interia.co',
       esAdministradorAzure: false,
-      perfilTecnicoCodigo: '',
+      perfilTecnicoId: null,
       dedicacionCodigo: '',
     },
   ],
 };
+
+const PERFILES_TECNICOS = [
+  { valor: 32, etiqueta: 'DevOps' },
+  { valor: 36, etiqueta: 'QA' },
+] as const;

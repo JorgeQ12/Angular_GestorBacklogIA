@@ -61,7 +61,25 @@ export class TarjetaBloqueFlujoProyecto {
     this.estadoEditor.abrirEditorNodo(this.bloque().id);
   }
 
+  /** Abre el bloque con Enter o Espacio cuando la propia tarjeta conserva el foco. */
+  protected abrirEditorDesdeTeclado(evento: Event): void {
+    if (evento.target !== evento.currentTarget) return;
+    evento.preventDefault();
+    evento.stopPropagation();
+    this.abrirEditor();
+  }
+
   protected iniciarArrastreConexion(evento: PointerEvent, etiqueta?: EtiquetaRamaDecision): void {
+    evento.preventDefault();
+    evento.stopPropagation();
+    this.estadoEditor.iniciarArrastreConexion(this.bloque().id, etiqueta);
+  }
+
+  /** Inicia una conexión desde teclado y habilita los conectores de destino. */
+  protected iniciarConexionDesdeTeclado(
+    evento: Event,
+    etiqueta?: EtiquetaRamaDecision,
+  ): void {
     evento.preventDefault();
     evento.stopPropagation();
     this.estadoEditor.iniciarArrastreConexion(this.bloque().id, etiqueta);
@@ -122,6 +140,15 @@ export class TarjetaBloqueFlujoProyecto {
   }
 
   protected completarArrastreConexion(evento: PointerEvent): void {
+    if (!this.estadoEditor.arrastrandoConexion()) return;
+    evento.preventDefault();
+    evento.stopPropagation();
+    this.enfocarDestino();
+    this.estadoEditor.completarArrastreConexion();
+  }
+
+  /** Completa sobre el bloque enfocado una conexión iniciada desde teclado. */
+  protected completarConexionDesdeTeclado(evento: Event): void {
     if (!this.estadoEditor.arrastrandoConexion()) return;
     evento.preventDefault();
     evento.stopPropagation();

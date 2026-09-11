@@ -159,6 +159,7 @@
             <app-paso-equipo-proyecto
               [datos]="proyecto.equipo"
               [nombreEquipo]="proyecto.azure?.teamNombre ?? 'Team de Azure DevOps'"
+              [perfilesTecnicos]="perfilesTecnicos()"
               [modo]="modoFormulario()"
               [editable]="proyecto.esVersionActual"
               [acciones]="accionesInformacion"

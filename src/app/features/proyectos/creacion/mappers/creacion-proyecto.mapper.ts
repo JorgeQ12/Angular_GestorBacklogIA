@@ -58,6 +58,7 @@ export function mapearOrigenEquipoAzure(
       nombre: miembro.nombre,
       correo: miembro.correo,
       esAdministradorAzure: miembro.esAdministrador,
+      perfilTecnicoId: 'perfilTecnico' in miembro ? miembro.perfilTecnico?.id ?? null : null,
     })),
     fechaSincronizacion: 'fechaSincronizacion' in dto ? dto.fechaSincronizacion : null,
   };

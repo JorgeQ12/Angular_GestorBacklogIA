@@ -14,6 +14,7 @@ import {
   URL_CREACION_PROYECTO,
   URL_PROYECTOS,
   crearUrlCreacionProyecto,
+  crearUrlInformacionProyecto,
 } from '../../../../core/navegacion/rutas';
 import { EncabezadoPagina } from '../../../../shared/components/encabezado-pagina/encabezado-pagina';
 import { EstadoError } from '../../../../shared/components/estado-error/estado-error';
@@ -97,11 +98,9 @@ export class PaginaInicioPanel {
     });
   }
 
-  /** Abre el listado enfocado mientras se incorpora la consulta detallada. */
+  /** Abre la información integral del proyecto seleccionado. */
   protected abrirProyecto(proyecto: ProyectoInicioPanel): void {
-    void this.router.navigate([URL_PROYECTOS], {
-      queryParams: { [PARAMETROS_RUTA.nombreProyecto]: proyecto.nombre },
-    });
+    void this.router.navigateByUrl(crearUrlInformacionProyecto(proyecto.id));
   }
 
   /** Reanuda el borrador desde el recorrido de especificación disponible. */

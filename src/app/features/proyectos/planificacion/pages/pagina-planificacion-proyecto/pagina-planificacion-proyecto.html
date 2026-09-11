@@ -1,6 +1,11 @@
-<section class='pagina-planificacion' aria-labelledby='titulo-planificacion-proyecto'>
+<section
+  class='pagina-planificacion'
+  [attr.aria-labelledby]='!errorCarga() && estado.planificacion() ? "titulo-planificacion-proyecto" : null'
+  [attr.aria-label]='errorCarga() ? "Estado de carga de la planificación" : !estado.planificacion() ? "Cargando planificación del proyecto" : null'
+>
   @if (errorCarga()) {
     <app-estado-error
+      [paginaCompleta]='true'
       [titulo]='mensajeError.titulo'
       [descripcion]='mensajeError.descripcion'
       [reintentable]='true'

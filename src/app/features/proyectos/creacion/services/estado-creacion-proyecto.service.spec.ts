@@ -272,7 +272,7 @@ describe('EstadoCreacionProyectoService', () => {
           nombre: 'Jorge',
           correo: null,
           esAdministradorAzure: false,
-          perfilTecnicoCodigo: 'devops',
+          perfilTecnicoId: 32,
           dedicacionCodigo: '100',
         },
       ],

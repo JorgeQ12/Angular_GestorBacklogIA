@@ -5,8 +5,11 @@
     "ng": "ng",
     "start": "ng serve --configuration development",
     "build": "ng build",
+    "build:development": "ng build --configuration development",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "test:ci": "ng test --watch=false",
+    "verify": "npm run build && npm run build:development && npm run test:ci"
   },
   "prettier": {
     "printWidth": 100,

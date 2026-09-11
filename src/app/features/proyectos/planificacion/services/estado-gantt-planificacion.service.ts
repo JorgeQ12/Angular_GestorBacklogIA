@@ -22,9 +22,16 @@ export class EstadoGanttPlanificacionService {
   private readonly errorEstado = signal(false);
   private readonly datosEstado = signal<GanttPlanificacion | null>(null);
 
+  /** Indica si la vista Gantt reemplaza actualmente al árbol. */
   public readonly abierto = this.abiertoEstado.asReadonly();
+
+  /** Indica si existe una consulta del cronograma en curso. */
   public readonly cargando = this.cargandoEstado.asReadonly();
+
+  /** Indica si la última consulta del cronograma falló. */
   public readonly error = this.errorEstado.asReadonly();
+
+  /** Expone la fotografía del Gantt lista para representar. */
   public readonly datos = this.datosEstado.asReadonly();
 
   /** Abre la vista y prepara el cronograma de la fotografía presentada. */

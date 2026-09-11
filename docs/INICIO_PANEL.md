@@ -54,18 +54,13 @@ features/inicio-panel/
 - Los indicadores de avance consumen el contrato público de `features/proyectos/public-api.ts`.
 - “Ver proyectos” abre `/panel/proyectos`; seleccionar un estado agrega el query param `estado` y
   deja que el listado resuelva su consulta.
+- Seleccionar un proyecto reciente o que requiere atención abre su ruta canónica de Información.
 - Los estados compartidos se consumen desde el contrato público de Proyectos y no se vuelven a
   declarar dentro de Inicio. El resumen administrativo representa `enBorrador`, `enProgreso`,
   `finalizados` y `cerrados`, alineados con el catálogo vigente del backend.
 - `enBorrador` es la única fuente para el total de borradores; no se conserva un
   `totalBorradores` duplicado. Todos los indicadores y colecciones se derivan de una misma
   fotografía de proyectos activos para evitar conteos contradictorios.
-
-## Integraciones pendientes
-
-La migración conserva puntos explícitos para conectar posteriormente:
-
-- Detalle de proyectos.
 
 El resumen vacío solo actúa como valor inicial mientras el loader global cubre la solicitud. Una
 falla reemplaza el encabezado y las secciones por el estado de error de página completa; no se

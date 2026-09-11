@@ -51,7 +51,7 @@
               id="equipo-perfil-masivo"
               placeholder="Asignar perfil técnico"
               [opciones]="perfilesTecnicos()"
-              [formControl]="asignacionMasiva.controls.perfilTecnicoCodigo"
+              [formControl]="asignacionMasiva.controls.perfilTecnicoId"
             />
             <app-selector-campo
               id="equipo-dedicacion-masiva"
@@ -139,7 +139,7 @@
                   [opciones]="perfilesTecnicos()"
                   [soloLectura]="esSoloLectura()"
                   placeholder="Selecciona un perfil"
-                  formControlName="perfilTecnicoCodigo"
+                  formControlName="perfilTecnicoId"
                   [appMensajesError]="mensajesAsignacion"
                   appErrorCampo
                 />

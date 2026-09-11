@@ -4,7 +4,8 @@
     [attr.viewBox]="'0 0 ' + estadoEditor.tamanoLienzo.ancho + ' ' + estadoEditor.tamanoLienzo.alto"
     [attr.width]="estadoEditor.tamanoLienzo.ancho"
     [attr.height]="estadoEditor.tamanoLienzo.alto"
-    aria-hidden="true"
+    role="group"
+    aria-label="Conexiones del flujo"
   >
     <defs>
       <marker id="flecha-flujo" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse">
@@ -25,11 +26,13 @@
       <g>
         <path
           class="capa-conexiones-flujo__halo"
+          aria-hidden="true"
           [class.esta-seleccionado]="estadoEditor.idConexionSeleccionada() === conexion.id"
           [attr.d]="conexion.trayectoria"
         />
         <path
           class="capa-conexiones-flujo__linea"
+          aria-hidden="true"
           [class.esta-seleccionado]="estadoEditor.idConexionSeleccionada() === conexion.id"
           [class.es-rama-decision]="conexion.esRamaDecision"
           [attr.d]="conexion.trayectoria"
@@ -43,11 +46,17 @@
           class="capa-conexiones-flujo__area-interaccion"
           data-interaccion-conexion="true"
           [attr.d]="conexion.trayectoria"
+          [attr.role]="estadoEditor.soloLectura() ? null : 'button'"
+          [attr.tabindex]="estadoEditor.soloLectura() ? null : 0"
+          [attr.aria-label]="estadoEditor.soloLectura() ? null : conexion.etiquetaAccesible"
+          [attr.aria-hidden]="estadoEditor.soloLectura() ? true : null"
           (click)="seleccionarConexion(conexion.id)"
+          (keydown.enter)="seleccionarConexionDesdeTeclado($event, conexion.id)"
+          (keydown.space)="seleccionarConexionDesdeTeclado($event, conexion.id)"
         />
 
         @if (conexion.etiqueta && !conexion.esRamaDecision) {
-          <g class="capa-conexiones-flujo__etiqueta">
+          <g class="capa-conexiones-flujo__etiqueta" aria-hidden="true">
             <rect
               class="capa-conexiones-flujo__superficie-etiqueta"
               rx="10"
@@ -72,6 +81,7 @@
     @if (previsualizacionConexion(); as previsualizacion) {
       <path
         class="capa-conexiones-flujo__linea capa-conexiones-flujo__linea--previsualizacion"
+        aria-hidden="true"
         [class.esta-acoplada]="previsualizacion.idDestino"
         [class.es-rama-decision]="esRamaDecision(previsualizacion.etiqueta)"
         [attr.d]="previsualizacion.trayectoria"

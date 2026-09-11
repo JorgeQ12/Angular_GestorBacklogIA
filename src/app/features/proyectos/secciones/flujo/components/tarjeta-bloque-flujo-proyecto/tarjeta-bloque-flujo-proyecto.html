@@ -21,7 +21,8 @@
   (pointerleave)="salirTarjeta()"
   (pointerup)="completarArrastreConexion($event)"
   (click)="abrirEditor()"
-  (keydown.enter)="abrirEditor()"
+  (keydown.enter)="abrirEditorDesdeTeclado($event)"
+  (keydown.space)="abrirEditorDesdeTeclado($event)"
 >
   @if (!estadoEditor.soloLectura()) {
     <button
@@ -34,6 +35,8 @@
       (pointerenter)="enfocarDestino()"
       (pointerleave)="desenfocarDestino()"
       (pointerup)="completarArrastreConexion($event)"
+      (keydown.enter)="completarConexionDesdeTeclado($event)"
+      (keydown.space)="completarConexionDesdeTeclado($event)"
     ></button>
 
     @if (esBloqueDecision()) {
@@ -46,6 +49,8 @@
           [class.esta-visible]="estadoEditor.idBloqueSeleccionado() === bloqueActual.id || estadoEditor.arrastrandoConexion()"
           [attr.aria-label]="'Iniciar rama ' + rama + ' desde ' + bloqueActual.titulo"
           (pointerdown)="iniciarArrastreConexion($event, rama)"
+          (keydown.enter)="iniciarConexionDesdeTeclado($event, rama)"
+          (keydown.space)="iniciarConexionDesdeTeclado($event, rama)"
         >
           <span class="tarjeta-bloque-flujo__texto-rama">{{ rama }}</span>
         </button>
@@ -57,6 +62,8 @@
         [class.esta-visible]="estadoEditor.idBloqueSeleccionado() === bloqueActual.id || estadoEditor.arrastrandoConexion()"
         [attr.aria-label]="'Iniciar conexión desde ' + bloqueActual.titulo"
         (pointerdown)="iniciarArrastreConexion($event)"
+        (keydown.enter)="iniciarConexionDesdeTeclado($event)"
+        (keydown.space)="iniciarConexionDesdeTeclado($event)"
       ></button>
     }
   }

@@ -81,6 +81,11 @@
   cursor: pointer;
 }
 
+.capa-conexiones-flujo__area-interaccion:focus-visible {
+  outline: 0;
+  stroke: color-mix(in srgb, var(--text-primary) 32%, transparent);
+}
+
 .capa-conexiones-flujo__superficie-etiqueta {
   fill: var(--surface-default);
   stroke: var(--border-default);

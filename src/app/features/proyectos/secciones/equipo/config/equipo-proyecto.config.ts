@@ -1,25 +1,9 @@
+import { CodigoTipoCatalogoIdentidad } from '../../../../../core/catalogos/models/codigo-tipo-catalogo-identidad.enum';
 import { OpcionSelector } from '../../../../../shared/forms/controles/selector-campo/models/opcion-selector.model';
 import { MensajesError } from '../../../../../shared/forms/errores-validacion';
 
-/** Centraliza los perfiles técnicos mientras el backend incorpora su catálogo. */
-export const OPCIONES_PERFIL_TECNICO_EQUIPO = [
-  { valor: 'devops', etiqueta: 'DevOps' },
-  { valor: 'cloud', etiqueta: 'Cloud' },
-  { valor: 'dev-master', etiqueta: 'Desarrollador master' },
-  { valor: 'dev-senior', etiqueta: 'Desarrollador senior' },
-  { valor: 'qa', etiqueta: 'QA' },
-  { valor: 'cientifico-datos', etiqueta: 'Científico de datos' },
-  { valor: 'arquitecto', etiqueta: 'Arquitecto' },
-  { valor: 'gerente', etiqueta: 'Gerente' },
-  { valor: 'subgerente', etiqueta: 'Subgerente' },
-  { valor: 'planner', etiqueta: 'Planner' },
-  { valor: 'scrum-master', etiqueta: 'Scrum master' },
-  { valor: 'ux-ui', etiqueta: 'UX/UI' },
-  { valor: 'pmo', etiqueta: 'PMO' },
-  { valor: 'operaciones-ti', etiqueta: 'Operaciones TI' },
-  { valor: 'lider-tecnico', etiqueta: 'Líder técnico' },
-  { valor: 'seguridad', etiqueta: 'Seguridad' },
-] as const satisfies readonly OpcionSelector[];
+/** Identifica el catálogo remoto que alimenta los perfiles técnicos de Equipo. */
+export const CATALOGO_PERFILES_TECNICOS_EQUIPO = CodigoTipoCatalogoIdentidad.PerfilTecnico;
 
 /** Centraliza las dedicaciones admitidas para cada integrante. */
 export const OPCIONES_DEDICACION_EQUIPO = [

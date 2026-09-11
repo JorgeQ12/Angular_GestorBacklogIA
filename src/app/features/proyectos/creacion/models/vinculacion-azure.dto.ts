@@ -13,6 +13,19 @@ export interface MiembroEquipoAzureDto {
   esAdministrador: boolean;
 }
 
+/** Refleja el perfil técnico asociado a un usuario sincronizado. */
+export interface PerfilTecnicoUsuarioDto {
+  id: number;
+  codigo: string;
+  nombre: string;
+}
+
+/** Extiende la identidad de Azure con la información ya registrada para el usuario. */
+export interface MiembroEquipoAzureSincronizadoDto extends MiembroEquipoAzureDto {
+  idUsuario: number | null;
+  perfilTecnico: PerfilTecnicoUsuarioDto | null;
+}
+
 /** Describe una revisión histórica de la épica vinculada. */
 export interface RevisionEpicaAzureDto {
   revision: number;
@@ -50,7 +63,7 @@ export type ValidarVinculacionAzureRespuestaDto = VinculacionAzureDto;
 export interface SincronizarEquipoAzureRespuestaDto {
   teamId: string;
   teamNombre: string;
-  miembros: readonly MiembroEquipoAzureDto[];
+  miembros: readonly MiembroEquipoAzureSincronizadoDto[];
   grupos: readonly MiembroEquipoAzureDto[];
   fechaSincronizacion: string;
 }

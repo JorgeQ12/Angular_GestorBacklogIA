@@ -224,6 +224,17 @@ describe('PaginaPlanificacionProyecto', () => {
     expect(harness.routeNativeElement?.textContent).toContain(
       'No fue posible cargar la planificación',
     );
+    expect(harness.routeNativeElement?.querySelector('app-encabezado-pagina')).toBeNull();
+    expect(
+      harness.routeNativeElement
+        ?.querySelector('app-estado-error')
+        ?.classList.contains('estado-error--pagina-completa'),
+    ).toBe(true);
+    expect(
+      harness.routeNativeElement
+        ?.querySelector('.pagina-planificacion')
+        ?.getAttribute('aria-labelledby'),
+    ).toBeNull();
   });
 
   it('distingue una planificación válida sin elementos mediante el estado vacío', async () => {

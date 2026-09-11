@@ -168,4 +168,29 @@ describe('PaginaInicioPanel', () => {
 
     expect(navegar).toHaveBeenCalledWith('/panel/proyectos/creacion?proyectoId=42');
   });
+
+  it('abre la información del proyecto reciente seleccionado', () => {
+    const navegar = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
+    resumen$.next({
+      ...RESUMEN,
+      proyectosRecientes: [
+        {
+          id: 42,
+          nombre: 'Portal de clientes',
+          responsable: 'Jorge',
+          estado: 'En Progreso',
+          fechaObjetivo: '2026-09-30',
+          tieneBacklog: true,
+          motivoAtencion: null,
+        },
+      ],
+    });
+    fixture.detectChanges();
+
+    (fixture.nativeElement as HTMLElement)
+      .querySelector<HTMLButtonElement>('.proyecto-reciente')
+      ?.click();
+
+    expect(navegar).toHaveBeenCalledWith('/panel/proyectos/42/informacion');
+  });
 });

@@ -35,14 +35,31 @@ export class EstadoHistorialElementoPlanificacionService {
   private readonly errorHistorialEstado = signal(false);
   private readonly errorVersionEstado = signal(false);
 
+  /** Expone los resúmenes de versiones cargados hasta el momento. */
   public readonly registros = this.registrosEstado.asReadonly();
+
+  /** Conserva el cursor requerido para solicitar la siguiente página. */
   public readonly siguienteCursor = this.siguienteCursorEstado.asReadonly();
+
+  /** Indica si el backend informa más versiones disponibles. */
   public readonly hayMas = this.hayMasEstado.asReadonly();
+
+  /** Identifica la versión elegida en el historial. */
   public readonly versionSeleccionadaId = this.versionSeleccionadaIdEstado.asReadonly();
+
+  /** Expone el detalle de la versión seleccionada. */
   public readonly versionSeleccionada = this.versionSeleccionadaEstado.asReadonly();
+
+  /** Indica si se está consultando una página del historial. */
   public readonly cargandoHistorial = this.cargandoHistorialEstado.asReadonly();
+
+  /** Indica si se está consultando el detalle de una versión. */
   public readonly cargandoVersion = this.cargandoVersionEstado.asReadonly();
+
+  /** Indica si falló la consulta principal del historial. */
   public readonly errorHistorial = this.errorHistorialEstado.asReadonly();
+
+  /** Indica si falló la consulta del detalle seleccionado. */
   public readonly errorVersion = this.errorVersionEstado.asReadonly();
 
   /** Inicia una consulta histórica limpia para la identidad seleccionada. */

@@ -8,6 +8,8 @@ import {
   IntegranteEquipoProyecto,
   OrigenEquipoAzureProyecto,
 } from '../models/equipo-proyecto.model';
+import type { OpcionCatalogo } from '../../../../../core/catalogos/models/opcion-catalogo.model';
+import type { OpcionSelector } from '../../../../../shared/forms/controles/selector-campo/models/opcion-selector.model';
 
 /** Recupera Equipo desde su contrato canónico en español. */
 export function deserializarEquipoProyecto(json: string): EquipoProyecto | null {
@@ -21,10 +23,17 @@ export function deserializarEquipoProyecto(json: string): EquipoProyecto | null 
     const idAzure = obtenerTextoJson(dato, 'idAzure');
     const nombre = obtenerTextoJson(dato, 'nombre');
     const correo = obtenerTextoJson(dato, 'correo');
-    const perfilTecnicoCodigo = obtenerTextoJson(dato, 'perfilTecnicoCodigo');
+    const perfilTecnicoId = dato['perfilTecnicoId'];
     const dedicacionCodigo = obtenerTextoJson(dato, 'dedicacionCodigo');
     const esAdministradorAzure = dato['esAdministradorAzure'];
-    if (idAzure === null || nombre === null || typeof esAdministradorAzure !== 'boolean') {
+    if (
+      idAzure === null ||
+      nombre === null ||
+      typeof esAdministradorAzure !== 'boolean' ||
+      (perfilTecnicoId !== null &&
+        perfilTecnicoId !== undefined &&
+        (!Number.isInteger(perfilTecnicoId) || Number(perfilTecnicoId) <= 0))
+    ) {
       return null;
     }
 
@@ -33,7 +42,7 @@ export function deserializarEquipoProyecto(json: string): EquipoProyecto | null 
       nombre,
       correo,
       esAdministradorAzure,
-      perfilTecnicoCodigo: perfilTecnicoCodigo ?? '',
+      perfilTecnicoId: typeof perfilTecnicoId === 'number' ? perfilTecnicoId : null,
       dedicacionCodigo: dedicacionCodigo ?? '',
     });
   }
@@ -49,7 +58,7 @@ export function serializarEquipoProyecto(datos: EquipoProyecto): string {
       nombre: integrante.nombre.trim(),
       correo: integrante.correo?.trim() || null,
       esAdministradorAzure: integrante.esAdministradorAzure,
-      perfilTecnicoCodigo: integrante.perfilTecnicoCodigo.trim(),
+      perfilTecnicoId: integrante.perfilTecnicoId,
       dedicacionCodigo: integrante.dedicacionCodigo.trim(),
     })),
   );
@@ -69,11 +78,22 @@ export function combinarEquipoConAzure(
       const guardado = guardados.get(integrante.idAzure);
       return {
         ...integrante,
-        perfilTecnicoCodigo: guardado?.perfilTecnicoCodigo ?? '',
+        perfilTecnicoId: guardado?.perfilTecnicoId ?? integrante.perfilTecnicoId,
         dedicacionCodigo: guardado?.dedicacionCodigo ?? '',
       };
     }),
   };
+}
+
+/** Adapta el catálogo remoto al contrato neutral de los selectores de Equipo. */
+export function mapearPerfilesTecnicosEquipo(
+  opciones: readonly OpcionCatalogo[],
+): OpcionSelector[] {
+  return opciones.map((opcion) => ({
+    valor: opcion.id,
+    etiqueta: opcion.nombre,
+    descripcion: opcion.descripcion,
+  }));
 }
 
 function esObjetoJson(valor: unknown): valor is ObjetoJson {

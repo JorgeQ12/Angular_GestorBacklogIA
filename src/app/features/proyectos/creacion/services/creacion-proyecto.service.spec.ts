@@ -133,7 +133,14 @@ describe('CreacionProyectoService', () => {
         teamId: 'team-1',
         teamNombre: 'Producto',
         miembros: [
-          { id: 'u1', nombre: 'Jorge', correo: 'jorge@interia.co', esAdministrador: true },
+          {
+            idUsuario: 8,
+            id: 'u1',
+            nombre: 'Jorge',
+            correo: 'jorge@interia.co',
+            esAdministrador: true,
+            perfilTecnico: { id: 32, codigo: 'ingeniero_senior_cloud', nombre: 'Ingeniero senior cloud' },
+          },
         ],
         grupos: [],
         fechaSincronizacion: '2026-08-27T10:00:00Z',
@@ -149,6 +156,7 @@ describe('CreacionProyectoService', () => {
           nombre: 'Jorge',
           correo: 'jorge@interia.co',
           esAdministradorAzure: true,
+          perfilTecnicoId: 32,
         },
       ],
       fechaSincronizacion: '2026-08-27T10:00:00Z',

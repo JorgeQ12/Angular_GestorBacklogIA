@@ -50,7 +50,7 @@ const DTO: ProyectoInformacionDto = {
   alcanceJson: '{"incluido":"Portal","excluido":"Pagos"}',
   rolesJson: '[{"nombre":"Administrador","descripcion":"Configura"}]',
   equipoJson:
-    '[{"idAzure":"u1","nombre":"María","correo":null,"esAdministradorAzure":true,"perfilTecnicoCodigo":"qa","dedicacionCodigo":"100"}]',
+    '[{"idAzure":"u1","nombre":"María","correo":null,"esAdministradorAzure":true,"perfilTecnicoId":36,"dedicacionCodigo":"100"}]',
   diagramFlujoJson: '{}',
   azure: {
     organizacion: 'interia',

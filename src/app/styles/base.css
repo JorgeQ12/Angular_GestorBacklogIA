@@ -1,3 +1,4 @@
+/* Registra la tipografía oficial y el comportamiento base de todo el documento. */
 @font-face {
   font-family: 'Prospero';
   src: url('/fonts/prospero/Prospero-Regular.ttf') format('truetype');

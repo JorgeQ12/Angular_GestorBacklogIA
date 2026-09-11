@@ -69,6 +69,7 @@ export class CapaConexionesFlujoProyecto {
 
         return {
           ...conexion,
+          etiquetaAccesible: `Seleccionar conexión de ${origen.titulo} hacia ${destino.titulo}`,
           esRamaDecision,
           ladoDestino,
           trayectoria: construirRutaConexion(puntoOrigen, puntoDestino, ladoDestino),
@@ -89,6 +90,16 @@ export class CapaConexionesFlujoProyecto {
 
   protected seleccionarConexion(idConexion: string): void {
     if (!this.estadoEditor.soloLectura()) this.estadoEditor.seleccionarConexion(idConexion);
+  }
+
+  /** Selecciona una conexión desde Enter o Espacio sin desplazar el lienzo. */
+  protected seleccionarConexionDesdeTeclado(
+    evento: Event,
+    idConexion: string,
+  ): void {
+    evento.preventDefault();
+    evento.stopPropagation();
+    this.seleccionarConexion(idConexion);
   }
 
   protected eliminarConexion(idConexion: string): void {

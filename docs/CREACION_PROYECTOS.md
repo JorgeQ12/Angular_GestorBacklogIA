@@ -362,8 +362,8 @@ DevOps. No duplica los roles funcionales definidos en el paso anterior:
   reutilizables.
 - La identidad de cada integrante (`idAzure`, nombre, correo y condición de administrador) es de
   solo lectura y se origina en Azure.
-- La configuración local asigna `perfilTecnicoCodigo` y `dedicacionCodigo`; ambos son obligatorios
-  para guardar la sección.
+- La configuración del proyecto asigna `perfilTecnicoId` y `dedicacionCodigo`; ambos son
+  obligatorios para guardar la sección. El perfil se identifica por el ID del catálogo remoto.
 - El formulario presenta búsqueda por nombre o correo y filtros de todos, pendientes y
   configurados. No pagina el Team; comunica el progreso vigente al componente coordinador.
 - Equipo no crea una segunda tarjeta ni un encabezado interno. El nombre del Team, el progreso y
@@ -377,12 +377,13 @@ DevOps. No duplica los roles funcionales definidos en el paso anterior:
 - “Actualizar desde Azure” consulta nuevamente la membresía, relaciona integrantes mediante
   `idAzure`, conserva sus asignaciones, incorpora personas nuevas sin configurar y retira las que
   ya no pertenecen al Team.
-- `equipoJson` es la fuente de la configuración guardada. Si la consulta del borrador no incluye
-  integrantes de Azure, el paso presenta inmediatamente esa fotografía y sincroniza la membresía
-  en segundo plano, conservando las asignaciones mediante `idAzure`.
-- Cuando la consulta del borrador ya incluye la membresía de Azure, el paso la combina con
-  `equipoJson` sin ejecutar otra solicitud. Una sincronización explícita sí considera autoritativa
-  la colección recibida, incluso cuando esté vacía, para retirar integrantes que dejaron el Team.
+- `equipoJson` es la fuente de la configuración guardada. Al entrar en Equipo, el paso presenta
+  inmediatamente esa fotografía y sincroniza la membresía en segundo plano para recuperar también
+  el perfil técnico registrado del usuario. Las asignaciones del proyecto se conservan mediante
+  `idAzure` y tienen prioridad sobre el perfil sugerido por la sincronización.
+- La colección sincronizada se considera autoritativa, incluso cuando esté vacía, para retirar
+  integrantes que dejaron el Team. Un integrante nuevo toma como valor inicial el perfil técnico
+  asociado a su usuario, cuando existe, sin actualizarlo al guardar el proyecto.
 - La acción “Actualizar desde Azure” queda disponible para renovar explícitamente la membresía
   después de restaurar una configuración existente.
 - El paso obtiene del formulario una fotografía de la edición antes de sincronizar. Así coordina
@@ -399,16 +400,16 @@ El formato persistido es una colección canónica en español:
     "nombre": "María Gómez",
     "correo": "maria@empresa.co",
     "esAdministradorAzure": false,
-    "perfilTecnicoCodigo": "qa",
+    "perfilTecnicoId": 36,
     "dedicacionCodigo": "75"
   }
 ]
 ```
 
-Los perfiles técnicos y dedicaciones viven temporalmente en
-`equipo/config/equipo-proyecto.config.ts`. Los componentes consumen códigos estables y no repiten
-literales. Cuando el backend exponga catálogos oficiales, el paso los proporcionará al formulario
-sin modificar el contrato persistido ni la composición de la sección.
+Los perfiles técnicos provienen del catálogo remoto `identidad_perfil_tecnico` y el control
+conserva su ID; no se queman los 40 valores ni los identificadores de sus semillas en Angular. Las
+dedicaciones permanecen centralizadas en `equipo/config/equipo-proyecto.config.ts` porque todavía
+son una regla local del formulario.
 
 En Información del proyecto, Equipo reutiliza el modelo, el mapper y el formulario. En lectura se
 muestran todas las identidades y asignaciones, pero se retiran búsqueda, filtros, selección múltiple

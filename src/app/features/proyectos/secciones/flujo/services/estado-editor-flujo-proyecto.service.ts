@@ -73,8 +73,13 @@ export class EstadoEditorFlujoProyectoService {
   private readonly estadoEditorNodoSenal = signal<EstadoEditorNodo | null>(null);
   private readonly soloLecturaSenal = signal(false);
 
+  /** Expone los límites compartidos del área editable. */
   public readonly tamanoLienzo = TAMANO_LIENZO_FLUJO;
+
+  /** Expone las dimensiones usadas para posicionar cada bloque. */
   public readonly tamanoBloque = TAMANO_BLOQUE_FLUJO;
+
+  /** Construye las opciones visibles de tipos de bloque disponibles. */
   public readonly opcionesTipoBloque = computed(() =>
     TIPOS_BLOQUE_FLUJO_DISPONIBLES.map((tipo) => ({
       tipo,
@@ -82,20 +87,44 @@ export class EstadoEditorFlujoProyectoService {
       descripcion: DESCRIPCIONES_TIPO_BLOQUE_FLUJO[tipo],
     })),
   );
+
+  /** Expone el flujo completo que mantiene el editor. */
   public readonly flujo = computed(() => this.flujoSenal());
+
+  /** Expone los roles disponibles para asignar a los nodos. */
   public readonly roles = computed(() => this.flujoSenal().roles);
+
+  /** Expone el desplazamiento y la escala actuales del lienzo. */
   public readonly vista = computed(() => this.vistaSenal());
+
+  /** Identifica el bloque seleccionado, si existe. */
   public readonly idBloqueSeleccionado = computed(() => this.idBloqueSeleccionadoSenal());
+
+  /** Identifica la conexión seleccionada, si existe. */
   public readonly idConexionSeleccionada = computed(() => this.idConexionSeleccionadaSenal());
+
+  /** Identifica el bloque donde comienza la conexión en curso. */
   public readonly idOrigenConexionActiva = computed(() => this.idOrigenConexionSenal());
+
+  /** Indica si la paleta de bloques permanece abierta. */
   public readonly paletaBloquesAbierta = computed(() => this.paletaBloquesAbiertaSenal());
+
+  /** Expone la operación de creación o edición del nodo. */
   public readonly estadoEditorNodo = computed(() => this.estadoEditorNodoSenal());
+
+  /** Indica si el diálogo de nodo está visible. */
   public readonly editorNodoAbierto = computed(() => this.estadoEditorNodoSenal() !== null);
+
+  /** Indica si el usuario está construyendo una conexión. */
   public readonly arrastrandoConexion = computed(() => this.idOrigenConexionSenal() !== null);
+
+  /** Resuelve el bloque correspondiente a la selección actual. */
   public readonly bloqueSeleccionado = computed(() => {
     const idSeleccionado = this.idBloqueSeleccionadoSenal();
     return this.flujoSenal().nodos.find((bloque) => bloque.id === idSeleccionado) ?? null;
   });
+
+  /** Resuelve el bloque que alimenta el formulario de edición. */
   public readonly bloqueEnEdicion = computed(() => {
     const estadoEditor = this.estadoEditorNodoSenal();
     if (!estadoEditor?.idNodo) {
@@ -104,7 +133,11 @@ export class EstadoEditorFlujoProyectoService {
 
     return this.flujoSenal().nodos.find((nodo) => nodo.id === estadoEditor.idNodo) ?? null;
   });
+
+  /** Expone los bloques representables en el lienzo actual. */
   public readonly bloquesVisibles = computed(() => this.flujoSenal().nodos);
+
+  /** Excluye conexiones cuyos extremos no forman parte del flujo visible. */
   public readonly conexionesVisibles = computed(() => {
     const idsBloquesVisibles = new Set(this.bloquesVisibles().map((bloque) => bloque.id));
     return this.flujoSenal().conexiones.filter(
@@ -113,8 +146,14 @@ export class EstadoEditorFlujoProyectoService {
         idsBloquesVisibles.has(conexion.idBloqueDestino),
     );
   });
+
+  /** Indica si el editor debe impedir cambios funcionales. */
   public readonly soloLectura = computed(() => this.soloLecturaSenal());
+
+  /** Indica si el flujo contiene al menos un nodo. */
   public readonly tieneContenido = computed(() => this.flujoSenal().nodos.length > 0);
+
+  /** Construye la ruta temporal de la conexión que está en curso. */
   public readonly previsualizacionConexionActiva = computed(() => {
     const idOrigen = this.idOrigenConexionSenal();
 
