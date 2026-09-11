@@ -8,8 +8,21 @@ import { AdministracionCatalogosService } from './administracion-catalogos.servi
 describe('Administración HTTP de catálogos', () => {
   let api: AdministracionCatalogosService;
   let http: HttpTestingController;
-  const tipo = { id: 51, nombre: 'Áreas', descripcion: 'Áreas operativas', activo: false };
-  const valor = { ...tipo, id: 83, catalogoTipoId: 51, catalogoTipoNombre: 'Áreas' };
+  const tipo = {
+    id: 51,
+    codigo: 'gestion_areas',
+    nombre: 'Áreas',
+    descripcion: 'Áreas operativas',
+    activo: false,
+  };
+  const valor = {
+    ...tipo,
+    id: 83,
+    codigo: 'areas_logistica',
+    catalogoTipoId: 51,
+    catalogoTipoCodigo: 'gestion_areas',
+    catalogoTipoNombre: 'Áreas',
+  };
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [provideHttpClient(), provideHttpClientTesting()],
@@ -47,6 +60,7 @@ describe('Administración HTTP de catálogos', () => {
     const post = http.expectOne(E.crearTipo);
     expect(post.request.method).toBe('POST');
     expect(post.request.body).toEqual({
+      codigo: tipo.codigo,
       nombre: tipo.nombre,
       descripcion: tipo.descripcion,
       activo: true,
@@ -56,7 +70,12 @@ describe('Administración HTTP de catálogos', () => {
     const editar = firstValueFrom(api.guardarTipo(tipo, tipo));
     const put = http.expectOne(E.actualizarTipo);
     expect(put.request.method).toBe('PUT');
-    expect(put.request.body).toEqual(tipo);
+    expect(put.request.body).toEqual({
+      id: tipo.id,
+      nombre: tipo.nombre,
+      descripcion: tipo.descripcion,
+      activo: tipo.activo,
+    });
     put.flush(resultado(tipo));
     await editar;
   });
@@ -65,6 +84,7 @@ describe('Administración HTTP de catálogos', () => {
     const post = http.expectOne(E.crearValor);
     expect(post.request.method).toBe('POST');
     expect(post.request.body).toEqual({
+      codigo: valor.codigo,
       nombre: valor.nombre,
       descripcion: valor.descripcion,
       catalogoTipoId: 51,

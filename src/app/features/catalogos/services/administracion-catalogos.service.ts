@@ -32,32 +32,35 @@ export class AdministracionCatalogosService {
       .pipe(map((r) => exigirDatosResultadoApi(r, 'las opciones').map(mapearValorCatalogo)));
   }
 
-  /** Crea o actualiza un tipo; editar conserva su estado salvo cambio explícito. */
+  /** Crea o actualiza un tipo; el código solo forma parte del alta. */
   public guardarTipo(
     datos: DatosCatalogo,
     entidad: Catalogo | null,
     activo = entidad?.activo ?? true,
   ): Observable<Catalogo> {
-    const cuerpo = { nombre: datos.nombre, descripcion: datos.descripcion, activo };
+    const cuerpoEditable = { nombre: datos.nombre, descripcion: datos.descripcion, activo };
     const solicitud = entidad
       ? this.http.put<ResultadoApi<CatalogoTipoDto>>(E.actualizarTipo, {
           id: entidad.id,
-          ...cuerpo,
+          ...cuerpoEditable,
         })
-      : this.http.post<ResultadoApi<CatalogoTipoDto>>(E.crearTipo, cuerpo);
+      : this.http.post<ResultadoApi<CatalogoTipoDto>>(E.crearTipo, {
+          codigo: datos.codigo,
+          ...cuerpoEditable,
+        });
     return solicitud.pipe(
       map((r) => mapearCatalogo(exigirDatosResultadoApi(r, 'el catálogo guardado'))),
     );
   }
 
-  /** Persiste una opción en el padre indicado y conserva su estado al editar. */
+  /** Persiste una opción; el código solo forma parte del alta. */
   public guardarValor(
     datos: DatosCatalogo,
     padreId: number,
     entidad: ValorCatalogo | null,
     activo = entidad?.activo ?? true,
   ): Observable<ValorCatalogo> {
-    const cuerpo = {
+    const cuerpoEditable = {
       catalogoTipoId: padreId,
       nombre: datos.nombre,
       descripcion: datos.descripcion,
@@ -66,9 +69,12 @@ export class AdministracionCatalogosService {
     const solicitud = entidad
       ? this.http.put<ResultadoApi<CatalogoValorDto>>(E.actualizarValor, {
           id: entidad.id,
-          ...cuerpo,
+          ...cuerpoEditable,
         })
-      : this.http.post<ResultadoApi<CatalogoValorDto>>(E.crearValor, cuerpo);
+      : this.http.post<ResultadoApi<CatalogoValorDto>>(E.crearValor, {
+          codigo: datos.codigo,
+          ...cuerpoEditable,
+        });
     return solicitud.pipe(
       map((r) => mapearValorCatalogo(exigirDatosResultadoApi(r, 'la opción guardada'))),
     );

@@ -19,6 +19,38 @@
     class="ui-form-grid"
   >
     <div class="ui-field">
+      <div class="ui-field__label-group">
+        <label class="ui-label" for="catalogo-codigo">Código</label>
+        @if (!esEdicion()) {
+          <app-tooltip
+            [texto]="ayudaCodigo()"
+            posicion="derecha"
+            etiqueta="Ayuda para definir el código"
+          />
+        }
+      </div>
+      <input
+        class="ui-control"
+        id="catalogo-codigo"
+        formControlName="codigo"
+        appErrorCampo
+        required
+        autocomplete="off"
+        spellcheck="false"
+        [readOnly]="esEdicion()"
+        [attr.aria-readonly]="esEdicion()"
+        aria-describedby="catalogo-codigo-ayuda"
+        [maxlength]="limites.codigo"
+      />
+      <span id="catalogo-codigo-ayuda" class="ui-hint">
+        @if (esEdicion()) {
+          Identificador técnico inmutable.
+        } @else {
+          Después de crear el registro, el código no podrá modificarse.
+        }
+      </span>
+    </div>
+    <div class="ui-field">
       <label class="ui-label" for="catalogo-nombre">Nombre</label>
       <input
         class="ui-control"

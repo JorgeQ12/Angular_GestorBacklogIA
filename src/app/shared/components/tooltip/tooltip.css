@@ -1,0 +1,182 @@
+:host {
+  display: inline-flex;
+}
+
+.ui-tooltip {
+  position: relative;
+  display: inline-flex;
+}
+
+.ui-tooltip__trigger {
+  display: inline-grid;
+  width: var(--space-5);
+  height: var(--space-5);
+  place-items: center;
+  padding: 0;
+  border: var(--border-width) solid transparent;
+  border-radius: var(--radius-circle);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: help;
+  transition:
+    border-color var(--transition-fast) var(--ease-standard),
+    background-color var(--transition-fast) var(--ease-standard),
+    color var(--transition-fast) var(--ease-standard);
+}
+
+.ui-tooltip__trigger:hover {
+  border-color: var(--border-subtle);
+  background: var(--surface-muted);
+  color: var(--text-primary);
+}
+
+.ui-tooltip__trigger:focus-visible {
+  outline: 0;
+  box-shadow: var(--shadow-focus);
+}
+
+.ui-tooltip__trigger app-icono {
+  width: var(--font-size-sm);
+  height: var(--font-size-sm);
+}
+
+.ui-tooltip__contenido {
+  position: absolute;
+  z-index: var(--z-tooltip);
+  width: max-content;
+  max-width: 18rem;
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-width) solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--surface-default);
+  box-shadow: var(--shadow-lg);
+  color: var(--text-primary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-normal);
+  text-align: left;
+  text-wrap: pretty;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity var(--transition-fast) var(--ease-standard),
+    transform var(--transition-fast) var(--ease-standard),
+    visibility var(--transition-fast) var(--ease-standard);
+}
+
+.ui-tooltip__contenido::before {
+  position: absolute;
+  content: '';
+}
+
+.ui-tooltip:hover .ui-tooltip__contenido,
+.ui-tooltip:focus-within .ui-tooltip__contenido {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.ui-tooltip[data-posicion='superior'] .ui-tooltip__contenido,
+.ui-tooltip[data-posicion='inferior'] .ui-tooltip__contenido {
+  left: 50%;
+}
+
+.ui-tooltip[data-posicion='superior'] .ui-tooltip__contenido {
+  bottom: calc(100% + var(--space-2));
+  transform: translate(-50%, var(--space-1));
+}
+
+.ui-tooltip[data-posicion='inferior'] .ui-tooltip__contenido {
+  top: calc(100% + var(--space-2));
+  transform: translate(-50%, calc(-1 * var(--space-1)));
+}
+
+.ui-tooltip[data-posicion='derecha'] .ui-tooltip__contenido,
+.ui-tooltip[data-posicion='izquierda'] .ui-tooltip__contenido {
+  top: 0;
+}
+
+.ui-tooltip[data-posicion='derecha'] .ui-tooltip__contenido {
+  left: calc(100% + var(--space-2));
+  transform: translateX(calc(-1 * var(--space-1)));
+}
+
+.ui-tooltip[data-posicion='izquierda'] .ui-tooltip__contenido {
+  right: calc(100% + var(--space-2));
+  transform: translateX(var(--space-1));
+}
+
+.ui-tooltip[data-posicion='superior']:is(:hover, :focus-within) .ui-tooltip__contenido,
+.ui-tooltip[data-posicion='inferior']:is(:hover, :focus-within) .ui-tooltip__contenido {
+  transform: translate(-50%, 0);
+}
+
+.ui-tooltip[data-posicion='derecha']:is(:hover, :focus-within) .ui-tooltip__contenido,
+.ui-tooltip[data-posicion='izquierda']:is(:hover, :focus-within) .ui-tooltip__contenido {
+  transform: translateX(0);
+}
+
+.ui-tooltip[data-posicion='superior'] .ui-tooltip__contenido::before {
+  top: 100%;
+  right: 0;
+  left: 0;
+  height: var(--space-2);
+}
+
+.ui-tooltip[data-posicion='inferior'] .ui-tooltip__contenido::before {
+  right: 0;
+  bottom: 100%;
+  left: 0;
+  height: var(--space-2);
+}
+
+.ui-tooltip[data-posicion='derecha'] .ui-tooltip__contenido::before {
+  top: 0;
+  right: 100%;
+  bottom: 0;
+  width: var(--space-2);
+}
+
+.ui-tooltip[data-posicion='izquierda'] .ui-tooltip__contenido::before {
+  top: 0;
+  bottom: 0;
+  left: 100%;
+  width: var(--space-2);
+}
+
+@media (max-width: 640px) {
+  .ui-tooltip__contenido {
+    max-width: min(16rem, calc(100vw - var(--space-16) - var(--space-8)));
+  }
+
+  .ui-tooltip[data-posicion='derecha'] .ui-tooltip__contenido,
+  .ui-tooltip[data-posicion='izquierda'] .ui-tooltip__contenido {
+    top: calc(100% + var(--space-2));
+    right: auto;
+    bottom: auto;
+    left: calc(-1 * var(--space-12));
+    transform: translateY(calc(-1 * var(--space-1)));
+  }
+
+  .ui-tooltip[data-posicion='derecha']:is(:hover, :focus-within) .ui-tooltip__contenido,
+  .ui-tooltip[data-posicion='izquierda']:is(:hover, :focus-within) .ui-tooltip__contenido {
+    transform: translateY(0);
+  }
+
+  .ui-tooltip[data-posicion='derecha'] .ui-tooltip__contenido::before,
+  .ui-tooltip[data-posicion='izquierda'] .ui-tooltip__contenido::before {
+    right: 0;
+    bottom: 100%;
+    left: 0;
+    width: auto;
+    height: var(--space-2);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-tooltip__trigger,
+  .ui-tooltip__contenido {
+    transition: none;
+  }
+}
