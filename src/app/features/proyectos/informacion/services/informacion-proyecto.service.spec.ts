@@ -27,7 +27,7 @@ describe('InformacionProyectoService', () => {
     const solicitud = httpTesting.expectOne(
       (request) => request.url === ENDPOINTS_INFORMACION_PROYECTO.obtenerProyecto,
     );
-    expect(solicitud.request.params.get('ProyectoId')).toBe('42');
+    expect(solicitud.request.params.get('proyectoId')).toBe('42');
     solicitud.flush(resultado(DTO));
     await expect(respuesta).resolves.toMatchObject({ id: 42, versionId: 81, numeroVersion: 4 });
   });

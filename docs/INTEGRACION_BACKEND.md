@@ -49,6 +49,8 @@ Responsabilidades:
 - `core/http/models` contiene el sobre transversal `ResultadoApi<T>`.
 - `config` centraliza las rutas de la feature.
 - El DTO refleja exactamente nombres, nulabilidad y estructura del backend.
+- Los parámetros de consulta se envían en camelCase, igual que las propiedades de los cuerpos
+  JSON (`proyectoId`, `tipo`, `itemTrabajoId`).
 - El mapper adapta el DTO sin permitir que el contrato HTTP llegue a la vista.
 - El servicio consulta, valida el resultado y entrega un modelo de interfaz.
 - La página coordina carga, error, reintento, sesión y navegación.
@@ -62,7 +64,7 @@ Cada servicio conserva el contrato explícito de sus operaciones.
 Los valores administrados por el backend no se replican como listas estáticas en las features.
 
 - `core/catalogos` centraliza endpoint, DTO, mapper y servicio de consulta.
-- La feature solicita el tipo mediante `CatalogoTipoCodigo`; los códigos técnicos compartidos se
+- La feature solicita el tipo mediante `catalogoTipoCodigo`; los códigos técnicos compartidos se
   centralizan en `core/catalogos` y no se duplican entre features.
 - El control trabaja con el ID del valor y usa el nombre únicamente para presentación.
 - Los valores inactivos no se ofrecen en formularios nuevos.

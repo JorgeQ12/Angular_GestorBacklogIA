@@ -91,7 +91,7 @@ export class CreacionProyectoService {
 
   /** Renueva los integrantes del Team vinculado en Azure DevOps. */
   public sincronizarEquipoAzure(proyectoId: number): Observable<OrigenEquipoAzureProyecto> {
-    const params = new HttpParams().set('ProyectoId', proyectoId);
+    const params = new HttpParams().set('proyectoId', proyectoId);
     return this.http
       .post<ResultadoApi<SincronizarEquipoAzureRespuestaDto>>(
         ENDPOINTS_CREACION_PROYECTO.sincronizarEquipoAzure,

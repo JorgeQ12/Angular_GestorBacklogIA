@@ -186,6 +186,9 @@ describe('PaginaPlanificacionProyecto', () => {
     expect(elemento?.textContent).toContain('historias de usuario');
     expect(elemento?.textContent).toContain('5');
     expect(elemento?.textContent).toContain('Épica de entregas');
+    expect(
+      elemento?.querySelector('.pagina-planificacion__contenido--arbol'),
+    ).not.toBeNull();
   });
 
   it('abre una característica vigente y autorizada directamente en edición', async () => {
@@ -270,8 +273,12 @@ describe('PaginaPlanificacionProyecto', () => {
       .find((elemento) => elemento.textContent?.includes('Vista Gantt'));
 
     (boton as HTMLButtonElement | undefined)?.click();
+    harness.detectChanges();
 
     expect(gantt.abrir).toHaveBeenCalledWith(PLANIFICACION);
+    expect(
+      harness.routeNativeElement?.querySelector('.pagina-planificacion__contenido--arbol'),
+    ).toBeNull();
   });
 
   it('filtra el árbol y permite limpiar una búsqueda sin resultados', async () => {

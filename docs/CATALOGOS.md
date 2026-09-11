@@ -43,17 +43,17 @@ Todas las operaciones viven bajo `${environment.apiBaseUrl}/Catalogo`.
 
 | Operación                 | Método | Entrada                                       |
 | ------------------------- | ------ | --------------------------------------------- |
-| `ObtenerCatalogosTipo`    | GET    | `IncluirInactivos=true`                       |
-| `ObtenerCatalogosValor`   | GET    | `IncluirInactivos=true`                       |
+| `ObtenerCatalogosTipo`    | GET    | `incluirInactivos=true`                       |
+| `ObtenerCatalogosValor`   | GET    | `incluirInactivos=true`                       |
 | `CrearCatalogoTipo`       | POST   | nombre, descripción y activo                  |
 | `ActualizarCatalogoTipo`  | PUT    | ID, nombre, descripción y activo              |
-| `InactivarCatalogoTipo`   | PATCH  | `Id` como query param y cuerpo nulo           |
+| `InactivarCatalogoTipo`   | PATCH  | `id` como query param y cuerpo nulo           |
 | `CrearCatalogoValor`      | POST   | ID del tipo, nombre, descripción y activo     |
 | `ActualizarCatalogoValor` | PUT    | ID, ID del tipo, nombre, descripción y activo |
-| `InactivarCatalogoValor`  | PATCH  | `Id` como query param y cuerpo nulo           |
+| `InactivarCatalogoValor`  | PATCH  | `id` como query param y cuerpo nulo           |
 
 El DTO de valores refleja el contrato vigente, incluidos los códigos técnicos asignados por el
-backend. La consulta transversal solicita opciones mediante `CatalogoTipoCodigo` y mantiene sus
+backend. La consulta transversal solicita opciones mediante `catalogoTipoCodigo` y mantiene sus
 códigos centralizados; nunca los deriva del nombre ni utiliza IDs de semillas. Nombre y descripción
 son obligatorios y admiten 100 y 500 caracteres respectivamente. El estado activo no aparece en el
 formulario: se conserva al editar y se modifica mediante su acción independiente.

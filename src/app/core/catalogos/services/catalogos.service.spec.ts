@@ -29,8 +29,8 @@ describe('CatalogosService', () => {
     const solicitud = httpTesting.expectOne(
       (peticion) =>
         peticion.url === ENDPOINTS_CATALOGOS.obtenerValores &&
-        peticion.params.get('CatalogoTipoCodigo') === CodigoTipoCatalogoGestionProducto.Prioridad &&
-        !peticion.params.has('CatalogoTipoNombre'),
+        peticion.params.get('catalogoTipoCodigo') === CodigoTipoCatalogoGestionProducto.Prioridad &&
+        !peticion.params.has('catalogoTipoNombre'),
     );
 
     solicitud.flush(

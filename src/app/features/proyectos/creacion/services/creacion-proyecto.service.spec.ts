@@ -123,7 +123,7 @@ describe('CreacionProyectoService', () => {
     const solicitud = httpTesting.expectOne(
       (peticion) =>
         peticion.url === ENDPOINTS_CREACION_PROYECTO.sincronizarEquipoAzure &&
-        peticion.params.get('ProyectoId') === '42',
+        peticion.params.get('proyectoId') === '42',
     );
 
     expect(solicitud.request.method).toBe('POST');

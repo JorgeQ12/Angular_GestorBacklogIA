@@ -35,9 +35,9 @@ describe('PlanificacionProyectoService', () => {
     );
 
     expect(solicitud.request.method).toBe('GET');
-    expect(solicitud.request.params.get('ProyectoId')).toBe('42');
-    expect(solicitud.request.params.get('IncluirEliminados')).toBe('false');
-    expect(solicitud.request.params.has('VersionBacklogId')).toBe(false);
+    expect(solicitud.request.params.get('proyectoId')).toBe('42');
+    expect(solicitud.request.params.get('incluirEliminados')).toBe('false');
+    expect(solicitud.request.params.has('versionBacklogId')).toBe(false);
     solicitud.flush(crearResultado(PLANIFICACION_DTO));
 
     await expect(respuesta).resolves.toMatchObject({
@@ -71,9 +71,9 @@ describe('PlanificacionProyectoService', () => {
       (request) => request.url === ENDPOINTS_PLANIFICACION_PROYECTO.obtenerPlanificacion,
     );
 
-    expect(solicitud.request.params.get('ProyectoId')).toBe('42');
-    expect(solicitud.request.params.get('VersionBacklogId')).toBe('80');
-    expect(solicitud.request.params.get('IncluirEliminados')).toBe('false');
+    expect(solicitud.request.params.get('proyectoId')).toBe('42');
+    expect(solicitud.request.params.get('versionBacklogId')).toBe('80');
+    expect(solicitud.request.params.get('incluirEliminados')).toBe('false');
     solicitud.flush(
       crearResultado({
         ...PLANIFICACION_DTO,
@@ -92,9 +92,9 @@ describe('PlanificacionProyectoService', () => {
       (request) => request.url === ENDPOINTS_PLANIFICACION_PROYECTO.obtenerPlanificacion,
     );
 
-    expect(solicitud.request.params.get('ProyectoId')).toBe('42');
-    expect(solicitud.request.params.get('IncluirEliminados')).toBe('true');
-    expect(solicitud.request.params.has('VersionBacklogId')).toBe(false);
+    expect(solicitud.request.params.get('proyectoId')).toBe('42');
+    expect(solicitud.request.params.get('incluirEliminados')).toBe('true');
+    expect(solicitud.request.params.has('versionBacklogId')).toBe(false);
     solicitud.flush(crearResultado(PLANIFICACION_DTO));
 
     await expect(respuesta).resolves.toMatchObject({ proyectoId: 42 });
@@ -107,7 +107,7 @@ describe('PlanificacionProyectoService', () => {
     );
 
     expect(solicitud.request.method).toBe('GET');
-    expect(solicitud.request.params.get('ProyectoId')).toBe('42');
+    expect(solicitud.request.params.get('proyectoId')).toBe('42');
     solicitud.flush(crearResultado(VERSIONES_DTO));
 
     await expect(respuesta).resolves.toEqual([
@@ -207,7 +207,7 @@ describe('PlanificacionProyectoService', () => {
 
     expect(solicitud.request.method).toBe('POST');
     expect(solicitud.request.body).toBeNull();
-    expect(solicitud.request.params.get('ProyectoId')).toBe('42');
+    expect(solicitud.request.params.get('proyectoId')).toBe('42');
     solicitud.flush(
       crearResultado({
         epicaId: 15,

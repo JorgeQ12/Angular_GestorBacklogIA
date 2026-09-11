@@ -41,6 +41,7 @@
 
     <section
       class='ui-card pagina-planificacion__contenido'
+      [class.pagina-planificacion__contenido--arbol]='!listaRequisitosAbierta() && !gantt.abierto()'
       [attr.aria-label]='listaRequisitosAbierta() ? "Lista de requisitos del proyecto" : gantt.abierto() ? "Diagrama de Gantt de la planificación" : "Planificación del proyecto"'
       [attr.aria-busy]='gantt.cargando()'
     >

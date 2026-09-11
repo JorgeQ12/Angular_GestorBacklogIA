@@ -34,7 +34,7 @@ describe('Administración HTTP de catálogos', () => {
       [E.obtenerValores, valor],
     ] as const) {
       const req = http.expectOne(
-        (r) => r.url === url && r.params.get('IncluirInactivos') === 'true',
+        (r) => r.url === url && r.params.get('incluirInactivos') === 'true',
       );
       expect(req.request.method).toBe('GET');
       req.flush(resultado([datos]));
@@ -92,7 +92,7 @@ describe('Administración HTTP de catálogos', () => {
       [E.inactivarTipo, tipo],
       [E.inactivarValor, valor],
     ] as const) {
-      const req = http.expectOne((r) => r.url === url && r.params.get('Id') === String(datos.id));
+      const req = http.expectOne((r) => r.url === url && r.params.get('id') === String(datos.id));
       expect(req.request.method).toBe('PATCH');
       expect(req.request.body).toBeNull();
       req.flush(resultado(datos));
