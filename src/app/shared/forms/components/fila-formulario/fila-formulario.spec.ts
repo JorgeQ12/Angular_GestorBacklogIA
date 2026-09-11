@@ -13,14 +13,14 @@ describe('FilaFormulario', () => {
   });
 
   it('presenta la posición y comunica la eliminación', () => {
-    const eliminar = vi.fn();
+    const eliminar = jasmine.createSpy('eliminar');
     fixture.componentInstance.eliminar.subscribe(eliminar);
 
     const elemento = fixture.nativeElement as HTMLElement;
     expect(elemento.querySelector('.fila-formulario__numero')?.textContent).toBe('2');
     (elemento.querySelector('button') as HTMLButtonElement).click();
 
-    expect(eliminar).toHaveBeenCalledOnce();
+    expect(eliminar).toHaveBeenCalledTimes(1);
   });
 
   it('bloquea la acción cuando el elemento no puede eliminarse', () => {

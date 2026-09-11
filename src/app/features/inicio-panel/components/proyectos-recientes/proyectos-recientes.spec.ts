@@ -17,7 +17,7 @@ describe('ProyectosRecientes', () => {
   });
 
   it('presenta el proyecto y emite su selección', () => {
-    const seleccionar = vi.fn();
+    const seleccionar = jasmine.createSpy('seleccionar');
     fixture.componentInstance.seleccionarProyecto.subscribe(seleccionar);
     const boton = (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>(
       '.proyecto-reciente',
@@ -31,13 +31,13 @@ describe('ProyectosRecientes', () => {
   });
 
   it('emite la consulta de todos los proyectos', () => {
-    const verTodos = vi.fn();
+    const verTodos = jasmine.createSpy('verTodos');
     fixture.componentInstance.verTodos.subscribe(verTodos);
     const boton = [...(fixture.nativeElement as HTMLElement).querySelectorAll('button')].find(
       (actual) => actual.textContent?.includes('Ver todos'),
     );
     boton?.click();
-    expect(verTodos).toHaveBeenCalledOnce();
+    expect(verTodos).toHaveBeenCalledTimes(1);
   });
 });
 

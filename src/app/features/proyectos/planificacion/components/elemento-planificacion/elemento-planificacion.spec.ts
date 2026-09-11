@@ -16,7 +16,7 @@ describe('ElementoPlanificacion', () => {
     fixture = TestBed.createComponent(ElementoPlanificacion);
   });
 
-  it.each([
+  ([
     [TipoElementoPlanificacion.Epica, 'epica'],
     [TipoElementoPlanificacion.Caracteristica, 'caracteristica'],
     [TipoElementoPlanificacion.ListaRequisitos, 'listaRequisitos'],
@@ -24,9 +24,8 @@ describe('ElementoPlanificacion', () => {
     [TipoElementoPlanificacion.TareaRequisito, 'tareaRequisito'],
     [TipoElementoPlanificacion.Historia, 'historiaUsuario'],
     [TipoElementoPlanificacion.Tarea, 'tarea'],
-  ] as const)(
-    'representa el tipo %s mediante el icono semántico %s',
-    (tipo, nombreIcono: NombreIconoAplicacion) => {
+  ] as const).forEach(([tipo, nombreIcono]) => {
+    it(`representa el tipo ${tipo} mediante el icono semántico ${nombreIcono}`, () => {
       fixture.componentRef.setInput('elemento', crearElemento(tipo));
       fixture.detectChanges();
 
@@ -34,12 +33,12 @@ describe('ElementoPlanificacion', () => {
         .query(By.css('.elemento-planificacion__icono'))
         .query(By.directive(IconoComponent))
         .componentInstance as IconoComponent;
-      expect(icono.nombre()).toBe(nombreIcono);
-    },
-  );
+      expect(icono.nombre()).toBe(nombreIcono as NombreIconoAplicacion);
+    });
+  });
 
   it('emite la expansión únicamente cuando el elemento contiene hijos', () => {
-    const alternar = vi.fn();
+    const alternar = jasmine.createSpy();
     fixture.componentRef.setInput('elemento', {
       ...crearElemento(TipoElementoPlanificacion.Epica),
       hijos: [crearElemento(TipoElementoPlanificacion.Caracteristica)],
@@ -50,7 +49,7 @@ describe('ElementoPlanificacion', () => {
     const boton = (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>('button');
     boton?.click();
 
-    expect(alternar).toHaveBeenCalledOnce();
+    expect(alternar).toHaveBeenCalledTimes(1);
     expect(boton?.getAttribute('aria-expanded')).toBe('false');
   });
 
@@ -103,7 +102,7 @@ describe('ElementoPlanificacion', () => {
   });
 
   it('bloquea la expansión manual cuando la búsqueda administra la rama', () => {
-    const alternar = vi.fn();
+    const alternar = jasmine.createSpy();
     fixture.componentRef.setInput('elemento', {
       ...crearElemento(TipoElementoPlanificacion.Epica),
       hijos: [crearElemento(TipoElementoPlanificacion.Caracteristica)],
@@ -120,7 +119,7 @@ describe('ElementoPlanificacion', () => {
   });
 
   it('permite consultar un elemento eliminado sin ofrecer acciones de modificación', () => {
-    const consultar = vi.fn();
+    const consultar = jasmine.createSpy();
     fixture.componentRef.setInput('elemento', {
       ...crearElemento(TipoElementoPlanificacion.Tarea),
       activo: false,
@@ -145,13 +144,13 @@ describe('ElementoPlanificacion', () => {
 
     expect(elemento.textContent).toContain('Eliminado');
     expect(botonConsulta).toBeDefined();
-    expect(consultar).toHaveBeenCalledOnce();
+    expect(consultar).toHaveBeenCalledTimes(1);
     expect(
       botones.some((boton) => boton.getAttribute('aria-label') === 'Editar Tarea'),
     ).toBe(false);
   });
   it('abre la edición desde el menú contextual', () => {
-    const editar = vi.fn();
+    const editar = jasmine.createSpy();
     fixture.componentRef.setInput('elemento', crearElemento(TipoElementoPlanificacion.Caracteristica));
     fixture.componentRef.setInput('menuAccionesAbierto', true);
     fixture.componentInstance.editar.subscribe(editar);
@@ -162,35 +161,37 @@ describe('ElementoPlanificacion', () => {
     boton?.click();
 
     expect(boton).toBeDefined();
-    expect(editar).toHaveBeenCalledOnce();
+    expect(editar).toHaveBeenCalledTimes(1);
   });
 
-  it.each([
+  ([
     [TipoElementoPlanificacion.Epica, 'Nueva característica'],
     [TipoElementoPlanificacion.Caracteristica, 'Nueva historia de usuario'],
     [TipoElementoPlanificacion.Historia, 'Nueva tarea'],
     [TipoElementoPlanificacion.ListaRequisitos, 'Crear actividad'],
     [TipoElementoPlanificacion.ActividadRequisito, 'Crear tarea de requisitos'],
-  ] as const)('muestra el tooltip de creación correspondiente para %s', (tipo, etiqueta) => {
-    const elemento = crearElemento(tipo);
-    fixture.componentRef.setInput('elemento', {
-      ...elemento,
-      capacidades: { ...elemento.capacidades, puedeCrearHijo: true },
+  ] as const).forEach(([tipo, etiqueta]) => {
+    it(`muestra el tooltip de creación correspondiente para ${tipo}`, () => {
+      const elemento = crearElemento(tipo);
+      fixture.componentRef.setInput('elemento', {
+        ...elemento,
+        capacidades: { ...elemento.capacidades, puedeCrearHijo: true },
+      });
+      fixture.detectChanges();
+
+      const boton = (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>(
+        '.elemento-planificacion__crear-hijo',
+      );
+
+      expect(boton?.getAttribute('data-tooltip')).toBe(etiqueta);
+      expect(boton?.getAttribute('aria-label')).toBe(etiqueta);
+      expect(boton?.classList.contains('ui-tooltip')).toBe(true);
     });
-    fixture.detectChanges();
-
-    const boton = (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>(
-      '.elemento-planificacion__crear-hijo',
-    );
-
-    expect(boton?.getAttribute('data-tooltip')).toBe(etiqueta);
-    expect(boton?.getAttribute('aria-label')).toBe(etiqueta);
-    expect(boton?.classList.contains('ui-tooltip')).toBe(true);
   });
   it('ofrece crear característica, editar y eliminar cuando la épica está autorizada', () => {
-    const crearHijo = vi.fn();
-    const editar = vi.fn();
-    const eliminar = vi.fn();
+    const crearHijo = jasmine.createSpy();
+    const editar = jasmine.createSpy();
+    const eliminar = jasmine.createSpy();
     const epica = crearElemento(TipoElementoPlanificacion.Epica);
     fixture.componentRef.setInput('elemento', {
       ...epica,
@@ -223,12 +224,12 @@ describe('ElementoPlanificacion', () => {
     expect(botonCrear).toBeDefined();
     expect(botonEditar).toBeDefined();
     expect(botonEliminar).toBeDefined();
-    expect(crearHijo).toHaveBeenCalledOnce();
-    expect(editar).toHaveBeenCalledOnce();
-    expect(eliminar).toHaveBeenCalledOnce();
+    expect(crearHijo).toHaveBeenCalledTimes(1);
+    expect(editar).toHaveBeenCalledTimes(1);
+    expect(eliminar).toHaveBeenCalledTimes(1);
   });
   it('ofrece la sincronizacion solo cuando la capacidad fue autorizada', () => {
-    const sincronizar = vi.fn();
+    const sincronizar = jasmine.createSpy();
     const epica = crearElemento(TipoElementoPlanificacion.Epica);
     fixture.componentRef.setInput('elemento', {
       ...epica,
@@ -248,7 +249,7 @@ describe('ElementoPlanificacion', () => {
     boton?.click();
 
     expect(boton).toBeDefined();
-    expect(sincronizar).toHaveBeenCalledOnce();
+    expect(sincronizar).toHaveBeenCalledTimes(1);
   });
 
   it('bloquea la sincronizacion mientras existe otra operacion de escritura', () => {
@@ -266,7 +267,7 @@ describe('ElementoPlanificacion', () => {
   });
 
   it('permite eliminar una actividad de requisito autorizada por el backend', () => {
-    const eliminar = vi.fn();
+    const eliminar = jasmine.createSpy();
     const actividad = crearElemento(TipoElementoPlanificacion.ActividadRequisito);
     fixture.componentRef.setInput('elemento', {
       ...actividad,
@@ -281,7 +282,7 @@ describe('ElementoPlanificacion', () => {
     boton?.click();
 
     expect(boton).toBeDefined();
-    expect(eliminar).toHaveBeenCalledOnce();
+    expect(eliminar).toHaveBeenCalledTimes(1);
   });
 
   it('permite eliminar una tarea autorizada por el backend', () => {

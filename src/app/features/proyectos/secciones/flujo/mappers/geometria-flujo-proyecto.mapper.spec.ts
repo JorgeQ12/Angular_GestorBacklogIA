@@ -57,15 +57,17 @@ describe('geometria-flujo-proyecto.mapper', () => {
     expect(resolverLadoDestinoMasCercano(bloque, { x: 220, y: 370 })).toBe(LadoConexionFlujo.Abajo);
   });
 
-  it.each([
+  [
     LadoConexionFlujo.Izquierda,
     LadoConexionFlujo.Derecha,
     LadoConexionFlujo.Arriba,
     LadoConexionFlujo.Abajo,
-  ])('construye una trayectoria SVG completa hacia %s', (lado) => {
-    const ruta = construirRutaConexion({ x: 10, y: 20 }, { x: 200, y: 160 }, lado);
+  ].forEach((lado) => {
+    it(`construye una trayectoria SVG completa hacia ${lado}`, () => {
+      const ruta = construirRutaConexion({ x: 10, y: 20 }, { x: 200, y: 160 }, lado);
 
-    expect(ruta).toMatch(/^M 10 20 C /);
-    expect(ruta).toMatch(/200 160$/);
+      expect(ruta).toMatch(/^M 10 20 C /);
+      expect(ruta).toMatch(/200 160$/);
+    });
   });
 });

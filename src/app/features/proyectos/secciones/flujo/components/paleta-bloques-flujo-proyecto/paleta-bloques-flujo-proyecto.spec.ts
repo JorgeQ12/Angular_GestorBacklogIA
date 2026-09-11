@@ -22,7 +22,7 @@ describe('PaletaBloquesFlujoProyecto', () => {
     const opciones = (fixture.nativeElement as HTMLElement).querySelectorAll<HTMLButtonElement>(
       '.paleta-bloques-flujo__elemento',
     );
-    expect(opciones).toHaveLength(5);
+    expect(opciones.length).toBe(5);
 
     (fixture.nativeElement as HTMLElement)
       .querySelector<HTMLButtonElement>(`[data-tipo="${TipoBloqueFlujo.Decision}"]`)

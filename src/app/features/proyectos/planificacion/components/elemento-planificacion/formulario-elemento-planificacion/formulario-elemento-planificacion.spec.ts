@@ -61,7 +61,7 @@ describe('FormularioElementoPlanificacionComponent', () => {
   });
 
   it('impide guardar una tarea cuando faltan sus campos obligatorios', () => {
-    const guardar = vi.fn();
+    const guardar = jasmine.createSpy();
     fixture.componentInstance.guardar.subscribe(guardar);
     escribir('#elemento-titulo', '   ');
     escribir('#elemento-descripcion', '');
@@ -77,7 +77,7 @@ describe('FormularioElementoPlanificacionComponent', () => {
   });
 
   it('emite la fotografía válida de una tarea para que el estado construya el comando', () => {
-    const guardar = vi.fn();
+    const guardar = jasmine.createSpy();
     fixture.componentInstance.guardar.subscribe(guardar);
     escribir('#elemento-titulo', 'Tarea actualizada');
     escribir('#elemento-dependencias', 'Servicio desplegado');
@@ -94,7 +94,7 @@ describe('FormularioElementoPlanificacionComponent', () => {
   });
 
   it('mantiene el formulario consultivo en solo lectura y bloquea su envío', () => {
-    const guardar = vi.fn();
+    const guardar = jasmine.createSpy();
     fixture.componentInstance.guardar.subscribe(guardar);
     fixture.componentRef.setInput('modo', ModoEditorElementoPlanificacion.Consulta);
     fixture.detectChanges();
@@ -173,24 +173,26 @@ describe('FormularioElementoPlanificacionComponent', () => {
     expect([...controles].every((control) => !control.readOnly)).toBe(true);
   });
 
-  it.each([
+  ([
     TipoElementoPlanificacion.Historia,
     TipoElementoPlanificacion.Tarea,
-  ] as const)('presenta Información del registro para la %s', (tipo) => {
-    const detalle = {
-      ...DETALLE_EPICA,
-      tipo,
-      urlAzure: null,
-    } satisfies DetalleElementoPlanificacion;
-    fixture.componentRef.setInput('tipo', tipo);
-    fixture.componentRef.setInput('modo', ModoEditorElementoPlanificacion.Edicion);
-    fixture.componentRef.setInput('detalle', detalle);
-    fixture.componentRef.setInput('datosIniciales', VALORES_VALIDOS);
-    fixture.detectChanges();
+  ] as const).forEach((tipo) => {
+    it(`presenta Información del registro para la ${tipo}`, () => {
+      const detalle = {
+        ...DETALLE_EPICA,
+        tipo,
+        urlAzure: null,
+      } satisfies DetalleElementoPlanificacion;
+      fixture.componentRef.setInput('tipo', tipo);
+      fixture.componentRef.setInput('modo', ModoEditorElementoPlanificacion.Edicion);
+      fixture.componentRef.setInput('detalle', detalle);
+      fixture.componentRef.setInput('datosIniciales', VALORES_VALIDOS);
+      fixture.detectChanges();
 
-    const elemento = obtenerElemento();
-    expect(elemento.textContent).toContain('Información del registro');
-    expect(elemento.textContent).toContain('Versión actual');
+      const elemento = obtenerElemento();
+      expect(elemento.textContent).toContain('Información del registro');
+      expect(elemento.textContent).toContain('Versión actual');
+    });
   });
 
   function escribir(selector: string, valor: string): void {

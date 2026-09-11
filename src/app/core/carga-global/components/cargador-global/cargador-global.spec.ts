@@ -24,7 +24,7 @@ describe('CargadorGlobal', () => {
 
     expect(estado.textContent).toContain('Procesando información');
     expect(camion.getAttribute('src')).toBe('/brand/camion_carga.webp');
-    expect(fixture.nativeElement.querySelectorAll('.cargador-global__humo')).toHaveLength(4);
+    expect(fixture.nativeElement.querySelectorAll('.cargador-global__humo').length).toBe(4);
   });
 
   it('no presenta el overlay cuando no existen operaciones pendientes', () => {

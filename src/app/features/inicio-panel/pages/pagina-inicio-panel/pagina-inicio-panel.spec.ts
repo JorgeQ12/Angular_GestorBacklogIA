@@ -68,7 +68,7 @@ describe('PaginaInicioPanel', () => {
     expect(elemento.querySelector('.ui-page-header__description')?.textContent).toContain(
       'Hola, Jorge.',
     );
-    expect(elemento.querySelectorAll('.indicador-proyecto')).toHaveLength(4);
+    expect(elemento.querySelectorAll('.indicador-proyecto').length).toBe(4);
   });
 
   it('presenta las secciones globales sin depender de un rol', () => {
@@ -117,7 +117,7 @@ describe('PaginaInicioPanel', () => {
   });
 
   it('abre el punto de partida al seleccionar un nuevo proyecto', () => {
-    const navegar = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
+    const navegar = spyOn(TestBed.inject(Router), 'navigateByUrl').and.returnValue(Promise.resolve(true));
     const boton = [...(fixture.nativeElement as HTMLElement).querySelectorAll('button')].find(
       (elemento) => elemento.textContent?.includes('Nuevo proyecto'),
     );
@@ -128,7 +128,7 @@ describe('PaginaInicioPanel', () => {
   });
 
   it('abre el listado y conserva el estado seleccionado como filtro', () => {
-    const navegar = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+    const navegar = spyOn(TestBed.inject(Router), 'navigate').and.returnValue(Promise.resolve(true));
     const boton = [...(fixture.nativeElement as HTMLElement).querySelectorAll('button')].find(
       (elemento) => elemento.textContent?.includes('En progreso'),
     );
@@ -141,7 +141,7 @@ describe('PaginaInicioPanel', () => {
   });
 
   it('reanuda un borrador en el paso alcanzado y presenta el recorrido real', () => {
-    const navegar = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
+    const navegar = spyOn(TestBed.inject(Router), 'navigateByUrl').and.returnValue(Promise.resolve(true));
     resumen$.next({
       ...RESUMEN,
       indicadores: { ...RESUMEN.indicadores, enBorrador: 1 },
@@ -170,7 +170,7 @@ describe('PaginaInicioPanel', () => {
   });
 
   it('abre la información del proyecto reciente seleccionado', () => {
-    const navegar = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
+    const navegar = spyOn(TestBed.inject(Router), 'navigateByUrl').and.returnValue(Promise.resolve(true));
     resumen$.next({
       ...RESUMEN,
       proyectosRecientes: [

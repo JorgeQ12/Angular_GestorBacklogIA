@@ -45,7 +45,7 @@ describe('ArbolPlanificacionProyecto', () => {
     expect(boton?.getAttribute('data-tooltip')).toBe('Nueva épica');
     expect(boton?.getAttribute('aria-label')).toBe('Nueva épica');
     expect(boton?.classList.contains('ui-tooltip')).toBe(true);
-    expect(boton?.querySelectorAll('.ui-create-icon app-icono')).toHaveLength(2);
+    expect(boton?.querySelectorAll('.ui-create-icon app-icono').length).toBe(2);
   });
   it('permite expandir y contraer manualmente las ramas con hijos', () => {
     const elemento = fixture.nativeElement as HTMLElement;
@@ -81,7 +81,7 @@ describe('ArbolPlanificacionProyecto', () => {
     expect(ramas[1]?.getAttribute('aria-expanded')).toBe('false');
   });
   it('propaga la solicitud de sincronizacion de la epica principal', () => {
-    const sincronizar = vi.fn();
+    const sincronizar = jasmine.createSpy();
     fixture.componentInstance.sincronizarEpica.subscribe(sincronizar);
     const elemento = fixture.nativeElement as HTMLElement;
     obtenerBoton(elemento, 'Acciones de Épica principal').click();
@@ -97,11 +97,11 @@ describe('ArbolPlanificacionProyecto', () => {
     expect(elemento.querySelector('.arbol-planificacion__rama--menu-abierto')).toBeNull();
     expect(elemento.querySelector('.arbol-planificacion--menu-abierto')).toBeNull();
     expect(boton).toBeDefined();
-    expect(sincronizar).toHaveBeenCalledOnce();
+    expect(sincronizar).toHaveBeenCalledTimes(1);
   });
 
   it('propaga la actividad de requisito seleccionada para eliminar', () => {
-    const eliminar = vi.fn();
+    const eliminar = jasmine.createSpy();
     fixture.componentInstance.eliminarElemento.subscribe(eliminar);
     const elemento = fixture.nativeElement as HTMLElement;
     obtenerBoton(elemento, 'Expandir Característica').click();

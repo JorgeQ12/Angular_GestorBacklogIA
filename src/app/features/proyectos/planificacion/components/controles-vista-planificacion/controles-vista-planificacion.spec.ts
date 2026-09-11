@@ -13,7 +13,7 @@ describe('ControlesVistaPlanificacionComponent', () => {
   });
 
   it('comunica la inclusión de elementos eliminados desde el checkbox compartido', () => {
-    const cambiar = vi.fn();
+    const cambiar = jasmine.createSpy();
     fixture.componentInstance.inclusionEliminadosCambiada.subscribe(cambiar);
     abrirPanelVista();
     const control = (fixture.nativeElement as HTMLElement).querySelector<HTMLInputElement>(
@@ -40,7 +40,7 @@ describe('ControlesVistaPlanificacionComponent', () => {
   });
 
   it('comunica el término escrito mediante el campo de búsqueda compartido', () => {
-    const buscar = vi.fn();
+    const buscar = jasmine.createSpy();
     fixture.componentInstance.busquedaCambiada.subscribe(buscar);
     const control = (fixture.nativeElement as HTMLElement).querySelector<HTMLInputElement>(
       'app-campo-busqueda input',
@@ -55,7 +55,7 @@ describe('ControlesVistaPlanificacionComponent', () => {
   });
 
   it('solicita expandir todas las ramas y bloquea la acción durante una búsqueda', () => {
-    const cambiarExpansion = vi.fn();
+    const cambiarExpansion = jasmine.createSpy();
     fixture.componentInstance.expansionCompletaCambiada.subscribe(cambiarExpansion);
     abrirPanelVista();
     const control = (fixture.nativeElement as HTMLElement).querySelector<HTMLInputElement>(
@@ -84,7 +84,7 @@ describe('ControlesVistaPlanificacionComponent', () => {
   });
 
   it('comunica el cambio a la vista Gantt', () => {
-    const abrirGantt = vi.fn();
+    const abrirGantt = jasmine.createSpy();
     fixture.componentInstance.ganttSolicitado.subscribe(abrirGantt);
     abrirPanelVista();
     const boton = [...(fixture.nativeElement as HTMLElement).querySelectorAll('button')]
@@ -92,11 +92,11 @@ describe('ControlesVistaPlanificacionComponent', () => {
 
     (boton as HTMLButtonElement | undefined)?.click();
 
-    expect(abrirGantt).toHaveBeenCalledOnce();
+    expect(abrirGantt).toHaveBeenCalledTimes(1);
   });
 
   it('comunica la apertura del asistente de generación desde la barra', () => {
-    const alternar = vi.fn();
+    const alternar = jasmine.createSpy();
     fixture.componentInstance.generacionAlternada.subscribe(alternar);
     const boton = [...(fixture.nativeElement as HTMLElement).querySelectorAll('button')].find(
       (elemento) => elemento.textContent?.includes('Generar con IA'),
@@ -104,7 +104,7 @@ describe('ControlesVistaPlanificacionComponent', () => {
 
     (boton as HTMLButtonElement | undefined)?.click();
 
-    expect(alternar).toHaveBeenCalledOnce();
+    expect(alternar).toHaveBeenCalledTimes(1);
   });
 
   function abrirPanelVista(): void {

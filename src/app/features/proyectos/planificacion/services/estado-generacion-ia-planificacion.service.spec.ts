@@ -11,24 +11,28 @@ import { PlanificacionProyectoService } from './planificacion-proyecto.service';
 
 describe('EstadoGeneracionIaPlanificacionService', () => {
   const planificacion = signal<PlanificacionProyecto | null>(PLANIFICACION);
-  const api = { generarConIa: vi.fn() };
+  const api = { generarConIa: jasmine.createSpy('generarConIa') };
   const estadoPlanificacion = {
     planificacion: planificacion.asReadonly(),
-    cargar: vi.fn(),
+    cargar: jasmine.createSpy('cargar'),
   };
   const mensajes = {
-    confirmar: vi.fn(),
-    exito: vi.fn(),
+    confirmar: jasmine.createSpy('confirmar'),
+    exito: jasmine.createSpy('exito'),
   };
-  const notificador = { comunicar: vi.fn() };
+  const notificador = { comunicar: jasmine.createSpy('comunicar') };
   let servicio: EstadoGeneracionIaPlanificacionService;
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    api.generarConIa.calls.reset();
+    estadoPlanificacion.cargar.calls.reset();
+    mensajes.confirmar.calls.reset();
+    mensajes.exito.calls.reset();
+    notificador.comunicar.calls.reset();
     planificacion.set(PLANIFICACION);
-    mensajes.confirmar.mockResolvedValue(true);
-    mensajes.exito.mockResolvedValue(undefined);
-    api.generarConIa.mockReturnValue(
+    mensajes.confirmar.and.returnValue(Promise.resolve(true));
+    mensajes.exito.and.returnValue(Promise.resolve(undefined));
+    api.generarConIa.and.returnValue(
       of({
         proyectoId: 42,
         nivel: NivelGeneracionIaPlanificacion.Caracteristicas,
@@ -55,7 +59,7 @@ describe('EstadoGeneracionIaPlanificacionService', () => {
 
     expect(mensajes.confirmar).toHaveBeenCalledWith(
       'Generar características',
-      expect.stringContaining('versión histórica'),
+      jasmine.stringContaining('versión histórica'),
       'Generar',
     );
     expect(api.generarConIa).toHaveBeenCalledWith(
@@ -72,7 +76,7 @@ describe('EstadoGeneracionIaPlanificacionService', () => {
   });
 
   it('no consulta el backend cuando el usuario cancela', async () => {
-    mensajes.confirmar.mockResolvedValueOnce(false);
+    mensajes.confirmar.and.returnValue(Promise.resolve(false));
 
     await servicio.generar(42, NivelGeneracionIaPlanificacion.Epicas);
 
@@ -82,14 +86,14 @@ describe('EstadoGeneracionIaPlanificacionService', () => {
 
   it('comunica el error y conserva abierto el asistente para reintentar', async () => {
     const error = new Error('fallo');
-    api.generarConIa.mockReturnValueOnce(throwError(() => error));
+    api.generarConIa.and.returnValue(throwError(() => error));
     servicio.alternarPanel();
 
     await servicio.generar(42, NivelGeneracionIaPlanificacion.Tareas);
 
     expect(notificador.comunicar).toHaveBeenCalledWith(
       error,
-      expect.objectContaining({ titulo: 'No fue posible generar la planificación' }),
+      jasmine.objectContaining({ titulo: 'No fue posible generar la planificación' }),
     );
     expect(servicio.panelAbierto()).toBe(true);
     expect(servicio.procesando()).toBe(false);
@@ -108,7 +112,7 @@ describe('EstadoGeneracionIaPlanificacionService', () => {
 
   it('ignora una confirmación pendiente cuando cambia el proyecto', async () => {
     let resolverConfirmacion: ((confirmado: boolean) => void) | undefined;
-    mensajes.confirmar.mockReturnValueOnce(
+    mensajes.confirmar.and.returnValue(
       new Promise<boolean>((resolver) => {
         resolverConfirmacion = resolver;
       }),

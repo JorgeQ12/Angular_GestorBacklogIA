@@ -32,7 +32,7 @@ describe('PasoFlujoProyecto', () => {
   });
 
   it('confirma desde el footer centralizado cuando el paso no utiliza formulario', () => {
-    const guardar = vi.fn();
+    const guardar = jasmine.createSpy();
     fixture.componentInstance.guardar.subscribe(guardar);
     fixture.componentRef.setInput('modo', ModoFormularioProyecto.Edicion);
     fixture.componentRef.setInput('acciones', ACCIONES_CREACION_PASO_PROYECTO);
@@ -42,11 +42,11 @@ describe('PasoFlujoProyecto', () => {
       .querySelector<HTMLButtonElement>('app-acciones-paso-proyecto .ui-button--primary')
       ?.click();
 
-    expect(guardar).toHaveBeenCalledOnce();
+    expect(guardar).toHaveBeenCalledTimes(1);
   });
 
   it('habilita el guardado del canvas cuando el editor comunica un cambio', () => {
-    const guardarBorrador = vi.fn();
+    const guardarBorrador = jasmine.createSpy();
     const flujoModificado = {
       ...FLUJO_CON_CONTENIDO,
       fechaActualizacion: '2026-09-04T11:00:00.000Z',
@@ -86,7 +86,7 @@ describe('PasoFlujoProyecto', () => {
   });
 
   it('permite generar el primer diagrama desde el estado vacío del canvas', () => {
-    const generarConIA = vi.fn();
+    const generarConIA = jasmine.createSpy();
     fixture.componentInstance.generarConIA.subscribe(generarConIA);
     fixture.componentRef.setInput('modo', ModoFormularioProyecto.Edicion);
     fixture.detectChanges();
@@ -96,11 +96,11 @@ describe('PasoFlujoProyecto', () => {
     ).find((elemento) => elemento.textContent?.includes('Generar con IA'));
     boton?.click();
 
-    expect(generarConIA).toHaveBeenCalledOnce();
+    expect(generarConIA).toHaveBeenCalledTimes(1);
   });
 
   it('confirma antes de regenerar un diagrama existente', async () => {
-    const generarConIA = vi.fn();
+    const generarConIA = jasmine.createSpy();
     const mensajes = TestBed.inject(MensajesService);
     fixture.componentInstance.generarConIA.subscribe(generarConIA);
     fixture.componentRef.setInput('modo', ModoFormularioProyecto.Edicion);
@@ -119,7 +119,7 @@ describe('PasoFlujoProyecto', () => {
     mensajes.aceptar();
     await fixture.whenStable();
 
-    expect(generarConIA).toHaveBeenCalledOnce();
+    expect(generarConIA).toHaveBeenCalledTimes(1);
   });
 });
 

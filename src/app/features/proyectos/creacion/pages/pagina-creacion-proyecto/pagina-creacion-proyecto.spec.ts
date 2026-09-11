@@ -15,8 +15,11 @@ import {
   FlujoProyecto,
   TipoBloqueFlujo,
 } from '../../../secciones/flujo/models/flujo-proyecto.model';
+import { NotificadorErroresApiService } from '../../../../../core/mensajes/services/notificador-errores-api.service';
+import type { ContextoProyecto } from '../../../secciones/contexto/models/contexto-proyecto.model';
 import { CreacionProyectoService } from '../../services/creacion-proyecto.service';
 import { EstadoCreacionProyectoService } from '../../services/estado-creacion-proyecto.service';
+import { NotificadorErroresBorradorProyectoService } from '../../services/notificador-errores-borrador-proyecto.service';
 import { PaginaCreacionProyecto } from './pagina-creacion-proyecto';
 import {
   AsistenteIAFlotante,
@@ -33,24 +36,30 @@ const RUTAS: Routes = [
 
 describe('PaginaCreacionProyecto', () => {
   const creacionProyecto = {
-    obtenerBorrador: vi.fn(),
-    validarVinculacionAzure: vi.fn(),
-    crearBorrador: vi.fn(),
-    actualizarBorrador: vi.fn(),
-    generarDiagramaFlujoIA: vi.fn(),
-    guardarProyecto: vi.fn(),
-    sincronizarEquipoAzure: vi.fn(),
+    obtenerBorrador: jasmine.createSpy('obtenerBorrador'),
+    validarVinculacionAzure: jasmine.createSpy('validarVinculacionAzure'),
+    crearBorrador: jasmine.createSpy('crearBorrador'),
+    actualizarBorrador: jasmine.createSpy('actualizarBorrador'),
+    generarDiagramaFlujoIA: jasmine.createSpy('generarDiagramaFlujoIA'),
+    guardarProyecto: jasmine.createSpy('guardarProyecto'),
+    sincronizarEquipoAzure: jasmine.createSpy('sincronizarEquipoAzure'),
   };
 
   beforeEach(() => {
-    vi.clearAllMocks();
-    creacionProyecto.obtenerBorrador.mockReturnValue(of(BORRADOR_AVANZADO));
-    creacionProyecto.crearBorrador.mockReturnValue(of({ id: 42, revision: 1, pasoActual: 1 }));
-    creacionProyecto.actualizarBorrador.mockReturnValue(
+    creacionProyecto.obtenerBorrador.calls.reset();
+    creacionProyecto.validarVinculacionAzure.calls.reset();
+    creacionProyecto.crearBorrador.calls.reset();
+    creacionProyecto.actualizarBorrador.calls.reset();
+    creacionProyecto.generarDiagramaFlujoIA.calls.reset();
+    creacionProyecto.guardarProyecto.calls.reset();
+    creacionProyecto.sincronizarEquipoAzure.calls.reset();
+    creacionProyecto.obtenerBorrador.and.returnValue(of(BORRADOR_AVANZADO));
+    creacionProyecto.crearBorrador.and.returnValue(of({ id: 42, revision: 1, pasoActual: 1 }));
+    creacionProyecto.actualizarBorrador.and.returnValue(
       of({ ...BORRADOR_FLUJO, revision: 5, pasoActual: 9 }),
     );
-    creacionProyecto.guardarProyecto.mockReturnValue(of(undefined));
-    creacionProyecto.generarDiagramaFlujoIA.mockReturnValue(of(FLUJO_GENERADO_IA));
+    creacionProyecto.guardarProyecto.and.returnValue(of(undefined));
+    creacionProyecto.generarDiagramaFlujoIA.and.returnValue(of(FLUJO_GENERADO_IA));
 
     TestBed.configureTestingModule({
       imports: [PaginaCreacionProyecto],
@@ -84,7 +93,7 @@ describe('PaginaCreacionProyecto', () => {
   });
 
   it('mantiene oculto el Asistente IA antes de alcanzar necesidad de negocio', async () => {
-    creacionProyecto.obtenerBorrador.mockReturnValueOnce(
+    creacionProyecto.obtenerBorrador.and.returnValue(
       of({ ...BORRADOR_AVANZADO, pasoActual: 2 }),
     );
     const harness = await RouterTestingHarness.create('/proyectos/creacion?proyectoId=42');
@@ -94,9 +103,8 @@ describe('PaginaCreacionProyecto', () => {
     ).toBeNull();
   });
 
-  it.each(['Contexto del proyecto', 'Tipo de solución'])(
-    'oculta el asistente al volver a %s y lo muestra al regresar a Necesidad',
-    async (tituloPaso) => {
+  ['Contexto del proyecto', 'Tipo de solución'].forEach((tituloPaso) => {
+    it(`oculta el asistente al volver a ${tituloPaso} y lo muestra al regresar a Necesidad`, async () => {
       const harness = await RouterTestingHarness.create('/proyectos/creacion?proyectoId=42');
       const elemento = harness.routeNativeElement as HTMLElement;
       const estadoIA = harness.routeDebugElement!.injector.get(EstadoAsistenteIAService);
@@ -125,8 +133,8 @@ describe('PaginaCreacionProyecto', () => {
       expect(asistente.componentInstance.contexto().seccionActiva).toBe(ClaveSeccionProyecto.Necesidad);
       expect(asistente.injector.get(EstadoAsistenteIAService)).toBe(estadoIA);
       expect(creacionProyecto.obtenerBorrador).toHaveBeenCalledTimes(1);
-    },
-  );
+    });
+  });
 
   it('recarga el borrador después de aplicar una propuesta de IA', async () => {
     const harness = await RouterTestingHarness.create('/proyectos/creacion?proyectoId=42');
@@ -147,7 +155,7 @@ describe('PaginaCreacionProyecto', () => {
   });
 
   it('oculta el encabezado y el recorrido cuando falla la carga del borrador', async () => {
-    creacionProyecto.obtenerBorrador.mockReturnValueOnce(
+    creacionProyecto.obtenerBorrador.and.returnValue(
       throwError(() => new Error('Error de carga')),
     );
 
@@ -192,7 +200,7 @@ describe('PaginaCreacionProyecto', () => {
     const harness = await RouterTestingHarness.create('/proyectos/creacion');
     const componente = harness.routeDebugElement?.componentInstance as PaginaCreacionProyecto;
     const router = TestBed.inject(Router);
-    const navegar = vi.spyOn(router, 'navigate');
+    const navegar = spyOn(router, 'navigate');
 
     (componente as unknown as { datosVinculacion: { set: (datos: DatosVinculacionAzure) => void } })
       .datosVinculacion.set(DATOS_VINCULACION);
@@ -200,19 +208,19 @@ describe('PaginaCreacionProyecto', () => {
 
     expect(creacionProyecto.crearBorrador).toHaveBeenCalledWith(DATOS_VINCULACION);
     expect(navegar).toHaveBeenCalledWith([], {
-      relativeTo: expect.anything(),
+      relativeTo: jasmine.anything(),
       queryParams: { proyectoId: 42 },
       replaceUrl: true,
     });
   });
 
   it('actualiza el flujo, guarda con la nueva revisión y luego regresa al inicio', async () => {
-    creacionProyecto.obtenerBorrador.mockReturnValue(of(BORRADOR_FLUJO));
+    creacionProyecto.obtenerBorrador.and.returnValue(of(BORRADOR_FLUJO));
     const confirmacionGuardado = new Subject<void>();
-    creacionProyecto.guardarProyecto.mockReturnValueOnce(confirmacionGuardado.asObservable());
+    creacionProyecto.guardarProyecto.and.returnValue(confirmacionGuardado.asObservable());
     const harness = await RouterTestingHarness.create('/proyectos/creacion?proyectoId=42');
     const router = TestBed.inject(Router);
-    const navegar = vi.spyOn(router, 'navigateByUrl').mockResolvedValue(true);
+    const navegar = spyOn(router, 'navigateByUrl').and.returnValue(Promise.resolve(true));
     const pasoFlujo = harness.routeDebugElement?.query(By.directive(PasoFlujoProyecto))
       .componentInstance as PasoFlujoProyecto;
 
@@ -232,7 +240,7 @@ describe('PaginaCreacionProyecto', () => {
   });
 
   it('reemplaza el canvas con el diagrama generado sin persistirlo automáticamente', async () => {
-    creacionProyecto.obtenerBorrador.mockReturnValue(of(BORRADOR_FLUJO));
+    creacionProyecto.obtenerBorrador.and.returnValue(of(BORRADOR_FLUJO));
     const harness = await RouterTestingHarness.create('/proyectos/creacion?proyectoId=42');
     const pasoFlujo = harness.routeDebugElement?.query(By.directive(PasoFlujoProyecto))
       .componentInstance as PasoFlujoProyecto;
@@ -246,10 +254,10 @@ describe('PaginaCreacionProyecto', () => {
   });
 
   it('guarda los cambios del canvas en el borrador sin finalizar ni abandonar el proyecto', async () => {
-    creacionProyecto.obtenerBorrador.mockReturnValue(of(BORRADOR_FLUJO));
+    creacionProyecto.obtenerBorrador.and.returnValue(of(BORRADOR_FLUJO));
     const harness = await RouterTestingHarness.create('/proyectos/creacion?proyectoId=42');
     const router = TestBed.inject(Router);
-    const navegar = vi.spyOn(router, 'navigateByUrl').mockResolvedValue(true);
+    const navegar = spyOn(router, 'navigateByUrl').and.returnValue(Promise.resolve(true));
     const pasoFlujo = harness.routeDebugElement?.query(By.directive(PasoFlujoProyecto))
       .componentInstance as PasoFlujoProyecto;
 
@@ -268,9 +276,9 @@ describe('PaginaCreacionProyecto', () => {
   });
 
   it('recupera las asignaciones de Equipo al volver después de guardarlas', async () => {
-    creacionProyecto.obtenerBorrador.mockReturnValue(of(BORRADOR_EQUIPO));
-    creacionProyecto.sincronizarEquipoAzure.mockReturnValue(of(ORIGEN_EQUIPO));
-    creacionProyecto.actualizarBorrador.mockReturnValueOnce(
+    creacionProyecto.obtenerBorrador.and.returnValue(of(BORRADOR_EQUIPO));
+    creacionProyecto.sincronizarEquipoAzure.and.returnValue(of(ORIGEN_EQUIPO));
+    creacionProyecto.actualizarBorrador.and.returnValue(
       of({
         ...BORRADOR_EQUIPO,
         revision: 5,
@@ -296,6 +304,277 @@ describe('PaginaCreacionProyecto', () => {
     const pasoEquipoRestaurado = harness.routeDebugElement?.query(By.directive(PasoEquipoProyecto))
       .componentInstance as PasoEquipoProyecto;
     expect(pasoEquipoRestaurado.datos()).toEqual(EQUIPO_CONFIGURADO);
+  });
+
+  it('valida la vinculación de Azure y expone el resultado', async () => {
+    creacionProyecto.validarVinculacionAzure.and.returnValue(of({ ok: true }));
+    const harness = await RouterTestingHarness.create('/proyectos/creacion');
+    const componente = harness.routeDebugElement?.componentInstance as PaginaCreacionProyecto;
+    const acceso = componente as unknown as {
+      validarVinculacion: (datos: DatosVinculacionAzure) => void;
+      resultadoValidacion: () => unknown;
+      procesandoVinculacion: () => boolean;
+    };
+
+    acceso.validarVinculacion(DATOS_VINCULACION);
+
+    expect(creacionProyecto.validarVinculacionAzure).toHaveBeenCalledWith(DATOS_VINCULACION);
+    expect(acceso.resultadoValidacion()).toEqual({ ok: true });
+    expect(acceso.procesandoVinculacion()).toBe(false);
+  });
+
+  it('ignora una nueva validación mientras hay una vinculación en proceso', async () => {
+    const enCurso = new Subject<unknown>();
+    creacionProyecto.validarVinculacionAzure.and.returnValue(enCurso.asObservable());
+    const harness = await RouterTestingHarness.create('/proyectos/creacion');
+    const componente = harness.routeDebugElement?.componentInstance as PaginaCreacionProyecto;
+    const acceso = componente as unknown as {
+      validarVinculacion: (datos: DatosVinculacionAzure) => void;
+    };
+
+    acceso.validarVinculacion(DATOS_VINCULACION);
+    acceso.validarVinculacion(DATOS_VINCULACION);
+
+    expect(creacionProyecto.validarVinculacionAzure).toHaveBeenCalledTimes(1);
+    enCurso.complete();
+  });
+
+  it('notifica el error al fallar la validación de la vinculación', async () => {
+    creacionProyecto.validarVinculacionAzure.and.returnValue(
+      throwError(() => new Error('Azure caído')),
+    );
+    const harness = await RouterTestingHarness.create('/proyectos/creacion');
+    const componente = harness.routeDebugElement?.componentInstance as PaginaCreacionProyecto;
+    const notificador = TestBed.inject(NotificadorErroresApiService);
+    const comunicar = spyOn(notificador, 'comunicar');
+    const acceso = componente as unknown as {
+      validarVinculacion: (datos: DatosVinculacionAzure) => void;
+      procesandoVinculacion: () => boolean;
+    };
+
+    acceso.validarVinculacion(DATOS_VINCULACION);
+
+    expect(comunicar).toHaveBeenCalled();
+    expect(acceso.procesandoVinculacion()).toBe(false);
+  });
+
+  it('limpia el resultado de validación al editar la vinculación', async () => {
+    creacionProyecto.validarVinculacionAzure.and.returnValue(of({ ok: true }));
+    const harness = await RouterTestingHarness.create('/proyectos/creacion');
+    const componente = harness.routeDebugElement?.componentInstance as PaginaCreacionProyecto;
+    const acceso = componente as unknown as {
+      validarVinculacion: (datos: DatosVinculacionAzure) => void;
+      editarVinculacion: () => void;
+      resultadoValidacion: () => unknown;
+    };
+
+    acceso.validarVinculacion(DATOS_VINCULACION);
+    expect(acceso.resultadoValidacion()).not.toBeNull();
+
+    acceso.editarVinculacion();
+    expect(acceso.resultadoValidacion()).toBeNull();
+  });
+
+  it('no crea el borrador cuando no hay datos de vinculación', async () => {
+    const harness = await RouterTestingHarness.create('/proyectos/creacion');
+    const componente = harness.routeDebugElement?.componentInstance as PaginaCreacionProyecto;
+
+    (componente as unknown as { crearBorrador: () => void }).crearBorrador();
+
+    expect(creacionProyecto.crearBorrador).not.toHaveBeenCalled();
+  });
+
+  it('notifica el error al fallar la creación del borrador', async () => {
+    creacionProyecto.crearBorrador.and.returnValue(throwError(() => new Error('sin borrador')));
+    const harness = await RouterTestingHarness.create('/proyectos/creacion');
+    const componente = harness.routeDebugElement?.componentInstance as PaginaCreacionProyecto;
+    const notificador = TestBed.inject(NotificadorErroresApiService);
+    const comunicar = spyOn(notificador, 'comunicar');
+    const acceso = componente as unknown as {
+      datosVinculacion: { set: (datos: DatosVinculacionAzure) => void };
+      crearBorrador: () => void;
+      procesandoVinculacion: () => boolean;
+    };
+
+    acceso.datosVinculacion.set(DATOS_VINCULACION);
+    acceso.crearBorrador();
+
+    expect(comunicar).toHaveBeenCalled();
+    expect(acceso.procesandoVinculacion()).toBe(false);
+  });
+
+  it('actualiza el nombre temporal del proyecto desde el contexto', async () => {
+    const harness = await RouterTestingHarness.create('/proyectos/creacion?proyectoId=42');
+    const componente = harness.routeDebugElement?.componentInstance as PaginaCreacionProyecto;
+    const estado = harness.routeDebugElement!.injector.get(EstadoCreacionProyectoService);
+
+    (
+      componente as unknown as { actualizarContextoTemporal: (contexto: ContextoProyecto) => void }
+    ).actualizarContextoTemporal({ ...BORRADOR_AVANZADO.contexto, nombre: 'Nombre nuevo' });
+
+    expect(estado.nombreProyecto()).toBe('Nombre nuevo');
+  });
+
+  it('no vuelve al inicio cuando el guardado del proyecto falla', async () => {
+    creacionProyecto.obtenerBorrador.and.returnValue(of(BORRADOR_FLUJO));
+    creacionProyecto.guardarProyecto.and.returnValue(throwError(() => new Error('falló guardar')));
+    const harness = await RouterTestingHarness.create('/proyectos/creacion?proyectoId=42');
+    const router = TestBed.inject(Router);
+    const navegar = spyOn(router, 'navigateByUrl').and.returnValue(Promise.resolve(true));
+    const notificador = TestBed.inject(NotificadorErroresApiService);
+    const comunicar = spyOn(notificador, 'comunicar');
+    const pasoFlujo = harness.routeDebugElement?.query(By.directive(PasoFlujoProyecto))
+      .componentInstance as PasoFlujoProyecto;
+
+    pasoFlujo.guardar.emit(pasoFlujo.datos());
+
+    expect(comunicar).toHaveBeenCalled();
+    expect(navegar).not.toHaveBeenCalled();
+  });
+
+  it('no genera el diagrama con IA mientras se está guardando una sección', async () => {
+    creacionProyecto.obtenerBorrador.and.returnValue(of(BORRADOR_FLUJO));
+    const guardado = new Subject<BorradorProyecto>();
+    creacionProyecto.actualizarBorrador.and.returnValue(guardado.asObservable());
+    const harness = await RouterTestingHarness.create('/proyectos/creacion?proyectoId=42');
+    const pasoFlujo = harness.routeDebugElement?.query(By.directive(PasoFlujoProyecto))
+      .componentInstance as PasoFlujoProyecto;
+
+    pasoFlujo.guardarBorrador.emit(FLUJO_GENERADO_IA);
+    pasoFlujo.generarConIA.emit();
+
+    expect(creacionProyecto.generarDiagramaFlujoIA).not.toHaveBeenCalled();
+    guardado.complete();
+  });
+
+  it('notifica el error al fallar la generación del diagrama con IA', async () => {
+    creacionProyecto.obtenerBorrador.and.returnValue(of(BORRADOR_FLUJO));
+    creacionProyecto.generarDiagramaFlujoIA.and.returnValue(
+      throwError(() => new Error('IA no disponible')),
+    );
+    const harness = await RouterTestingHarness.create('/proyectos/creacion?proyectoId=42');
+    const notificador = TestBed.inject(NotificadorErroresApiService);
+    const comunicar = spyOn(notificador, 'comunicar');
+    const pasoFlujo = harness.routeDebugElement?.query(By.directive(PasoFlujoProyecto))
+      .componentInstance as PasoFlujoProyecto;
+
+    pasoFlujo.generarConIA.emit();
+
+    expect(comunicar).toHaveBeenCalled();
+  });
+
+  it('notifica el error al fallar el guardado del flujo en el borrador', async () => {
+    creacionProyecto.obtenerBorrador.and.returnValue(of(BORRADOR_FLUJO));
+    creacionProyecto.actualizarBorrador.and.returnValue(
+      throwError(() => new Error('no guardó borrador')),
+    );
+    const harness = await RouterTestingHarness.create('/proyectos/creacion?proyectoId=42');
+    const notificador = TestBed.inject(NotificadorErroresBorradorProyectoService);
+    const comunicar = spyOn(notificador, 'comunicar');
+    const pasoFlujo = harness.routeDebugElement?.query(By.directive(PasoFlujoProyecto))
+      .componentInstance as PasoFlujoProyecto;
+
+    pasoFlujo.guardarBorrador.emit(FLUJO_GENERADO_IA);
+
+    expect(comunicar).toHaveBeenCalledWith(jasmine.anything(), ClaveSeccionProyecto.Flujo);
+  });
+
+  it('notifica el error al fallar el guardado de una sección estándar', async () => {
+    creacionProyecto.actualizarBorrador.and.returnValue(
+      throwError(() => new Error('conflicto de revisión')),
+    );
+    const harness = await RouterTestingHarness.create('/proyectos/creacion?proyectoId=42');
+    const notificador = TestBed.inject(NotificadorErroresBorradorProyectoService);
+    const comunicar = spyOn(notificador, 'comunicar');
+    const componente = harness.routeDebugElement?.componentInstance as PaginaCreacionProyecto;
+
+    (
+      componente as unknown as {
+        guardarSeccion: (
+          actualizacion: { seccion: ClaveSeccionProyecto; datos: unknown },
+          siguiente: ClaveSeccionProyecto,
+        ) => void;
+      }
+    ).guardarSeccion(
+      { seccion: ClaveSeccionProyecto.Objetivos, datos: {} },
+      ClaveSeccionProyecto.Alcance,
+    );
+
+    expect(comunicar).toHaveBeenCalledWith(jasmine.anything(), ClaveSeccionProyecto.Objetivos);
+  });
+
+  it('no guarda una sección mientras hay un guardado en curso', async () => {
+    const enCurso = new Subject<BorradorProyecto>();
+    creacionProyecto.actualizarBorrador.and.returnValue(enCurso.asObservable());
+    const harness = await RouterTestingHarness.create('/proyectos/creacion?proyectoId=42');
+    const componente = harness.routeDebugElement?.componentInstance as PaginaCreacionProyecto;
+    const guardar = componente as unknown as {
+      guardarSeccion: (
+        actualizacion: { seccion: ClaveSeccionProyecto; datos: unknown },
+        siguiente: ClaveSeccionProyecto,
+      ) => void;
+    };
+
+    guardar.guardarSeccion(
+      { seccion: ClaveSeccionProyecto.Objetivos, datos: {} },
+      ClaveSeccionProyecto.Alcance,
+    );
+    guardar.guardarSeccion(
+      { seccion: ClaveSeccionProyecto.Objetivos, datos: {} },
+      ClaveSeccionProyecto.Alcance,
+    );
+
+    expect(creacionProyecto.actualizarBorrador).toHaveBeenCalledTimes(1);
+    enCurso.complete();
+  });
+
+  it('sincroniza el equipo al abrir el paso y notifica el error si falla', async () => {
+    creacionProyecto.obtenerBorrador.and.returnValue(of(BORRADOR_EQUIPO));
+    creacionProyecto.sincronizarEquipoAzure.and.returnValue(
+      throwError(() => new Error('sin equipo')),
+    );
+    const harness = await RouterTestingHarness.create('/proyectos/creacion?proyectoId=42');
+    const notificador = TestBed.inject(NotificadorErroresApiService);
+    const comunicar = spyOn(notificador, 'comunicar');
+    const componente = harness.routeDebugElement?.componentInstance as PaginaCreacionProyecto;
+
+    (
+      componente as unknown as { sincronizarEquipo: (equipo: EquipoProyecto) => void }
+    ).sincronizarEquipo(EQUIPO_CONFIGURADO);
+
+    expect(comunicar).toHaveBeenCalled();
+  });
+
+  it('recarga el borrador solo cuando la propuesta pertenece al proyecto activo', async () => {
+    creacionProyecto.obtenerBorrador.and.returnValue(of(BORRADOR_AVANZADO));
+    const harness = await RouterTestingHarness.create('/proyectos/creacion?proyectoId=42');
+    const componente = harness.routeDebugElement?.componentInstance as PaginaCreacionProyecto;
+    const recargar = componente as unknown as {
+      recargarBorradorDesdeIA: (id: number) => void;
+    };
+
+    recargar.recargarBorradorDesdeIA(99);
+    expect(creacionProyecto.obtenerBorrador).toHaveBeenCalledTimes(1);
+
+    recargar.recargarBorradorDesdeIA(42);
+    expect(creacionProyecto.obtenerBorrador).toHaveBeenCalledTimes(2);
+  });
+
+  it('notifica el error cuando la recarga posterior a la IA falla', async () => {
+    creacionProyecto.obtenerBorrador.and.returnValues(
+      of(BORRADOR_AVANZADO),
+      throwError(() => new Error('no recargó')),
+    );
+    const harness = await RouterTestingHarness.create('/proyectos/creacion?proyectoId=42');
+    const notificador = TestBed.inject(NotificadorErroresApiService);
+    const comunicar = spyOn(notificador, 'comunicar');
+    const componente = harness.routeDebugElement?.componentInstance as PaginaCreacionProyecto;
+
+    (
+      componente as unknown as { recargarBorradorDesdeIA: (id: number) => void }
+    ).recargarBorradorDesdeIA(42);
+
+    expect(comunicar).toHaveBeenCalled();
   });
 
   function obtenerPosicionRecorrido(elemento: HTMLElement): string {

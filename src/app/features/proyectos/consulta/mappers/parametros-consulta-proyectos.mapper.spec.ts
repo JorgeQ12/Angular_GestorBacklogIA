@@ -35,6 +35,6 @@ describe('parametros-consulta-proyectos.mapper', () => {
   it('descarta términos con menos de tres caracteres', () => {
     expect(
       mapearParametrosConsultaProyectos(convertToParamMap({ nombre: 'IA', responsable: 'QA' })),
-    ).toMatchObject({ nombre: '', responsable: '' });
+    ).toEqual(jasmine.objectContaining({ nombre: '', responsable: '' }));
   });
 });

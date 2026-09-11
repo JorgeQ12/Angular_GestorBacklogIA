@@ -15,7 +15,7 @@ describe('PanelAsistenteIA', () => {
     fixture.componentRef.setInput('mensajes', []);
     fixture.componentRef.setInput('nombreSeccion', 'Necesidad de negocio');
     fixture.detectChanges();
-    const emitido = vi.fn();
+    const emitido = jasmine.createSpy('emitido');
     fixture.componentInstance.mensajeEnviado.subscribe(emitido);
     const textarea = fixture.nativeElement.querySelector('textarea') as HTMLTextAreaElement;
     const formulario = fixture.nativeElement.querySelector('form') as HTMLFormElement;
@@ -33,7 +33,7 @@ describe('PanelAsistenteIA', () => {
     fixture.componentRef.setInput('mensajes', []);
     fixture.componentRef.setInput('nombreSeccion', 'Necesidad de negocio');
     fixture.detectChanges();
-    const emitido = vi.fn();
+    const emitido = jasmine.createSpy('emitido');
     fixture.componentInstance.mensajeEnviado.subscribe(emitido);
 
     (fixture.nativeElement.querySelector('form') as HTMLFormElement).dispatchEvent(
@@ -43,33 +43,37 @@ describe('PanelAsistenteIA', () => {
     expect(emitido).not.toHaveBeenCalled();
   });
 
-  it.each([
+  (
     [
-      'Detectar vacíos',
-      'Detecta vacíos en esta sección y hazme preguntas concretas para completarla.',
-    ],
-    ['Mejorar claridad', 'Ayúdame a mejorar la claridad y precisión de esta sección.'],
-    [
-      'Crear propuestas',
-      'Crea una propuesta completa para esta sección con el contexto disponible.',
-    ],
-  ])('envía la acción sugerida %s como un mensaje', (etiqueta, mensaje) => {
-    const fixture = TestBed.createComponent(PanelAsistenteIA);
-    fixture.componentRef.setInput('mensajes', []);
-    fixture.componentRef.setInput('nombreSeccion', 'Necesidad de negocio');
-    fixture.detectChanges();
-    const emitido = vi.fn();
-    fixture.componentInstance.mensajeEnviado.subscribe(emitido);
-    const boton = Array.from(
-      (fixture.nativeElement as HTMLElement).querySelectorAll<HTMLButtonElement>(
-        '.panel-asistente__capacidad',
-      ),
-    ).find((elemento) => elemento.textContent?.trim() === etiqueta);
+      [
+        'Detectar vacíos',
+        'Detecta vacíos en esta sección y hazme preguntas concretas para completarla.',
+      ],
+      ['Mejorar claridad', 'Ayúdame a mejorar la claridad y precisión de esta sección.'],
+      [
+        'Crear propuestas',
+        'Crea una propuesta completa para esta sección con el contexto disponible.',
+      ],
+    ] as const
+  ).forEach(([etiqueta, mensaje]) => {
+    it(`envía la acción sugerida ${etiqueta} como un mensaje`, () => {
+      const fixture = TestBed.createComponent(PanelAsistenteIA);
+      fixture.componentRef.setInput('mensajes', []);
+      fixture.componentRef.setInput('nombreSeccion', 'Necesidad de negocio');
+      fixture.detectChanges();
+      const emitido = jasmine.createSpy('emitido');
+      fixture.componentInstance.mensajeEnviado.subscribe(emitido);
+      const boton = Array.from(
+        (fixture.nativeElement as HTMLElement).querySelectorAll<HTMLButtonElement>(
+          '.panel-asistente__capacidad',
+        ),
+      ).find((elemento) => elemento.textContent?.trim() === etiqueta);
 
-    expect(boton).toBeDefined();
-    boton!.click();
+      expect(boton).toBeDefined();
+      boton!.click();
 
-    expect(emitido).toHaveBeenCalledWith(mensaje);
+      expect(emitido).toHaveBeenCalledWith(mensaje);
+    });
   });
 
   it('deshabilita las acciones sugeridas durante una operación remota', () => {
@@ -85,7 +89,7 @@ describe('PanelAsistenteIA', () => {
       ),
     );
 
-    expect(botones).toHaveLength(3);
+    expect(botones.length).toBe(3);
     expect(botones.every((boton) => boton.disabled)).toBe(true);
   });
 
@@ -94,7 +98,7 @@ describe('PanelAsistenteIA', () => {
     fixture.componentRef.setInput('mensajes', []);
     fixture.componentRef.setInput('nombreSeccion', 'Necesidad de negocio');
     fixture.detectChanges();
-    const emitido = vi.fn();
+    const emitido = jasmine.createSpy('emitido');
     fixture.componentInstance.mensajeEnviado.subscribe(emitido);
     const textarea = fixture.nativeElement.querySelector('textarea') as HTMLTextAreaElement;
 
@@ -111,7 +115,7 @@ describe('PanelAsistenteIA', () => {
     expect(emitido).toHaveBeenCalledWith('Analiza esta necesidad');
     expect(textarea.value).toBe('');
 
-    emitido.mockClear();
+    emitido.calls.reset();
     textarea.value = 'Primera línea';
     textarea.dispatchEvent(new Event('input'));
     const shiftEnter = new KeyboardEvent('keydown', {
@@ -132,7 +136,7 @@ describe('PanelAsistenteIA', () => {
     fixture.componentRef.setInput('mensajes', []);
     fixture.componentRef.setInput('nombreSeccion', 'Necesidad de negocio');
     fixture.detectChanges();
-    const emitido = vi.fn();
+    const emitido = jasmine.createSpy('emitido');
     fixture.componentInstance.mensajeEnviado.subscribe(emitido);
     const textarea = fixture.nativeElement.querySelector('textarea') as HTMLTextAreaElement;
 
@@ -217,7 +221,7 @@ describe('PanelAsistenteIA', () => {
       },
     ]);
     fixture.detectChanges();
-    const emitido = vi.fn();
+    const emitido = jasmine.createSpy('emitido');
     fixture.componentInstance.propuestaAplicada.subscribe(emitido);
     const botones = (fixture.nativeElement as HTMLElement).querySelectorAll<HTMLButtonElement>(
       'button',
@@ -262,7 +266,7 @@ describe('PanelAsistenteIA', () => {
       ),
     );
 
-    expect(botones).toHaveLength(2);
+    expect(botones.length).toBe(2);
     expect(botones.every((boton) => boton.disabled)).toBe(true);
   });
 });

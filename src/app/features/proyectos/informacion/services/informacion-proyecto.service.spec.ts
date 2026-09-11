@@ -29,7 +29,7 @@ describe('InformacionProyectoService', () => {
     );
     expect(solicitud.request.params.get('proyectoId')).toBe('42');
     solicitud.flush(resultado(DTO));
-    await expect(respuesta).resolves.toMatchObject({ id: 42, versionId: 81, numeroVersion: 4 });
+    await expectAsync(respuesta).toBeResolvedTo(jasmine.objectContaining({ id: 42, versionId: 81, numeroVersion: 4 }));
   });
 
   it('envía la versión esperada y conserva las secciones no editadas', async () => {
@@ -47,13 +47,13 @@ describe('InformacionProyectoService', () => {
     const solicitud = httpTesting.expectOne(
       (request) => request.url === ENDPOINTS_INFORMACION_PROYECTO.actualizarProyecto,
     );
-    expect(solicitud.request.body).toMatchObject({
+    expect(solicitud.request.body).toEqual(jasmine.objectContaining({
       id: 42,
       versionActualIdEsperada: 81,
       objetivosJson: DTO.objetivosJson,
-    });
+    }));
     solicitud.flush(resultado({ ...DTO, versionActualId: 82, numeroVersionActual: 5 }));
-    await expect(respuesta).resolves.toMatchObject({ versionId: 82, numeroVersion: 5 });
+    await expectAsync(respuesta).toBeResolvedTo(jasmine.objectContaining({ versionId: 82, numeroVersion: 5 }));
   });
 });
 

@@ -5,11 +5,11 @@ import { PanelLayout } from './panel-layout';
 
 describe('PanelLayout', () => {
   const autenticacion = {
-    cerrarSesion: vi.fn(),
+    cerrarSesion: jasmine.createSpy('cerrarSesion'),
   };
 
   beforeEach(async () => {
-    autenticacion.cerrarSesion.mockReset();
+    autenticacion.cerrarSesion.calls.reset();
 
     await TestBed.configureTestingModule({
       imports: [PanelLayout],
@@ -45,7 +45,7 @@ describe('PanelLayout', () => {
 
     boton.click();
 
-    expect(autenticacion.cerrarSesion).toHaveBeenCalledOnce();
+    expect(autenticacion.cerrarSesion).toHaveBeenCalledTimes(1);
   });
 
   function crearComponente(): ComponentFixture<PanelLayout> {

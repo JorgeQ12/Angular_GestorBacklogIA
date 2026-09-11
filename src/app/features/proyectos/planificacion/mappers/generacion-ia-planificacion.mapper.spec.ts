@@ -31,15 +31,16 @@ describe('generacionIaPlanificacionMapper', () => {
     });
   });
 
-  it.each([
+  (
     [
-      NivelGeneracionIaPlanificacionDto.Caracteristicas,
-      NivelGeneracionIaPlanificacion.Caracteristicas,
-    ],
-    [NivelGeneracionIaPlanificacionDto.Historias, NivelGeneracionIaPlanificacion.Historias],
-  ])(
-    'adapta el nivel serializado por el backend sin convertir un éxito en error',
-    (nivelDto, nivelEsperado) => {
+      [
+        NivelGeneracionIaPlanificacionDto.Caracteristicas,
+        NivelGeneracionIaPlanificacion.Caracteristicas,
+      ],
+      [NivelGeneracionIaPlanificacionDto.Historias, NivelGeneracionIaPlanificacion.Historias],
+    ] as const
+  ).forEach(([nivelDto, nivelEsperado]) => {
+    it(`adapta el nivel serializado por el backend sin convertir un éxito en error (${nivelDto})`, () => {
       expect(
         mapearResultadoGeneracionIaPlanificacion({
           proyectoId: 42,
@@ -47,9 +48,9 @@ describe('generacionIaPlanificacionMapper', () => {
           totalCreados: 4,
           mensaje: 'Generación completada.',
         }),
-      ).toMatchObject({ nivel: nivelEsperado, totalCreados: 4 });
-    },
-  );
+      ).toEqual(jasmine.objectContaining({ nivel: nivelEsperado, totalCreados: 4 }));
+    });
+  });
 
   it('rechaza un nivel desconocido recibido desde el backend', () => {
     expect(() =>
@@ -59,6 +60,6 @@ describe('generacionIaPlanificacionMapper', () => {
         totalCreados: 0,
         mensaje: '',
       }),
-    ).toThrow('Nivel de generación mediante IA no compatible');
+    ).toThrowError(/Nivel de generación mediante IA no compatible/);
   });
 });

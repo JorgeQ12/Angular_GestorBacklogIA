@@ -15,7 +15,7 @@ describe('FormularioModuloFlujoProyecto', () => {
       providers: [
         {
           provide: EstadoEditorFlujoProyectoService,
-          useValue: { roles: signal([]).asReadonly(), obtenerNombreRol: vi.fn() },
+          useValue: { roles: signal([]).asReadonly(), obtenerNombreRol: jasmine.createSpy('obtenerNombreRol') },
         },
       ],
     }).compileComponents();
@@ -33,11 +33,11 @@ describe('FormularioModuloFlujoProyecto', () => {
       .find((boton) => boton.textContent?.includes('Agregar franja'))
       ?.click();
     fixture.detectChanges();
-    expect(formulario.controls.horariosMayorActividad).toHaveLength(2);
+    expect(formulario.controls.horariosMayorActividad.length).toBe(2);
 
     elemento.querySelector<HTMLButtonElement>('[aria-label="Eliminar horario 2"]')?.click();
     fixture.detectChanges();
-    expect(formulario.controls.horariosMayorActividad).toHaveLength(1);
+    expect(formulario.controls.horariosMayorActividad.length).toBe(1);
     expect(elemento.querySelector<HTMLButtonElement>('[aria-label="Eliminar horario 1"]')?.disabled).toBe(
       true,
     );

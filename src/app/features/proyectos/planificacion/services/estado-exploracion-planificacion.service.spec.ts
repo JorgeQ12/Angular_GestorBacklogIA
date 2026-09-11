@@ -41,7 +41,7 @@ describe('EstadoExploracionPlanificacionService', () => {
     servicio.buscar('registro');
 
     expect(servicio.cantidadResultados()).toBe(7);
-    expect(servicio.elementosVisibles()[0].hijos[0].hijos).toHaveLength(2);
+    expect(servicio.elementosVisibles()[0].hijos[0].hijos.length).toBe(2);
   });
 
   it('encuentra contenido alternativo no visible de una tarea de requisito', () => {

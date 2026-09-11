@@ -3,7 +3,7 @@ import { PlataformaSolucion } from '../secciones/tipo-solucion/models/tipo-soluc
 import { mapearCambioSeccionProyecto } from './actualizacion-seccion-proyecto.mapper';
 
 describe('mapearCambioSeccionProyecto', () => {
-  it.each([
+  ([
     {
       actualizacion: {
         seccion: ClaveSeccionProyecto.Contexto,
@@ -41,7 +41,9 @@ describe('mapearCambioSeccionProyecto', () => {
         necesidadJson: '{"situacionActual":"Manual","problemas":"Retrasos","impacto":"Costos"}',
       },
     },
-  ] as const)('reemplaza únicamente $actualizacion.seccion', ({ actualizacion, esperado }) => {
-    expect(mapearCambioSeccionProyecto(actualizacion)).toEqual(esperado);
+  ] as const).forEach(({ actualizacion, esperado }) => {
+    it(`reemplaza únicamente ${actualizacion.seccion}`, () => {
+      expect(mapearCambioSeccionProyecto(actualizacion)).toEqual(esperado);
+    });
   });
 });

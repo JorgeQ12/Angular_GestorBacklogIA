@@ -13,7 +13,7 @@ describe('PublicacionAzurePlanificacionComponent', () => {
   });
 
   it('habilita y emite la publicación cuando la planificación está completa', () => {
-    const publicar = vi.fn();
+    const publicar = jasmine.createSpy();
     fixture.componentRef.setInput('disponibilidad', { puedePublicar: true, bloqueos: [] });
     fixture.componentInstance.publicar.subscribe(publicar);
     fixture.detectChanges();
@@ -22,7 +22,7 @@ describe('PublicacionAzurePlanificacionComponent', () => {
     expect(boton?.disabled).toBe(false);
     expect(boton?.textContent).toContain('Planificación completa · lista para enviar');
     boton?.click();
-    expect(publicar).toHaveBeenCalledOnce();
+    expect(publicar).toHaveBeenCalledTimes(1);
   });
 
   it('explica los bloqueos y mantiene deshabilitada la publicación', () => {

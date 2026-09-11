@@ -13,17 +13,19 @@ import { PlanificacionProyectoService } from './planificacion-proyecto.service';
 
 describe('EstadoSincronizacionEpicaAzurePlanificacionService', () => {
   const planificacion = signal<PlanificacionProyecto | null>(PLANIFICACION);
-  const api = { sincronizarEpicaPrincipal: vi.fn() };
+  const api = { sincronizarEpicaPrincipal: jasmine.createSpy('sincronizarEpicaPrincipal') };
   const estadoPlanificacion = { planificacion: planificacion.asReadonly() };
-  const mensajes = { exito: vi.fn() };
-  const notificador = { comunicar: vi.fn() };
+  const mensajes = { exito: jasmine.createSpy('exito') };
+  const notificador = { comunicar: jasmine.createSpy('comunicar') };
   let servicio: EstadoSincronizacionEpicaAzurePlanificacionService;
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    api.sincronizarEpicaPrincipal.calls.reset();
+    mensajes.exito.calls.reset();
+    notificador.comunicar.calls.reset();
     planificacion.set(PLANIFICACION);
-    api.sincronizarEpicaPrincipal.mockReturnValue(of(RESULTADO));
-    mensajes.exito.mockResolvedValue(undefined);
+    api.sincronizarEpicaPrincipal.and.returnValue(of(RESULTADO));
+    mensajes.exito.and.returnValue(Promise.resolve(undefined));
     TestBed.configureTestingModule({
       providers: [
         EstadoSincronizacionEpicaAzurePlanificacionService,
@@ -37,7 +39,7 @@ describe('EstadoSincronizacionEpicaAzurePlanificacionService', () => {
   });
 
   it('sincroniza la épica autorizada y comunica las revisiones importadas', () => {
-    const completado = vi.fn();
+    const completado = jasmine.createSpy('completado');
 
     servicio.sincronizar(42, completado);
 
@@ -51,11 +53,11 @@ describe('EstadoSincronizacionEpicaAzurePlanificacionService', () => {
   });
 
   it('distingue una épica que ya estaba actualizada', () => {
-    api.sincronizarEpicaPrincipal.mockReturnValueOnce(
+    api.sincronizarEpicaPrincipal.and.returnValue(
       of({ ...RESULTADO, revisionesImportadas: 0 }),
     );
 
-    servicio.sincronizar(42, vi.fn());
+    servicio.sincronizar(42, jasmine.createSpy('completado'));
 
     expect(mensajes.exito).toHaveBeenCalledWith(
       'Épica sincronizada',
@@ -77,20 +79,20 @@ describe('EstadoSincronizacionEpicaAzurePlanificacionService', () => {
       ],
     });
 
-    servicio.sincronizar(42, vi.fn());
+    servicio.sincronizar(42, jasmine.createSpy('completado'));
 
     expect(api.sincronizarEpicaPrincipal).not.toHaveBeenCalled();
   });
 
   it('comunica el error funcional y libera la operación', () => {
     const error = new Error('fallo');
-    api.sincronizarEpicaPrincipal.mockReturnValueOnce(throwError(() => error));
+    api.sincronizarEpicaPrincipal.and.returnValue(throwError(() => error));
 
-    servicio.sincronizar(42, vi.fn());
+    servicio.sincronizar(42, jasmine.createSpy('completado'));
 
     expect(notificador.comunicar).toHaveBeenCalledWith(
       error,
-      expect.objectContaining({ titulo: 'No fue posible sincronizar la épica' }),
+      jasmine.objectContaining({ titulo: 'No fue posible sincronizar la épica' }),
     );
     expect(servicio.sincronizando()).toBe(false);
   });

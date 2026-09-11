@@ -21,7 +21,7 @@ describe('TablaOpcionesCatalogo', () => {
   });
 
   it('emite la opción seleccionada y bloquea todas las acciones durante una operación', () => {
-    const editar = vi.fn();
+    const editar = jasmine.createSpy('editar');
     fixture.componentInstance.editarOpcion.subscribe(editar);
     (fixture.nativeElement as HTMLElement)
       .querySelector<HTMLButtonElement>('[aria-label="Editar opción QA"]')

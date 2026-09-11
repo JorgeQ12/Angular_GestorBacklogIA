@@ -22,10 +22,10 @@ describe('TablaProyectos', () => {
     const elemento = fixture.nativeElement as HTMLElement;
 
     expect(elemento.querySelector('caption')?.textContent).toContain('Proyectos disponibles');
-    expect(elemento.querySelectorAll('th[scope="col"]')).toHaveLength(6);
+    expect(elemento.querySelectorAll('th[scope="col"]').length).toBe(6);
     expect(elemento.textContent).toContain('Portal de clientes');
     expect(elemento.textContent).toContain('30 de sept de 2026');
-    expect(elemento.querySelectorAll('.ui-table app-indicador-estado')).toHaveLength(2);
+    expect(elemento.querySelectorAll('.ui-table app-indicador-estado').length).toBe(2);
   });
 
   it('muestra el avance y emite la continuación únicamente para borradores', () => {
@@ -35,7 +35,7 @@ describe('TablaProyectos', () => {
     const botones = [...elemento.querySelectorAll<HTMLButtonElement>('tbody button')];
 
     expect(elemento.textContent).toContain('Paso 5 de 9');
-    expect(botones).toHaveLength(2);
+    expect(botones.length).toBe(2);
     botones[0].click();
 
     expect(seleccionado).toEqual(PROYECTOS[0]);
@@ -43,7 +43,7 @@ describe('TablaProyectos', () => {
   });
 
   it('emite la consulta únicamente para proyectos publicados', () => {
-    const consultar = vi.fn();
+    const consultar = jasmine.createSpy('consultar');
     fixture.componentInstance.consultarProyecto.subscribe(consultar);
     const boton = [...(fixture.nativeElement as HTMLElement).querySelectorAll('tbody button')].find(
       (elemento) => elemento.textContent?.includes('Ver información'),
@@ -55,7 +55,7 @@ describe('TablaProyectos', () => {
   });
 
   it('emite una página válida desde la paginación', () => {
-    const paginaCambiada = vi.fn();
+    const paginaCambiada = jasmine.createSpy('paginaCambiada');
     fixture.componentInstance.paginaCambiada.subscribe(paginaCambiada);
     const botonSiguiente = [
       ...(fixture.nativeElement as HTMLElement).querySelectorAll('button'),

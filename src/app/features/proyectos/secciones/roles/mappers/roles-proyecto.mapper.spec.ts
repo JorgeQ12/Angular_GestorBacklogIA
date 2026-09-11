@@ -21,10 +21,10 @@ describe('mapeadores de Roles', () => {
     ).toBeNull();
   });
 
-  it.each(['{}', 'json-invalido', '[null]', '["Administrador"]'])(
-    'tolera un contrato no utilizable: %s',
-    (json) => expect(deserializarRolesProyecto(json)).toBeNull(),
-  );
+  ['{}', 'json-invalido', '[null]', '["Administrador"]'].forEach((json) => {
+    it(`tolera un contrato no utilizable: ${json}`, () =>
+      expect(deserializarRolesProyecto(json)).toBeNull());
+  });
 
   it('serializa únicamente el arreglo canónico y normalizado', () => {
     expect(

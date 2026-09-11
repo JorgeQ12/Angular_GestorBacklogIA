@@ -130,14 +130,14 @@ describe('mapeadores de creación de proyecto', () => {
       2,
     );
 
-    expect(solicitud).toMatchObject({
+    expect(solicitud).toEqual(jasmine.objectContaining({
       proyectoId: 42,
       revisionEsperada: 3,
       pasoActual: 2,
       nombre: 'InterIA renovado',
       tipoSolucionJson: '{"tieneInterfaz":true}',
       rolesJson: '[]',
-    });
+    }));
   });
 
   it('reemplaza únicamente el JSON de Necesidad', () => {
@@ -148,12 +148,12 @@ describe('mapeadores de creación de proyecto', () => {
       4,
     );
 
-    expect(solicitud).toMatchObject({
+    expect(solicitud).toEqual(jasmine.objectContaining({
       pasoActual: 4,
       tipoSolucionJson: '{"tieneInterfaz":true}',
       necesidadJson: '{"situacionActual":"Registro manual"}',
       objetivosJson: '{}',
-    });
+    }));
   });
 
   it('reemplaza únicamente el JSON de Objetivos', () => {
@@ -167,12 +167,12 @@ describe('mapeadores de creación de proyecto', () => {
       5,
     );
 
-    expect(solicitud).toMatchObject({
+    expect(solicitud).toEqual(jasmine.objectContaining({
       pasoActual: 5,
       necesidadJson: '{}',
       objetivosJson: '{"objetivoGeneral":"Reducir tiempos","objetivosEspecificos":["Automatizar"]}',
       alcanceJson: '{}',
-    });
+    }));
   });
 
   it('reemplaza únicamente el JSON de Alcance', () => {
@@ -183,12 +183,12 @@ describe('mapeadores de creación de proyecto', () => {
       6,
     );
 
-    expect(solicitud).toMatchObject({
+    expect(solicitud).toEqual(jasmine.objectContaining({
       pasoActual: 6,
       objetivosJson: '{}',
       alcanceJson: '{"incluido":"Seguimiento","excluido":"Pagos"}',
       rolesJson: '[]',
-    });
+    }));
   });
 
   it('reemplaza únicamente el JSON de Roles', () => {
@@ -196,12 +196,12 @@ describe('mapeadores de creación de proyecto', () => {
     const rolesJson = '[{"nombre":"Administrador","descripcion":"Configura"}]';
     const solicitud = mapearActualizacionBorrador(borrador, { rolesJson }, 7);
 
-    expect(solicitud).toMatchObject({
+    expect(solicitud).toEqual(jasmine.objectContaining({
       pasoActual: 7,
       alcanceJson: '{}',
       rolesJson,
       equipoJson: '[]',
-    });
+    }));
   });
 
   it('reemplaza únicamente el JSON de Equipo', () => {
@@ -209,12 +209,12 @@ describe('mapeadores de creación de proyecto', () => {
     const equipoJson = '[{"idAzure":"u1","perfilTecnicoId":36}]';
     const solicitud = mapearActualizacionBorrador(borrador, { equipoJson }, 8);
 
-    expect(solicitud).toMatchObject({
+    expect(solicitud).toEqual(jasmine.objectContaining({
       pasoActual: 8,
       rolesJson: '[]',
       equipoJson,
       diagramFlujoJson: '{}',
-    });
+    }));
   });
 
   it('reemplaza únicamente el JSON de Flujo', () => {
@@ -223,11 +223,11 @@ describe('mapeadores de creación de proyecto', () => {
       '{"projectId":"42","roles":[],"nodes":[],"connections":[],"updatedAt":"2026-08-28T10:00:00.000Z"}';
     const solicitud = mapearActualizacionBorrador(borrador, { diagramFlujoJson }, 9);
 
-    expect(solicitud).toMatchObject({
+    expect(solicitud).toEqual(jasmine.objectContaining({
       pasoActual: 9,
       equipoJson: '[]',
       diagramFlujoJson,
-    });
+    }));
   });
 });
 

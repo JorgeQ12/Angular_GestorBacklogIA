@@ -46,10 +46,12 @@ describe('ResumenInicioPanelService', () => {
     expect(solicitud.request.method).toBe('GET');
     solicitud.flush(crearResultado(DATOS));
 
-    await expect(respuesta).resolves.toMatchObject({
-      fechaCorte: '2026-08-24',
-      indicadores: { totalProyectos: 1, enProgreso: 1 },
-    });
+    await expectAsync(respuesta).toBeResolvedTo(
+      jasmine.objectContaining({
+        fechaCorte: '2026-08-24',
+        indicadores: jasmine.objectContaining({ totalProyectos: 1, enProgreso: 1 }),
+      }),
+    );
   });
 
   it('rechaza respuestas de negocio sin datos válidos', async () => {
@@ -65,7 +67,7 @@ describe('ResumenInicioPanelService', () => {
       errores: null,
     } satisfies ResultadoApi<ResumenAdministrativoDto>);
 
-    await expect(respuesta).rejects.toThrow('No fue posible obtener el resumen.');
+    await expectAsync(respuesta).toBeRejectedWithError('No fue posible obtener el resumen.');
   });
 });
 

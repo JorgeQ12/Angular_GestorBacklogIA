@@ -77,7 +77,7 @@ describe('Modal', () => {
     expect(dialogo.querySelector('.contenido-proyectado')?.textContent).toContain(
       'Información de Azure',
     );
-    expect(dialogo.querySelectorAll('.ui-modal__badge')).toHaveLength(2);
+    expect(dialogo.querySelectorAll('.ui-modal__badge').length).toBe(2);
     expect(dialogo.querySelector('.ui-modal__eyebrow')?.textContent).toContain('Solo lectura');
     expect(dialogo.querySelector('.ui-modal__actions .accion-adicional')).not.toBeNull();
     expect(dialogo.querySelector('.ui-modal__body .accion-adicional')).toBeNull();

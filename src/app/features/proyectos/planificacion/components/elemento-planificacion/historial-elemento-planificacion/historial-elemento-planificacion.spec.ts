@@ -36,7 +36,7 @@ describe('HistorialElementoPlanificacionComponent', () => {
   });
 
   it('emite la versión elegida desde la línea de tiempo', () => {
-    const seleccionar = vi.fn();
+    const seleccionar = jasmine.createSpy();
     fixture.componentInstance.seleccionar.subscribe(seleccionar);
 
     (fixture.nativeElement as HTMLElement)

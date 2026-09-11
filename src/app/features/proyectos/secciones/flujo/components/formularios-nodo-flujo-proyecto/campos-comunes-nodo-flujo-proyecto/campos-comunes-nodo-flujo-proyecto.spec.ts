@@ -38,11 +38,11 @@ describe('CamposComunesNodoFlujoProyecto', () => {
       .find((boton) => boton.textContent?.includes('Agregar criterio'))
       ?.click();
     fixture.detectChanges();
-    expect(formulario.controls.criteriosAceptacion).toHaveLength(2);
+    expect(formulario.controls.criteriosAceptacion.length).toBe(2);
 
     elemento.querySelector<HTMLButtonElement>('[aria-label="Eliminar criterio de aceptación 2"]')?.click();
     fixture.detectChanges();
-    expect(formulario.controls.criteriosAceptacion).toHaveLength(1);
+    expect(formulario.controls.criteriosAceptacion.length).toBe(1);
   });
 
   it('sincroniza la selección de rol y sus permisos con el formulario', () => {
@@ -59,5 +59,51 @@ describe('CamposComunesNodoFlujoProyecto', () => {
       { idRol: 'rol-1', permisos: [AccionPermisoModulo.Ver] },
     ]);
     expect(formulario.controls.nombresRoles.value).toBe('Administrador');
+  });
+
+  it('mantiene la última fila de criterios al intentar eliminarla', () => {
+    const componente = fixture.componentInstance as unknown as {
+      eliminarCriterioAceptacion: (indice: number) => void;
+    };
+
+    componente.eliminarCriterioAceptacion(0);
+
+    expect(formulario.controls.criteriosAceptacion.length).toBe(1);
+  });
+
+  it('ignora el cambio de rol cuando el evento no procede de un checkbox', () => {
+    const componente = fixture.componentInstance as unknown as {
+      cambiarSeleccionRol: (rol: { id: string; nombre: string }, evento: Event) => void;
+    };
+
+    componente.cambiarSeleccionRol(roles[0], { target: null } as unknown as Event);
+
+    expect(formulario.controls.nombresRoles.value).toBe('');
+  });
+
+  it('retira el rol cuando se desmarca su último permiso', () => {
+    fixture.componentRef.setInput('usarPermisosRoles', true);
+    fixture.detectChanges();
+    const componente = fixture.componentInstance as unknown as {
+      cambiarSeleccionRol: (rol: { id: string; nombre: string }, evento: Event) => void;
+      alternarPermiso: (idRol: string, permiso: AccionPermisoModulo) => void;
+      estaSeleccionadoRol: (idRol: string) => boolean;
+    };
+
+    componente.cambiarSeleccionRol(roles[0], {
+      target: { checked: true } as HTMLInputElement,
+    } as unknown as Event);
+    componente.alternarPermiso('rol-1', AccionPermisoModulo.Ver);
+
+    expect(componente.estaSeleccionadoRol('rol-1')).toBe(false);
+    expect(formulario.controls.permisosRoles.value).toEqual([]);
+  });
+
+  it('no reporta permiso para un rol que no está seleccionado', () => {
+    const componente = fixture.componentInstance as unknown as {
+      tienePermiso: (idRol: string, permiso: AccionPermisoModulo) => boolean;
+    };
+
+    expect(componente.tienePermiso('rol-inexistente', AccionPermisoModulo.Ver)).toBe(false);
   });
 });

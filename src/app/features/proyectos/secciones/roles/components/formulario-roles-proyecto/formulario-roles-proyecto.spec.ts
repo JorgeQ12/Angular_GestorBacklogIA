@@ -26,7 +26,7 @@ describe('FormularioRolesProyecto', () => {
   });
 
   it('agrega roles y emite sus valores normalizados', () => {
-    const guardar = vi.fn();
+    const guardar = jasmine.createSpy();
     fixture.componentInstance.guardar.subscribe(guardar);
     escribir('#rol-nombre-0', '  Administrador  ');
     escribir('#rol-descripcion-0', '  Configura la solución.  ');
@@ -72,7 +72,7 @@ describe('FormularioRolesProyecto', () => {
     expect(eliminar.disabled).toBe(true);
     eliminar.click();
     fixture.detectChanges();
-    expect(obtenerElemento().querySelectorAll('[id^="rol-nombre-"]')).toHaveLength(1);
+    expect(obtenerElemento().querySelectorAll('[id^="rol-nombre-"]').length).toBe(1);
   });
 
   it('presenta la colección recuperada del borrador', () => {
@@ -100,7 +100,7 @@ describe('FormularioRolesProyecto', () => {
   });
 
   it('presenta la colección sin acciones ni envío en modo lectura', () => {
-    const guardar = vi.fn();
+    const guardar = jasmine.createSpy();
     fixture.componentInstance.guardar.subscribe(guardar);
     fixture.componentRef.setInput('datosIniciales', {
       roles: [{ nombre: 'Administrador', descripcion: 'Configura la solución.' }],

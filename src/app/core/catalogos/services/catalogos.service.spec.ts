@@ -42,7 +42,7 @@ describe('CatalogosService', () => {
       ]),
     );
 
-    await expect(respuesta).resolves.toEqual([
+    await expectAsync(respuesta).toBeResolvedTo([
       { id: 13, nombre: 'Alta', descripcion: 'Prioridad Alta' },
     ]);
   });
@@ -54,7 +54,7 @@ describe('CatalogosService', () => {
     const solicitud = httpTesting.expectOne(
       (peticion) =>
         peticion.url === ENDPOINTS_CATALOGOS.obtenerValores &&
-        peticion.params.get('CatalogoTipoCodigo') === CodigoTipoCatalogoIdentidad.PerfilTecnico,
+        peticion.params.get('catalogoTipoCodigo') === CodigoTipoCatalogoIdentidad.PerfilTecnico,
     );
 
     solicitud.flush(
@@ -69,7 +69,7 @@ describe('CatalogosService', () => {
       ]),
     );
 
-    await expect(respuesta).resolves.toEqual([
+    await expectAsync(respuesta).toBeResolvedTo([
       { id: 32, nombre: 'Ingeniero senior cloud', descripcion: 'Prioridad Ingeniero senior cloud' },
     ]);
   });

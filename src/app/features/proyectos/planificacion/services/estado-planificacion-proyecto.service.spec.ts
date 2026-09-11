@@ -9,13 +9,17 @@ import { EstadoPlanificacionProyectoService } from './estado-planificacion-proye
 import { PlanificacionProyectoService } from './planificacion-proyecto.service';
 
 describe('EstadoPlanificacionProyectoService', () => {
-  const api = { obtenerPlanificacion: vi.fn(), obtenerVersiones: vi.fn() };
+  const api = {
+    obtenerPlanificacion: jasmine.createSpy('obtenerPlanificacion'),
+    obtenerVersiones: jasmine.createSpy('obtenerVersiones'),
+  };
   let servicio: EstadoPlanificacionProyectoService;
 
   beforeEach(() => {
-    vi.clearAllMocks();
-    api.obtenerPlanificacion.mockReturnValue(of(PLANIFICACION));
-    api.obtenerVersiones.mockReturnValue(of(VERSIONES));
+    api.obtenerPlanificacion.calls.reset();
+    api.obtenerVersiones.calls.reset();
+    api.obtenerPlanificacion.and.returnValue(of(PLANIFICACION));
+    api.obtenerVersiones.and.returnValue(of(VERSIONES));
     TestBed.configureTestingModule({
       providers: [
         EstadoPlanificacionProyectoService,
@@ -37,7 +41,7 @@ describe('EstadoPlanificacionProyectoService', () => {
   });
 
   it('distingue una falla de carga de una respuesta disponible', () => {
-    api.obtenerPlanificacion.mockReturnValueOnce(throwError(() => new Error('fallo')));
+    api.obtenerPlanificacion.and.returnValue(throwError(() => new Error('fallo')));
 
     servicio.cargar(42);
 
@@ -46,12 +50,12 @@ describe('EstadoPlanificacionProyectoService', () => {
   });
 
   it('consulta y presenta una fotografía histórica disponible', () => {
+    api.obtenerPlanificacion.and.returnValues(of(PLANIFICACION), of(PLANIFICACION_HISTORICA));
     servicio.cargar(42);
-    api.obtenerPlanificacion.mockReturnValueOnce(of(PLANIFICACION_HISTORICA));
 
     servicio.presentarVersion(80);
 
-    expect(api.obtenerPlanificacion).toHaveBeenLastCalledWith(42, 80);
+    expect(api.obtenerPlanificacion.calls.mostRecent().args).toEqual([42, 80]);
     expect(servicio.planificacion()).toEqual(PLANIFICACION_HISTORICA);
     expect(servicio.planificacionActual()).toEqual(PLANIFICACION);
     expect(servicio.seleccionando()).toBe(false);
@@ -59,7 +63,7 @@ describe('EstadoPlanificacionProyectoService', () => {
 
   it('recupera la fotografía vigente sin ejecutar otra consulta', () => {
     servicio.cargar(42);
-    api.obtenerPlanificacion.mockClear();
+    api.obtenerPlanificacion.calls.reset();
 
     servicio.presentarVersion(81);
 
@@ -77,40 +81,46 @@ describe('EstadoPlanificacionProyectoService', () => {
   });
 
   it('recarga la versión vigente incluyendo los elementos eliminados', () => {
+    api.obtenerPlanificacion.and.returnValues(of(PLANIFICACION), of(PLANIFICACION_CON_ELIMINADOS));
     servicio.cargar(42);
-    api.obtenerPlanificacion.mockReturnValueOnce(of(PLANIFICACION_CON_ELIMINADOS));
 
     servicio.actualizarInclusionEliminados(true);
 
-    expect(api.obtenerPlanificacion).toHaveBeenLastCalledWith(42, null, true);
+    expect(api.obtenerPlanificacion.calls.mostRecent().args).toEqual([42, null, true]);
     expect(servicio.incluirEliminados()).toBe(true);
     expect(servicio.planificacion()).toEqual(PLANIFICACION_CON_ELIMINADOS);
   });
 
   it('retira el filtro al consultar una versión histórica', () => {
+    api.obtenerPlanificacion.and.returnValues(
+      of(PLANIFICACION),
+      of(PLANIFICACION_CON_ELIMINADOS),
+      of(PLANIFICACION_HISTORICA),
+    );
     servicio.cargar(42);
-    api.obtenerPlanificacion.mockReturnValueOnce(of(PLANIFICACION_CON_ELIMINADOS));
     servicio.actualizarInclusionEliminados(true);
-    api.obtenerPlanificacion.mockReturnValueOnce(of(PLANIFICACION_HISTORICA));
 
     servicio.presentarVersion(80);
 
     expect(servicio.incluirEliminados()).toBe(false);
-    expect(api.obtenerPlanificacion).toHaveBeenLastCalledWith(42, 80);
+    expect(api.obtenerPlanificacion.calls.mostRecent().args).toEqual([42, 80]);
     expect(servicio.planificacion()).toEqual(PLANIFICACION_HISTORICA);
   });
 
   it('recupera la versión vigente sin eliminados al volver desde el histórico', () => {
+    api.obtenerPlanificacion.and.returnValues(
+      of(PLANIFICACION),
+      of(PLANIFICACION_CON_ELIMINADOS),
+      of(PLANIFICACION_HISTORICA),
+      of(PLANIFICACION),
+    );
     servicio.cargar(42);
-    api.obtenerPlanificacion.mockReturnValueOnce(of(PLANIFICACION_CON_ELIMINADOS));
     servicio.actualizarInclusionEliminados(true);
-    api.obtenerPlanificacion.mockReturnValueOnce(of(PLANIFICACION_HISTORICA));
     servicio.presentarVersion(80);
-    api.obtenerPlanificacion.mockReturnValueOnce(of(PLANIFICACION));
 
     servicio.presentarVersion(81);
 
-    expect(api.obtenerPlanificacion).toHaveBeenLastCalledWith(42, null, false);
+    expect(api.obtenerPlanificacion.calls.mostRecent().args).toEqual([42, null, false]);
     expect(servicio.planificacion()).toEqual(PLANIFICACION);
   });
 });

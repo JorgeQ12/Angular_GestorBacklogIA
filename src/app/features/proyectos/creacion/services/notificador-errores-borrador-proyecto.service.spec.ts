@@ -5,11 +5,11 @@ import { ClaveSeccionProyecto } from '../../config/secciones-proyecto.config';
 import { NotificadorErroresBorradorProyectoService } from './notificador-errores-borrador-proyecto.service';
 
 describe('NotificadorErroresBorradorProyectoService', () => {
-  const notificadorErrores = { comunicar: vi.fn() };
+  const notificadorErrores = { comunicar: jasmine.createSpy('comunicar') };
   let servicio: NotificadorErroresBorradorProyectoService;
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    notificadorErrores.comunicar.calls.reset();
     TestBed.configureTestingModule({
       providers: [
         NotificadorErroresBorradorProyectoService,
@@ -23,8 +23,8 @@ describe('NotificadorErroresBorradorProyectoService', () => {
     servicio.comunicar(new HttpErrorResponse({ status: 409 }), ClaveSeccionProyecto.Necesidad);
 
     expect(notificadorErrores.comunicar).toHaveBeenCalledWith(
-      expect.any(HttpErrorResponse),
-      expect.objectContaining({
+      jasmine.any(HttpErrorResponse),
+      jasmine.objectContaining({
         mensajesPorEstado: {
           409: {
             titulo: 'El borrador cambió',
@@ -40,8 +40,8 @@ describe('NotificadorErroresBorradorProyectoService', () => {
     servicio.comunicar(new HttpErrorResponse({ status: 500 }), ClaveSeccionProyecto.TipoSolucion);
 
     expect(notificadorErrores.comunicar).toHaveBeenCalledWith(
-      expect.any(HttpErrorResponse),
-      expect.objectContaining({
+      jasmine.any(HttpErrorResponse),
+      jasmine.objectContaining({
         titulo: 'No fue posible guardar el tipo de solución',
         descripcion: 'Conservamos la selección para que puedas intentarlo nuevamente.',
       }),

@@ -4,11 +4,11 @@ import { MensajesService } from './mensajes.service';
 import { NotificadorErroresApiService } from './notificador-errores-api.service';
 
 describe('NotificadorErroresApiService', () => {
-  const mensajes = { error: vi.fn() };
+  const mensajes = { error: jasmine.createSpy('error') };
   let servicio: NotificadorErroresApiService;
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    mensajes.error.calls.reset();
     TestBed.configureTestingModule({
       providers: [NotificadorErroresApiService, { provide: MensajesService, useValue: mensajes }],
     });

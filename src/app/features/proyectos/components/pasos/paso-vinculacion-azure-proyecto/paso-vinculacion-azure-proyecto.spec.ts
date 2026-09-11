@@ -38,7 +38,7 @@ describe('PasoVinculacionAzureProyecto', () => {
   });
 
   it('impide un envío inválido y presenta los mensajes particulares', () => {
-    const validar = vi.fn();
+    const validar = jasmine.createSpy();
     fixture.componentInstance.validar.subscribe(validar);
 
     obtenerFormulario().requestSubmit();
@@ -67,7 +67,7 @@ describe('PasoVinculacionAzureProyecto', () => {
   });
 
   it('presenta el enlace como obligatorio cuando solo contiene espacios', () => {
-    const validar = vi.fn();
+    const validar = jasmine.createSpy();
     fixture.componentInstance.validar.subscribe(validar);
     cambiarValor('vinculacion-url-board', '   ');
     cambiarValor('vinculacion-id-epica', '321');
@@ -100,7 +100,7 @@ describe('PasoVinculacionAzureProyecto', () => {
     expect(obtenerElemento().querySelector('.vinculacion-azure--confirmacion')).toBeTruthy();
     expect(obtenerElemento().textContent).toContain('Épica vigente');
     expect(obtenerElemento().textContent).toContain('5 integrantes encontrados');
-    expect(obtenerElemento().querySelectorAll('.vinculacion-azure__resultado-item')).toHaveLength(
+    expect(obtenerElemento().querySelectorAll('.vinculacion-azure__resultado-item').length).toBe(
       3,
     );
     expect(
@@ -119,8 +119,8 @@ describe('PasoVinculacionAzureProyecto', () => {
   });
 
   it('emite las decisiones disponibles durante la confirmación', () => {
-    const editar = vi.fn();
-    const confirmar = vi.fn();
+    const editar = jasmine.createSpy();
+    const confirmar = jasmine.createSpy();
     fixture.componentInstance.editar.subscribe(editar);
     fixture.componentInstance.confirmar.subscribe(confirmar);
     fixture.componentRef.setInput('resultadoValidacion', RESULTADO);
@@ -133,8 +133,8 @@ describe('PasoVinculacionAzureProyecto', () => {
     botones[0].click();
     botones[1].click();
 
-    expect(editar).toHaveBeenCalledOnce();
-    expect(confirmar).toHaveBeenCalledOnce();
+    expect(editar).toHaveBeenCalledTimes(1);
+    expect(confirmar).toHaveBeenCalledTimes(1);
   });
 
   it('deshabilita los controles y las acciones durante una operación remota', () => {

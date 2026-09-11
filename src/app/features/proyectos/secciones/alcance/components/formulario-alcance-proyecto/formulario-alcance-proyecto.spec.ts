@@ -27,7 +27,7 @@ describe('FormularioAlcanceProyecto', () => {
   });
 
   it('emite el alcance sin espacios exteriores', () => {
-    const guardar = vi.fn();
+    const guardar = jasmine.createSpy();
     fixture.componentInstance.guardar.subscribe(guardar);
     escribir('#alcance-incluido', '  Seguimiento de envíos  ');
     escribir('#alcance-excluido', '  Pagos en línea  ');
@@ -41,7 +41,7 @@ describe('FormularioAlcanceProyecto', () => {
   });
 
   it('no admite contenido compuesto únicamente por espacios', () => {
-    const guardar = vi.fn();
+    const guardar = jasmine.createSpy();
     fixture.componentInstance.guardar.subscribe(guardar);
     escribir('#alcance-incluido', '   ');
     escribir('#alcance-excluido', 'Pagos en línea');
@@ -75,7 +75,7 @@ describe('FormularioAlcanceProyecto', () => {
   });
 
   it('conserva ambos límites como contenido de solo lectura', () => {
-    const guardar = vi.fn();
+    const guardar = jasmine.createSpy();
     fixture.componentInstance.guardar.subscribe(guardar);
     fixture.componentRef.setInput('datosIniciales', {
       incluido: 'Seguimiento de envíos',

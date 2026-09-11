@@ -8,12 +8,12 @@ import { ConsultaProyectosService } from './consulta-proyectos.service';
 describe('EstadoConsultaProyectosService', () => {
   let servicio: EstadoConsultaProyectosService;
   let primeraConsulta$: Subject<PaginaProyectos>;
-  const consultaProyectos = { obtenerProyectos: vi.fn() };
+  const consultaProyectos = { obtenerProyectos: jasmine.createSpy('obtenerProyectos') };
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    consultaProyectos.obtenerProyectos.calls.reset();
     primeraConsulta$ = new Subject<PaginaProyectos>();
-    consultaProyectos.obtenerProyectos.mockReturnValue(primeraConsulta$);
+    consultaProyectos.obtenerProyectos.and.returnValue(primeraConsulta$);
     TestBed.configureTestingModule({
       providers: [
         EstadoConsultaProyectosService,
@@ -36,7 +36,7 @@ describe('EstadoConsultaProyectosService', () => {
   it('cancela la consulta anterior cuando cambian los parámetros', () => {
     servicio.consultar(CONSULTA);
     const segundaConsulta$ = new Subject<PaginaProyectos>();
-    consultaProyectos.obtenerProyectos.mockReturnValueOnce(segundaConsulta$);
+    consultaProyectos.obtenerProyectos.and.returnValue(segundaConsulta$);
 
     servicio.consultar({ ...CONSULTA, pagina: 2 });
     primeraConsulta$.next(PAGINA);
@@ -46,16 +46,16 @@ describe('EstadoConsultaProyectosService', () => {
   });
 
   it('distingue una falla y permite reintentar la última consulta', () => {
-    consultaProyectos.obtenerProyectos.mockReturnValueOnce(
+    consultaProyectos.obtenerProyectos.and.returnValues(
       throwError(() => new Error('Sin conexión')),
+      primeraConsulta$,
     );
     servicio.consultar(CONSULTA);
 
     expect(servicio.errorCarga()).toBe(true);
-    consultaProyectos.obtenerProyectos.mockReturnValueOnce(primeraConsulta$);
     servicio.reintentar();
 
-    expect(consultaProyectos.obtenerProyectos).toHaveBeenLastCalledWith(CONSULTA);
+    expect(consultaProyectos.obtenerProyectos.calls.mostRecent().args).toEqual([CONSULTA]);
     expect(servicio.errorCarga()).toBe(false);
   });
 });

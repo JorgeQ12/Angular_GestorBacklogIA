@@ -24,14 +24,21 @@ describe('PaginaInformacionProyecto', () => {
     versiones: signal([]),
     errorCarga: signal(false),
     guardando: signal(false),
-    cargar: vi.fn(),
-    presentarVersion: vi.fn(),
-    guardar: vi.fn(),
+    cargar: jasmine.createSpy('cargar'),
+    presentarVersion: jasmine.createSpy('presentarVersion'),
+    guardar: jasmine.createSpy('guardar'),
   };
-  const router = { navigate: vi.fn(), navigateByUrl: vi.fn() };
+  const router = {
+    navigate: jasmine.createSpy('navigate'),
+    navigateByUrl: jasmine.createSpy('navigateByUrl'),
+  };
 
   beforeEach(async () => {
-    vi.clearAllMocks();
+    estado.cargar.calls.reset();
+    estado.presentarVersion.calls.reset();
+    estado.guardar.calls.reset();
+    router.navigate.calls.reset();
+    router.navigateByUrl.calls.reset();
     estado.proyectoActual.set({ id: 42, versionId: 81 });
     estado.proyectoPresentado.set(null);
     estado.errorCarga.set(false);
@@ -52,7 +59,7 @@ describe('PaginaInformacionProyecto', () => {
         {
           provide: CatalogosService,
           useValue: {
-            obtenerOpciones: vi.fn(() =>
+            obtenerOpciones: jasmine.createSpy('obtenerOpciones').and.callFake(() =>
               of([
                 { id: 2, nombre: 'Alta', descripcion: '' },
                 { id: 3, nombre: 'Media', descripcion: '' },
@@ -60,7 +67,12 @@ describe('PaginaInformacionProyecto', () => {
             ),
           },
         },
-        { provide: MensajesService, useValue: { confirmar: vi.fn(() => Promise.resolve(true)) } },
+        {
+          provide: MensajesService,
+          useValue: {
+            confirmar: jasmine.createSpy('confirmar').and.callFake(() => Promise.resolve(true)),
+          },
+        },
         { provide: EstadoInformacionProyectoService, useValue: estado },
       ],
     }).compileComponents();
@@ -76,7 +88,7 @@ describe('PaginaInformacionProyecto', () => {
   it('aplica la versión de la URL a todo el estado presentado', () => {
     consulta$.next(convertToParamMap({ version: '72' }));
     TestBed.flushEffects();
-    expect(estado.presentarVersion).toHaveBeenLastCalledWith(72);
+    expect(estado.presentarVersion.calls.mostRecent().args).toEqual([72]);
   });
 
   it('presenta un error de página completa sin encabezado ni recorrido', () => {
@@ -178,7 +190,7 @@ describe('PaginaInformacionProyecto', () => {
 
     expect(estado.guardar).toHaveBeenCalledWith(
       { seccion: ClaveSeccionProyecto.Contexto, datos: PROYECTO_PRESENTADO.contexto },
-      expect.any(Function),
+      jasmine.any(Function),
     );
   });
 
@@ -228,6 +240,112 @@ describe('PaginaInformacionProyecto', () => {
     expect(encabezado?.textContent).toContain('RESPONSABLE Jorge');
     expect(encabezado?.textContent).toContain('Prioridad Alta');
     expect(encabezado?.textContent).toContain('10 de dic de 2026');
+  });
+
+  it('vuelve al listado de proyectos', () => {
+    const componente = fixture.componentInstance as unknown as { volver: () => void };
+
+    componente.volver();
+
+    expect(router.navigateByUrl).toHaveBeenCalled();
+  });
+
+  it('recarga el proyecto con la versión solicitada en la URL', () => {
+    consulta$.next(convertToParamMap({ version: '72' }));
+    TestBed.flushEffects();
+    fixture.detectChanges();
+    estado.cargar.calls.reset();
+
+    (fixture.componentInstance as unknown as { recargar: () => void }).recargar();
+
+    expect(estado.cargar).toHaveBeenCalledWith(42, 72);
+  });
+
+  it('navega al cambiar de paso cuando no hay edición pendiente', async () => {
+    const componente = fixture.componentInstance as unknown as {
+      cambiarPaso: (paso: ClaveSeccionProyecto) => Promise<void>;
+    };
+
+    await componente.cambiarPaso(ClaveSeccionProyecto.Necesidad);
+
+    expect(router.navigate).toHaveBeenCalled();
+  });
+
+  it('no cambia de paso si el usuario decide seguir editando', async () => {
+    estado.proyectoPresentado.set(PROYECTO_PRESENTADO);
+    fixture.detectChanges();
+    const confirmar = TestBed.inject(MensajesService).confirmar as jasmine.Spy;
+    confirmar.and.returnValue(Promise.resolve(false));
+    const componente = fixture.componentInstance as unknown as {
+      editar: (seccion: ClaveSeccionProyecto) => void;
+      cambiarPaso: (paso: ClaveSeccionProyecto) => Promise<void>;
+    };
+
+    componente.editar(ClaveSeccionProyecto.Contexto);
+    await componente.cambiarPaso(ClaveSeccionProyecto.Necesidad);
+
+    expect(router.navigate).not.toHaveBeenCalled();
+  });
+
+  it('limpia el query param de versión al elegir la versión actual', async () => {
+    const componente = fixture.componentInstance as unknown as {
+      cambiarVersion: (versionId: number) => Promise<void>;
+    };
+
+    await componente.cambiarVersion(81);
+
+    expect(router.navigate).toHaveBeenCalledWith(
+      [],
+      jasmine.objectContaining({
+        queryParams: { [PARAMETROS_RUTA.versionProyectoId]: null },
+      }),
+    );
+  });
+
+  it('conserva el id al elegir una versión distinta de la actual', async () => {
+    const componente = fixture.componentInstance as unknown as {
+      cambiarVersion: (versionId: number) => Promise<void>;
+    };
+
+    await componente.cambiarVersion(72);
+
+    expect(router.navigate).toHaveBeenCalledWith(
+      [],
+      jasmine.objectContaining({
+        queryParams: { [PARAMETROS_RUTA.versionProyectoId]: 72 },
+      }),
+    );
+  });
+
+  it('no inicia la edición cuando la versión presentada no es la actual', () => {
+    estado.proyectoPresentado.set({ ...PROYECTO_PRESENTADO, esVersionActual: false });
+    fixture.detectChanges();
+    const componente = fixture.componentInstance as unknown as {
+      editar: (seccion: ClaveSeccionProyecto) => void;
+      seccionEditando: () => ClaveSeccionProyecto | null;
+    };
+
+    componente.editar(ClaveSeccionProyecto.Contexto);
+
+    expect(componente.seccionEditando()).toBeNull();
+  });
+
+  it('ignora la actualización temporal de contexto si no se edita Contexto', () => {
+    estado.proyectoPresentado.set(PROYECTO_PRESENTADO);
+    fixture.detectChanges();
+    const componente = fixture.componentInstance as unknown as {
+      editar: (seccion: ClaveSeccionProyecto) => void;
+      actualizarContextoTemporal: (contexto: InformacionProyecto['contexto']) => void;
+      datosEncabezado: () => { nombre: string };
+    };
+
+    componente.editar(ClaveSeccionProyecto.Necesidad);
+    componente.actualizarContextoTemporal({
+      ...PROYECTO_PRESENTADO.contexto,
+      nombre: 'Nombre temporal ignorado',
+    });
+
+    expect(componente.datosEncabezado().nombre).toBe('Portal');
   });
 });
 

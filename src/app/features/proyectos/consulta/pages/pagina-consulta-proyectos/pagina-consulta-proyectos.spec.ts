@@ -15,20 +15,26 @@ describe('PaginaConsultaProyectos', () => {
   const estadoConsulta = {
     pagina: () => pagina(),
     errorCarga: signal(false),
-    consultar: vi.fn(),
-    reintentar: vi.fn(),
+    consultar: jasmine.createSpy('consultar'),
+    reintentar: jasmine.createSpy('reintentar'),
   };
-  const router = { navigate: vi.fn(), navigateByUrl: vi.fn() };
+  const router = {
+    navigate: jasmine.createSpy('navigate'),
+    navigateByUrl: jasmine.createSpy('navigateByUrl'),
+  };
   const route = { queryParamMap: undefined as unknown };
 
   beforeEach(async () => {
-    vi.clearAllMocks();
+    estadoConsulta.consultar.calls.reset();
+    estadoConsulta.reintentar.calls.reset();
+    router.navigate.calls.reset();
+    router.navigateByUrl.calls.reset();
     estadoConsulta.errorCarga.set(false);
     pagina = signal<PaginaProyectos | null>(PAGINA);
     parametros$ = new BehaviorSubject(convertToParamMap({ estado: 'En Progreso', pagina: '2' }));
     route.queryParamMap = parametros$;
-    router.navigate.mockResolvedValue(true);
-    router.navigateByUrl.mockResolvedValue(true);
+    router.navigate.and.returnValue(Promise.resolve(true));
+    router.navigateByUrl.and.returnValue(Promise.resolve(true));
 
     await TestBed.configureTestingModule({
       imports: [PaginaConsultaProyectos],
@@ -55,13 +61,13 @@ describe('PaginaConsultaProyectos', () => {
     parametros$.next(convertToParamMap({ nombre: 'Portal' }));
     TestBed.flushEffects();
 
-    expect(estadoConsulta.consultar).toHaveBeenLastCalledWith({
+    expect(estadoConsulta.consultar.calls.mostRecent().args).toEqual([{
       nombre: 'Portal',
       responsable: '',
       estado: null,
       pagina: 1,
       paginaTamano: 10,
-    });
+    }]);
   });
 
   it('refleja los filtros en la URL y reinicia la página', () => {

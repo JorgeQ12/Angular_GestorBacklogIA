@@ -16,15 +16,22 @@ describe('AsistenteIAFlotante', () => {
     enviando: signal(false),
     mensajePendiente: signal<string | null>(null),
     propuestaProcesando: signal<number | null>(null),
-    seleccionarProyecto: vi.fn(),
-    cargar: vi.fn(),
-    enviar: vi.fn(() => EMPTY),
-    aplicar: vi.fn((): Observable<ResultadoResolucionPropuestaIA> => EMPTY),
-    rechazar: vi.fn(() => EMPTY),
+    seleccionarProyecto: jasmine.createSpy('seleccionarProyecto'),
+    cargar: jasmine.createSpy('cargar'),
+    enviar: jasmine.createSpy('enviar').and.callFake(() => EMPTY),
+    aplicar: jasmine
+      .createSpy('aplicar')
+      .and.callFake((): Observable<ResultadoResolucionPropuestaIA> => EMPTY),
+    rechazar: jasmine.createSpy('rechazar').and.callFake(() => EMPTY),
   };
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    estado.seleccionarProyecto.calls.reset();
+    estado.cargar.calls.reset();
+    estado.enviar.calls.reset();
+    estado.aplicar.calls.reset();
+    estado.aplicar.and.callFake((): Observable<ResultadoResolucionPropuestaIA> => EMPTY);
+    estado.rechazar.calls.reset();
     TestBed.configureTestingModule({
       imports: [AsistenteIAFlotante],
       providers: [{ provide: EstadoAsistenteIAService, useValue: estado }],
@@ -57,7 +64,7 @@ describe('AsistenteIAFlotante', () => {
   });
 
   it('selecciona el proyecto de entrada y emite su identidad después de aplicar', () => {
-    estado.aplicar.mockReturnValueOnce(
+    estado.aplicar.and.returnValue(
       of({
         proyectoId: 10,
         mensajeId: 9,
@@ -73,7 +80,7 @@ describe('AsistenteIAFlotante', () => {
       nombreSeccion: 'Necesidad de negocio',
     });
     fixture.detectChanges();
-    const actualizado = vi.fn();
+    const actualizado = jasmine.createSpy('actualizado');
     fixture.componentInstance.contextoActualizado.subscribe(actualizado);
 
     (fixture.componentInstance as unknown as { aplicarPropuesta(id: number): void })

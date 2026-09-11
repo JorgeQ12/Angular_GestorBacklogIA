@@ -22,23 +22,21 @@ describe('AutenticacionService', () => {
   });
 
   afterEach(() => {
-    vi.useRealTimers();
-    vi.restoreAllMocks();
     httpTesting.verify();
   });
 
   it('abre el flujo externo y espera a que el popup regrese al mismo origen', () => {
-    vi.useFakeTimers();
+    jasmine.clock().install();
     const ubicacion = {
       href: 'about:blank',
       origin: window.location.origin,
     };
     const popup = {
       closed: false,
-      close: vi.fn(),
+      close: jasmine.createSpy('close'),
       location: ubicacion,
     } as unknown as Window;
-    const abrir = vi.spyOn(window, 'open').mockReturnValue(popup);
+    const abrir = spyOn(window, 'open').and.returnValue(popup);
     let retornos = 0;
 
     servicio.iniciarSesionConMicrosoft().subscribe(() => retornos++);
@@ -46,26 +44,27 @@ describe('AutenticacionService', () => {
     expect(abrir).toHaveBeenCalledWith(
       ENDPOINTS_AUTENTICACION.iniciarSesion,
       'interia-autenticacion',
-      expect.stringContaining('popup=yes'),
+      jasmine.stringContaining('popup=yes'),
     );
-    vi.advanceTimersByTime(400);
+    jasmine.clock().tick(400);
     expect(retornos).toBe(0);
 
     ubicacion.href = `${window.location.origin}/`;
-    vi.advanceTimersByTime(400);
+    jasmine.clock().tick(400);
 
     expect(retornos).toBe(1);
-    expect(popup.close).toHaveBeenCalledOnce();
+    expect(popup.close).toHaveBeenCalledTimes(1);
+    jasmine.clock().uninstall();
   });
 
   it('confirma la sesión antes de aceptar el cierre automático del popup', () => {
-    vi.useFakeTimers();
+    jasmine.clock().install();
     const popup = {
       closed: false,
-      close: vi.fn(),
+      close: jasmine.createSpy('close'),
       location: { href: 'about:blank', origin: window.location.origin },
     } as unknown as Window;
-    vi.spyOn(window, 'open').mockReturnValue(popup);
+    spyOn(window, 'open').and.returnValue(popup);
     let retornos = 0;
     let flujoFinalizado = false;
 
@@ -74,7 +73,8 @@ describe('AutenticacionService', () => {
       complete: () => (flujoFinalizado = true),
     });
     Object.defineProperty(popup, 'closed', { value: true });
-    vi.advanceTimersByTime(400);
+    jasmine.clock().tick(400);
+    jasmine.clock().uninstall();
 
     httpTesting.expectOne(ENDPOINTS_AUTENTICACION.sesionActual).flush('', {
       headers: new HttpHeaders({ 'X-User-Name': 'Jorge Quintero' }),
@@ -85,13 +85,13 @@ describe('AutenticacionService', () => {
   });
 
   it('trata el cierre manual como cancelación cuando Kong no confirma sesión', () => {
-    vi.useFakeTimers();
+    jasmine.clock().install();
     const popup = {
       closed: false,
-      close: vi.fn(),
+      close: jasmine.createSpy('close'),
       location: { href: 'about:blank', origin: window.location.origin },
     } as unknown as Window;
-    vi.spyOn(window, 'open').mockReturnValue(popup);
+    spyOn(window, 'open').and.returnValue(popup);
     let retornos = 0;
     let flujoFinalizado = false;
 
@@ -100,7 +100,8 @@ describe('AutenticacionService', () => {
       complete: () => (flujoFinalizado = true),
     });
     Object.defineProperty(popup, 'closed', { value: true });
-    vi.advanceTimersByTime(400);
+    jasmine.clock().tick(400);
+    jasmine.clock().uninstall();
     httpTesting.expectOne(ENDPOINTS_AUTENTICACION.sesionActual).flush(null, {
       status: 401,
       statusText: 'Unauthorized',

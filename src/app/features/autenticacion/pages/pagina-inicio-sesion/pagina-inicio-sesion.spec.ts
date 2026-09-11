@@ -9,12 +9,12 @@ import { PaginaInicioSesion } from './pagina-inicio-sesion';
 describe('PaginaInicioSesion', () => {
   let fixture: ComponentFixture<PaginaInicioSesion>;
   const autenticacion = {
-    iniciarSesionConMicrosoft: vi.fn((): Observable<void> => EMPTY),
+    iniciarSesionConMicrosoft: jasmine.createSpy<() => Observable<void>>('iniciarSesionConMicrosoft'),
   };
 
   beforeEach(async () => {
-    autenticacion.iniciarSesionConMicrosoft.mockReset();
-    autenticacion.iniciarSesionConMicrosoft.mockReturnValue(EMPTY);
+    autenticacion.iniciarSesionConMicrosoft.calls.reset();
+    autenticacion.iniciarSesionConMicrosoft.and.returnValue(EMPTY);
 
     await TestBed.configureTestingModule({
       imports: [PaginaInicioSesion],
@@ -43,7 +43,7 @@ describe('PaginaInicioSesion', () => {
 
   it('mantiene el estado de espera hasta que la ventana externa regresa', () => {
     const resultado = new Subject<void>();
-    autenticacion.iniciarSesionConMicrosoft.mockReturnValue(resultado);
+    autenticacion.iniciarSesionConMicrosoft.and.returnValue(resultado);
 
     obtenerBoton().click();
     fixture.detectChanges();
@@ -60,8 +60,8 @@ describe('PaginaInicioSesion', () => {
   it('navega al panel únicamente después del retorno del popup', () => {
     const resultado = new Subject<void>();
     const router = TestBed.inject(Router);
-    const navegar = vi.spyOn(router, 'navigateByUrl').mockResolvedValue(true);
-    autenticacion.iniciarSesionConMicrosoft.mockReturnValue(resultado);
+    const navegar = spyOn(router, 'navigateByUrl').and.returnValue(Promise.resolve(true));
+    autenticacion.iniciarSesionConMicrosoft.and.returnValue(resultado);
 
     obtenerBoton().click();
     expect(navegar).not.toHaveBeenCalled();

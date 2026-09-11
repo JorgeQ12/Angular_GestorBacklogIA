@@ -19,7 +19,7 @@ describe('ProyectosAtencion', () => {
   });
 
   it('presenta el motivo y emite el proyecto que requiere revisión', () => {
-    const seleccionar = vi.fn();
+    const seleccionar = jasmine.createSpy('seleccionar');
     fixture.componentInstance.seleccionarProyecto.subscribe(seleccionar);
     const boton = (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>(
       '.proyecto-atencion',

@@ -30,7 +30,7 @@ describe('FormularioNecesidadProyecto', () => {
   });
 
   it('emite la necesidad sin espacios exteriores', () => {
-    const guardar = vi.fn();
+    const guardar = jasmine.createSpy();
     fixture.componentInstance.guardar.subscribe(guardar);
     escribir('#necesidad-situacion-actual', '  Registro manual  ');
     escribir('#necesidad-problemas', '  No existe trazabilidad  ');
@@ -46,7 +46,7 @@ describe('FormularioNecesidadProyecto', () => {
   });
 
   it('no admite respuestas compuestas únicamente por espacios', () => {
-    const guardar = vi.fn();
+    const guardar = jasmine.createSpy();
     fixture.componentInstance.guardar.subscribe(guardar);
     escribir('#necesidad-situacion-actual', '   ');
     escribir('#necesidad-problemas', 'Reprocesos');
@@ -85,7 +85,7 @@ describe('FormularioNecesidadProyecto', () => {
   });
 
   it('presenta los campos como lectura y no emite al enviar', () => {
-    const guardar = vi.fn();
+    const guardar = jasmine.createSpy();
     fixture.componentInstance.guardar.subscribe(guardar);
     fixture.componentRef.setInput('datosIniciales', {
       situacionActual: 'Registro manual',
