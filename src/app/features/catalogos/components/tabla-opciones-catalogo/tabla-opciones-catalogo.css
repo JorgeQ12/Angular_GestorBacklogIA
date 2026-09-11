@@ -11,8 +11,12 @@
   table-layout: fixed;
 }
 
+.tabla-opciones__columna-codigo {
+  width: 23%;
+}
+
 .tabla-opciones__columna-titulo {
-  width: 26%;
+  width: 21%;
 }
 
 .tabla-opciones__columna-estado {
@@ -30,8 +34,12 @@
 }
 
 @media (max-width: 640px) {
+  .tabla-opciones__columna-codigo {
+    width: 22%;
+  }
+
   .tabla-opciones__columna-titulo {
-    width: 24%;
+    width: 20%;
   }
 
   .tabla-opciones__columna-estado {
