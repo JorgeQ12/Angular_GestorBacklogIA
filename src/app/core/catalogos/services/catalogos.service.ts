@@ -23,7 +23,7 @@ export class CatalogosService {
   public obtenerOpciones(
     codigoCatalogo: CodigoTipoCatalogo,
   ): Observable<readonly OpcionCatalogo[]> {
-    const params = new HttpParams().set('CatalogoTipoCodigo', codigoCatalogo);
+    const params = new HttpParams().set('catalogoTipoCodigo', codigoCatalogo);
 
     return this.http
       .get<ResultadoApi<readonly CatalogoValorDto[]>>(ENDPOINTS_CATALOGOS.obtenerValores, {

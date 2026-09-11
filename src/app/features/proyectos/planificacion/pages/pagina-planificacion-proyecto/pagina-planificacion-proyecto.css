@@ -15,6 +15,10 @@
   overflow: hidden;
 }
 
+.pagina-planificacion__contenido--arbol {
+  overflow: visible;
+}
+
 .pagina-planificacion__contenido app-estado-vacio {
   --ui-empty-state-min-height: 22rem;
 }

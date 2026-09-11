@@ -74,8 +74,11 @@ el frontend envía únicamente los identificadores y opciones definidos por el c
 
 ## Códigos de tipos de item de trabajo
 
-Los campos `tipo` y `tipoEntidad`, y el parámetro de consulta `Tipo`, usan exclusivamente el código
+Los campos `tipo` y `tipoEntidad`, y el parámetro de consulta `tipo`, usan exclusivamente el código
 técnico del catálogo. Los alias cortos y los nombres PascalCase no forman parte del contrato HTTP.
+
+Todos los parámetros de consulta de planificación se envían en camelCase, por ejemplo
+`proyectoId`, `versionBacklogId`, `itemTrabajoId`, `numeroVersionEsperada` y `tamanoPagina`.
 
 | Tipo                   | Código técnico                   |
 | ---------------------- | -------------------------------- |

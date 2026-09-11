@@ -38,11 +38,11 @@ describe('ConsultaProyectosService', () => {
     );
 
     expect(solicitud.request.method).toBe('GET');
-    expect(solicitud.request.params.get('Nombre')).toBe('Portal');
-    expect(solicitud.request.params.get('Responsable')).toBe('María');
-    expect(solicitud.request.params.get('Estado')).toBe('1');
-    expect(solicitud.request.params.get('PaginaActual')).toBe('2');
-    expect(solicitud.request.params.get('PaginaTamano')).toBe('10');
+    expect(solicitud.request.params.get('nombre')).toBe('Portal');
+    expect(solicitud.request.params.get('responsable')).toBe('María');
+    expect(solicitud.request.params.get('estado')).toBe('1');
+    expect(solicitud.request.params.get('paginaActual')).toBe('2');
+    expect(solicitud.request.params.get('paginaTamano')).toBe('10');
     solicitud.flush(crearResultado(PAGINA_DTO));
 
     await expect(respuesta).resolves.toMatchObject({
@@ -65,9 +65,9 @@ describe('ConsultaProyectosService', () => {
       (request) => request.url === ENDPOINTS_CONSULTA_PROYECTOS.obtenerProyectos,
     );
 
-    expect(solicitud.request.params.has('Nombre')).toBe(false);
-    expect(solicitud.request.params.has('Responsable')).toBe(false);
-    expect(solicitud.request.params.has('Estado')).toBe(false);
+    expect(solicitud.request.params.has('nombre')).toBe(false);
+    expect(solicitud.request.params.has('responsable')).toBe(false);
+    expect(solicitud.request.params.has('estado')).toBe(false);
     solicitud.flush(crearResultado(PAGINA_DTO));
   });
 

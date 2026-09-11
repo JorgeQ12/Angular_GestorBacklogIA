@@ -18,7 +18,7 @@ export class AdministracionCatalogosService {
   public obtenerTipos(): Observable<readonly Catalogo[]> {
     return this.http
       .get<ResultadoApi<CatalogoTipoDto[]>>(E.obtenerTipos, {
-        params: new HttpParams().set('IncluirInactivos', true),
+        params: new HttpParams().set('incluirInactivos', true),
       })
       .pipe(map((r) => exigirDatosResultadoApi(r, 'los catálogos').map(mapearCatalogo)));
   }
@@ -27,7 +27,7 @@ export class AdministracionCatalogosService {
   public obtenerValores(): Observable<readonly ValorCatalogo[]> {
     return this.http
       .get<ResultadoApi<CatalogoValorDto[]>>(E.obtenerValores, {
-        params: new HttpParams().set('IncluirInactivos', true),
+        params: new HttpParams().set('incluirInactivos', true),
       })
       .pipe(map((r) => exigirDatosResultadoApi(r, 'las opciones').map(mapearValorCatalogo)));
   }
@@ -84,7 +84,7 @@ export class AdministracionCatalogosService {
   public inactivarTipo(id: number): Observable<Catalogo> {
     return this.http
       .patch<ResultadoApi<CatalogoTipoDto>>(E.inactivarTipo, null, {
-        params: new HttpParams().set('Id', id),
+        params: new HttpParams().set('id', id),
       })
       .pipe(map((r) => mapearCatalogo(exigirDatosResultadoApi(r, 'el catálogo inactivado'))));
   }
@@ -93,7 +93,7 @@ export class AdministracionCatalogosService {
   public inactivarValor(id: number): Observable<ValorCatalogo> {
     return this.http
       .patch<ResultadoApi<CatalogoValorDto>>(E.inactivarValor, null, {
-        params: new HttpParams().set('Id', id),
+        params: new HttpParams().set('id', id),
       })
       .pipe(map((r) => mapearValorCatalogo(exigirDatosResultadoApi(r, 'la opción inactivada'))));
   }
