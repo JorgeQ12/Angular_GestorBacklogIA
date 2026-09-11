@@ -9,5 +9,7 @@ import { CargaGlobalService } from '../../services/carga-global.service';
   styleUrl: './cargador-global.css',
 })
 export class CargadorGlobal {
+
+  /** Proporciona acceso al servicio de carga global. */
   protected readonly visible = inject(CargaGlobalService).visible;
 }

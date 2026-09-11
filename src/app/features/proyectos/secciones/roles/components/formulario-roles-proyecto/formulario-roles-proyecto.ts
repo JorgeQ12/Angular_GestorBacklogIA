@@ -43,7 +43,11 @@ import { RolProyecto, RolesProyecto } from '../../models/roles-proyecto.model';
   styleUrl: './formulario-roles-proyecto.css',
 })
 export class FormularioRolesProyecto {
+
+  /** Construye los controles reactivos administrados por el componente. */
   private readonly constructorFormulario = inject(NonNullableFormBuilder);
+
+  /** Coordina la finalización de recursos cuando se destruye la instancia. */
   private readonly destroyRef = inject(DestroyRef);
 
   /** Identifica el formulario para permitir acciones externas mediante el atributo form. */
@@ -61,13 +65,21 @@ export class FormularioRolesProyecto {
   /** Entrega Roles válidos y normalizados al flujo consumidor. */
   public readonly guardar = output<RolesProyecto>();
 
+  /** Conserva mensajes nombre para coordinar esta responsabilidad. */
   protected readonly mensajesNombre = MENSAJES_NOMBRE_ROL_PROYECTO;
+
+  /** Conserva mensajes descripción para coordinar esta responsabilidad. */
   protected readonly mensajesDescripcion = MENSAJES_DESCRIPCION_ROL_PROYECTO;
+
+  /** Deriva es solo lectura a partir del estado vigente. */
   protected readonly esSoloLectura = computed(() => this.modo() === ModoFormularioProyecto.Lectura);
+
+  /** Administra los valores y validaciones del formulario reactivo. */
   protected readonly formulario: FormularioRolesProyectoTipado = this.constructorFormulario.group({
     roles: this.constructorFormulario.array([this.crearGrupoRol()], [Validators.minLength(1)]),
   });
 
+  /** Obtiene controles roles. */
   protected get controlesRoles(): readonly FormGroup<ControlesRolProyecto>[] {
     return this.formulario.controls.roles.controls;
   }

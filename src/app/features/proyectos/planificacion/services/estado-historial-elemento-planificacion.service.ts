@@ -18,21 +18,50 @@ interface IdentidadHistorialElemento {
 /** Coordina la paginación y selección histórica sin trasladar HTTP al componente visual. */
 @Injectable()
 export class EstadoHistorialElementoPlanificacionService {
+
+  /** Proporciona acceso al servicio remoto requerido por esta responsabilidad. */
   private readonly api = inject(ElementoPlanificacionService);
+
+  /** Proporciona acceso al servicio de notificador errores API. */
   private readonly notificador = inject(NotificadorErroresApiService);
+
+  /** Coordina la finalización de recursos cuando se destruye la instancia. */
   private readonly destroyRef = inject(DestroyRef);
+
+  /** Conserva operación historial para controlar el ciclo de vida de la operación. */
   private operacionHistorial: Subscription | null = null;
+
+  /** Conserva operación version para controlar el ciclo de vida de la operación. */
   private operacionVersion: Subscription | null = null;
 
+  /** Conserva identidad estado como estado reactivo de la instancia. */
   private readonly identidadEstado = signal<IdentidadHistorialElemento | null>(null);
+
+  /** Conserva registros estado como estado reactivo de la instancia. */
   private readonly registrosEstado = signal<readonly VersionElementoResumen[]>([]);
+
+  /** Conserva siguiente cursor estado como estado reactivo de la instancia. */
   private readonly siguienteCursorEstado = signal<number | null>(null);
+
+  /** Conserva hay mas estado como estado reactivo de la instancia. */
   private readonly hayMasEstado = signal(false);
+
+  /** Conserva version seleccionada ID estado como estado reactivo de la instancia. */
   private readonly versionSeleccionadaIdEstado = signal<number | null>(null);
+
+  /** Conserva version seleccionada estado como estado reactivo de la instancia. */
   private readonly versionSeleccionadaEstado = signal<VersionElementoPlanificacion | null>(null);
+
+  /** Conserva cargando historial estado como estado reactivo de la instancia. */
   private readonly cargandoHistorialEstado = signal(false);
+
+  /** Conserva cargando version estado como estado reactivo de la instancia. */
   private readonly cargandoVersionEstado = signal(false);
+
+  /** Conserva error historial estado como estado reactivo de la instancia. */
   private readonly errorHistorialEstado = signal(false);
+
+  /** Conserva error version estado como estado reactivo de la instancia. */
   private readonly errorVersionEstado = signal(false);
 
   /** Expone los resúmenes de versiones cargados hasta el momento. */
@@ -130,6 +159,7 @@ export class EstadoHistorialElementoPlanificacionService {
     this.errorVersionEstado.set(false);
   }
 
+  /** Carga historial dentro del flujo actual. */
   private cargarHistorial(acumular: boolean): void {
     const identidad = this.identidadEstado();
     if (!identidad || this.cargandoHistorialEstado()) return;

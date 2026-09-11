@@ -60,6 +60,9 @@ export class TarjetaPasoProyecto {
   /** Solicita presentar otra versión desde el encabezado. */
   public readonly versionCambiada = output<number>();
 
+  /** Conserva modos para coordinar esta responsabilidad. */
   protected readonly modos = ModoFormularioProyecto;
+
+  /** Deriva definicion a partir del estado vigente. */
   protected readonly definicion = computed(() => obtenerPasoProyecto(this.paso()));
 }

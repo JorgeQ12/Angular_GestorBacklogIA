@@ -17,6 +17,8 @@ type CodigoTipoCatalogo =
 /** Proporciona los catálogos transversales requeridos por las features. */
 @Injectable({ providedIn: 'root' })
 export class CatalogosService {
+
+  /** Ejecuta las solicitudes HTTP correspondientes a esta responsabilidad. */
   private readonly http = inject(HttpClient);
 
   /** Obtiene las opciones activas del tipo de catálogo solicitado por su código técnico. */

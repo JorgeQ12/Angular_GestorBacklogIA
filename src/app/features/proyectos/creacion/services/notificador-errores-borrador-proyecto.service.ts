@@ -13,6 +13,8 @@ const DESCRIPCION_CONFLICTO_REVISION =
 /** Presenta de forma uniforme los errores producidos al guardar el borrador. */
 @Injectable({ providedIn: 'root' })
 export class NotificadorErroresBorradorProyectoService {
+
+  /** Proporciona acceso al servicio de notificador errores API. */
   private readonly notificadorErrores = inject(NotificadorErroresApiService);
 
   /** Comunica un conflicto de revisión o el error particular de una sección. */

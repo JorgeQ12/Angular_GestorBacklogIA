@@ -61,11 +61,22 @@ export class PasoEquipoProyecto {
   /** Comunica la versión seleccionada por el usuario. */
   public readonly versionCambiada = output<number>();
 
+  /** Administra los valores y validaciones del formulario reactivo. */
   private readonly formulario = viewChild(FormularioEquipoProyecto);
+
+  /** Conserva progreso temporal como estado reactivo de la instancia. */
   private readonly progresoTemporal = signal<ProgresoEquipoProyecto | null>(null);
+
+  /** Conserva paso para coordinar esta responsabilidad. */
   protected readonly paso = ClaveSeccionProyecto.Equipo;
+
+  /** Conserva ID formulario para coordinar esta responsabilidad. */
   protected readonly idFormulario = construirIdFormularioPasoProyecto(this.paso);
+
+  /** Conserva modos para coordinar esta responsabilidad. */
   protected readonly modos = ModoFormularioProyecto;
+
+  /** Deriva detalle a partir del estado vigente. */
   protected readonly detalle = computed(() => {
     const progreso = this.progresoTemporal() ?? this.calcularProgreso(this.datos());
     return {
@@ -93,6 +104,7 @@ export class PasoEquipoProyecto {
     this.sincronizar.emit(this.formulario()?.obtenerDatosVigentes() ?? this.datos());
   }
 
+  /** Calcula progreso dentro del flujo actual. */
   private calcularProgreso(equipo: EquipoProyecto): ProgresoEquipoProyecto {
     const configurados = equipo.integrantes.filter(
       (integrante) => integrante.perfilTecnicoId !== null && integrante.dedicacionCodigo,

@@ -14,6 +14,8 @@ import { BorradorInicioPanel } from '../../models/resumen-inicio-panel.model';
   styleUrl: './borradores-recientes.css',
 })
 export class BorradoresRecientes {
+
+  /** Conserva obtener progreso para coordinar esta responsabilidad. */
   protected readonly obtenerProgreso = obtenerProgresoCreacionProyecto;
 
   /** Proporciona los borradores disponibles para el usuario vigente. */

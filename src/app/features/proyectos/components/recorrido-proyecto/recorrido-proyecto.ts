@@ -32,20 +32,31 @@ export class RecorridoProyecto {
   /** Solicita al contenedor presentar otro paso habilitado. */
   public readonly pasoSeleccionado = output<ClavePasoProyecto>();
 
+  /** Conserva pasos para coordinar esta responsabilidad. */
   protected readonly pasos = PASOS_PROYECTO;
+
+  /** Deriva posición actual a partir del estado vigente. */
   protected readonly posicionActual = computed(() => {
     const indice = this.pasos.findIndex((paso) => paso.clave === this.pasoActual());
     return indice >= 0 ? indice + 1 : 1;
   });
+
+  /** Deriva porcentaje recorrido a partir del estado vigente. */
   protected readonly porcentajeRecorrido = computed(
     () => (this.posicionActual() / this.pasos.length) * 100,
   );
+
+  /** Deriva texto progreso a partir del estado vigente. */
   protected readonly textoProgreso = computed(
     () => `Paso ${this.posicionActual()} de ${this.pasos.length}`,
   );
+
+  /** Deriva claves completadas a partir del estado vigente. */
   private readonly clavesCompletadas = computed(
     () => new Set<ClavePasoProyecto>(this.pasosCompletados()),
   );
+
+  /** Deriva claves navegables a partir del estado vigente. */
   private readonly clavesNavegables = computed(
     () => new Set<ClavePasoProyecto>(this.pasosNavegables()),
   );

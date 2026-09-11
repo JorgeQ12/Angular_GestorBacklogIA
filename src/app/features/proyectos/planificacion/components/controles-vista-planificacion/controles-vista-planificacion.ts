@@ -28,6 +28,8 @@ import { SelectorVersionPlanificacionComponent } from '../selector-version-plani
   styleUrl: './controles-vista-planificacion.css',
 })
 export class ControlesVistaPlanificacionComponent {
+
+  /** Conserva ID búsqueda para coordinar esta responsabilidad. */
   protected readonly idBusqueda = 'buscar-elemento-planificacion';
   /** Proporciona el término vigente de búsqueda. */
   public readonly terminoBusqueda = input('');
@@ -62,7 +64,10 @@ export class ControlesVistaPlanificacionComponent {
   /** Solicita presentar otra versión integral de la planificación. */
   public readonly versionCambiada = output<number>();
 
+  /** Administra búsqueda control mediante formularios reactivos. */
   protected readonly busquedaControl = new FormControl('', { nonNullable: true });
+
+  /** Conserva panel vista abierto como estado reactivo de la instancia. */
   protected readonly panelVistaAbierto = signal(false);
 
   public constructor() {
@@ -81,6 +86,7 @@ export class ControlesVistaPlanificacionComponent {
       .subscribe((termino) => this.busquedaCambiada.emit(termino));
   }
 
+  /** Ejecuta cambiar inclusion como parte del flujo interno. */
   protected cambiarInclusion(evento: Event): void {
     const control = evento.target;
     if (control instanceof HTMLInputElement) {
@@ -88,6 +94,7 @@ export class ControlesVistaPlanificacionComponent {
     }
   }
 
+  /** Ejecuta cambiar expansion como parte del flujo interno. */
   protected cambiarExpansion(evento: Event): void {
     const control = evento.target;
     if (control instanceof HTMLInputElement) {
@@ -95,21 +102,25 @@ export class ControlesVistaPlanificacionComponent {
     }
   }
 
+  /** Alterna panel vista dentro del flujo actual. */
   protected alternarPanelVista(evento: MouseEvent): void {
     evento.stopPropagation();
     this.panelVistaAbierto.update((abierto) => !abierto);
   }
 
+  /** Abre gantt dentro del flujo actual. */
   protected abrirGantt(): void {
     this.panelVistaAbierto.set(false);
     this.ganttSolicitado.emit();
   }
 
+  /** Cierra panel vista dentro del flujo actual. */
   @HostListener('document:click')
   protected cerrarPanelVista(): void {
     this.panelVistaAbierto.set(false);
   }
 
+  /** Cierra panel vista con escape dentro del flujo actual. */
   @HostListener('document:keydown.escape')
   protected cerrarPanelVistaConEscape(): void {
     this.panelVistaAbierto.set(false);

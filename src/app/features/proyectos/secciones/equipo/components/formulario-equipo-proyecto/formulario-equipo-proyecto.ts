@@ -55,8 +55,14 @@ const EQUIPO_VACIO: EquipoProyecto = { integrantes: [] };
   styleUrl: './formulario-equipo-proyecto.css',
 })
 export class FormularioEquipoProyecto {
+
+  /** Construye los controles reactivos administrados por el componente. */
   private readonly constructorFormulario = inject(NonNullableFormBuilder);
+
+  /** Coordina la finalización de recursos cuando se destruye la instancia. */
   private readonly destroyRef = inject(DestroyRef);
+
+  /** Conserva version formulario como estado reactivo de la instancia. */
   private readonly versionFormulario = signal(0);
 
   /** Identifica el formulario para permitir acciones externas mediante el atributo form. */
@@ -86,24 +92,45 @@ export class FormularioEquipoProyecto {
   /** Comunica el avance vigente para presentarlo fuera del formulario. */
   public readonly progresoCambiado = output<ProgresoEquipoProyecto>();
 
+  /** Conserva mensajes asignacion para coordinar esta responsabilidad. */
   protected readonly mensajesAsignacion = MENSAJES_ASIGNACION_EQUIPO;
+
+  /** Deriva es solo lectura a partir del estado vigente. */
   protected readonly esSoloLectura = computed(() => this.modo() === ModoFormularioProyecto.Lectura);
+
+  /** Conserva filtros para coordinar esta responsabilidad. */
   protected readonly filtros = FiltroEquipoProyecto;
+
+  /** Administra control busqueda mediante formularios reactivos. */
   protected readonly controlBusqueda = this.constructorFormulario.control('');
+
+  /** Conserva filtro como estado reactivo de la instancia. */
   protected readonly filtro = signal(FiltroEquipoProyecto.Todos);
+
+  /** Conserva seleccionados como estado reactivo de la instancia. */
   protected readonly seleccionados = signal<ReadonlySet<string>>(new Set());
+
+  /** Administra los valores y validaciones del formulario reactivo. */
   protected readonly formulario: FormularioEquipoProyectoTipado = this.constructorFormulario.group({
     integrantes: this.constructorFormulario.array<FormGroup<ControlesIntegranteEquipoProyecto>>([]),
   });
+
+  /** Administra asignacion masiva mediante formularios reactivos. */
   protected readonly asignacionMasiva = this.constructorFormulario.group({
     perfilTecnicoId: this.constructorFormulario.control<number | null>(null),
     dedicacionCodigo: [''],
   });
+
+  /** Conserva busqueda para coordinar esta responsabilidad. */
   private readonly busqueda = toSignal(this.controlBusqueda.valueChanges, { initialValue: '' });
+
+  /** Deriva controles integrantes a partir del estado vigente. */
   protected readonly controlesIntegrantes = computed(() => {
     this.versionFormulario();
     return [...this.formulario.controls.integrantes.controls];
   });
+
+  /** Deriva controles visibles a partir del estado vigente. */
   protected readonly controlesVisibles = computed(() => {
     const termino = normalizarBusqueda(this.busqueda());
     const filtro = this.filtro();
@@ -118,13 +145,19 @@ export class FormularioEquipoProyecto {
       return coincideFiltro && (!termino || contenido.includes(termino));
     });
   });
+
+  /** Deriva cantidad configurados a partir del estado vigente. */
   protected readonly cantidadConfigurados = computed(
     () =>
       this.controlesIntegrantes().filter((grupo) => estaConfigurado(grupo.getRawValue())).length,
   );
+
+  /** Deriva cantidad pendientes a partir del estado vigente. */
   protected readonly cantidadPendientes = computed(
     () => this.controlesIntegrantes().length - this.cantidadConfigurados(),
   );
+
+  /** Deriva todos visibles seleccionados a partir del estado vigente. */
   protected readonly todosVisiblesSeleccionados = computed(() => {
     const visibles = this.controlesVisibles();
     const seleccionados = this.seleccionados();
@@ -133,6 +166,8 @@ export class FormularioEquipoProyecto {
       visibles.every((grupo) => seleccionados.has(grupo.controls.idAzure.value))
     );
   });
+
+  /** Deriva algunos visibles seleccionados a partir del estado vigente. */
   protected readonly algunosVisiblesSeleccionados = computed(() => {
     const visibles = this.controlesVisibles();
     const seleccionados = this.seleccionados();
@@ -141,6 +176,8 @@ export class FormularioEquipoProyecto {
     ).length;
     return cantidadSeleccionada > 0 && cantidadSeleccionada < visibles.length;
   });
+
+  /** Deriva puede aplicar asignacion a partir del estado vigente. */
   protected readonly puedeAplicarAsignacion = computed(() => {
     this.versionFormulario();
     const asignacion = this.asignacionMasiva.getRawValue();

@@ -16,6 +16,8 @@ const MENSAJES_HTTP: Readonly<Record<number, string>> = {
 /** Presenta errores del API priorizando el detalle funcional proporcionado por el backend. */
 @Injectable({ providedIn: 'root' })
 export class NotificadorErroresApiService {
+
+  /** Proporciona acceso al servicio de mensajes. */
   private readonly mensajes = inject(MensajesService);
 
   /** Comunica el error con el contexto de la operación que no pudo completarse. */
@@ -31,6 +33,7 @@ export class NotificadorErroresApiService {
     );
   }
 
+  /** Obtiene mensaje especializado dentro del flujo actual. */
   private obtenerMensajeEspecializado(
     error: ErrorApi,
     contexto: ContextoErrorApi,
@@ -43,6 +46,7 @@ export class NotificadorErroresApiService {
     return error.estadoHttp === null ? undefined : contexto.mensajesPorEstado?.[error.estadoHttp];
   }
 
+  /** Obtiene contenido dentro del flujo actual. */
   private obtenerContenido(
     error: ErrorApi,
     mensajeEspecializado: MensajeErrorApi | undefined,
@@ -67,6 +71,7 @@ export class NotificadorErroresApiService {
     };
   }
 
+  /** Obtiene descripción HTTP dentro del flujo actual. */
   private obtenerDescripcionHttp(estadoHttp: number | null): string | undefined {
     if (estadoHttp === null) return undefined;
     if (estadoHttp >= 500) return MENSAJES_HTTP[500];

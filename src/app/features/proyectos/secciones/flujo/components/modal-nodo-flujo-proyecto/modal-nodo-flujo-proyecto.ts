@@ -67,21 +67,42 @@ import { FormularioPaginaFlujoProyecto } from '../formularios-nodo-flujo-proyect
   styleUrl: './modal-nodo-flujo-proyecto.css',
 })
 export class ModalNodoFlujoProyecto {
+
+  /** Construye los controles reactivos administrados por el componente. */
   private readonly constructorFormulario = inject(NonNullableFormBuilder);
+
+  /** Proporciona acceso al servicio de estado editor flujo proyecto. */
   protected readonly estadoEditor = inject(EstadoEditorFlujoProyectoService);
+
+  /** Conserva formulario senal como estado reactivo de la instancia. */
   private readonly formularioSenal = signal<FormularioNodoFlujoProyecto>(
     this.construirFormulario(
       this.estadoEditor.obtenerBorradorPredeterminado(TipoBloqueFlujo.Accion),
     ),
   );
 
+  /** Indica estado modal dentro del estado actual. */
   protected readonly estadoModal = this.estadoEditor.estadoEditorNodo;
+
+  /** Administra los valores y validaciones del formulario reactivo. */
   protected readonly formulario = computed(() => this.formularioSenal());
+
+  /** Conserva ID formulario para coordinar esta responsabilidad. */
   protected readonly idFormulario = 'formulario-nodo-flujo-proyecto';
+
+  /** Conserva iconos tipo para coordinar esta responsabilidad. */
   protected readonly iconosTipo = ICONOS_TIPO_BLOQUE_FLUJO;
+
+  /** Conserva modos editor nodo para coordinar esta responsabilidad. */
   protected readonly modosEditorNodo = ModoEditorNodoFlujo;
+
+  /** Conserva tipos bloque para coordinar esta responsabilidad. */
   protected readonly tiposBloque = TipoBloqueFlujo;
+
+  /** Conserva mensajes formulario para coordinar esta responsabilidad. */
   protected readonly mensajesFormulario = MENSAJES_FORMULARIO_NODO_FLUJO;
+
+  /** Deriva encabezado modal a partir del estado vigente. */
   protected readonly encabezadoModal = computed(() =>
     this.estadoEditor.soloLectura()
       ? 'Versión histórica'
@@ -89,17 +110,25 @@ export class ModalNodoFlujoProyecto {
         ? 'Nuevo bloque del flujo'
         : 'Edición del bloque',
   );
+
+  /** Deriva texto acción principal a partir del estado vigente. */
   protected readonly textoAccionPrincipal = computed(() =>
     this.estadoModal()?.modo === ModoEditorNodoFlujo.Crear ? 'Crear bloque' : 'Guardar cambios',
   );
+
+  /** Deriva etiqueta tipo a partir del estado vigente. */
   protected readonly etiquetaTipo = computed(() => {
     const tipo = this.estadoModal()?.tipo;
     return tipo ? ETIQUETAS_TIPO_BLOQUE_FLUJO[tipo] : '';
   });
+
+  /** Deriva descripción tipo a partir del estado vigente. */
   protected readonly descripcionTipo = computed(() => {
     const tipo = this.estadoModal()?.tipo;
     return tipo ? DESCRIPCIONES_TIPO_BLOQUE_FLUJO[tipo] : '';
   });
+
+  /** Deriva título modal a partir del estado vigente. */
   protected readonly tituloModal = computed(() => {
     const estado = this.estadoModal();
     if (!estado) return '';
@@ -112,6 +141,8 @@ export class ModalNodoFlujoProyecto {
       ? `Configurar ${this.obtenerEtiquetaTipo(estado.tipo)}`
       : `Editar ${this.obtenerEtiquetaTipo(estado.tipo)}`;
   });
+
+  /** Deriva descripción modal a partir del estado vigente. */
   protected readonly descripcionModal = computed(() => {
     const estado = this.estadoModal();
     if (!estado) return '';
@@ -145,10 +176,12 @@ export class ModalNodoFlujoProyecto {
     });
   }
 
+  /** Cierra la operación solicitada dentro del flujo actual. */
   protected cerrar(): void {
     this.estadoEditor.cancelarBorradorNodo();
   }
 
+  /** Guarda la operación solicitada dentro del flujo actual. */
   protected guardar(): void {
     if (this.estadoEditor.soloLectura()) return;
 
@@ -161,6 +194,7 @@ export class ModalNodoFlujoProyecto {
     this.estadoEditor.confirmarBorradorNodo(this.convertirFormularioEnBorrador(formulario));
   }
 
+  /** Construye formulario dentro del flujo actual. */
   private construirFormulario(borrador: BorradorNodoFlujo): FormularioNodoFlujoProyecto {
     const esModulo = borrador.tipo === TipoBloqueFlujo.Modulo;
     const esComponente = borrador.tipo === TipoBloqueFlujo.Componente;
@@ -201,6 +235,7 @@ export class ModalNodoFlujoProyecto {
     });
   }
 
+  /** Convierte formulario en borrador dentro del flujo actual. */
   private convertirFormularioEnBorrador(
     formulario: FormularioNodoFlujoProyecto,
   ): BorradorNodoFlujo {
@@ -248,6 +283,7 @@ export class ModalNodoFlujoProyecto {
     }
   }
 
+  /** Ejecuta separar lista como parte del flujo interno. */
   private separarLista(valor: string): string[] {
     return valor
       .split(/[\n,]/)
@@ -255,6 +291,7 @@ export class ModalNodoFlujoProyecto {
       .filter(Boolean);
   }
 
+  /** Crea criterios aceptacion dentro del flujo actual. */
   private crearCriteriosAceptacion(criterios: string[]): FormArray<FormControl<string>> {
     const controles = (criterios.length ? criterios : ['']).map((criterio) =>
       this.constructorFormulario.control(criterio, validarTextoRequerido),
@@ -262,6 +299,7 @@ export class ModalNodoFlujoProyecto {
     return this.constructorFormulario.array(controles);
   }
 
+  /** Crea horarios mayor actividad dentro del flujo actual. */
   private crearHorariosMayorActividad(
     franjas: FranjaMayorActividadModulo[],
   ): FormArray<FormularioFranjaActividadModulo> {
@@ -279,6 +317,7 @@ export class ModalNodoFlujoProyecto {
     );
   }
 
+  /** Obtiene etiqueta tipo dentro del flujo actual. */
   private obtenerEtiquetaTipo(tipo: TipoBloqueFlujo): string {
     return ETIQUETAS_TIPO_BLOQUE_FLUJO[tipo].toLowerCase();
   }

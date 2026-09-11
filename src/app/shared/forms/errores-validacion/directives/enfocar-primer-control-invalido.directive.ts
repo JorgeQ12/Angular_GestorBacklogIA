@@ -15,6 +15,8 @@ export function enfocarPrimerControlInvalido(contenedor: ParentNode): boolean {
   host: { '(submit)': 'programarEnfoque()' },
 })
 export class EnfocarPrimerControlInvalidoDirective {
+
+  /** Administra los valores y validaciones del formulario reactivo. */
   private readonly formulario = inject<ElementRef<HTMLFormElement>>(ElementRef);
 
   /** Espera la presentación de errores antes de localizar el primer control. */

@@ -8,11 +8,23 @@ import { ConsultaProyectosService } from './consulta-proyectos.service';
 /** Conserva el estado remoto únicamente durante la permanencia en la consulta. */
 @Injectable()
 export class EstadoConsultaProyectosService {
+
+  /** Proporciona acceso al servicio de consulta proyectos. */
   private readonly consultaProyectos = inject(ConsultaProyectosService);
+
+  /** Coordina la finalización de recursos cuando se destruye la instancia. */
   private readonly destroyRef = inject(DestroyRef);
+
+  /** Conserva estado página como estado reactivo de la instancia. */
   private readonly estadoPagina = signal<PaginaProyectos | null>(null);
+
+  /** Conserva estado error carga como estado reactivo de la instancia. */
   private readonly estadoErrorCarga = signal(false);
+
+  /** Conserva consulta actual para controlar el ciclo de vida de la operación. */
   private consultaActual: Subscription | null = null;
+
+  /** Conserva última consulta para coordinar esta responsabilidad. */
   private ultimaConsulta: ConsultaProyectos | null = null;
 
   /** Expone la página confirmada por el backend. */

@@ -7,9 +7,17 @@ import type {
 /** Coordina la búsqueda y la expansión local del árbol de planificación. */
 @Injectable()
 export class EstadoExploracionPlanificacionService {
+
+  /** Conserva planificación estado como estado reactivo de la instancia. */
   private readonly planificacionEstado = signal<PlanificacionProyecto | null>(null);
+
+  /** Conserva término búsqueda estado como estado reactivo de la instancia. */
   private readonly terminoBusquedaEstado = signal('');
+
+  /** Conserva expandidos estado como estado reactivo de la instancia. */
   private readonly expandidosEstado = signal<ReadonlySet<string>>(new Set());
+
+  /** Conserva fotografia inicializada para coordinar esta responsabilidad. */
   private fotografiaInicializada: string | null = null;
 
   /** Expone el término escrito sin alterar su representación en el campo. */

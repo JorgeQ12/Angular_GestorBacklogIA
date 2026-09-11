@@ -7,7 +7,8 @@
 .ui-empty-state {
   display: grid;
   min-height: var(--ui-empty-state-min-height, 10rem);
-  place-items: center;
+  place-content: center;
+  justify-items: center;
   gap: var(--space-2);
   padding: var(--space-6);
   color: var(--text-secondary);

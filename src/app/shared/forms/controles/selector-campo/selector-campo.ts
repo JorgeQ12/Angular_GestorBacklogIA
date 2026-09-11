@@ -58,15 +58,30 @@ export class SelectorCampo implements ControlValueAccessor, ControlCampoPersonal
   /** Conserva el valor visible e impide abrir o modificar la selección. */
   public readonly soloLectura = input(false);
 
+  /** Conserva abierto como estado reactivo de la instancia. */
   protected readonly abierto = signal(false);
+
+  /** Conserva deshabilitado como estado reactivo de la instancia. */
   protected readonly deshabilitado = signal(false);
+
+  /** Conserva con error como estado reactivo de la instancia. */
   protected readonly conError = signal(false);
+
+  /** Conserva valor como estado reactivo de la instancia. */
   protected readonly valor = signal<string | number | null>(null);
+
+  /** Conserva indice activo como estado reactivo de la instancia. */
   protected readonly indiceActivo = signal(-1);
+
+  /** Conserva ancho overlay como estado reactivo de la instancia. */
   protected readonly anchoOverlay = signal(0);
+
+  /** Deriva opción seleccionada a partir del estado vigente. */
   protected readonly opcionSeleccionada = computed(() =>
     this.opciones().find((opcion) => opcion.valor === this.valor()),
   );
+
+  /** Conserva posiciones para coordinar esta responsabilidad. */
   protected readonly posiciones: ConnectedPosition[] = [
     {
       originX: 'start',
@@ -84,9 +99,16 @@ export class SelectorCampo implements ControlValueAccessor, ControlCampoPersonal
     },
   ];
 
+  /** Referencia trigger dentro de la vista. */
   private readonly trigger = viewChild<ElementRef<HTMLButtonElement>>('trigger');
+
+  /** Referencia elementos opción dentro de la vista. */
   private readonly elementosOpcion = viewChildren<ElementRef<HTMLButtonElement>>('opcionElemento');
+
+  /** Conserva la función que atenderá notificar cambio. */
   private notificarCambio: (valor: string | number | null) => void = () => undefined;
+
+  /** Conserva la función que atenderá notificar tocado. */
   private notificarTocado: () => void = () => undefined;
 
   public constructor() {
@@ -195,6 +217,7 @@ export class SelectorCampo implements ControlValueAccessor, ControlCampoPersonal
     this.cerrar();
   }
 
+  /** Abre la operación solicitada dentro del flujo actual. */
   private abrir(preferencia: 'seleccionada' | 'ultima' = 'seleccionada'): void {
     const trigger = this.trigger()?.nativeElement;
     if (!trigger) return;
@@ -211,6 +234,7 @@ export class SelectorCampo implements ControlValueAccessor, ControlCampoPersonal
     this.abierto.set(true);
   }
 
+  /** Cierra la operación solicitada dentro del flujo actual. */
   private cerrar(devolverFoco = false): void {
     if (!this.abierto()) return;
     this.abierto.set(false);
@@ -218,6 +242,7 @@ export class SelectorCampo implements ControlValueAccessor, ControlCampoPersonal
     if (devolverFoco) queueMicrotask(() => this.trigger()?.nativeElement.focus());
   }
 
+  /** Ejecuta mover activo como parte del flujo interno. */
   private moverActivo(direccion: 1 | -1): void {
     const opciones = this.opciones();
     if (opciones.length === 0) return;
@@ -233,11 +258,13 @@ export class SelectorCampo implements ControlValueAccessor, ControlCampoPersonal
     }
   }
 
+  /** Ejecuta activar extremo como parte del flujo interno. */
   private activarExtremo(extremo: 'primera' | 'ultima'): void {
     this.indiceActivo.set(this.obtenerIndiceExtremo(extremo));
     this.enfocarOpcionActiva();
   }
 
+  /** Obtiene indice extremo dentro del flujo actual. */
   private obtenerIndiceExtremo(extremo: 'primera' | 'ultima'): number {
     const opciones = this.opciones();
     if (extremo === 'primera') return opciones.findIndex((opcion) => !opcion.deshabilitada);
@@ -248,11 +275,13 @@ export class SelectorCampo implements ControlValueAccessor, ControlCampoPersonal
     return -1;
   }
 
+  /** Selecciona indice dentro del flujo actual. */
   private seleccionarIndice(indice: number): void {
     const opcion = this.opciones()[indice];
     if (opcion) this.seleccionar(opcion);
   }
 
+  /** Enfoca opción activa dentro del flujo actual. */
   private enfocarOpcionActiva(): void {
     queueMicrotask(() => this.elementosOpcion()[this.indiceActivo()]?.nativeElement.focus());
   }

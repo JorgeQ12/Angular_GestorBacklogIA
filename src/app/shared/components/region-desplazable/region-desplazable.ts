@@ -29,21 +29,44 @@ const DURACION_VISIBILIDAD_SCROLLBAR_MS = 900;
   styleUrl: './region-desplazable.css',
 })
 export class RegionDesplazable implements AfterViewInit, OnDestroy {
+
+  /** Referencia viewport dentro de la vista. */
   private readonly viewport = viewChild.required<ElementRef<HTMLElement>>('viewport');
+
+  /** Referencia contenido dentro de la vista. */
   private readonly contenido = viewChild.required<ElementRef<HTMLElement>>('contenido');
+
+  /** Referencia pista dentro de la vista. */
   private readonly pista = viewChild.required<ElementRef<HTMLElement>>('pista');
+
+  /** Referencia control dentro de la vista. */
   private readonly control = viewChild.required<ElementRef<HTMLElement>>('control');
+
+  /** Conserva observador tamaño para coordinar esta responsabilidad. */
   private observadorTamano: ResizeObserver | null = null;
+
+  /** Conserva arrastre para coordinar esta responsabilidad. */
   private arrastre: ArrastreScrollbar | null = null;
+
+  /** Conserva temporizador ocultar para coordinar esta responsabilidad. */
   private temporizadorOcultar: ReturnType<typeof setTimeout> | null = null;
 
   /** Proporciona el nombre accesible de la región que recibe el desplazamiento. */
   public readonly etiqueta = input.required<string>();
 
+  /** Conserva control visible como estado reactivo de la instancia. */
   protected readonly controlVisible = signal(false);
+
+  /** Conserva control activo como estado reactivo de la instancia. */
   protected readonly controlActivo = signal(false);
+
+  /** Conserva control arrastrado como estado reactivo de la instancia. */
   protected readonly controlArrastrado = signal(false);
+
+  /** Conserva altura control como estado reactivo de la instancia. */
   protected readonly alturaControl = signal(0);
+
+  /** Conserva posición control como estado reactivo de la instancia. */
   protected readonly posicionControl = signal(0);
 
   /** Inicia la observación cuando el contenido proyectado ya forma parte del documento. */
@@ -158,6 +181,7 @@ export class RegionDesplazable implements AfterViewInit, OnDestroy {
     this.mostrarTemporalmente();
   }
 
+  /** Muestra temporalmente dentro del flujo actual. */
   private mostrarTemporalmente(): void {
     if (!this.controlVisible()) return;
 
@@ -169,6 +193,7 @@ export class RegionDesplazable implements AfterViewInit, OnDestroy {
     }, DURACION_VISIBILIDAD_SCROLLBAR_MS);
   }
 
+  /** Cancela ocultamiento dentro del flujo actual. */
   private cancelarOcultamiento(): void {
     if (this.temporizadorOcultar === null) return;
 

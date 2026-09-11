@@ -11,17 +11,38 @@ import { InformacionProyectoService } from './informacion-proyecto.service';
 /** Coordina la fotografía vigente, la versión presentada y las actualizaciones de la página. */
 @Injectable()
 export class EstadoInformacionProyectoService {
+
+  /** Proporciona acceso al servicio remoto requerido por esta responsabilidad. */
   private readonly api = inject(InformacionProyectoService);
+
+  /** Proporciona acceso al servicio de notificador errores API. */
   private readonly notificador = inject(NotificadorErroresApiService);
+
+  /** Coordina la finalización de recursos cuando se destruye la instancia. */
   private readonly destroyRef = inject(DestroyRef);
+
+  /** Conserva carga actual para controlar el ciclo de vida de la operación. */
   private cargaActual: Subscription | null = null;
+
+  /** Conserva selección actual para controlar el ciclo de vida de la operación. */
   private seleccionActual: Subscription | null = null;
+
+  /** Conserva guardado actual para controlar el ciclo de vida de la operación. */
   private guardadoActual: Subscription | null = null;
 
+  /** Conserva proyecto actual estado como estado reactivo de la instancia. */
   private readonly proyectoActualEstado = signal<InformacionProyecto | null>(null);
+
+  /** Conserva proyecto presentado estado como estado reactivo de la instancia. */
   private readonly proyectoPresentadoEstado = signal<InformacionProyecto | null>(null);
+
+  /** Conserva versiones estado como estado reactivo de la instancia. */
   private readonly versionesEstado = signal<readonly VersionProyectoResumen[]>([]);
+
+  /** Conserva error carga estado como estado reactivo de la instancia. */
   private readonly errorCargaEstado = signal(false);
+
+  /** Conserva guardando estado como estado reactivo de la instancia. */
   private readonly guardandoEstado = signal(false);
 
   /** Expone la única fotografía que puede originar una nueva versión. */
@@ -111,6 +132,7 @@ export class EstadoInformacionProyectoService {
       });
   }
 
+  /** Cancela operaciones dentro del flujo actual. */
   private cancelarOperaciones(): void {
     this.cargaActual?.unsubscribe();
     this.seleccionActual?.unsubscribe();

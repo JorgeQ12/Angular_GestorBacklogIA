@@ -15,12 +15,26 @@ import { ElementoPlanificacionService } from './elemento-planificacion.service';
 /** Coordina la eliminación lógica de los elementos persistibles de la planificación. */
 @Injectable()
 export class EstadoEliminacionRequisitosPlanificacionService {
+
+  /** Proporciona acceso al servicio remoto requerido por esta responsabilidad. */
   private readonly api = inject(ElementoPlanificacionService);
+
+  /** Proporciona acceso al servicio de estado planificación proyecto. */
   private readonly estadoPlanificacion = inject(EstadoPlanificacionProyectoService);
+
+  /** Proporciona acceso al servicio de mensajes. */
   private readonly mensajes = inject(MensajesService);
+
+  /** Proporciona acceso al servicio de notificador errores API. */
   private readonly notificador = inject(NotificadorErroresApiService);
+
+  /** Coordina la finalización de recursos cuando se destruye la instancia. */
   private readonly destroyRef = inject(DestroyRef);
+
+  /** Conserva operación actual para controlar el ciclo de vida de la operación. */
   private operacionActual: Subscription | null = null;
+
+  /** Conserva eliminando estado como estado reactivo de la instancia. */
   private readonly eliminandoEstado = signal(false);
 
   /** Impide ejecutar mutaciones simultáneas mientras continúa una eliminación. */

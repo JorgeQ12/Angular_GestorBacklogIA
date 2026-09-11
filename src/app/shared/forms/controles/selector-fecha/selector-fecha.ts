@@ -57,23 +57,46 @@ export class SelectorFecha implements ControlValueAccessor, ControlCampoPersonal
   /** Conserva la fecha visible e impide abrir o modificar el calendario. */
   public readonly soloLectura = input(false);
 
+  /** Conserva días semana para coordinar esta responsabilidad. */
   protected readonly diasSemana = DIAS_SEMANA;
+
+  /** Conserva abierto como estado reactivo de la instancia. */
   protected readonly abierto = signal(false);
+
+  /** Conserva deshabilitado como estado reactivo de la instancia. */
   protected readonly deshabilitado = signal(false);
+
+  /** Conserva con error como estado reactivo de la instancia. */
   protected readonly conError = signal(false);
+
+  /** Conserva valor como estado reactivo de la instancia. */
   protected readonly valor = signal('');
+
+  /** Conserva fecha activa como estado reactivo de la instancia. */
   protected readonly fechaActiva = signal('');
+
+  /** Conserva mes visible como estado reactivo de la instancia. */
   protected readonly mesVisible = signal(this.inicioMes(new Date()));
+
+  /** Conserva ancho overlay como estado reactivo de la instancia. */
   protected readonly anchoOverlay = signal(0);
+
+  /** Deriva texto valor a partir del estado vigente. */
   protected readonly textoValor = computed(() =>
     this.formateador.formatear(this.valor(), 'breve', this.placeholder()),
   );
+
+  /** Deriva etiqueta mes a partir del estado vigente. */
   protected readonly etiquetaMes = computed(() =>
     this.capitalizar(this.formateador.formatear(this.mesVisible(), 'mesAnio')),
   );
+
+  /** Conserva días para coordinar esta responsabilidad. */
   protected readonly dias = computed<readonly DiaCalendario[]>(() =>
     this.construirDias(this.mesVisible(), this.valor()),
   );
+
+  /** Conserva posiciones para coordinar esta responsabilidad. */
   protected readonly posiciones: ConnectedPosition[] = [
     {
       originX: 'start',
@@ -91,10 +114,19 @@ export class SelectorFecha implements ControlValueAccessor, ControlCampoPersonal
     },
   ];
 
+  /** Proporciona acceso al servicio de formateador fecha. */
   private readonly formateador = inject(FormateadorFechaService);
+
+  /** Referencia trigger dentro de la vista. */
   private readonly trigger = viewChild<ElementRef<HTMLButtonElement>>('trigger');
+
+  /** Referencia elementos día dentro de la vista. */
   private readonly elementosDia = viewChildren<ElementRef<HTMLButtonElement>>('diaElemento');
+
+  /** Conserva la función que atenderá notificar cambio. */
   private notificarCambio: (valor: string) => void = () => undefined;
+
+  /** Conserva la función que atenderá notificar tocado. */
   private notificarTocado: () => void = () => undefined;
 
   public constructor() {
@@ -235,6 +267,7 @@ export class SelectorFecha implements ControlValueAccessor, ControlCampoPersonal
     return this.capitalizar(this.formateador.formatear(fecha, 'completa'));
   }
 
+  /** Abre la operación solicitada dentro del flujo actual. */
   private abrir(): void {
     const trigger = this.trigger()?.nativeElement;
     if (!trigger) return;
@@ -246,6 +279,7 @@ export class SelectorFecha implements ControlValueAccessor, ControlCampoPersonal
     this.abierto.set(true);
   }
 
+  /** Cierra la operación solicitada dentro del flujo actual. */
   private cerrar(devolverFoco = false): void {
     if (!this.abierto()) return;
     this.abierto.set(false);
@@ -253,6 +287,7 @@ export class SelectorFecha implements ControlValueAccessor, ControlCampoPersonal
     if (devolverFoco) queueMicrotask(() => this.trigger()?.nativeElement.focus());
   }
 
+  /** Obtiene fecha inicial dentro del flujo actual. */
   private obtenerFechaInicial(): string {
     const seleccionada = this.normalizarFecha(this.valor());
     if (seleccionada && !this.estaFueraDeRango(seleccionada)) return seleccionada;
@@ -264,6 +299,7 @@ export class SelectorFecha implements ControlValueAccessor, ControlCampoPersonal
     );
   }
 
+  /** Construye días dentro del flujo actual. */
   private construirDias(mes: Date, seleccionada: string): readonly DiaCalendario[] {
     const primerDia = new Date(mes.getFullYear(), mes.getMonth(), 1);
     const retroceso = (primerDia.getDay() + 6) % 7;
@@ -284,12 +320,14 @@ export class SelectorFecha implements ControlValueAccessor, ControlCampoPersonal
     });
   }
 
+  /** Ejecuta desplazar fecha activa como parte del flujo interno. */
   private desplazarFechaActiva(dias: number): void {
     const fecha = this.desdeIso(this.fechaActiva());
     if (!fecha) return;
     this.activarFechaPermitida(this.sumarDias(fecha, dias), Math.sign(dias) || 1);
   }
 
+  /** Ejecuta desplazar al extremo semana como parte del flujo interno. */
   private desplazarAlExtremoSemana(extremo: 'inicio' | 'fin'): void {
     const fecha = this.desdeIso(this.fechaActiva());
     if (!fecha) return;
@@ -301,6 +339,7 @@ export class SelectorFecha implements ControlValueAccessor, ControlCampoPersonal
     );
   }
 
+  /** Ejecuta desplazar fecha activa por mes como parte del flujo interno. */
   private desplazarFechaActivaPorMes(meses: number): void {
     const fecha = this.desdeIso(this.fechaActiva());
     if (!fecha) return;
@@ -311,6 +350,7 @@ export class SelectorFecha implements ControlValueAccessor, ControlCampoPersonal
     );
   }
 
+  /** Ejecuta activar fecha permitida como parte del flujo interno. */
   private activarFechaPermitida(candidata: Date, direccion: number): void {
     let fecha = candidata;
     for (let intentos = 0; intentos < 42; intentos += 1) {
@@ -325,11 +365,13 @@ export class SelectorFecha implements ControlValueAccessor, ControlCampoPersonal
     }
   }
 
+  /** Selecciona fecha activa dentro del flujo actual. */
   private seleccionarFechaActiva(): void {
     const dia = this.dias().find((item) => item.fecha === this.fechaActiva());
     if (dia) this.seleccionarDia(dia);
   }
 
+  /** Enfoca fecha activa dentro del flujo actual. */
   private enfocarFechaActiva(): void {
     queueMicrotask(() => {
       const indice = this.dias().findIndex((dia) => dia.fecha === this.fechaActiva());
@@ -337,24 +379,28 @@ export class SelectorFecha implements ControlValueAccessor, ControlCampoPersonal
     });
   }
 
+  /** Determina si ta fuera de rango. */
   private estaFueraDeRango(fecha: string): boolean {
     const minima = this.normalizarFecha(this.fechaMinima());
     const maxima = this.normalizarFecha(this.fechaMaxima());
     return (!!minima && fecha < minima) || (!!maxima && fecha > maxima);
   }
 
+  /** Normaliza fecha dentro del flujo actual. */
   private normalizarFecha(valor: string | null | undefined): string {
     if (!valor || !PATRON_FECHA.test(valor)) return '';
     const fecha = this.desdeIso(valor);
     return fecha && this.aIso(fecha) === valor ? valor : '';
   }
 
+  /** Ejecuta desde ISO como parte del flujo interno. */
   private desdeIso(valor: string): Date | null {
     const coincidencia = PATRON_FECHA.exec(valor);
     if (!coincidencia) return null;
     return new Date(Number(coincidencia[1]), Number(coincidencia[2]) - 1, Number(coincidencia[3]));
   }
 
+  /** Ejecuta a ISO como parte del flujo interno. */
   private aIso(fecha: Date): string {
     const anio = fecha.getFullYear();
     const mes = `${fecha.getMonth() + 1}`.padStart(2, '0');
@@ -362,14 +408,17 @@ export class SelectorFecha implements ControlValueAccessor, ControlCampoPersonal
     return `${anio}-${mes}-${dia}`;
   }
 
+  /** Ejecuta sumar días como parte del flujo interno. */
   private sumarDias(fecha: Date, cantidad: number): Date {
     return new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate() + cantidad);
   }
 
+  /** Ejecuta inicio mes como parte del flujo interno. */
   private inicioMes(fecha: Date): Date {
     return new Date(fecha.getFullYear(), fecha.getMonth(), 1);
   }
 
+  /** Ejecuta capitalizar como parte del flujo interno. */
   private capitalizar(valor: string): string {
     return `${valor.charAt(0).toUpperCase()}${valor.slice(1)}`;
   }

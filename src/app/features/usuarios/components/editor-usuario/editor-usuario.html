@@ -1,0 +1,106 @@
+<app-modal
+  [titulo]="titulo()"
+  [descripcion]="descripcion()"
+  [icono]="icono()"
+  tamano="lg"
+  idFormulario="formulario-usuario"
+  [descartable]="!ocupado()"
+  [mostrarCancelar]="!ocupado()"
+  [confirmacionDeshabilitada]="ocupado()"
+  [cierreExteriorHabilitado]="false"
+  iconoConfirmar="guardar"
+  (cerrar)="cerrar.emit()"
+>
+  <form
+    id="formulario-usuario"
+    class="ui-form-grid"
+    [formGroup]="formulario"
+    [appMensajesFormulario]="mensajes"
+    appEnfocarPrimerControlInvalido
+    (ngSubmit)="enviar()"
+  >
+    <div class="ui-field">
+      <label class="ui-label" for="usuario-id-azure">Identificador de Azure</label>
+      <input
+        id="usuario-id-azure"
+        class="ui-control"
+        formControlName="idAzure"
+        appErrorCampo
+        required
+        autocomplete="off"
+        spellcheck="false"
+        [readOnly]="esEdicion()"
+        [attr.aria-readonly]="esEdicion()"
+        [maxlength]="limites.idAzure"
+        aria-describedby="usuario-id-azure-ayuda"
+      />
+      <span id="usuario-id-azure-ayuda" class="ui-hint">
+        {{
+          esEdicion()
+            ? 'La identidad usada para cruzar Azure DevOps es inmutable.'
+            : 'Usa la identidad estable entregada por Azure DevOps.'
+        }}
+      </span>
+    </div>
+
+    <div class="ui-form-grid ui-form-grid--2">
+      <div class="ui-field">
+        <label class="ui-label" for="usuario-nombre">Nombre</label>
+        <input
+          id="usuario-nombre"
+          class="ui-control"
+          formControlName="nombre"
+          appErrorCampo
+          required
+          autocomplete="name"
+          [maxlength]="limites.nombre"
+        />
+      </div>
+
+      <div class="ui-field">
+        <label class="ui-label" for="usuario-correo">Correo</label>
+        <input
+          id="usuario-correo"
+          class="ui-control"
+          type="email"
+          formControlName="correo"
+          appErrorCampo
+          autocomplete="email"
+          [maxlength]="limites.correo"
+        />
+      </div>
+
+      <div class="ui-field">
+        <label id="usuario-perfil-etiqueta" class="ui-label" for="usuario-perfil">
+          Perfil técnico
+        </label>
+        <app-selector-campo
+          id="usuario-perfil"
+          formControlName="perfilTecnicoId"
+          appErrorCampo
+          [opciones]="perfilesTecnicos()"
+          etiquetadoPor="usuario-perfil-etiqueta"
+          placeholder="Selecciona un perfil"
+        />
+      </div>
+
+      <div class="ui-field">
+        <label class="ui-label" for="usuario-limite-tokens">Límite mensual de tokens</label>
+        <input
+          id="usuario-limite-tokens"
+          class="ui-control"
+          type="number"
+          inputmode="numeric"
+          min="0"
+          step="1"
+          formControlName="limiteTokensMensual"
+          appErrorCampo
+          aria-describedby="usuario-limite-tokens-ayuda"
+        />
+        <span id="usuario-limite-tokens-ayuda" class="ui-hint">
+          Déjalo vacío para no establecer un límite individual.
+        </span>
+      </div>
+    </div>
+  </form>
+</app-modal>

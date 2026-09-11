@@ -117,6 +117,8 @@ const SEPARACION_MARCA_AGUA_POR_ESCALA: Readonly<Record<EscalaGanttPlanificacion
   styleUrl: './gantt-planificacion.css',
 })
 export class GanttPlanificacionComponent {
+
+  /** Proporciona acceso al servicio de formateador fecha. */
   private readonly fechas = inject(FormateadorFechaService);
 
   /** Proporciona la fotografía temporal que debe representarse. */
@@ -132,13 +134,24 @@ export class GanttPlanificacionComponent {
   /** Solicita presentar el Gantt de otra versión. */
   public readonly versionCambiada = output<number>();
 
+  /** Conserva ID búsqueda para coordinar esta responsabilidad. */
   protected readonly idBusqueda = 'buscar-elemento-gantt';
+
+  /** Conserva ID escala para coordinar esta responsabilidad. */
   protected readonly idEscala = 'escala-gantt-planificacion';
+
+  /** Conserva ID etiqueta escala para coordinar esta responsabilidad. */
   protected readonly idEtiquetaEscala = 'escala-gantt-planificacion-label';
+
+  /** Administra búsqueda control mediante formularios reactivos. */
   protected readonly busquedaControl = new FormControl('', { nonNullable: true });
+
+  /** Administra escala control mediante formularios reactivos. */
   protected readonly escalaControl = new FormControl(EscalaGanttPlanificacion.Semana, {
     nonNullable: true,
   });
+
+  /** Conserva opciones escala para coordinar esta responsabilidad. */
   protected readonly opcionesEscala: readonly OpcionSelector[] = [
     { valor: EscalaGanttPlanificacion.Dia, etiqueta: 'Día' },
     { valor: EscalaGanttPlanificacion.Semana, etiqueta: 'Semana' },
@@ -146,35 +159,72 @@ export class GanttPlanificacionComponent {
     { valor: EscalaGanttPlanificacion.Trimestre, etiqueta: 'Trimestre' },
     { valor: EscalaGanttPlanificacion.Anio, etiqueta: 'Año' },
   ];
+
+  /** Conserva búsqueda como estado reactivo de la instancia. */
   protected readonly busqueda = signal('');
+
+  /** Conserva escala como estado reactivo de la instancia. */
   protected readonly escala = signal(EscalaGanttPlanificacion.Semana);
+
+  /** Conserva mostrar relaciones como estado reactivo de la instancia. */
   protected readonly mostrarRelaciones = signal(true);
+
+  /** Conserva panel vista abierto como estado reactivo de la instancia. */
   protected readonly panelVistaAbierto = signal(false);
+
+  /** Conserva claves contraidas como estado reactivo de la instancia. */
   protected readonly clavesContraidas = signal<ReadonlySet<string>>(new Set<string>());
+
+  /** Conserva relacion resaltada como estado reactivo de la instancia. */
   protected readonly relacionResaltada = signal<string | null>(null);
+
+  /** Conserva posición tooltip como estado reactivo de la instancia. */
   protected readonly posicionTooltip = signal<PosicionTooltipGantt | null>(null);
+
+  /** Conserva ancho ventana temporal como estado reactivo de la instancia. */
   private readonly anchoVentanaTemporal = signal(0);
+
+  /** Conserva filas ventana como estado reactivo de la instancia. */
   private readonly filasVentana = signal(FILAS_VISIBLES_RESPALDO);
+
+  /** Conserva primera fila visible como estado reactivo de la instancia. */
   private readonly primeraFilaVisible = signal(0);
+
+  /** Referencia tablero dentro de la vista. */
   private readonly tablero = viewChild<ElementRef<HTMLDivElement>>('tablero');
+
+  /** Referencia barra horizontal dentro de la vista. */
   private readonly barraHorizontal = viewChild<ElementRef<HTMLDivElement>>('barraHorizontal');
+
+  /** Conserva temporizador tooltip para coordinar esta responsabilidad. */
   private temporizadorTooltip: ReturnType<typeof setTimeout> | null = null;
 
+  /** Deriva ancho día a partir del estado vigente. */
   protected readonly anchoDia = computed(() => ANCHO_DIA_POR_ESCALA[this.escala()]);
+
+  /** Deriva claves expandibles a partir del estado vigente. */
   protected readonly clavesExpandibles = computed(() =>
     this.datos()
       .elementos.filter((elemento) => elemento.tieneHijos)
       .map((elemento) => elemento.clave),
   );
+
+  /** Deriva expansion completa a partir del estado vigente. */
   protected readonly expansionCompleta = computed(
     () => this.clavesExpandibles().length > 0 && this.clavesContraidas().size === 0,
   );
+
+  /** Conserva ícono expansion para coordinar esta responsabilidad. */
   protected readonly iconoExpansion = computed<NombreIconoAplicacion>(() =>
     this.expansionCompleta() ? 'reducir' : 'ampliar',
   );
+
+  /** Conserva ícono relaciones para coordinar esta responsabilidad. */
   protected readonly iconoRelaciones = computed<NombreIconoAplicacion>(() =>
     this.mostrarRelaciones() ? 'ocultar' : 'mostrar',
   );
+
+  /** Deriva rango planificado a partir del estado vigente. */
   protected readonly rangoPlanificado = computed(() => {
     const elementos = this.datos().elementos;
     const hoy = obtenerHoyCalendario();
@@ -188,6 +238,8 @@ export class GanttPlanificacionComponent {
       ),
     };
   });
+
+  /** Deriva rango a partir del estado vigente. */
   protected readonly rango = computed(() => {
     const margen = Math.max(2, Math.ceil(72 / this.anchoDia()));
     const inicio = sumarDias(inicioSemana(this.rangoPlanificado().inicio), -margen);
@@ -196,6 +248,8 @@ export class GanttPlanificacionComponent {
     const minimoDias = Math.ceil(this.anchoVentanaTemporal() / this.anchoDia());
     return { inicio, final: sumarDias(finalBase, Math.max(0, minimoDias - diasBase)) };
   });
+
+  /** Conserva días para coordinar esta responsabilidad. */
   protected readonly dias = computed<readonly DiaGantt[]>(() => {
     const dias: DiaGantt[] = [];
     const hoy = claveFecha(obtenerHoyCalendario());
@@ -216,6 +270,8 @@ export class GanttPlanificacionComponent {
     }
     return dias;
   });
+
+  /** Conserva segmentos encabezado para coordinar esta responsabilidad. */
   protected readonly segmentosEncabezado = computed<readonly SegmentoTemporalGantt[]>(() => {
     const segmentos: SegmentoTemporalGantt[] = [];
     for (const [indice, dia] of this.dias().entries()) {
@@ -246,7 +302,11 @@ export class GanttPlanificacionComponent {
     }
     return segmentos;
   });
+
+  /** Deriva ancho linea temporal a partir del estado vigente. */
   protected readonly anchoLineaTemporal = computed(() => this.dias().length * this.anchoDia());
+
+  /** Conserva elementos visibles para coordinar esta responsabilidad. */
   protected readonly elementosVisibles = computed<readonly ElementoGanttPlanificacion[]>(() => {
     const elementos = this.datos().elementos;
     const termino = normalizarTexto(this.busqueda());
@@ -277,9 +337,13 @@ export class GanttPlanificacionComponent {
       return true;
     });
   });
+
+  /** Deriva visibles por clave a partir del estado vigente. */
   private readonly visiblesPorClave = computed(
     () => new Map(this.elementosVisibles().map((elemento) => [elemento.clave, elemento])),
   );
+
+  /** Deriva ventana renderizado a partir del estado vigente. */
   protected readonly ventanaRenderizado = computed(() => {
     const total = this.elementosVisibles().length;
     const ancla = Math.max(0, Math.min(total, this.primeraFilaVisible()));
@@ -291,12 +355,16 @@ export class GanttPlanificacionComponent {
       espacioInferior: Math.max(0, total - final) * ALTO_FILA_GANTT,
     };
   });
+
+  /** Deriva tamaño marca agua a partir del estado vigente. */
   protected readonly tamanoMarcaAgua = computed(() =>
     Math.min(
       TAMANO_MARCA_AGUA_POR_ESCALA[this.escala()],
       Math.max(140, this.anchoLineaTemporal() * 0.48),
     ),
   );
+
+  /** Conserva posiciones marca agua para coordinar esta responsabilidad. */
   protected readonly posicionesMarcaAgua = computed<readonly PosicionMarcaAguaGantt[]>(() => {
     const ancho = this.anchoLineaTemporal();
     const alto = Math.max(ALTO_FILA_GANTT, this.elementosVisibles().length * ALTO_FILA_GANTT);
@@ -318,6 +386,8 @@ export class GanttPlanificacionComponent {
     }
     return posiciones;
   });
+
+  /** Conserva conectores para coordinar esta responsabilidad. */
   protected readonly conectores = computed<ReadonlyMap<string, ConectorJerarquiaGantt>>(() => {
     if (!this.mostrarRelaciones()) return new Map();
     const elementos = this.elementosVisibles();
@@ -346,27 +416,38 @@ export class GanttPlanificacionComponent {
     }
     return conectores;
   });
+
+  /** Deriva conteos a partir del estado vigente. */
   protected readonly conteos = computed(() => ({
     epicas: this.contar(TipoElementoPlanificacion.Epica),
     caracteristicas: this.contar(TipoElementoPlanificacion.Caracteristica),
     historias: this.contar(TipoElementoPlanificacion.Historia),
     tareas: this.contar(TipoElementoPlanificacion.Tarea),
   }));
+
+  /** Deriva horas tareas a partir del estado vigente. */
   protected readonly horasTareas = computed(() =>
     this.datos()
       .elementos.filter((elemento) => elemento.tipo === TipoElementoPlanificacion.Tarea)
       .reduce((total, elemento) => total + elemento.estimacionHoras, 0),
   );
+
+  /** Deriva fecha inicial a partir del estado vigente. */
   protected readonly fechaInicial = computed(() =>
     this.fechas.formatear(this.rangoPlanificado().inicio, 'breve'),
   );
+
+  /** Deriva fecha final a partir del estado vigente. */
   protected readonly fechaFinal = computed(() =>
     this.fechas.formatear(this.rangoPlanificado().final, 'breve'),
   );
+
+  /** Deriva duracion días a partir del estado vigente. */
   protected readonly duracionDias = computed(
     () => diferenciaDias(this.rangoPlanificado().inicio, this.rangoPlanificado().final) + 1,
   );
 
+  /** Conserva observar tablero para coordinar esta responsabilidad. */
   private readonly observarTablero = effect((limpiar) => {
     const tablero = this.tablero()?.nativeElement;
     if (!tablero) return;
@@ -401,6 +482,7 @@ export class GanttPlanificacionComponent {
       .subscribe((escala) => this.escala.set(escala));
   }
 
+  /** Alterna todos dentro del flujo actual. */
   protected alternarTodos(): void {
     if (this.busqueda() || this.clavesExpandibles().length === 0) return;
     this.clavesContraidas.set(
@@ -408,6 +490,7 @@ export class GanttPlanificacionComponent {
     );
   }
 
+  /** Ejecuta cambiar expansion como parte del flujo interno. */
   protected cambiarExpansion(evento: Event): void {
     const control = evento.target;
     if (!(control instanceof HTMLInputElement)) return;
@@ -416,27 +499,32 @@ export class GanttPlanificacionComponent {
     );
   }
 
+  /** Ejecuta cambiar relaciones como parte del flujo interno. */
   protected cambiarRelaciones(evento: Event): void {
     const control = evento.target;
     if (control instanceof HTMLInputElement) this.mostrarRelaciones.set(control.checked);
   }
 
+  /** Alterna panel vista dentro del flujo actual. */
   protected alternarPanelVista(evento: MouseEvent): void {
     evento.stopPropagation();
     this.panelVistaAbierto.update((abierto) => !abierto);
   }
 
+  /** Ejecuta volver al árbol como parte del flujo interno. */
   protected volverAlArbol(): void {
     this.panelVistaAbierto.set(false);
     this.volver.emit();
   }
 
+  /** Cierra panel vista dentro del flujo actual. */
   @HostListener('document:click')
   @HostListener('document:keydown.escape')
   protected cerrarPanelVista(): void {
     this.panelVistaAbierto.set(false);
   }
 
+  /** Alterna elemento dentro del flujo actual. */
   protected alternarElemento(elemento: ElementoGanttPlanificacion): void {
     if (!elemento.tieneHijos) return;
     this.clavesContraidas.update((actuales) => {
@@ -448,10 +536,12 @@ export class GanttPlanificacionComponent {
     });
   }
 
+  /** Determina si ta contraido. */
   protected estaContraido(clave: string): boolean {
     return this.clavesContraidas().has(clave);
   }
 
+  /** Sincroniza desplazamiento dentro del flujo actual. */
   protected sincronizarDesplazamiento(): void {
     const tablero = this.tablero()?.nativeElement;
     const barra = this.barraHorizontal()?.nativeElement;
@@ -465,6 +555,7 @@ export class GanttPlanificacionComponent {
       barra.scrollLeft = tablero.scrollLeft;
   }
 
+  /** Ejecuta desplazar desde barra como parte del flujo interno. */
   protected desplazarDesdeBarra(): void {
     const tablero = this.tablero()?.nativeElement;
     const barra = this.barraHorizontal()?.nativeElement;
@@ -472,6 +563,7 @@ export class GanttPlanificacionComponent {
       tablero.scrollLeft = barra.scrollLeft;
   }
 
+  /** Ejecuta desplazar con rueda como parte del flujo interno. */
   protected desplazarConRueda(evento: WheelEvent): void {
     const delta =
       Math.abs(evento.deltaX) > Math.abs(evento.deltaY)
@@ -486,6 +578,7 @@ export class GanttPlanificacionComponent {
     evento.preventDefault();
   }
 
+  /** Ejecuta posición barra como parte del flujo interno. */
   protected posicionBarra(elemento: ElementoGanttPlanificacion): number {
     return Math.max(
       0,
@@ -493,6 +586,7 @@ export class GanttPlanificacionComponent {
     );
   }
 
+  /** Ejecuta ancho barra como parte del flujo interno. */
   protected anchoBarra(elemento: ElementoGanttPlanificacion): number {
     const duracion = Math.max(
       1,
@@ -501,28 +595,43 @@ export class GanttPlanificacionComponent {
     return Math.max(this.anchoDia() * duracion, 8);
   }
 
+  /** Ejecuta posición segmento como parte del flujo interno. */
   protected posicionSegmento(segmento: SegmentoTemporalGantt): number {
     return segmento.inicio * this.anchoDia();
   }
+
+  /** Ejecuta ancho segmento como parte del flujo interno. */
   protected anchoSegmento(segmento: SegmentoTemporalGantt): number {
     return segmento.dias * this.anchoDia();
   }
+
+  /** Ejecuta sangria elemento como parte del flujo interno. */
   protected sangriaElemento(elemento: ElementoGanttPlanificacion): number {
     return 12 + elemento.nivel * 22;
   }
+
+  /** Ejecuta semana como parte del flujo interno. */
   protected semana(fecha: Date): string {
     const primerJueves = new Date(fecha.getFullYear(), 0, 4);
     return `S${Math.floor(diferenciaDias(inicioSemana(primerJueves), inicioSemana(fecha)) / 7) + 1}`;
   }
+
+  /** Muestra detalle días dentro del flujo actual. */
   protected mostrarDetalleDias(): boolean {
     return this.escala() === EscalaGanttPlanificacion.Dia;
   }
+
+  /** Muestra semana dentro del flujo actual. */
   protected mostrarSemana(dia: DiaGantt): boolean {
     return this.escala() === EscalaGanttPlanificacion.Semana && dia.fecha.getDay() === 1;
   }
+
+  /** Ejecuta resaltar relacion como parte del flujo interno. */
   protected resaltarRelacion(clave: string | null): void {
     this.relacionResaltada.set(clave);
   }
+
+  /** Muestra tooltip dentro del flujo actual. */
   protected mostrarTooltip(clave: string, evento: Event): void {
     this.resaltarRelacion(clave);
     const disparador = evento.currentTarget;
@@ -546,11 +655,13 @@ export class GanttPlanificacionComponent {
     this.temporizadorTooltip = setTimeout(presentar, RETARDO_TOOLTIP_MS);
   }
 
+  /** Oculta tooltip dentro del flujo actual. */
   protected ocultarTooltip(clave: string): void {
     this.cancelarAperturaTooltip();
     if (this.posicionTooltip()?.clave === clave) this.posicionTooltip.set(null);
   }
 
+  /** Ejecuta posicionar tooltip como parte del flujo interno. */
   private posicionarTooltip(clave: string, disparador: HTMLElement, tooltip: HTMLElement): void {
     const margen = 12;
     const separacion = 13;
@@ -578,22 +689,28 @@ export class GanttPlanificacionComponent {
     this.posicionTooltip.set({ clave, izquierda, arriba, flechaIzquierda, ubicacion });
   }
 
+  /** Ejecuta limpiar resaltado como parte del flujo interno. */
   protected limpiarResaltado(clave: string): void {
     this.ocultarTooltip(clave);
     if (this.relacionResaltada() === clave) this.relacionResaltada.set(null);
   }
 
+  /** Cancela apertura tooltip dentro del flujo actual. */
   private cancelarAperturaTooltip(): void {
     if (this.temporizadorTooltip === null) return;
     clearTimeout(this.temporizadorTooltip);
     this.temporizadorTooltip = null;
   }
+
+  /** Determina si origen relacion. */
   protected esOrigenRelacion(clave: string): boolean {
     const resaltado = this.relacionResaltada();
     if (!resaltado) return false;
     const elemento = this.visiblesPorClave().get(resaltado);
     return elemento?.clavePadre === clave || (elemento?.tieneHijos === true && resaltado === clave);
   }
+
+  /** Determina si destino relacion. */
   protected esDestinoRelacion(clave: string): boolean {
     const resaltado = this.relacionResaltada();
     if (!resaltado) return false;
@@ -602,12 +719,16 @@ export class GanttPlanificacionComponent {
     const elementoResaltado = elementos.get(resaltado);
     return resaltado === clave || elemento?.clavePadre === elementoResaltado?.clave;
   }
+
+  /** Determina si conector resaltado. */
   protected esConectorResaltado(clave: string): boolean {
     const resaltado = this.relacionResaltada();
     if (!resaltado) return false;
     const destino = this.visiblesPorClave().get(clave);
     return clave === resaltado || destino?.clavePadre === resaltado;
   }
+
+  /** Ejecuta tipo visual conector como parte del flujo interno. */
   protected tipoVisualConector(clave: string): ElementoGanttPlanificacion['tipo'] {
     const elementos = this.visiblesPorClave();
     const destino = elementos.get(clave);
@@ -620,9 +741,13 @@ export class GanttPlanificacionComponent {
       ? elementoResaltado.tipo
       : (destino?.tipo ?? TipoElementoPlanificacion.Tarea);
   }
+
+  /** Ejecuta conector como parte del flujo interno. */
   protected conector(clave: string): ConectorJerarquiaGantt | undefined {
     return this.conectores().get(clave);
   }
+
+  /** Ejecuta etiqueta tipo como parte del flujo interno. */
   protected etiquetaTipo(tipo: ElementoGanttPlanificacion['tipo']): string {
     switch (tipo) {
       case TipoElementoPlanificacion.Epica:
@@ -635,6 +760,8 @@ export class GanttPlanificacionComponent {
         return 'Tarea';
     }
   }
+
+  /** Ejecuta ícono tipo como parte del flujo interno. */
   protected iconoTipo(tipo: ElementoGanttPlanificacion['tipo']): NombreIconoAplicacion {
     switch (tipo) {
       case TipoElementoPlanificacion.Epica:
@@ -647,13 +774,19 @@ export class GanttPlanificacionComponent {
         return 'tarea';
     }
   }
+
+  /** Ejecuta fecha elemento como parte del flujo interno. */
   protected fechaElemento(fecha: string): string {
     return this.fechas.formatear(fecha, 'breve');
   }
+
+  /** Ejecuta descripción barra como parte del flujo interno. */
   protected descripcionBarra(elemento: ElementoGanttPlanificacion): string {
     const resumen = elemento.tieneHijos ? ' · Periodo consolidado con sus hijos' : '';
     return `${elemento.titulo}. ${this.fechaElemento(elemento.fechaInicio)} — ${this.fechaElemento(elemento.fechaFinal)}. ${elemento.estimacionHoras} horas${resumen}`;
   }
+
+  /** Ejecuta contar como parte del flujo interno. */
   private contar(tipo: ElementoGanttPlanificacion['tipo']): number {
     return this.datos().elementos.filter((elemento) => elemento.tipo === tipo).length;
   }

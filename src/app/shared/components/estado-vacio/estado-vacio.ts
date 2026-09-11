@@ -11,7 +11,7 @@ import { NombreIconoAplicacion } from '../icono/iconos-aplicacion';
   styleUrl: './estado-vacio.css',
 })
 export class EstadoVacio {
-  /** Selecciona el icono que representa el contexto sin contenido. */
+  /** Selecciona el ícono que representa el contexto sin contenido. */
   public readonly icono = input.required<NombreIconoAplicacion>();
 
   /** Proporciona el mensaje principal del estado vacío. */

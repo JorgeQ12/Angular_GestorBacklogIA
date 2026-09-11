@@ -34,17 +34,38 @@ const CATALOGOS_VACIOS: CatalogosFormularioElementoPlanificacion = {
 /** Coordina el diálogo, su carga y la persistencia sin trasladar HTTP a la página. */
 @Injectable()
 export class EstadoEditorElementoPlanificacionService {
+
+  /** Proporciona acceso al servicio remoto requerido por esta responsabilidad. */
   private readonly api = inject(ElementoPlanificacionService);
+
+  /** Proporciona acceso al servicio de catálogos. */
   private readonly catalogosApi = inject(CatalogosService);
+
+  /** Proporciona acceso al servicio de notificador errores API. */
   private readonly notificador = inject(NotificadorErroresApiService);
+
+  /** Proporciona acceso al servicio de mensajes. */
   private readonly mensajes = inject(MensajesService);
+
+  /** Coordina la finalización de recursos cuando se destruye la instancia. */
   private readonly destroyRef = inject(DestroyRef);
+
+  /** Conserva operación actual para controlar el ciclo de vida de la operación. */
   private operacionActual: Subscription | null = null;
 
+  /** Conserva contexto estado como estado reactivo de la instancia. */
   private readonly contextoEstado = signal<ContextoEditorElementoPlanificacion | null>(null);
+
+  /** Conserva detalle estado como estado reactivo de la instancia. */
   private readonly detalleEstado = signal<DetalleElementoPlanificacion | null>(null);
+
+  /** Conserva catálogos estado como estado reactivo de la instancia. */
   private readonly catalogosEstado = signal<CatalogosFormularioElementoPlanificacion>(CATALOGOS_VACIOS);
+
+  /** Conserva cargando estado como estado reactivo de la instancia. */
   private readonly cargandoEstado = signal(false);
+
+  /** Conserva guardando estado como estado reactivo de la instancia. */
   private readonly guardandoEstado = signal(false);
 
   /** Expone el flujo abierto y la identidad que debe persistirse. */
@@ -187,6 +208,7 @@ export class EstadoEditorElementoPlanificacionService {
       });
   }
 
+  /** Abre detalle dentro del flujo actual. */
   private abrirDetalle(
     modo: ModoEditorElementoPlanificacion.Consulta | ModoEditorElementoPlanificacion.Edicion,
     proyectoId: number,
@@ -241,6 +263,7 @@ export class EstadoEditorElementoPlanificacionService {
       });
   }
 
+  /** Obtiene catálogos dentro del flujo actual. */
   private obtenerCatalogos(
     tipo: TipoItemPlanificacion,
   ): Observable<CatalogosFormularioElementoPlanificacion> {
@@ -263,12 +286,14 @@ export class EstadoEditorElementoPlanificacionService {
     return of(CATALOGOS_VACIOS);
   }
 
+  /** Cancela operación dentro del flujo actual. */
   private cancelarOperacion(): void {
     this.operacionActual?.unsubscribe();
     this.cargandoEstado.set(false);
     this.guardandoEstado.set(false);
   }
 
+  /** Cierra forzado dentro del flujo actual. */
   private cerrarForzado(): void {
     this.cancelarOperacion();
     this.contextoEstado.set(null);

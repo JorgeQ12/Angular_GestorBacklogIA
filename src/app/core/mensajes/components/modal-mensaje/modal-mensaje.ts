@@ -22,9 +22,17 @@ const ICONO_POR_VARIANTE = {
   styleUrl: './modal-mensaje.css',
 })
 export class ModalMensaje {
+
+  /** Proporciona acceso al servicio de mensajes. */
   protected readonly mensajes = inject(MensajesService);
+
+  /** Conserva mensaje para coordinar esta responsabilidad. */
   protected readonly mensaje = this.mensajes.mensajeActual;
+
+  /** Conserva ícono por variante para coordinar esta responsabilidad. */
   protected readonly iconoPorVariante = ICONO_POR_VARIANTE;
+
+  /** Conserva variantes para coordinar esta responsabilidad. */
   protected readonly variantes = VarianteMensaje;
 
   /** Selecciona el rol accesible correspondiente a la urgencia del mensaje. */

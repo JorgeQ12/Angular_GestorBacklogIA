@@ -35,6 +35,18 @@ export const routes: Routes = [
           ),
       },
       {
+        path: SEGMENTOS_RUTA.usuarios,
+        redirectTo: `${SEGMENTOS_RUTA.configuracion}/${SEGMENTOS_RUTA.usuarios}`,
+        pathMatch: 'full',
+      },
+      {
+        path: `${SEGMENTOS_RUTA.configuracion}/${SEGMENTOS_RUTA.usuarios}`,
+        loadComponent: () =>
+          import('./features/usuarios/pages/pagina-usuarios/pagina-usuarios').then(
+            (modulo) => modulo.PaginaUsuarios,
+          ),
+      },
+      {
         path: '',
         pathMatch: 'full',
         redirectTo: SEGMENTOS_RUTA.inicio,

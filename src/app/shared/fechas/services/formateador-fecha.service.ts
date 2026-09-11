@@ -9,9 +9,17 @@ const PATRON_FECHA_SIN_HORA = /^(\d{4})-(\d{2})-(\d{2})$/;
 /** Normaliza y representa fechas de acuerdo con la configuración regional vigente. */
 @Injectable({ providedIn: 'root' })
 export class FormateadorFechaService {
+
+  /** Proporciona acceso a locale_id. */
   private readonly locale = inject(LOCALE_ID);
+
+  /** Conserva formateadores para coordinar esta responsabilidad. */
   private readonly formateadores = new Map<FormatoFecha, Intl.DateTimeFormat>();
+
+  /** Conserva tiempo relativo para coordinar esta responsabilidad. */
   private readonly tiempoRelativo = new Intl.RelativeTimeFormat(this.locale, { numeric: 'always' });
+
+  /** Conserva tiempo actual para coordinar esta responsabilidad. */
   private readonly tiempoActual = new Intl.RelativeTimeFormat(this.locale, { numeric: 'auto' });
 
   /** Representa una fecha mediante uno de los formatos compartidos. */
@@ -51,6 +59,7 @@ export class FormateadorFechaService {
     return this.formatearDiferencia(diferencia, 86_400_000, 'day');
   }
 
+  /** Obtiene formateador dentro del flujo actual. */
   private obtenerFormateador(formato: FormatoFecha): Intl.DateTimeFormat {
     const existente = this.formateadores.get(formato);
     if (existente) return existente;
@@ -60,6 +69,7 @@ export class FormateadorFechaService {
     return formateador;
   }
 
+  /** Normaliza la operación solicitada dentro del flujo actual. */
   private normalizar(valor: ValorFecha): Date | null {
     if (valor === null || valor === undefined || valor === '') return null;
     if (valor instanceof Date) return this.esValida(valor) ? valor : null;
@@ -72,6 +82,7 @@ export class FormateadorFechaService {
     return this.esValida(fecha) ? fecha : null;
   }
 
+  /** Formatea diferencia dentro del flujo actual. */
   private formatearDiferencia(
     diferencia: number,
     divisor: number,
@@ -82,10 +93,12 @@ export class FormateadorFechaService {
     return this.capitalizar(this.tiempoRelativo.format(valor, unidad));
   }
 
+  /** Determina si valida. */
   private esValida(fecha: Date): boolean {
     return !Number.isNaN(fecha.getTime());
   }
 
+  /** Ejecuta capitalizar como parte del flujo interno. */
   private capitalizar(valor: string): string {
     return `${valor.charAt(0).toUpperCase()}${valor.slice(1)}`;
   }

@@ -39,14 +39,26 @@ import { EstadoConsultaProyectosService } from '../../services/estado-consulta-p
   styleUrl: './pagina-consulta-proyectos.css',
 })
 export class PaginaConsultaProyectos {
+
+  /** Proporciona acceso a activated route. */
   private readonly route = inject(ActivatedRoute);
+
+  /** Proporciona acceso a la navegación administrada por Angular. */
   private readonly router = inject(Router);
+
+  /** Proporciona acceso al servicio de estado consulta proyectos. */
   protected readonly estadoConsulta = inject(EstadoConsultaProyectosService);
+
+  /** Conserva mensaje error para coordinar esta responsabilidad. */
   protected readonly mensajeError = MENSAJE_ERROR_CONSULTA_PROYECTOS;
 
+  /** Conserva parámetros para coordinar esta responsabilidad. */
   private readonly parametros = toSignal(this.route.queryParamMap, { requireSync: true });
+
+  /** Deriva consulta a partir del estado vigente. */
   private readonly consulta = computed(() => mapearParametrosConsultaProyectos(this.parametros()));
 
+  /** Conserva filtros para coordinar esta responsabilidad. */
   protected readonly filtros = computed<FiltrosProyectos>(() => {
     const consulta = this.consulta();
     return {
@@ -55,6 +67,8 @@ export class PaginaConsultaProyectos {
       estado: consulta.estado,
     };
   });
+
+  /** Deriva hay filtros a partir del estado vigente. */
   protected readonly hayFiltros = computed(() => {
     const filtros = this.filtros();
     return !!(filtros.nombre || filtros.responsable || filtros.estado);

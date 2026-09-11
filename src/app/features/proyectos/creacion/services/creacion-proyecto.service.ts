@@ -41,6 +41,8 @@ import type { FlujoProyecto } from '../../secciones/flujo/models/flujo-proyecto.
 /** Ejecuta y adapta las operaciones remotas del recorrido de creación. */
 @Injectable({ providedIn: 'root' })
 export class CreacionProyectoService {
+
+  /** Ejecuta las solicitudes HTTP correspondientes a esta responsabilidad. */
   private readonly http = inject(HttpClient);
 
   /** Comprueba en Azure los datos capturados antes de crear información local. */

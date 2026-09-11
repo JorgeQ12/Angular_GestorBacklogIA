@@ -50,8 +50,10 @@ export class HistorialElementoPlanificacionComponent {
   /** Solicita regresar al detalle vigente del elemento. */
   public readonly volverDetalle = output<void>();
 
+  /** Conserva tipos para coordinar esta responsabilidad. */
   protected readonly tipos = TipoElementoPlanificacion;
 
+  /** Obtiene nombre catálogo dentro del flujo actual. */
   protected obtenerNombreCatalogo(
     id: number | null,
     opciones: CatalogosFormularioElementoPlanificacion['prioridades'],
@@ -61,6 +63,7 @@ export class HistorialElementoPlanificacionComponent {
     return opciones.find((opcion) => opcion.id === id)?.nombre ?? `Valor registrado #${id}`;
   }
 
+  /** Obtiene ícono version dentro del flujo actual. */
   protected obtenerIconoVersion(versionId: number): NombreIconoAplicacion {
     return this.versionSeleccionadaId() === versionId ? 'confirmar' : 'continuar';
   }

@@ -11,13 +11,29 @@ import { PlanificacionProyectoService } from './planificacion-proyecto.service';
 /** Coordina la confirmación y ejecución de la publicación en Azure DevOps. */
 @Injectable()
 export class EstadoPublicacionAzurePlanificacionService {
+
+  /** Proporciona acceso al servicio remoto requerido por esta responsabilidad. */
   private readonly api = inject(PlanificacionProyectoService);
+
+  /** Proporciona acceso al servicio de estado planificación proyecto. */
   private readonly estadoPlanificacion = inject(EstadoPlanificacionProyectoService);
+
+  /** Proporciona acceso al servicio de mensajes. */
   private readonly mensajes = inject(MensajesService);
+
+  /** Proporciona acceso al servicio de notificador errores API. */
   private readonly notificador = inject(NotificadorErroresApiService);
+
+  /** Coordina la finalización de recursos cuando se destruye la instancia. */
   private readonly destroyRef = inject(DestroyRef);
+
+  /** Conserva operación actual para controlar el ciclo de vida de la operación. */
   private operacionActual: Subscription | null = null;
+
+  /** Conserva confirmacion actual ID para coordinar esta responsabilidad. */
   private confirmacionActualId = 0;
+
+  /** Conserva publicando estado como estado reactivo de la instancia. */
   private readonly publicandoEstado = signal(false);
 
   /** Impide iniciar una segunda publicación mientras existe una decisión u operación pendiente. */

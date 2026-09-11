@@ -45,11 +45,23 @@ export type VarianteConfirmacionModal = 'primary' | 'danger';
   styleUrl: './modal.css',
 })
 export class Modal implements AfterViewInit, OnDestroy {
+
+  /** Proporciona acceso seguro al documento activo. */
   private readonly documento = inject(DOCUMENT);
+
+  /** Referencia diálogo dentro de la vista. */
   private readonly dialogo = viewChild.required<ElementRef<HTMLElement>>('dialogo');
+
+  /** Referencia overlay dentro de la vista. */
   private readonly overlay = viewChild.required<ElementRef<HTMLElement>>('overlay');
+
+  /** Conserva identificador para coordinar esta responsabilidad. */
   private readonly identificador = ++consecutivoModal;
+
+  /** Conserva elemento con foco anterior para coordinar esta responsabilidad. */
   private elementoConFocoAnterior: HTMLElement | null = null;
+
+  /** Conserva overflow anterior para coordinar esta responsabilidad. */
   private overflowAnterior = '';
 
   /** Define el encabezado principal anunciado por las tecnologías de asistencia. */
@@ -112,7 +124,10 @@ export class Modal implements AfterViewInit, OnDestroy {
   /** Comunica la acción principal cuando no pertenece a un formulario. */
   public readonly confirmar = output<void>();
 
+  /** Conserva ID título para coordinar esta responsabilidad. */
   protected readonly idTitulo = `modal-titulo-${this.identificador}`;
+
+  /** Conserva ID descripción para coordinar esta responsabilidad. */
   protected readonly idDescripcion = `modal-descripcion-${this.identificador}`;
 
   /** Lleva el foco al diálogo y bloquea el desplazamiento del documento. */
@@ -170,6 +185,7 @@ export class Modal implements AfterViewInit, OnDestroy {
     }
   }
 
+  /** Ejecuta conservar foco como parte del flujo interno. */
   private conservarFoco(evento: KeyboardEvent): void {
     const dialogo = this.dialogo().nativeElement;
     const elementos = Array.from(
@@ -195,6 +211,7 @@ export class Modal implements AfterViewInit, OnDestroy {
     }
   }
 
+  /** Determina si modal superior. */
   private esModalSuperior(): boolean {
     const modales = this.documento.querySelectorAll<HTMLElement>('[data-app-modal]');
     return modales.item(modales.length - 1) === this.overlay().nativeElement;

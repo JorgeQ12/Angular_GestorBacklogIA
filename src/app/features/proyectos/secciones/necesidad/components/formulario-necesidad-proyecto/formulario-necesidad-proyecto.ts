@@ -30,6 +30,8 @@ import { NecesidadProyecto } from '../../models/necesidad-proyecto.model';
   styleUrl: './formulario-necesidad-proyecto.css',
 })
 export class FormularioNecesidadProyecto {
+
+  /** Construye los controles reactivos administrados por el componente. */
   private readonly constructorFormulario = inject(NonNullableFormBuilder);
 
   /** Identifica el formulario para permitir acciones externas mediante el atributo form. */
@@ -47,9 +49,16 @@ export class FormularioNecesidadProyecto {
   /** Entrega una Necesidad válida y normalizada al flujo consumidor. */
   public readonly guardar = output<NecesidadProyecto>();
 
+  /** Conserva límites para coordinar esta responsabilidad. */
   protected readonly limites = LIMITES_NECESIDAD_PROYECTO;
+
+  /** Conserva mensajes formulario para coordinar esta responsabilidad. */
   protected readonly mensajesFormulario = MENSAJES_NECESIDAD_PROYECTO;
+
+  /** Deriva es solo lectura a partir del estado vigente. */
   protected readonly esSoloLectura = computed(() => this.modo() === ModoFormularioProyecto.Lectura);
+
+  /** Administra los valores y validaciones del formulario reactivo. */
   protected readonly formulario: FormularioNecesidadProyectoTipado =
     this.constructorFormulario.group({
       situacionActual: [

@@ -24,6 +24,8 @@ import type { ActualizacionSeccionProyecto } from '../../models/actualizacion-se
 /** Ejecuta y adapta las operaciones remotas de consulta y versionamiento. */
 @Injectable({ providedIn: 'root' })
 export class InformacionProyectoService {
+
+  /** Ejecuta las solicitudes HTTP correspondientes a esta responsabilidad. */
   private readonly http = inject(HttpClient);
 
   /** Obtiene la fotografía vigente y la asociación de Azure del proyecto. */

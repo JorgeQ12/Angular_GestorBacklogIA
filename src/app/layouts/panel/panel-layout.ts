@@ -15,11 +15,20 @@ import { NavegacionPanelService } from './services/navegacion-panel.service';
   styleUrl: './panel-layout.css',
 })
 export class PanelLayout {
+
+  /** Proporciona acceso al servicio de autenticación. */
   private readonly autenticacion = inject(AutenticacionService);
+
+  /** Proporciona acceso al servicio de navegación panel. */
   private readonly navegacionPanel = inject(NavegacionPanelService);
 
+  /** Conserva ruta inicio para coordinar esta responsabilidad. */
   protected readonly rutaInicio = URL_PANEL;
+
+  /** Conserva items navegación para coordinar esta responsabilidad. */
   protected readonly itemsNavegacion = this.navegacionPanel.itemsVisibles;
+
+  /** Conserva barra lateral colapsada como estado reactivo de la instancia. */
   protected readonly barraLateralColapsada = signal(false);
 
   /** Gestiona la presentación completa o compacta de la navegación. */

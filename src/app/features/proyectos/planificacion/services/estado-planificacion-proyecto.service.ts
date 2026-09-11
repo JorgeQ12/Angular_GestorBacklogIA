@@ -8,17 +8,38 @@ import { PlanificacionProyectoService } from './planificacion-proyecto.service';
 /** Coordina la carga y la fotografía presentada por la página de planificación. */
 @Injectable()
 export class EstadoPlanificacionProyectoService {
+
+  /** Proporciona acceso al servicio remoto requerido por esta responsabilidad. */
   private readonly api = inject(PlanificacionProyectoService);
+
+  /** Coordina la finalización de recursos cuando se destruye la instancia. */
   private readonly destroyRef = inject(DestroyRef);
+
+  /** Conserva carga actual para controlar el ciclo de vida de la operación. */
   private cargaActual: Subscription | null = null;
+
+  /** Conserva selección actual para controlar el ciclo de vida de la operación. */
   private seleccionActual: Subscription | null = null;
+
+  /** Conserva planificación actual incluye eliminados para coordinar esta responsabilidad. */
   private planificacionActualIncluyeEliminados = false;
 
+  /** Conserva planificación actual estado como estado reactivo de la instancia. */
   private readonly planificacionActualEstado = signal<PlanificacionProyecto | null>(null);
+
+  /** Conserva planificación presentada estado como estado reactivo de la instancia. */
   private readonly planificacionPresentadaEstado = signal<PlanificacionProyecto | null>(null);
+
+  /** Conserva versiones estado como estado reactivo de la instancia. */
   private readonly versionesEstado = signal<readonly VersionPlanificacion[]>([]);
+
+  /** Conserva error carga estado como estado reactivo de la instancia. */
   private readonly errorCargaEstado = signal(false);
+
+  /** Conserva seleccionando estado como estado reactivo de la instancia. */
   private readonly seleccionandoEstado = signal(false);
+
+  /** Conserva incluir eliminados estado como estado reactivo de la instancia. */
   private readonly incluirEliminadosEstado = signal(false);
 
   /** Expone la fotografía vigente utilizada como referencia del selector. */
@@ -116,6 +137,7 @@ export class EstadoPlanificacionProyectoService {
     this.consultarPlanificacionActual(actual.proyectoId, incluirEliminados);
   }
 
+  /** Ejecuta consultar planificación actual como parte del flujo interno. */
   private consultarPlanificacionActual(
     proyectoId: number,
     incluirEliminados: boolean,
@@ -140,6 +162,7 @@ export class EstadoPlanificacionProyectoService {
       });
   }
 
+  /** Cancela operaciones dentro del flujo actual. */
   private cancelarOperaciones(): void {
     this.cargaActual?.unsubscribe();
     this.seleccionActual?.unsubscribe();

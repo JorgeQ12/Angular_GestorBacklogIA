@@ -24,9 +24,17 @@ export const PERMISOS_NAVEGACION_PANEL = new InjectionToken<
 /** Construye la navegación visible a partir del catálogo y los permisos disponibles. */
 @Injectable()
 export class NavegacionPanelService {
+
+  /** Proporciona acceso a catálogo_navegación_panel. */
   private readonly catalogo = inject(CATALOGO_NAVEGACION_PANEL);
+
+  /** Proporciona acceso a permisos_navegación_panel. */
   private readonly permisos = inject(PERMISOS_NAVEGACION_PANEL);
+
+  /** Proporciona acceso a la navegación administrada por Angular. */
   private readonly router = inject(Router);
+
+  /** Conserva url actual para coordinar esta responsabilidad. */
   private readonly urlActual = toSignal(
     this.router.events.pipe(
       filter((evento): evento is NavigationEnd => evento instanceof NavigationEnd),
@@ -49,6 +57,7 @@ export class NavegacionPanelService {
     return this.filtrarPermitidos(itemsContextuales, permisos);
   });
 
+  /** Ejecuta filtrar permitidos como parte del flujo interno. */
   private filtrarPermitidos(
     items: readonly ItemNavegacionPanel[],
     permisos: ReadonlySet<ClavePermisoNavegacion>,

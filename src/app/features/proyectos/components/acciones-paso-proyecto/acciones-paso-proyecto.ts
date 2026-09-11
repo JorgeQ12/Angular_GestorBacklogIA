@@ -14,7 +14,11 @@ import {
   templateUrl: './acciones-paso-proyecto.html',
 })
 export class AccionesPasoProyecto {
+
+  /** Proporciona acceso seguro al documento activo. */
   private readonly documento = inject(DOCUMENT);
+
+  /** Conserva alineaciones para coordinar esta responsabilidad. */
   protected readonly alineaciones = AlineacionAccionesPasoProyecto;
 
   /** Define textos e iconos de las acciones vigentes. */

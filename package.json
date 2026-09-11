@@ -9,7 +9,8 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:ci": "ng test --watch=false",
-    "verify": "npm run build && npm run build:development && npm run test:ci"
+    "docs:check": "node scripts/verificar-documentacion.cjs",
+    "verify": "npm run docs:check && npm run build && npm run build:development && npm run test:ci"
   },
   "prettier": {
     "printWidth": 100,

@@ -24,6 +24,7 @@ export class Tooltip {
   /** Nombra la acción para tecnologías de asistencia. */
   public readonly etiqueta = input('Más información');
 
+  /** Conserva ID tooltip para coordinar esta responsabilidad. */
   protected readonly idTooltip = `tooltip-${++secuenciaTooltip}`;
 
   /** Descarta la ayuda enfocada sin propagar Escape a contenedores como modales. */

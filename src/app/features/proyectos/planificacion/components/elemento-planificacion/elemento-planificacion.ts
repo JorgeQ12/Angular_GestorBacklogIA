@@ -42,71 +42,107 @@ export class ElementoPlanificacion {
   /** Solicita eliminar lógicamente un elemento autorizado por el backend. */
   public readonly eliminar = output<void>();
 
+  /** Conserva tipos para coordinar esta responsabilidad. */
   protected readonly tipos = TipoElementoPlanificacion;
+
+  /** Deriva tiene hijos a partir del estado vigente. */
   protected readonly tieneHijos = computed(() => this.elemento().hijos.length > 0);
+
+  /** Deriva muestra alternador a partir del estado vigente. */
   protected readonly muestraAlternador = computed(() =>
     admiteHijos(this.elemento().tipo),
   );
+
+  /** Deriva etiqueta tipo a partir del estado vigente. */
   protected readonly etiquetaTipo = computed(() => obtenerEtiquetaTipo(this.elemento().tipo));
+
+  /** Deriva descripción a partir del estado vigente. */
   protected readonly descripcion = computed(() => construirDescripcion(this.elemento()));
+
+  /** Deriva etiqueta alternador a partir del estado vigente. */
   protected readonly etiquetaAlternador = computed(
     () =>
       `${this.expandido() ? 'Contraer' : 'Expandir'} ${this.etiquetaTipo()}: ${this.elemento().titulo}`,
   );
+
+  /** Deriva puede consultar a partir del estado vigente. */
   protected readonly puedeConsultar = computed(
     () => this.elemento().capacidades.puedeConsultar,
   );
+
+  /** Deriva puede editar a partir del estado vigente. */
   protected readonly puedeEditar = computed(
     () => this.elemento().activo && this.elemento().capacidades.puedeEditar,
   );
+
+  /** Deriva puede crear hijo a partir del estado vigente. */
   protected readonly puedeCrearHijo = computed(
     () => this.elemento().activo && this.elemento().capacidades.puedeCrearHijo,
   );
+
+  /** Deriva puede sincronizar a partir del estado vigente. */
   protected readonly puedeSincronizar = computed(
     () => this.elemento().activo && this.elemento().capacidades.puedeSincronizar,
   );
+
+  /** Deriva puede eliminar a partir del estado vigente. */
   protected readonly puedeEliminar = computed(
     () =>
       this.elemento().activo &&
       this.elemento().capacidades.puedeEliminar,
   );
+
+  /** Deriva muestra menu acciones a partir del estado vigente. */
   protected readonly muestraMenuAcciones = computed(
     () => this.puedeEditar() || this.puedeSincronizar() || this.puedeEliminar(),
   );
+
+  /** Conserva ícono hijo para coordinar esta responsabilidad. */
   protected readonly iconoHijo = computed<NombreIconoAplicacion>(() =>
     obtenerIconoHijo(this.elemento().tipo),
   );
+
+  /** Deriva etiqueta consulta a partir del estado vigente. */
   protected readonly etiquetaConsulta = computed(
     () => `Consultar ${this.etiquetaTipo()}: ${this.elemento().titulo}`,
   );
+
+  /** Deriva etiqueta crear hijo a partir del estado vigente. */
   protected readonly etiquetaCrearHijo = computed(() =>
     obtenerEtiquetaCrearHijo(this.elemento().tipo),
   );
+
+  /** Deriva etiqueta eliminación a partir del estado vigente. */
   protected readonly etiquetaEliminacion = computed(
     () => `Eliminar ${this.etiquetaTipo().toLowerCase()}: ${this.elemento().titulo}`,
   );
 
+  /** Alterna expansion dentro del flujo actual. */
   protected alternarExpansion(): void {
     if (this.tieneHijos() && !this.expansionDeshabilitada()) this.alternar.emit();
   }
 
+  /** Abre o cerrar menu dentro del flujo actual. */
   protected abrirOCerrarMenu(evento: MouseEvent): void {
     evento.stopPropagation();
     this.alternarMenuAcciones.emit();
   }
 
+  /** Ejecuta ejecutar edicion como parte del flujo interno. */
   protected ejecutarEdicion(evento: MouseEvent): void {
     evento.stopPropagation();
     this.cerrarMenuAcciones.emit();
     this.editar.emit();
   }
 
+  /** Ejecuta ejecutar sincronización como parte del flujo interno. */
   protected ejecutarSincronizacion(evento: MouseEvent): void {
     evento.stopPropagation();
     this.cerrarMenuAcciones.emit();
     this.sincronizar.emit();
   }
 
+  /** Ejecuta ejecutar eliminación como parte del flujo interno. */
   protected ejecutarEliminacion(evento: MouseEvent): void {
     evento.stopPropagation();
     this.cerrarMenuAcciones.emit();

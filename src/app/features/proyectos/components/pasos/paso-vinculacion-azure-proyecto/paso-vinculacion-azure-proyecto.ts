@@ -36,6 +36,8 @@ const PATRON_URL_SEGURA = /^https:\/\/.+/i;
   styleUrl: './paso-vinculacion-azure-proyecto.css',
 })
 export class PasoVinculacionAzureProyecto {
+
+  /** Construye los controles reactivos administrados por el componente. */
   private readonly constructorFormulario = inject(NonNullableFormBuilder);
 
   /** Restaura los valores cuando el usuario regresa a la captura. */
@@ -68,9 +70,16 @@ export class PasoVinculacionAzureProyecto {
   /** Solicita presentar otra versión desde el encabezado. */
   public readonly versionCambiada = output<number>();
 
+  /** Conserva paso para coordinar esta responsabilidad. */
   protected readonly paso = ClavePasoEspecialProyecto.VinculacionAzure;
+
+  /** Conserva modos para coordinar esta responsabilidad. */
   protected readonly modos = ModoFormularioProyecto;
+
+  /** Conserva mensajes formulario para coordinar esta responsabilidad. */
   protected readonly mensajesFormulario = MENSAJES_VINCULACION_AZURE;
+
+  /** Administra los valores y validaciones del formulario reactivo. */
   protected readonly formulario: FormularioVinculacionAzureTipado =
     this.constructorFormulario.group({
       urlBoard: [

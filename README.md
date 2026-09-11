@@ -1,7 +1,7 @@
 # Frontend de InterIA
 
-Aplicación Angular para crear, consultar y planificar proyectos, administrar catálogos y trabajar
-con el asistente de IA de InterIA.
+Aplicación Angular para crear, consultar y planificar proyectos, administrar catálogos y usuarios,
+y trabajar con el asistente de IA de InterIA.
 
 ## Requisitos
 
@@ -23,6 +23,7 @@ navegador.
 ## Verificación
 
 ```powershell
+npm run docs:check
 npm run build
 npm run build:development
 npm run test:ci

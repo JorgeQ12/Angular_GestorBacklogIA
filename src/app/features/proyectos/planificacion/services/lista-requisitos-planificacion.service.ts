@@ -28,6 +28,8 @@ import type {
 /** Encapsula el contrato HTTP de la lista de requisitos del proyecto. */
 @Injectable({ providedIn: 'root' })
 export class ListaRequisitosPlanificacionService {
+
+  /** Ejecuta las solicitudes HTTP correspondientes a esta responsabilidad. */
   private readonly http = inject(HttpClient);
 
   /** Obtiene y ordena los requisitos vigentes del proyecto. */

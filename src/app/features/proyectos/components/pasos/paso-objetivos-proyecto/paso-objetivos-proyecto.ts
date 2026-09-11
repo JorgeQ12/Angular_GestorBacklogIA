@@ -36,6 +36,10 @@ export class PasoObjetivosProyecto {
   public readonly guardar = output<ObjetivosProyecto>();
   /** Comunica la versión seleccionada por el usuario. */
   public readonly versionCambiada = output<number>();
+
+  /** Conserva paso para coordinar esta responsabilidad. */
   protected readonly paso = ClaveSeccionProyecto.Objetivos;
+
+  /** Conserva ID formulario para coordinar esta responsabilidad. */
   protected readonly idFormulario = construirIdFormularioPasoProyecto(this.paso);
 }

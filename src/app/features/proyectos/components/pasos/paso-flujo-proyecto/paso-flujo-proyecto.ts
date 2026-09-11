@@ -26,6 +26,8 @@ import { TarjetaPasoProyecto } from '../../tarjeta-paso-proyecto/tarjeta-paso-pr
   templateUrl: './paso-flujo-proyecto.html',
 })
 export class PasoFlujoProyecto {
+
+  /** Proporciona acceso al servicio de mensajes. */
   private readonly mensajes = inject(MensajesService);
   /** Fotografía del flujo que debe presentar o editar el paso. */
   public readonly datos = input.required<FlujoProyecto>();
@@ -55,12 +57,26 @@ export class PasoFlujoProyecto {
   public readonly generarConIA = output<void>();
   /** Comunica la versión seleccionada por el usuario. */
   public readonly versionCambiada = output<number>();
+
+  /** Conserva flujo temporal como estado reactivo de la instancia. */
   protected readonly flujoTemporal = signal<FlujoProyecto | null>(null);
+
+  /** Conserva paso para coordinar esta responsabilidad. */
   protected readonly paso = ClaveSeccionProyecto.Flujo;
+
+  /** Conserva modos para coordinar esta responsabilidad. */
   protected readonly modos = ModoFormularioProyecto;
+
+  /** Deriva flujo presentado a partir del estado vigente. */
   protected readonly flujoPresentado = computed(() => this.flujoTemporal() ?? this.datos());
+
+  /** Deriva tiene contenido a partir del estado vigente. */
   protected readonly tieneContenido = computed(() => this.flujoPresentado().nodos.length > 0);
+
+  /** Deriva ocupado a partir del estado vigente. */
   protected readonly ocupado = computed(() => this.procesando() || this.generandoConIA());
+
+  /** Deriva cambios pendientes a partir del estado vigente. */
   protected readonly cambiosPendientes = computed(
     () =>
       this.cambioInicialPendiente() ||

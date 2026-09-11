@@ -44,6 +44,8 @@ import { ObjetivosProyecto } from '../../models/objetivos-proyecto.model';
   styleUrl: './formulario-objetivos-proyecto.css',
 })
 export class FormularioObjetivosProyecto {
+
+  /** Construye los controles reactivos administrados por el componente. */
   private readonly constructorFormulario = inject(NonNullableFormBuilder);
 
   /** Identifica el formulario para permitir acciones externas mediante el atributo form. */
@@ -61,10 +63,19 @@ export class FormularioObjetivosProyecto {
   /** Entrega Objetivos válidos y normalizados al flujo consumidor. */
   public readonly guardar = output<ObjetivosProyecto>();
 
+  /** Conserva límites para coordinar esta responsabilidad. */
   protected readonly limites = LIMITES_OBJETIVOS_PROYECTO;
+
+  /** Conserva mensajes formulario para coordinar esta responsabilidad. */
   protected readonly mensajesFormulario = MENSAJES_OBJETIVOS_PROYECTO;
+
+  /** Conserva mensajes objetivo especifico para coordinar esta responsabilidad. */
   protected readonly mensajesObjetivoEspecifico = MENSAJES_OBJETIVO_ESPECIFICO;
+
+  /** Deriva es solo lectura a partir del estado vigente. */
   protected readonly esSoloLectura = computed(() => this.modo() === ModoFormularioProyecto.Lectura);
+
+  /** Administra los valores y validaciones del formulario reactivo. */
   protected readonly formulario: FormularioObjetivosProyectoTipado =
     this.constructorFormulario.group({
       objetivoGeneral: [
@@ -77,6 +88,7 @@ export class FormularioObjetivosProyecto {
       ),
     });
 
+  /** Obtiene controles objetivos especificos. */
   protected get controlesObjetivosEspecificos(): readonly FormControl<string>[] {
     return this.formulario.controls.objetivosEspecificos.controls;
   }

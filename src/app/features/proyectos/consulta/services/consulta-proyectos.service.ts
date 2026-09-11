@@ -14,6 +14,8 @@ import type { PaginaProyectos } from '../models/resumen-proyecto.model';
 /** Consulta y adapta los proyectos disponibles para el usuario vigente. */
 @Injectable({ providedIn: 'root' })
 export class ConsultaProyectosService {
+
+  /** Ejecuta las solicitudes HTTP correspondientes a esta responsabilidad. */
   private readonly http = inject(HttpClient);
 
   /** Obtiene una página del portafolio con sus filtros aplicados en el backend. */
@@ -29,6 +31,7 @@ export class ConsultaProyectosService {
       );
   }
 
+  /** Construye parámetros dentro del flujo actual. */
   private construirParametros(consulta: ConsultaProyectos): HttpParams {
     let parametros = new HttpParams()
       .set('PaginaActual', consulta.pagina)

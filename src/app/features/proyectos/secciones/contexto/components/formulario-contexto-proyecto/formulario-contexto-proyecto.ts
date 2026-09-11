@@ -42,7 +42,11 @@ import { FormularioContextoProyectoTipado } from '../../models/formulario-contex
   styleUrl: './formulario-contexto-proyecto.css',
 })
 export class FormularioContextoProyecto {
+
+  /** Construye los controles reactivos administrados por el componente. */
   private readonly constructorFormulario = inject(NonNullableFormBuilder);
+
+  /** Coordina la finalización de recursos cuando se destruye la instancia. */
   private readonly destroyRef = inject(DestroyRef);
 
   /** Identifica el formulario para permitir acciones externas mediante el atributo form. */
@@ -66,9 +70,16 @@ export class FormularioContextoProyecto {
   /** Comunica la fotografía vigente para previsualizar datos fuera del formulario. */
   public readonly contextoCambiado = output<ContextoProyecto>();
 
+  /** Conserva límites para coordinar esta responsabilidad. */
   protected readonly limites = LIMITES_CONTEXTO_PROYECTO;
+
+  /** Conserva mensajes formulario para coordinar esta responsabilidad. */
   protected readonly mensajesFormulario = MENSAJES_CONTEXTO_PROYECTO;
+
+  /** Deriva es solo lectura a partir del estado vigente. */
   protected readonly esSoloLectura = computed(() => this.modo() === ModoFormularioProyecto.Lectura);
+
+  /** Conserva opciones prioridad para coordinar esta responsabilidad. */
   protected readonly opcionesPrioridad = computed<readonly OpcionSelector[]>(() =>
     this.prioridades().map((prioridad) => ({
       valor: prioridad.id,
@@ -76,6 +87,8 @@ export class FormularioContextoProyecto {
       descripcion: prioridad.descripcion ?? undefined,
     })),
   );
+
+  /** Administra los valores y validaciones del formulario reactivo. */
   protected readonly formulario: FormularioContextoProyectoTipado =
     this.constructorFormulario.group({
       nombre: ['', [validarTextoRequerido, Validators.maxLength(this.limites.nombre)]],
@@ -121,6 +134,7 @@ export class FormularioContextoProyecto {
     this.guardar.emit(this.obtenerContextoVigente());
   }
 
+  /** Obtiene contexto vigente dentro del flujo actual. */
   private obtenerContextoVigente(): ContextoProyecto {
     const valores = this.formulario.getRawValue();
     return {

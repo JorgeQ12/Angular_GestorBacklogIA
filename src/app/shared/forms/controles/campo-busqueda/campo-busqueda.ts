@@ -33,10 +33,16 @@ export class CampoBusqueda implements ControlValueAccessor {
   /** Ajusta la altura del buscador sin duplicar su estructura en cada feature. */
   public readonly tamano = input<'md' | 'lg'>('md');
 
+  /** Conserva valor como estado reactivo de la instancia. */
   protected readonly valor = signal('');
+
+  /** Conserva deshabilitado como estado reactivo de la instancia. */
   protected readonly deshabilitado = signal(false);
 
+  /** Conserva la función que atenderá notificar cambio. */
   private notificarCambio: (valor: string) => void = () => undefined;
+
+  /** Conserva la función que atenderá notificar tocado. */
   private notificarTocado: () => void = () => undefined;
 
   /** Sincroniza el término proporcionado por el formulario. */

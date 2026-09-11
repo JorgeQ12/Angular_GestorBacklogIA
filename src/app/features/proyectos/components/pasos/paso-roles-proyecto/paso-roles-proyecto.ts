@@ -36,6 +36,10 @@ export class PasoRolesProyecto {
   public readonly guardar = output<RolesProyecto>();
   /** Comunica la versión seleccionada por el usuario. */
   public readonly versionCambiada = output<number>();
+
+  /** Conserva paso para coordinar esta responsabilidad. */
   protected readonly paso = ClaveSeccionProyecto.Roles;
+
+  /** Conserva ID formulario para coordinar esta responsabilidad. */
   protected readonly idFormulario = construirIdFormularioPasoProyecto(this.paso);
 }

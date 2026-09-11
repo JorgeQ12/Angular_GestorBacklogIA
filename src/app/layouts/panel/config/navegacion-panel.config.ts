@@ -3,6 +3,7 @@ import {
   URL_INICIO_PANEL,
   URL_CATALOGOS,
   URL_PROYECTOS,
+  URL_USUARIOS,
   crearUrlInformacionProyecto,
   crearUrlPlanificacionProyecto,
 } from '../../../core/navegacion/rutas';
@@ -35,6 +36,14 @@ export const NAVEGACION_PANEL = [
     descripcion: 'Administrar catálogos y opciones',
     icono: 'catalogos',
     ruta: URL_CATALOGOS,
+    coincidenciaExacta: true,
+  },
+  {
+    id: ClaveItemNavegacionPanel.Usuarios,
+    etiqueta: 'Usuarios',
+    descripcion: 'Administrar perfiles y límites de usuarios',
+    icono: 'usuario',
+    ruta: URL_USUARIOS,
     coincidenciaExacta: true,
   },
 ] as const satisfies readonly ItemNavegacionPanel[];
