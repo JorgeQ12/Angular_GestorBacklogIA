@@ -4,12 +4,17 @@
 }
 
 .arbol-planificacion {
+  --arbol-espacio-inferior: var(--space-5);
+
   min-width: 0;
-  padding: var(--space-3) var(--space-4)
-    calc(
-      var(--control-height-sm) + var(--control-height-sm) +
-        var(--control-height-sm) + var(--space-8)
-    );
+  padding: var(--space-3) var(--space-4) var(--arbol-espacio-inferior);
+}
+
+.arbol-planificacion--menu-abierto {
+  --arbol-espacio-inferior: calc(
+    var(--control-height-sm) + var(--control-height-sm) +
+      var(--control-height-sm) + var(--space-8)
+  );
 }
 
 .arbol-planificacion__proyecto {
@@ -189,11 +194,7 @@
 
 @media (max-width: 640px) {
   .arbol-planificacion {
-    padding: var(--space-3) var(--space-3)
-      calc(
-        var(--control-height-sm) + var(--control-height-sm) +
-          var(--control-height-sm) + var(--space-8)
-      );
+    padding-inline: var(--space-3);
   }
 
   .arbol-planificacion__lista {

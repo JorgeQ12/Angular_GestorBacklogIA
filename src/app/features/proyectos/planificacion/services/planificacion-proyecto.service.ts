@@ -43,9 +43,9 @@ export class PlanificacionProyectoService {
     incluirEliminados = false,
   ): Observable<PlanificacionProyecto> {
     let params = new HttpParams()
-      .set('ProyectoId', proyectoId)
-      .set('IncluirEliminados', incluirEliminados);
-    if (versionId !== null) params = params.set('VersionBacklogId', versionId);
+      .set('proyectoId', proyectoId)
+      .set('incluirEliminados', incluirEliminados);
+    if (versionId !== null) params = params.set('versionBacklogId', versionId);
 
     return this.http
       .get<ResultadoApi<PlanificacionProyectoDto>>(
@@ -60,7 +60,7 @@ export class PlanificacionProyectoService {
 
   /** Obtiene las fotografías integrales disponibles para el proyecto. */
   public obtenerVersiones(proyectoId: number): Observable<readonly VersionPlanificacion[]> {
-    const params = new HttpParams().set('ProyectoId', proyectoId);
+    const params = new HttpParams().set('proyectoId', proyectoId);
     return this.http
       .get<ResultadoApi<readonly VersionPlanificacionDto[]>>(
         ENDPOINTS_PLANIFICACION_PROYECTO.obtenerVersiones,
@@ -107,7 +107,7 @@ export class PlanificacionProyectoService {
   public sincronizarEpicaPrincipal(
     proyectoId: number,
   ): Observable<ResultadoSincronizacionEpicaAzurePlanificacion> {
-    const params = new HttpParams().set('ProyectoId', proyectoId);
+    const params = new HttpParams().set('proyectoId', proyectoId);
     return this.http
       .post<ResultadoApi<ResultadoSincronizacionEpicaAzurePlanificacionDto>>(
         ENDPOINTS_PLANIFICACION_PROYECTO.sincronizarEpicaPrincipal,

@@ -32,7 +32,7 @@ export class InformacionProyectoService {
   public obtenerProyecto(proyectoId: number): Observable<InformacionProyecto> {
     return this.http
       .get<ResultadoApi<ProyectoInformacionDto>>(ENDPOINTS_INFORMACION_PROYECTO.obtenerProyecto, {
-        params: new HttpParams().set('ProyectoId', proyectoId),
+        params: new HttpParams().set('proyectoId', proyectoId),
       })
       .pipe(
         map((resultado) => exigirDatosResultadoApi(resultado, 'la información del proyecto')),
@@ -45,7 +45,7 @@ export class InformacionProyectoService {
     return this.http
       .get<ResultadoApi<readonly VersionProyectoResumenDto[]>>(
         ENDPOINTS_INFORMACION_PROYECTO.obtenerVersiones,
-        { params: new HttpParams().set('ProyectoId', proyectoId) },
+        { params: new HttpParams().set('proyectoId', proyectoId) },
       )
       .pipe(
         map((resultado) => exigirDatosResultadoApi(resultado, 'las versiones del proyecto')),
@@ -60,8 +60,8 @@ export class InformacionProyectoService {
     azure: VinculacionAzureProyectoResumen | null,
   ): Observable<InformacionProyecto> {
     const params = new HttpParams()
-      .set('ProyectoId', proyectoId)
-      .set('VersionProyectoId', versionId);
+      .set('proyectoId', proyectoId)
+      .set('versionProyectoId', versionId);
     return this.http
       .get<ResultadoApi<VersionProyectoDto>>(ENDPOINTS_INFORMACION_PROYECTO.obtenerVersion, {
         params,

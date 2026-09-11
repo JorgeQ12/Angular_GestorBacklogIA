@@ -49,10 +49,10 @@ export class ElementoPlanificacionService {
     versionPlanificacionId: number | null = null,
   ): Observable<DetalleElementoPlanificacion> {
     let params = new HttpParams()
-      .set('Tipo', serializarTipoElemento(tipo))
-      .set('ItemTrabajoId', elementoId);
+      .set('tipo', serializarTipoElemento(tipo))
+      .set('itemTrabajoId', elementoId);
     if (versionPlanificacionId !== null) {
-      params = params.set('VersionBacklogId', versionPlanificacionId);
+      params = params.set('versionBacklogId', versionPlanificacionId);
     }
     return this.http
       .get<ResultadoApi<DetalleElementoPlanificacionDto>>(
@@ -102,9 +102,9 @@ export class ElementoPlanificacionService {
     numeroVersionEsperada: number,
   ): Observable<ResultadoEliminacionElementoPlanificacion> {
     const params = new HttpParams()
-      .set('Tipo', serializarTipoElemento(tipo))
-      .set('ItemTrabajoId', elementoId)
-      .set('NumeroVersionEsperada', numeroVersionEsperada);
+      .set('tipo', serializarTipoElemento(tipo))
+      .set('itemTrabajoId', elementoId)
+      .set('numeroVersionEsperada', numeroVersionEsperada);
 
     return this.http
       .delete<ResultadoApi<ResultadoEliminacionElementoPlanificacionDto>>(
@@ -125,10 +125,10 @@ export class ElementoPlanificacionService {
     tamanoPagina = 20,
   ): Observable<HistorialElementoPlanificacion> {
     let params = new HttpParams()
-      .set('Tipo', serializarTipoElemento(tipo))
-      .set('ItemTrabajoId', elementoId)
-      .set('TamanoPagina', tamanoPagina);
-    if (cursor !== null) params = params.set('Cursor', cursor);
+      .set('tipo', serializarTipoElemento(tipo))
+      .set('itemTrabajoId', elementoId)
+      .set('tamanoPagina', tamanoPagina);
+    if (cursor !== null) params = params.set('cursor', cursor);
 
     return this.http
       .get<ResultadoApi<HistorialElementoPlanificacionDto>>(
@@ -148,9 +148,9 @@ export class ElementoPlanificacionService {
     versionId: number,
   ): Observable<VersionElementoPlanificacion> {
     const params = new HttpParams()
-      .set('Tipo', serializarTipoElemento(tipo))
-      .set('ItemTrabajoId', elementoId)
-      .set('VersionId', versionId);
+      .set('tipo', serializarTipoElemento(tipo))
+      .set('itemTrabajoId', elementoId)
+      .set('versionId', versionId);
 
     return this.http
       .get<ResultadoApi<VersionElementoPlanificacionDto>>(
