@@ -19,7 +19,7 @@ describe('normalizador de errores del API', () => {
     );
 
     expect(error).toEqual(
-      expect.objectContaining({
+      jasmine.objectContaining({
         estadoHttp: 400,
         codigo: 'epica_no_encontrada',
         mensajeUsuario: 'La épica indicada no existe.',

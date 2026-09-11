@@ -24,7 +24,7 @@ describe('GeneracionIaPlanificacionComponent', () => {
   it('presenta los cuatro niveles y bloquea los que no tienen padres', () => {
     const botones = obtenerBotonesNivel();
 
-    expect(botones).toHaveLength(4);
+    expect(botones.length).toBe(4);
     expect(botones[0].disabled).toBe(false);
     expect(botones[1].disabled).toBe(false);
     expect(botones[2].disabled).toBe(true);
@@ -34,7 +34,7 @@ describe('GeneracionIaPlanificacionComponent', () => {
   });
 
   it('emite el nivel seleccionado cuando sus padres están disponibles', () => {
-    const generar = vi.fn();
+    const generar = jasmine.createSpy();
     fixture.componentInstance.generar.subscribe(generar);
     fixture.componentRef.setInput('resumen', {
       epicas: 1,

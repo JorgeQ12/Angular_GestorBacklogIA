@@ -78,6 +78,6 @@ describe('publicacionAzurePlanificacionMapper', () => {
           },
         ],
       }),
-    ).toThrow('Tipo de entidad publicada no compatible: historia.');
+    ).toThrowError(/Tipo de entidad publicada no compatible/);
   });
 });

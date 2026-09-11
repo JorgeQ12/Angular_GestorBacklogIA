@@ -6,11 +6,11 @@ import { EstadoGanttPlanificacionService } from './estado-gantt-planificacion.se
 import { GanttPlanificacionService } from './gantt-planificacion.service';
 
 describe('EstadoGanttPlanificacionService', () => {
-  const obtener = vi.fn();
+  const obtener = jasmine.createSpy('obtener');
   let servicio: EstadoGanttPlanificacionService;
 
   beforeEach(() => {
-    obtener.mockReset();
+    obtener.calls.reset();
     TestBed.configureTestingModule({
       providers: [
         EstadoGanttPlanificacionService,
@@ -22,7 +22,7 @@ describe('EstadoGanttPlanificacionService', () => {
 
   it('abre la vista, expone la carga y conserva el resultado recibido', () => {
     const respuesta = new Subject<GanttPlanificacion>();
-    obtener.mockReturnValue(respuesta);
+    obtener.and.returnValue(respuesta);
 
     servicio.abrir(PLANIFICACION);
 
@@ -36,7 +36,7 @@ describe('EstadoGanttPlanificacionService', () => {
   });
 
   it('no repite una fotografía ya cargada y renueva una versión diferente', () => {
-    obtener.mockReturnValue(of(GANTT));
+    obtener.and.returnValue(of(GANTT));
     servicio.abrir(PLANIFICACION);
     servicio.sincronizar(PLANIFICACION);
     servicio.sincronizar({ ...PLANIFICACION, versionId: 10, numeroVersion: 5 });
@@ -45,7 +45,7 @@ describe('EstadoGanttPlanificacionService', () => {
   });
 
   it('permite reintentar una carga fallida sin abandonar la vista', () => {
-    obtener.mockReturnValueOnce(throwError(() => new Error('fallo'))).mockReturnValueOnce(of(GANTT));
+    obtener.and.returnValues(throwError(() => new Error('fallo')), of(GANTT));
 
     servicio.abrir(PLANIFICACION);
     expect(servicio.error()).toBe(true);
@@ -58,7 +58,7 @@ describe('EstadoGanttPlanificacionService', () => {
 
   it('cancela la operación pendiente al volver al árbol', () => {
     const respuesta = new Subject<GanttPlanificacion>();
-    obtener.mockReturnValue(respuesta);
+    obtener.and.returnValue(respuesta);
     servicio.abrir(PLANIFICACION);
 
     servicio.cerrar();

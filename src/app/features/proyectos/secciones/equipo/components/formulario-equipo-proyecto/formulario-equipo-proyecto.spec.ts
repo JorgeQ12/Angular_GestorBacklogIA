@@ -2,6 +2,7 @@ import { OverlayContainer } from '@angular/cdk/overlay';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ModoFormularioProyecto } from '../../../../models/modo-formulario-proyecto.model';
 import { EquipoProyecto } from '../../models/equipo-proyecto.model';
+import { FiltroEquipoProyecto } from '../../models/formulario-equipo-proyecto.model';
 import { FormularioEquipoProyecto } from './formulario-equipo-proyecto';
 
 describe('FormularioEquipoProyecto', () => {
@@ -44,8 +45,9 @@ describe('FormularioEquipoProyecto', () => {
 
     expect((fixtureTardia.nativeElement as HTMLElement).textContent).toContain('Todos 2');
     expect(
-      (fixtureTardia.nativeElement as HTMLElement).querySelectorAll('.formulario-equipo__fila'),
-    ).toHaveLength(2);
+      (fixtureTardia.nativeElement as HTMLElement).querySelectorAll('.formulario-equipo__fila')
+        .length,
+    ).toBe(2);
   });
 
   it('busca por nombre y filtra por estado de configuración', () => {
@@ -54,7 +56,7 @@ describe('FormularioEquipoProyecto', () => {
     busqueda.dispatchEvent(new Event('input'));
     fixture.detectChanges();
 
-    expect(obtenerElemento().querySelectorAll('.formulario-equipo__fila')).toHaveLength(1);
+    expect(obtenerElemento().querySelectorAll('.formulario-equipo__fila').length).toBe(1);
     expect(obtenerElemento().textContent).toContain('María Gómez');
 
     busqueda.value = '';
@@ -62,7 +64,7 @@ describe('FormularioEquipoProyecto', () => {
     pulsarBoton('Configurados');
     fixture.detectChanges();
 
-    expect(obtenerElemento().querySelectorAll('.formulario-equipo__fila')).toHaveLength(1);
+    expect(obtenerElemento().querySelectorAll('.formulario-equipo__fila').length).toBe(1);
     expect(obtenerElemento().textContent).toContain('Jorge Quintero');
   });
 
@@ -112,7 +114,7 @@ describe('FormularioEquipoProyecto', () => {
     const seleccionPendiente = obtenerElemento().querySelectorAll<HTMLInputElement>(
       '.formulario-equipo__seleccion input',
     )[1];
-    const guardar = vi.fn();
+    const guardar = jasmine.createSpy();
     fixture.componentInstance.guardar.subscribe(guardar);
 
     seleccionPendiente.checked = true;
@@ -139,13 +141,13 @@ describe('FormularioEquipoProyecto', () => {
     pulsarBoton('Aplicar');
     fixture.detectChanges();
 
-    const guardar = vi.fn();
+    const guardar = jasmine.createSpy();
     fixture.componentInstance.guardar.subscribe(guardar);
     enviarFormulario();
     expect(guardar).toHaveBeenCalledWith({
       integrantes: [
-        expect.objectContaining({ perfilTecnicoId: 36, dedicacionCodigo: '75' }),
-        expect.objectContaining({ perfilTecnicoId: 36, dedicacionCodigo: '75' }),
+        jasmine.objectContaining({ perfilTecnicoId: 36, dedicacionCodigo: '75' }),
+        jasmine.objectContaining({ perfilTecnicoId: 36, dedicacionCodigo: '75' }),
       ],
     });
   });
@@ -174,7 +176,7 @@ describe('FormularioEquipoProyecto', () => {
     enviarFormulario();
     fixture.detectChanges();
 
-    expect(obtenerElemento().querySelectorAll('.formulario-equipo__fila')).toHaveLength(1);
+    expect(obtenerElemento().querySelectorAll('.formulario-equipo__fila').length).toBe(1);
     expect(obtenerElemento().textContent).toContain('María Gómez');
     expect(obtenerElemento().textContent).toContain('Completa esta asignación.');
   });
@@ -190,10 +192,80 @@ describe('FormularioEquipoProyecto', () => {
     const elemento = obtenerElemento();
     expect(elemento.querySelector('.formulario-equipo__herramientas')).toBeNull();
     expect(elemento.querySelector('.ui-checkbox')).toBeNull();
-    expect(elemento.querySelectorAll('.formulario-equipo__fila')).toHaveLength(2);
+    expect(elemento.querySelectorAll('.formulario-equipo__fila').length).toBe(2);
     expect(elemento.querySelector('#equipo-perfil-u1-control')?.getAttribute('aria-readonly')).toBe(
       'true',
     );
+  });
+
+  it('ignora los cambios de filtro y selección en modo lectura', () => {
+    fixture.componentRef.setInput('modo', ModoFormularioProyecto.Lectura);
+    fixture.detectChanges();
+    const componente = fixture.componentInstance as unknown as {
+      cambiarFiltro: (filtro: FiltroEquipoProyecto) => void;
+      filtro: () => FiltroEquipoProyecto;
+      alternarSeleccion: (idAzure: string, seleccionado: boolean) => void;
+      alternarSeleccionVisible: (seleccionar: boolean) => void;
+      seleccionados: () => ReadonlySet<string>;
+    };
+
+    componente.cambiarFiltro(FiltroEquipoProyecto.Configurados);
+    componente.alternarSeleccion('u1', true);
+    componente.alternarSeleccionVisible(true);
+
+    expect(componente.filtro()).toBe(FiltroEquipoProyecto.Todos);
+    expect(componente.seleccionados().size).toBe(0);
+  });
+
+  it('no envía el formulario en modo lectura', () => {
+    fixture.componentRef.setInput('modo', ModoFormularioProyecto.Lectura);
+    fixture.detectChanges();
+    const guardar = jasmine.createSpy();
+    fixture.componentInstance.guardar.subscribe(guardar);
+
+    (fixture.componentInstance as unknown as { enviar: () => void }).enviar();
+
+    expect(guardar).not.toHaveBeenCalled();
+  });
+
+  it('bloquea los controles mientras el formulario está procesando', () => {
+    fixture.componentRef.setInput('procesando', true);
+    fixture.detectChanges();
+
+    expect(obtenerControl('input[type="search"]').disabled).toBe(true);
+  });
+
+  it('no aplica una asignación masiva sin selección ni valores elegidos', () => {
+    const componente = fixture.componentInstance as unknown as {
+      aplicarAsignacionMasiva: () => void;
+      obtenerDatosVigentes: () => EquipoProyecto;
+    };
+
+    componente.aplicarAsignacionMasiva();
+
+    expect(componente.obtenerDatosVigentes()).toEqual(EQUIPO);
+  });
+
+  it('aplica solo la dedicación cuando no se elige un perfil masivo', () => {
+    obtenerElemento()
+      .querySelectorAll<HTMLInputElement>('.formulario-equipo__seleccion input')
+      .forEach((control) => {
+        control.checked = true;
+        control.dispatchEvent(new Event('change'));
+      });
+    fixture.detectChanges();
+
+    seleccionarOpcionMasiva('equipo-dedicacion-masiva-control', '75%');
+    fixture.detectChanges();
+    pulsarBoton('Aplicar');
+    fixture.detectChanges();
+
+    const vigentes = (
+      fixture.componentInstance as unknown as { obtenerDatosVigentes: () => EquipoProyecto }
+    ).obtenerDatosVigentes();
+    expect(vigentes.integrantes[0].dedicacionCodigo).toBe('75');
+    expect(vigentes.integrantes[0].perfilTecnicoId).toBe(32);
+    expect(vigentes.integrantes[1].perfilTecnicoId).toBeNull();
   });
 
   function pulsarBoton(texto: string): void {

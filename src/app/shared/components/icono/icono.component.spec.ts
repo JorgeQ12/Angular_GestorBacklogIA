@@ -28,7 +28,7 @@ describe('IconoComponent', () => {
 
     const paths = (fixture.nativeElement as HTMLElement).querySelectorAll('path');
 
-    expect(paths).toHaveLength(2);
+    expect(paths.length).toBe(2);
     expect(paths[0]?.getAttribute('d')).toBe('M8 4h8v4c0 3-1.8 5-4 5s-4-2-4-5V4Z');
     expect(paths[1]?.getAttribute('d')).toContain('M8 6H5v1c0 2');
   });

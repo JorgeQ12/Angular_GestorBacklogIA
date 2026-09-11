@@ -36,7 +36,7 @@ describe('FormularioTipoSolucionProyecto', () => {
   });
 
   it('emite una solución con interfaz y plataforma', () => {
-    const guardar = vi.fn();
+    const guardar = jasmine.createSpy();
     fixture.componentInstance.guardar.subscribe(guardar);
     seleccionarOpcion('tipo-solucion-interfaz', 0);
     seleccionarOpcion('tipo-solucion-plataforma', 0);
@@ -50,7 +50,7 @@ describe('FormularioTipoSolucionProyecto', () => {
   });
 
   it('limpia la plataforma al cambiar a una solución sin interfaz', () => {
-    const guardar = vi.fn();
+    const guardar = jasmine.createSpy();
     fixture.componentInstance.guardar.subscribe(guardar);
     seleccionarOpcion('tipo-solucion-interfaz', 0);
     seleccionarOpcion('tipo-solucion-plataforma', 2);
@@ -65,7 +65,7 @@ describe('FormularioTipoSolucionProyecto', () => {
   });
 
   it('presenta la selección sin admitir cambios ni envío en modo lectura', () => {
-    const guardar = vi.fn();
+    const guardar = jasmine.createSpy();
     fixture.componentInstance.guardar.subscribe(guardar);
     fixture.componentRef.setInput('datosIniciales', {
       tieneInterfaz: true,

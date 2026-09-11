@@ -8,12 +8,11 @@ describe('lector JSON', () => {
     });
   });
 
-  it.each(['', 'json-invalido', 'null', '[]', '"texto"'])(
-    'tolera un valor no utilizable: %s',
-    (json) => {
+  ['', 'json-invalido', 'null', '[]', '"texto"'].forEach((json) => {
+    it(`tolera un valor no utilizable: ${json}`, () => {
       expect(deserializarObjetoJson(json)).toEqual({});
-    },
-  );
+    });
+  });
 
   it('recupera y normaliza únicamente propiedades textuales', () => {
     const objeto = deserializarObjetoJson('{"nombre":"  InterIA  ","cantidad":3}');

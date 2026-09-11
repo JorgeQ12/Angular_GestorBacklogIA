@@ -8,7 +8,7 @@ describe('Rutas principales', () => {
       (ruta) => ruta.path === `${SEGMENTOS_RUTA.configuracion}/${SEGMENTOS_RUTA.catalogos}`,
     );
 
-    expect(rutaCatalogos?.loadComponent).toBeTypeOf('function');
+    expect(typeof rutaCatalogos?.loadComponent).toBe('function');
   });
 
   it('conserva el acceso directo mediante redirección', () => {
@@ -16,7 +16,7 @@ describe('Rutas principales', () => {
     const redireccion = rutaPanel?.children?.find((ruta) => ruta.path === SEGMENTOS_RUTA.catalogos);
 
     expect(redireccion).toEqual(
-      expect.objectContaining({
+      jasmine.objectContaining({
         redirectTo: `${SEGMENTOS_RUTA.configuracion}/${SEGMENTOS_RUTA.catalogos}`,
         pathMatch: 'full',
       }),

@@ -32,7 +32,7 @@ describe('ModalMensaje', () => {
 
     (dialogo.querySelector('.ui-button--primary') as HTMLButtonElement).click();
     fixture.detectChanges();
-    await expect(reconocimiento).resolves.toBeUndefined();
+    await expectAsync(reconocimiento).toBeResolvedTo(undefined);
   });
 
   it('presenta los detalles asociados a una advertencia', () => {
@@ -46,7 +46,7 @@ describe('ModalMensaje', () => {
 
     const detalles = fixture.nativeElement.querySelectorAll('.modal-mensaje__detalles li');
 
-    expect(detalles).toHaveLength(2);
+    expect(detalles.length).toBe(2);
     expect(detalles.item(0).textContent).toContain('Falta el responsable');
     mensajes.aceptar();
   });
@@ -66,6 +66,6 @@ describe('ModalMensaje', () => {
 
     (dialogo.querySelector('.ui-button--secondary') as HTMLButtonElement).click();
     fixture.detectChanges();
-    await expect(decision).resolves.toBe(false);
+    await expectAsync(decision).toBeResolvedTo(false);
   });
 });

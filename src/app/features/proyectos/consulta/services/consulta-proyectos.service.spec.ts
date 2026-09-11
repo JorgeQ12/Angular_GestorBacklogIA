@@ -45,10 +45,12 @@ describe('ConsultaProyectosService', () => {
     expect(solicitud.request.params.get('paginaTamano')).toBe('10');
     solicitud.flush(crearResultado(PAGINA_DTO));
 
-    await expect(respuesta).resolves.toMatchObject({
-      totalRegistros: 1,
-      proyectos: [{ id: 42, nombre: 'Portal de clientes' }],
-    });
+    await expectAsync(respuesta).toBeResolvedTo(
+      jasmine.objectContaining({
+        totalRegistros: 1,
+        proyectos: [jasmine.objectContaining({ id: 42, nombre: 'Portal de clientes' })],
+      }),
+    );
   });
 
   it('omite los filtros vacíos en lugar de enviarlos como parámetros', () => {
@@ -93,7 +95,7 @@ describe('ConsultaProyectosService', () => {
       errores: null,
     } satisfies ResultadoApi<PaginadoDto<ResumenProyectoDto>>);
 
-    await expect(respuesta).rejects.toThrow('No fue posible consultar los proyectos.');
+    await expectAsync(respuesta).toBeRejectedWithError('No fue posible consultar los proyectos.');
   });
 });
 

@@ -6,12 +6,12 @@ import { ElementoPlanificacionService } from './elemento-planificacion.service';
 import { GanttPlanificacionService } from './gantt-planificacion.service';
 
 describe('GanttPlanificacionService', () => {
-  const obtener = vi.fn();
+  const obtener = jasmine.createSpy('obtener');
   let servicio: GanttPlanificacionService;
 
   beforeEach(() => {
-    obtener.mockReset();
-    obtener.mockImplementation((tipo: DetalleElementoPlanificacion['tipo'], id: number) =>
+    obtener.calls.reset();
+    obtener.and.callFake((tipo: DetalleElementoPlanificacion['tipo'], id: number) =>
       of(crearDetalle(tipo, id)),
     );
     TestBed.configureTestingModule({
@@ -27,15 +27,17 @@ describe('GanttPlanificacionService', () => {
     let resultado: unknown;
     servicio.obtener(PLANIFICACION).subscribe((datos) => (resultado = datos));
 
-    expect(obtener).toHaveBeenNthCalledWith(1, TipoElementoPlanificacion.Epica, 1, null);
-    expect(obtener).toHaveBeenNthCalledWith(2, TipoElementoPlanificacion.Caracteristica, 2, null);
-    expect(resultado).toMatchObject({
-      proyectoId: 42,
-      elementos: [
-        { clave: 'epica:1', orden: 0 },
-        { clave: 'caracteristica:2', orden: 1 },
-      ],
-    });
+    expect(obtener.calls.argsFor(0)).toEqual([TipoElementoPlanificacion.Epica, 1, null]);
+    expect(obtener.calls.argsFor(1)).toEqual([TipoElementoPlanificacion.Caracteristica, 2, null]);
+    expect(resultado).toEqual(
+      jasmine.objectContaining({
+        proyectoId: 42,
+        elementos: [
+          jasmine.objectContaining({ clave: 'epica:1', orden: 0 }),
+          jasmine.objectContaining({ clave: 'caracteristica:2', orden: 1 }),
+        ],
+      }),
+    );
   });
 
   it('solicita la fotografía histórica al consultar sus detalles', () => {

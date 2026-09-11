@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { of, Subject, throwError } from 'rxjs';
 import { MensajesService } from '../../../../core/mensajes/services/mensajes.service';
 import { NotificadorErroresApiService } from '../../../../core/mensajes/services/notificador-errores-api.service';
-import { Catalogo } from '../../models/catalogo.model';
+import { Catalogo, DatosCatalogo, ValorCatalogo } from '../../models/catalogo.model';
 import { AdministracionCatalogosService } from '../../services/administracion-catalogos.service';
 import { PaginaCatalogos } from './pagina-catalogos';
 
@@ -24,26 +24,35 @@ describe('Página de catálogos', () => {
     catalogoTipoNombre: 'Áreas',
   };
   const api = {
-    obtenerTipos: vi.fn(),
-    obtenerValores: vi.fn(),
-    guardarTipo: vi.fn(),
-    guardarValor: vi.fn(),
-    inactivarTipo: vi.fn(),
-    inactivarValor: vi.fn(),
+    obtenerTipos: jasmine.createSpy('obtenerTipos'),
+    obtenerValores: jasmine.createSpy('obtenerValores'),
+    guardarTipo: jasmine.createSpy('guardarTipo'),
+    guardarValor: jasmine.createSpy('guardarValor'),
+    inactivarTipo: jasmine.createSpy('inactivarTipo'),
+    inactivarValor: jasmine.createSpy('inactivarValor'),
   };
-  const comunicar = vi.fn();
-  const confirmar = vi.fn();
+  const comunicar = jasmine.createSpy('comunicar');
+  const confirmar = jasmine.createSpy('confirmar');
+  const exito = jasmine.createSpy('exito');
   beforeEach(() => {
-    vi.resetAllMocks();
-    api.obtenerTipos.mockReturnValue(
+    api.obtenerTipos.calls.reset();
+    api.obtenerValores.calls.reset();
+    api.guardarTipo.calls.reset();
+    api.guardarValor.calls.reset();
+    api.inactivarTipo.calls.reset();
+    api.inactivarValor.calls.reset();
+    comunicar.calls.reset();
+    confirmar.calls.reset();
+    exito.calls.reset();
+    api.obtenerTipos.and.returnValue(
       of([tipo, { ...tipo, id: 52, nombre: 'Archivados', activo: false }]),
     );
-    api.obtenerValores.mockReturnValue(of([valor]));
+    api.obtenerValores.and.returnValue(of([valor]));
     TestBed.configureTestingModule({
       providers: [
         { provide: AdministracionCatalogosService, useValue: api },
         { provide: NotificadorErroresApiService, useValue: { comunicar } },
-        { provide: MensajesService, useValue: { exito: vi.fn(), confirmarDestructiva: confirmar } },
+        { provide: MensajesService, useValue: { exito, confirmarDestructiva: confirmar } },
       ],
     });
   });
@@ -63,7 +72,7 @@ describe('Página de catálogos', () => {
     expect(f.nativeElement.textContent).toContain('areas_logistica');
     expect(f.nativeElement.textContent).toContain('Logística');
     expect(f.nativeElement.textContent).toContain('Archivados');
-    expect(root.querySelectorAll('.ui-table__action-group .ui-button--secondary')).toHaveLength(2);
+    expect(root.querySelectorAll('.ui-table__action-group .ui-button--secondary').length).toBe(2);
     expect(root.querySelector('.ui-table app-indicador-estado')).not.toBeNull();
   });
 
@@ -76,7 +85,7 @@ describe('Página de catálogos', () => {
 
     expect(root.querySelector('.catalogos__total')?.textContent?.trim()).toBe('2 en total');
     expect(root.textContent).toContain('Selecciona uno para administrarlo');
-    expect(resumenes).toEqual(expect.arrayContaining(['1 opción activa', '0 opciones activas']));
+    expect(resumenes).toEqual(jasmine.arrayContaining(['1 opción activa', '0 opciones activas']));
     expect(root.querySelector('.catalogos__tipo-descripcion')).toBeNull();
     expect(root.querySelector('[aria-label="Actualizar catálogos"]')).toBeNull();
   });
@@ -88,7 +97,7 @@ describe('Página de catálogos', () => {
     const pie = f.nativeElement.querySelector('.catalogos__detalle-panel .catalogos__pie');
 
     expect(encabezado.querySelector('app-campo-busqueda')).toBeNull();
-    expect(acciones).toHaveLength(3);
+    expect(acciones.length).toBe(3);
     expect(Array.from(acciones).map((accion) => accion.textContent?.trim())).toEqual([
       'Editar',
       'Desactivar',
@@ -99,7 +108,10 @@ describe('Página de catálogos', () => {
   });
 
   it('distingue error de consulta y permite reintentar', () => {
-    api.obtenerTipos.mockReturnValueOnce(throwError(() => new Error('fallo')));
+    api.obtenerTipos.and.returnValues(
+      throwError(() => new Error('fallo')),
+      of([tipo, { ...tipo, id: 52, nombre: 'Archivados', activo: false }]),
+    );
     const f = crear();
     const root = f.nativeElement as HTMLElement;
     const error = root.querySelector<HTMLElement>('app-estado-error');
@@ -119,7 +131,7 @@ describe('Página de catálogos', () => {
   });
   it('conserva la edición al fallar y evita enviar dos veces mientras guarda', () => {
     const pendiente = new Subject<Catalogo>();
-    api.guardarTipo.mockReturnValue(pendiente);
+    api.guardarTipo.and.returnValue(pendiente);
     const f = crear();
     pulsar(f.nativeElement, 'Crear catálogo');
     f.detectChanges();
@@ -139,7 +151,7 @@ describe('Página de catálogos', () => {
     expect(comunicar).toHaveBeenCalledTimes(1);
   });
   it('actualiza la fotografía confirmada y cierra el editor después del éxito', () => {
-    api.guardarTipo.mockReturnValue(of({ ...tipo, id: 60, nombre: 'Nuevo' }));
+    api.guardarTipo.and.returnValue(of({ ...tipo, id: 60, nombre: 'Nuevo' }));
     const f = crear();
     pulsar(f.nativeElement, 'Crear catálogo');
     f.detectChanges();
@@ -154,7 +166,7 @@ describe('Página de catálogos', () => {
   });
   it('no ejecuta una confirmación pendiente después de abandonar la página', async () => {
     let resolver!: (valor: boolean) => void;
-    confirmar.mockReturnValue(new Promise<boolean>((r) => (resolver = r)));
+    confirmar.and.returnValue(new Promise<boolean>((r) => (resolver = r)));
     const f = crear();
     pulsarEtiqueta(f.nativeElement, 'Desactivar Áreas');
     f.detectChanges();
@@ -166,11 +178,191 @@ describe('Página de catálogos', () => {
   });
   it('cancela la consulta al destruir la página', () => {
     const consulta = new Subject<Catalogo[]>();
-    api.obtenerTipos.mockReturnValue(consulta);
+    api.obtenerTipos.and.returnValue(consulta);
     const f = crear();
     expect(consulta.observed).toBe(true);
     f.destroy();
     expect(consulta.observed).toBe(false);
+  });
+
+  it('cambia el catálogo seleccionado al elegir otro tipo del aside', () => {
+    const f = crear();
+    const componente = f.componentInstance as unknown as {
+      seleccionar: (tipo: Catalogo) => void;
+      seleccionado: () => Catalogo | null;
+    };
+
+    componente.seleccionar({ ...tipo, id: 52, nombre: 'Archivados', activo: false });
+    f.detectChanges();
+
+    expect(componente.seleccionado()?.id).toBe(52);
+  });
+
+  it('ignora la selección de un tipo mientras un editor está abierto', () => {
+    const f = crear();
+    const componente = f.componentInstance as unknown as {
+      abrirTipo: (entidad?: Catalogo | null) => void;
+      seleccionar: (tipo: Catalogo) => void;
+      seleccionado: () => Catalogo | null;
+    };
+
+    componente.abrirTipo();
+    componente.seleccionar({ ...tipo, id: 52, nombre: 'Archivados', activo: false });
+
+    expect(componente.seleccionado()?.id).toBe(51);
+  });
+
+  it('no abre un editor de opción cuando el catálogo seleccionado está inactivo', () => {
+    api.obtenerTipos.and.returnValue(of([{ ...tipo, activo: false }]));
+    const f = crear();
+    const componente = f.componentInstance as unknown as {
+      abrirValor: (entidad?: ValorCatalogo | null) => void;
+      editor: () => unknown;
+    };
+
+    componente.abrirValor(null);
+
+    expect(componente.editor()).toBeNull();
+  });
+
+  it('abre el editor de una opción existente aunque el catálogo esté inactivo', () => {
+    api.obtenerTipos.and.returnValue(of([{ ...tipo, activo: false }]));
+    const f = crear();
+    const componente = f.componentInstance as unknown as {
+      abrirValor: (entidad?: ValorCatalogo | null) => void;
+      editor: () => { clase: unknown; entidad: unknown } | null;
+    };
+
+    componente.abrirValor(valor);
+
+    expect(componente.editor()).not.toBeNull();
+    expect(componente.editor()?.entidad).toEqual(valor);
+  });
+
+  it('no cierra el editor mientras hay una operación en curso', () => {
+    const pendiente = new Subject<Catalogo>();
+    api.guardarTipo.and.returnValue(pendiente);
+    const f = crear();
+    const componente = f.componentInstance as unknown as {
+      abrirTipo: (entidad?: Catalogo | null) => void;
+      guardar: (datos: DatosCatalogo) => void;
+      cerrarEditor: () => void;
+      editor: () => unknown;
+    };
+
+    componente.abrirTipo();
+    componente.guardar({ codigo: 'x', nombre: 'X', descripcion: '' } as DatosCatalogo);
+    componente.cerrarEditor();
+
+    expect(componente.editor()).not.toBeNull();
+    pendiente.complete();
+  });
+
+  it('reemplaza la opción guardada dentro del catálogo seleccionado', () => {
+    api.guardarValor.and.returnValue(of({ ...valor, nombre: 'Logística norte' }));
+    const f = crear();
+    const componente = f.componentInstance as unknown as {
+      abrirValor: (entidad?: ValorCatalogo | null) => void;
+      guardar: (datos: DatosCatalogo) => void;
+      valoresSeleccionados: () => ValorCatalogo[];
+    };
+
+    componente.abrirValor(valor);
+    componente.guardar({ codigo: valor.codigo, nombre: 'Logística norte', descripcion: '' } as DatosCatalogo);
+    f.detectChanges();
+
+    expect(componente.valoresSeleccionados()[0].nombre).toBe('Logística norte');
+    expect(exito).toHaveBeenCalled();
+  });
+
+  it('desactiva un catálogo activo solo cuando se confirma la acción', async () => {
+    confirmar.and.returnValue(Promise.resolve(true));
+    api.inactivarTipo.and.returnValue(of({ ...tipo, activo: false }));
+    const f = crear();
+    const componente = f.componentInstance as unknown as {
+      cambiarEstadoTipo: (tipo: Catalogo) => Promise<void>;
+    };
+
+    await componente.cambiarEstadoTipo(tipo);
+
+    expect(confirmar).toHaveBeenCalledTimes(1);
+    expect(api.inactivarTipo).toHaveBeenCalledWith(tipo.id);
+  });
+
+  it('no desactiva el catálogo cuando la confirmación se rechaza', async () => {
+    confirmar.and.returnValue(Promise.resolve(false));
+    const f = crear();
+    const componente = f.componentInstance as unknown as {
+      cambiarEstadoTipo: (tipo: Catalogo) => Promise<void>;
+    };
+
+    await componente.cambiarEstadoTipo(tipo);
+
+    expect(api.inactivarTipo).not.toHaveBeenCalled();
+  });
+
+  it('reactiva un catálogo inactivo sin pedir confirmación', async () => {
+    api.guardarTipo.and.returnValue(of({ ...tipo, activo: true }));
+    const f = crear();
+    const inactivo = { ...tipo, id: 52, nombre: 'Archivados', activo: false };
+    const componente = f.componentInstance as unknown as {
+      cambiarEstadoTipo: (tipo: Catalogo) => Promise<void>;
+    };
+
+    await componente.cambiarEstadoTipo(inactivo);
+
+    expect(confirmar).not.toHaveBeenCalled();
+    expect(api.guardarTipo).toHaveBeenCalledWith(inactivo, inactivo, true);
+  });
+
+  it('reactiva una opción inactiva directamente y confirma la inactivación de una activa', async () => {
+    confirmar.and.returnValue(Promise.resolve(true));
+    api.inactivarValor.and.returnValue(of({ ...valor, activo: false }));
+    api.guardarValor.and.returnValue(of({ ...valor, activo: true }));
+    const f = crear();
+    const componente = f.componentInstance as unknown as {
+      cambiarEstadoValor: (valor: ValorCatalogo) => Promise<void>;
+    };
+
+    await componente.cambiarEstadoValor(valor);
+    expect(confirmar).toHaveBeenCalledTimes(1);
+    expect(api.inactivarValor).toHaveBeenCalledWith(valor.id);
+
+    const inactivo = { ...valor, activo: false };
+    await componente.cambiarEstadoValor(inactivo);
+    expect(api.guardarValor).toHaveBeenCalledWith(inactivo, inactivo.catalogoTipoId, inactivo, true);
+  });
+
+  it('descarta una confirmación de opción resuelta después de destruir la página', async () => {
+    let resolver!: (valor: boolean) => void;
+    confirmar.and.returnValue(new Promise<boolean>((r) => (resolver = r)));
+    const f = crear();
+    const componente = f.componentInstance as unknown as {
+      cambiarEstadoValor: (valor: ValorCatalogo) => Promise<void>;
+    };
+
+    const pendiente = componente.cambiarEstadoValor(valor);
+    f.destroy();
+    resolver(true);
+    await pendiente;
+
+    expect(api.inactivarValor).not.toHaveBeenCalled();
+  });
+
+  it('notifica el error cuando la mutación de guardado falla', () => {
+    api.guardarTipo.and.returnValue(throwError(() => new Error('conflicto')));
+    const f = crear();
+    const componente = f.componentInstance as unknown as {
+      abrirTipo: (entidad?: Catalogo | null) => void;
+      guardar: (datos: DatosCatalogo) => void;
+      editor: () => unknown;
+    };
+
+    componente.abrirTipo();
+    componente.guardar({ codigo: 'x', nombre: 'X', descripcion: '' } as DatosCatalogo);
+
+    expect(comunicar).toHaveBeenCalledTimes(1);
+    expect(componente.editor()).not.toBeNull();
   });
 });
 function pulsar(root: HTMLElement, texto: string) {

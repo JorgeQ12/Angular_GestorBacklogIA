@@ -1,4 +1,3 @@
-import { describe, expect, it } from 'vitest';
 import {
   AccionPermisoModulo,
   FlujoProyecto,
@@ -20,8 +19,8 @@ describe('sincronizarRolesDelFlujo', () => {
     );
 
     expect(resultado.roles).toEqual([
-      expect.objectContaining({ nombre: 'Administrador', fechaCreacion: FECHA }),
-      expect.objectContaining({ nombre: 'Consulta', fechaCreacion: FECHA }),
+      jasmine.objectContaining({ nombre: 'Administrador', fechaCreacion: FECHA }),
+      jasmine.objectContaining({ nombre: 'Consulta', fechaCreacion: FECHA }),
     ]);
     expect(resultado.roles[0].id).toMatch(/^rol-proyecto-/);
     expect(resultado.roles[1].id).not.toBe(resultado.roles[0].id);
@@ -40,13 +39,13 @@ describe('sincronizarRolesDelFlujo', () => {
       { id: 'rol-administrador', nombre: 'administrador', fechaCreacion: FECHA },
     ]);
     expect(resultado.nodos[0].idsRoles).toEqual(['rol-administrador']);
-    expect(resultado.nodos[0]).toMatchObject({
-      datos: {
+    expect(resultado.nodos[0]).toEqual(jasmine.objectContaining({
+      datos: jasmine.objectContaining({
         permisosRoles: [
           { idRol: 'rol-administrador', permisos: [AccionPermisoModulo.Ver] },
         ],
-      },
-    });
+      }),
+    }));
   });
 });
 

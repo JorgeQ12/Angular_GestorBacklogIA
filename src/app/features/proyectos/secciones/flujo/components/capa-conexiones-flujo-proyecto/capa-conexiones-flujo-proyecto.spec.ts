@@ -7,7 +7,7 @@ import { CapaConexionesFlujoProyecto } from './capa-conexiones-flujo-proyecto';
 describe('CapaConexionesFlujoProyecto', () => {
   let fixture: ComponentFixture<CapaConexionesFlujoProyecto>;
   const soloLectura = signal(false);
-  const seleccionarConexion = vi.fn();
+  const seleccionarConexion = jasmine.createSpy('seleccionarConexion');
   const estado = {
     tamanoLienzo: { ancho: 1200, alto: 800 },
     bloquesVisibles: signal([
@@ -27,12 +27,12 @@ describe('CapaConexionesFlujoProyecto', () => {
     idConexionSeleccionada: signal<string | null>(null).asReadonly(),
     soloLectura: soloLectura.asReadonly(),
     seleccionarConexion,
-    eliminarConexion: vi.fn(),
+    eliminarConexion: jasmine.createSpy('eliminarConexion'),
   };
 
   beforeEach(async () => {
     soloLectura.set(false);
-    seleccionarConexion.mockClear();
+    seleccionarConexion.calls.reset();
     await TestBed.configureTestingModule({
       imports: [CapaConexionesFlujoProyecto],
       providers: [{ provide: EstadoEditorFlujoProyectoService, useValue: estado }],

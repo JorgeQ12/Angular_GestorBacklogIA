@@ -15,20 +15,23 @@ import { EstadoPlanificacionProyectoService } from './estado-planificacion-proye
 
 describe('EstadoEliminacionRequisitosPlanificacionService', () => {
   const planificacion = signal<PlanificacionProyecto | null>(PLANIFICACION);
-  const api = { eliminar: vi.fn() };
+  const api = { eliminar: jasmine.createSpy('eliminar') };
   const mensajes = {
-    confirmarDestructiva: vi.fn(),
-    exito: vi.fn(),
+    confirmarDestructiva: jasmine.createSpy('confirmarDestructiva'),
+    exito: jasmine.createSpy('exito'),
   };
-  const notificador = { comunicar: vi.fn() };
+  const notificador = { comunicar: jasmine.createSpy('comunicar') };
   let servicio: EstadoEliminacionRequisitosPlanificacionService;
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    api.eliminar.calls.reset();
+    mensajes.confirmarDestructiva.calls.reset();
+    mensajes.exito.calls.reset();
+    notificador.comunicar.calls.reset();
     planificacion.set(PLANIFICACION);
-    api.eliminar.mockReturnValue(of({ elementoId: 501, totalInactivados: 2 }));
-    mensajes.confirmarDestructiva.mockResolvedValue(true);
-    mensajes.exito.mockResolvedValue(undefined);
+    api.eliminar.and.returnValue(of({ elementoId: 501, totalInactivados: 2 }));
+    mensajes.confirmarDestructiva.and.returnValue(Promise.resolve(true));
+    mensajes.exito.and.returnValue(Promise.resolve(undefined));
     TestBed.configureTestingModule({
       providers: [
         EstadoEliminacionRequisitosPlanificacionService,
@@ -45,7 +48,7 @@ describe('EstadoEliminacionRequisitosPlanificacionService', () => {
   });
 
   it('confirma y elimina la actividad con su versión vigente', async () => {
-    const actualizarArbol = vi.fn();
+    const actualizarArbol = jasmine.createSpy('actualizarArbol');
 
     await servicio.eliminar(ACTIVIDAD, actualizarArbol);
 
@@ -58,7 +61,7 @@ describe('EstadoEliminacionRequisitosPlanificacionService', () => {
       501,
       4,
     );
-    expect(actualizarArbol).toHaveBeenCalledOnce();
+    expect(actualizarArbol).toHaveBeenCalledTimes(1);
     expect(mensajes.exito).toHaveBeenCalledWith(
       'Actividad eliminada',
       'La actividad quedó disponible como histórica de solo lectura.',
@@ -75,7 +78,7 @@ describe('EstadoEliminacionRequisitosPlanificacionService', () => {
       titulo: 'Cobertura funcional',
     };
 
-    await servicio.eliminar(caracteristica, vi.fn());
+    await servicio.eliminar(caracteristica, jasmine.createSpy('actualizarArbol'));
 
     expect(mensajes.confirmarDestructiva).toHaveBeenCalledWith(
       'Eliminar característica',
@@ -85,9 +88,9 @@ describe('EstadoEliminacionRequisitosPlanificacionService', () => {
   });
 
   it('no elimina cuando el usuario cancela la confirmación', async () => {
-    mensajes.confirmarDestructiva.mockResolvedValueOnce(false);
+    mensajes.confirmarDestructiva.and.returnValue(Promise.resolve(false));
 
-    await servicio.eliminar(TAREA, vi.fn());
+    await servicio.eliminar(TAREA, jasmine.createSpy('actualizarArbol'));
 
     expect(api.eliminar).not.toHaveBeenCalled();
   });
@@ -98,7 +101,7 @@ describe('EstadoEliminacionRequisitosPlanificacionService', () => {
         ...TAREA,
         capacidades: { ...TAREA.capacidades, puedeEliminar: false },
       },
-      vi.fn(),
+      jasmine.createSpy('actualizarArbol'),
     );
 
     expect(mensajes.confirmarDestructiva).not.toHaveBeenCalled();
@@ -106,16 +109,16 @@ describe('EstadoEliminacionRequisitosPlanificacionService', () => {
   });
 
   it('actualiza el árbol y comunica un conflicto de versión', async () => {
-    const actualizarArbol = vi.fn();
+    const actualizarArbol = jasmine.createSpy('actualizarArbol');
     const error = new HttpErrorResponse({ status: 409 });
-    api.eliminar.mockReturnValueOnce(throwError(() => error));
+    api.eliminar.and.returnValue(throwError(() => error));
 
     await servicio.eliminar(TAREA, actualizarArbol);
 
-    expect(actualizarArbol).toHaveBeenCalledOnce();
+    expect(actualizarArbol).toHaveBeenCalledTimes(1);
     expect(notificador.comunicar).toHaveBeenCalledWith(
       error,
-      expect.objectContaining({ titulo: 'No fue posible eliminar el elemento' }),
+      jasmine.objectContaining({ titulo: 'No fue posible eliminar el elemento' }),
     );
     expect(servicio.eliminando()).toBe(false);
   });
@@ -129,7 +132,7 @@ describe('EstadoEliminacionRequisitosPlanificacionService', () => {
       capacidades: { ...TAREA.capacidades, puedeEliminar: true },
     };
 
-    await servicio.eliminar(lista, vi.fn());
+    await servicio.eliminar(lista, jasmine.createSpy('actualizarArbol'));
 
     expect(mensajes.confirmarDestructiva).toHaveBeenCalledWith(
       'Eliminar lista de requisitos',

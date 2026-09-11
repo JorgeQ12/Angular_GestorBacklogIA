@@ -16,13 +16,13 @@ describe('sesionGuard', () => {
   const sesion = signal<SesionUsuario | null>(null);
   const autenticacion = {
     sesionActual: sesion.asReadonly(),
-    verificarSesion: vi.fn(() => of({ nombre: 'Jorge' })),
+    verificarSesion: jasmine.createSpy('verificarSesion'),
   };
 
   beforeEach(() => {
     sesion.set(null);
-    autenticacion.verificarSesion.mockReset();
-    autenticacion.verificarSesion.mockReturnValue(of({ nombre: 'Jorge' }));
+    autenticacion.verificarSesion.calls.reset();
+    autenticacion.verificarSesion.and.returnValue(of({ nombre: 'Jorge' }));
 
     TestBed.configureTestingModule({
       providers: [provideRouter([]), { provide: AutenticacionService, useValue: autenticacion }],
@@ -40,11 +40,11 @@ describe('sesionGuard', () => {
     const resultado = ejecutarGuard() as Observable<boolean | UrlTree>;
 
     expect(await firstValueFrom(resultado)).toBe(true);
-    expect(autenticacion.verificarSesion).toHaveBeenCalledOnce();
+    expect(autenticacion.verificarSesion).toHaveBeenCalledTimes(1);
   });
 
   it('redirige al inicio cuando Kong rechaza la sesión', async () => {
-    autenticacion.verificarSesion.mockReturnValue(throwError(() => ({ status: 401 })));
+    autenticacion.verificarSesion.and.returnValue(throwError(() => ({ status: 401 })));
     const resultado = ejecutarGuard() as Observable<boolean | UrlTree>;
 
     expect((await firstValueFrom(resultado)).toString()).toBe(URL_INICIO_SESION);

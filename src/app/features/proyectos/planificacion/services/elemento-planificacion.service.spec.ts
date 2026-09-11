@@ -48,11 +48,13 @@ describe('ElementoPlanificacionService', () => {
     expect(solicitud.request.params.has('versionBacklogId')).toBe(false);
     solicitud.flush(crearResultado(TAREA_DTO));
 
-    await expect(respuesta).resolves.toMatchObject({
-      id: 783,
-      tipo: TipoElementoPlanificacion.Tarea,
-      numeroVersion: 2,
-    });
+    await expectAsync(respuesta).toBeResolvedTo(
+      jasmine.objectContaining({
+        id: 783,
+        tipo: TipoElementoPlanificacion.Tarea,
+        numeroVersion: 2,
+      }),
+    );
   });
 
   it('consulta el detalle perteneciente a una versión histórica de la planificación', async () => {
@@ -68,7 +70,7 @@ describe('ElementoPlanificacionService', () => {
     expect(solicitud.request.params.get('versionBacklogId')).toBe('80');
     solicitud.flush(crearResultado({ ...TAREA_DTO, soloLectura: true }));
 
-    await expect(respuesta).resolves.toMatchObject({ id: 783 });
+    await expectAsync(respuesta).toBeResolvedTo(jasmine.objectContaining({ id: 783 }));
   });
 
   it('envía el comando discriminado al crear', async () => {
@@ -91,7 +93,7 @@ describe('ElementoPlanificacionService', () => {
     expect(solicitud.request.body).toEqual(comando);
     solicitud.flush(crearResultado(TAREA_DTO));
 
-    await expect(respuesta).resolves.toMatchObject({ id: 783 });
+    await expectAsync(respuesta).toBeResolvedTo(jasmine.objectContaining({ id: 783 }));
   });
 
   it('envía la versión esperada al actualizar', async () => {
@@ -115,7 +117,7 @@ describe('ElementoPlanificacionService', () => {
     expect(solicitud.request.body).toEqual(comando);
     solicitud.flush(crearResultado(TAREA_DTO));
 
-    await expect(respuesta).resolves.toMatchObject({ id: 783 });
+    await expectAsync(respuesta).toBeResolvedTo(jasmine.objectContaining({ id: 783 }));
   });
 
   it('elimina una actividad de requisito con tipo, identidad y versión en query', async () => {
@@ -136,7 +138,7 @@ describe('ElementoPlanificacionService', () => {
       crearResultadoGenerico({ itemTrabajoId: 501, totalInactivados: 3 }),
     );
 
-    await expect(respuesta).resolves.toEqual({ elementoId: 501, totalInactivados: 3 });
+    await expectAsync(respuesta).toBeResolvedTo({ elementoId: 501, totalInactivados: 3 });
   });
 
   it('consulta una página histórica sin enviar cursor cuando no existe', async () => {
@@ -154,7 +156,7 @@ describe('ElementoPlanificacionService', () => {
     expect(solicitud.request.params.has('cursor')).toBe(false);
     solicitud.flush(crearResultadoGenerico(HISTORIAL_DTO));
 
-    await expect(respuesta).resolves.toEqual({
+    await expectAsync(respuesta).toBeResolvedTo({
       registros: [
         { versionId: 91, numeroVersion: 3, fechaCreacion: '2026-09-02T10:00:00' },
       ],
@@ -177,12 +179,14 @@ describe('ElementoPlanificacionService', () => {
     expect(solicitud.request.params.get('versionId')).toBe('91');
     solicitud.flush(crearResultadoGenerico(VERSION_TAREA_DTO));
 
-    await expect(respuesta).resolves.toMatchObject({
-      tipo: TipoElementoPlanificacion.Tarea,
-      elementoId: 783,
-      versionId: 91,
-      numeroVersion: 3,
-    });
+    await expectAsync(respuesta).toBeResolvedTo(
+      jasmine.objectContaining({
+        tipo: TipoElementoPlanificacion.Tarea,
+        elementoId: 783,
+        versionId: 91,
+        numeroVersion: 3,
+      }),
+    );
   });
   it('serializa la eliminación del contenedor de requisitos', async () => {
     const respuesta = firstValueFrom(servicio.eliminar(TipoElementoPlanificacion.ListaRequisitos, 700, 2));
@@ -193,7 +197,7 @@ describe('ElementoPlanificacionService', () => {
     expect(solicitud.request.params.get('itemTrabajoId')).toBe('700');
     expect(solicitud.request.params.get('numeroVersionEsperada')).toBe('2');
     solicitud.flush(crearResultadoGenerico({ itemTrabajoId: 700, totalInactivados: 5 }));
-    await expect(respuesta).resolves.toEqual({ elementoId: 700, totalInactivados: 5 });
+    await expectAsync(respuesta).toBeResolvedTo({ elementoId: 700, totalInactivados: 5 });
   });
 });
 

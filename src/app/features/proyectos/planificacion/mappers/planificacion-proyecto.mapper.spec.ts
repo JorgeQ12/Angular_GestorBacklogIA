@@ -61,27 +61,31 @@ describe('mapearPlanificacionProyecto', () => {
     const [listaRequisitos, historia] = caracteristica.hijos;
     const actividad = listaRequisitos.hijos[0];
 
-    expect(epica).toMatchObject({
-      clave: 'epica:1',
-      tipo: TipoElementoPlanificacion.Epica,
-      vinculadaAzure: true,
-      capacidades: {
+    expect(epica).toEqual(
+      jasmine.objectContaining({
+        clave: 'epica:1',
+        tipo: TipoElementoPlanificacion.Epica,
+        vinculadaAzure: true,
+        capacidades: jasmine.objectContaining({
+          puedeEditar: true,
+          puedeEliminar: true,
+          puedeCrearHijo: true,
+          puedeSincronizar: true,
+          soloLectura: false,
+        }),
+      }),
+    );
+    expect(caracteristica.tipo).toBe(TipoElementoPlanificacion.Caracteristica);
+    expect(listaRequisitos.tipo).toBe(TipoElementoPlanificacion.ListaRequisitos);
+    expect(listaRequisitos.capacidades).toEqual(
+      jasmine.objectContaining({
+        puedeConsultar: true,
         puedeEditar: true,
         puedeEliminar: true,
         puedeCrearHijo: true,
-        puedeSincronizar: true,
         soloLectura: false,
-      },
-    });
-    expect(caracteristica.tipo).toBe(TipoElementoPlanificacion.Caracteristica);
-    expect(listaRequisitos.tipo).toBe(TipoElementoPlanificacion.ListaRequisitos);
-    expect(listaRequisitos.capacidades).toMatchObject({
-      puedeConsultar: true,
-      puedeEditar: true,
-      puedeEliminar: true,
-      puedeCrearHijo: true,
-      soloLectura: false,
-    });
+      }),
+    );
     expect(actividad.tipo).toBe(TipoElementoPlanificacion.ActividadRequisito);
     expect(actividad.capacidades.puedeEliminar).toBe(true);
     expect(actividad.hijos[0].tipo).toBe(TipoElementoPlanificacion.TareaRequisito);
@@ -109,17 +113,21 @@ describe('mapearPlanificacionProyecto', () => {
     const actual = mapearPlanificacionProyecto(dto).elementos[0];
     const historica = mapearPlanificacionProyecto({ ...dto, esHistorica: true }).elementos[0];
 
-    expect(actual.capacidades).toMatchObject({
-      puedeEditar: false,
-      puedeEliminar: false,
-      puedeCrearHijo: true,
-      puedeSincronizar: true,
-      soloLectura: true,
-    });
-    expect(historica.capacidades).toMatchObject({
-      puedeCrearHijo: false,
-      puedeSincronizar: false,
-    });
+    expect(actual.capacidades).toEqual(
+      jasmine.objectContaining({
+        puedeEditar: false,
+        puedeEliminar: false,
+        puedeCrearHijo: true,
+        puedeSincronizar: true,
+        soloLectura: true,
+      }),
+    );
+    expect(historica.capacidades).toEqual(
+      jasmine.objectContaining({
+        puedeCrearHijo: false,
+        puedeSincronizar: false,
+      }),
+    );
   });
 });
 

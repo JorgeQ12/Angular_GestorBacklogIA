@@ -11,16 +11,18 @@ import { EstadoHistorialElementoPlanificacionService } from './estado-historial-
 
 describe('EstadoHistorialElementoPlanificacionService', () => {
   const api = {
-    obtenerHistorial: vi.fn(),
-    obtenerVersion: vi.fn(),
+    obtenerHistorial: jasmine.createSpy('obtenerHistorial'),
+    obtenerVersion: jasmine.createSpy('obtenerVersion'),
   };
-  const notificador = { comunicar: vi.fn() };
+  const notificador = { comunicar: jasmine.createSpy('comunicar') };
   let estado: EstadoHistorialElementoPlanificacionService;
 
   beforeEach(() => {
-    vi.clearAllMocks();
-    api.obtenerHistorial.mockReturnValue(of(PRIMERA_PAGINA));
-    api.obtenerVersion.mockReturnValue(of(VERSION_TAREA));
+    api.obtenerHistorial.calls.reset();
+    api.obtenerVersion.calls.reset();
+    notificador.comunicar.calls.reset();
+    api.obtenerHistorial.and.returnValue(of(PRIMERA_PAGINA));
+    api.obtenerVersion.and.returnValue(of(VERSION_TAREA));
     TestBed.configureTestingModule({
       providers: [
         EstadoHistorialElementoPlanificacionService,
@@ -49,36 +51,35 @@ describe('EstadoHistorialElementoPlanificacionService', () => {
   });
 
   it('acumula la página siguiente usando el cursor recibido', () => {
-    api.obtenerHistorial
-      .mockReturnValueOnce(of(PRIMERA_PAGINA))
-      .mockReturnValueOnce(
-        of({
-          registros: [{ versionId: 80, numeroVersion: 2, fechaCreacion: '2026-08-20T10:00:00' }],
-          siguienteCursor: null,
-          hayMas: false,
-        } satisfies HistorialElementoPlanificacion),
-      );
+    api.obtenerHistorial.and.returnValues(
+      of(PRIMERA_PAGINA),
+      of({
+        registros: [{ versionId: 80, numeroVersion: 2, fechaCreacion: '2026-08-20T10:00:00' }],
+        siguienteCursor: null,
+        hayMas: false,
+      } satisfies HistorialElementoPlanificacion),
+    );
     estado.abrir(TipoElementoPlanificacion.Tarea, 783);
 
     estado.cargarMas();
 
-    expect(api.obtenerHistorial).toHaveBeenLastCalledWith(
+    expect(api.obtenerHistorial.calls.mostRecent().args).toEqual([
       TipoElementoPlanificacion.Tarea,
       783,
       3,
-    );
+    ]);
     expect(estado.registros().map((version) => version.numeroVersion)).toEqual([3, 2]);
     expect(estado.hayMas()).toBe(false);
   });
 
   it('distingue el error del historial de una colección vacía válida', () => {
-    api.obtenerHistorial.mockReturnValue(throwError(() => new Error('sin conexión')));
+    api.obtenerHistorial.and.returnValue(throwError(() => new Error('sin conexión')));
 
     estado.abrir(TipoElementoPlanificacion.Tarea, 783);
 
     expect(estado.errorHistorial()).toBe(true);
     expect(estado.registros()).toEqual([]);
-    expect(notificador.comunicar).toHaveBeenCalledOnce();
+    expect(notificador.comunicar).toHaveBeenCalledTimes(1);
   });
 });
 

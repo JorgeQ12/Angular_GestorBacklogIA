@@ -25,7 +25,7 @@ describe('ModalNodoFlujoProyecto', () => {
 
     elemento.querySelector('form')?.dispatchEvent(new Event('submit'));
 
-    expect(estado.flujo().nodos).toHaveLength(0);
+    expect(estado.flujo().nodos.length).toBe(0);
   });
 
   it('normaliza y crea la decisión después de completar sus campos obligatorios', () => {
@@ -36,13 +36,67 @@ describe('ModalNodoFlujoProyecto', () => {
       .querySelector('form')
       ?.dispatchEvent(new Event('submit'));
 
-    expect(estado.flujo().nodos[0]).toMatchObject({
-      tipo: TipoBloqueFlujo.Decision,
-      titulo: '¿La solicitud es válida?',
-      descripcion: 'Evalúa la información.',
-      criteriosAceptacion: ['Dirige a Sí o No.'],
-      idsRoles: [],
-    });
+    expect(estado.flujo().nodos[0]).toEqual(
+      jasmine.objectContaining({
+        tipo: TipoBloqueFlujo.Decision,
+        titulo: '¿La solicitud es válida?',
+        descripcion: 'Evalúa la información.',
+        criteriosAceptacion: ['Dirige a Sí o No.'],
+        idsRoles: [],
+      }),
+    );
+  });
+
+  it('cancela el borrador al cerrar el modal', () => {
+    const cancelar = spyOn(estado, 'cancelarBorradorNodo');
+
+    (fixture.componentInstance as unknown as { cerrar: () => void }).cerrar();
+
+    expect(cancelar).toHaveBeenCalled();
+  });
+
+  it('presenta los textos de creación mientras se crea un bloque', () => {
+    const componente = fixture.componentInstance as unknown as {
+      encabezadoModal: () => string;
+      textoAccionPrincipal: () => string;
+      tituloModal: () => string;
+      descripcionModal: () => string;
+      etiquetaTipo: () => string;
+      descripcionTipo: () => string;
+    };
+
+    expect(componente.encabezadoModal()).toBe('Nuevo bloque del flujo');
+    expect(componente.textoAccionPrincipal()).toBe('Crear bloque');
+    expect(componente.tituloModal()).toContain('Configurar');
+    expect(componente.descripcionModal()).toContain('Completa');
+    expect(componente.etiquetaTipo()).not.toBe('');
+    expect(componente.descripcionTipo()).not.toBe('');
+  });
+
+  it('presenta los textos de edición al abrir un bloque existente', () => {
+    escribir('#flujo-decision-titulo', '¿Es válida?');
+    escribir('#flujo-descripcion', 'Evalúa.');
+    escribir('#flujo-criterio-0', 'Sí o No.');
+    (fixture.nativeElement as HTMLElement).querySelector('form')?.dispatchEvent(new Event('submit'));
+    fixture.detectChanges();
+
+    const idNodo = estado.flujo().nodos[0].id;
+    estado.abrirEditorNodo(idNodo);
+    fixture.detectChanges();
+
+    const componente = fixture.componentInstance as unknown as {
+      encabezadoModal: () => string;
+      textoAccionPrincipal: () => string;
+      tituloModal: () => string;
+      descripcionModal: () => string;
+      formulario: () => { getRawValue: () => { titulo: string } };
+    };
+
+    expect(componente.encabezadoModal()).toBe('Edición del bloque');
+    expect(componente.textoAccionPrincipal()).toBe('Guardar cambios');
+    expect(componente.tituloModal()).toContain('Editar');
+    expect(componente.descripcionModal()).toContain('Actualiza');
+    expect(componente.formulario().getRawValue().titulo).toBe('¿Es válida?');
   });
 
   function escribir(selector: string, valor: string): void {

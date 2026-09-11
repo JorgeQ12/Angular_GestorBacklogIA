@@ -14,7 +14,7 @@ describe('BorradoresRecientes', () => {
   });
 
   it('presenta el avance real y emite el borrador que se desea continuar', () => {
-    const continuar = vi.fn();
+    const continuar = jasmine.createSpy('continuar');
     fixture.componentInstance.continuarBorrador.subscribe(continuar);
     const boton = (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>(
       '.borrador-reciente',

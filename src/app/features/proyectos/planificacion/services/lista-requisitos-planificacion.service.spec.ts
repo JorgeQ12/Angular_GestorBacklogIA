@@ -27,9 +27,9 @@ describe('ListaRequisitosPlanificacionService', () => {
     expect(solicitud.request.params.get('proyectoId')).toBe('42');
     solicitud.flush(resultado({ requisitos: [requisitoDto(2, 2), requisitoDto(1, 1)] }));
 
-    await expect(respuesta).resolves.toEqual([
-      expect.objectContaining({ id: 1, orden: 1 }),
-      expect.objectContaining({ id: 2, orden: 2 }),
+    await expectAsync(respuesta).toBeResolvedTo([
+      jasmine.objectContaining({ id: 1, orden: 1 }),
+      jasmine.objectContaining({ id: 2, orden: 2 }),
     ]);
   });
 
@@ -56,7 +56,9 @@ describe('ListaRequisitosPlanificacionService', () => {
     expect(solicitud.request.body).toEqual({ proyectoId: 42, ...cuerpo });
     solicitud.flush(resultado(requisitoDto(9, 3)));
 
-    await expect(respuesta).resolves.toMatchObject({ id: 9, codigo: 'REQ-9' });
+    await expectAsync(respuesta).toBeResolvedTo(
+      jasmine.objectContaining({ id: 9, codigo: 'REQ-9' }),
+    );
   });
 
   it('actualiza las decisiones editables del requisito', async () => {
@@ -74,7 +76,7 @@ describe('ListaRequisitosPlanificacionService', () => {
     expect(solicitud.request.body).toEqual({ proyectoId: 42, requisitoId: 9, ...cuerpo });
     solicitud.flush(resultado(null));
 
-    await expect(respuesta).resolves.toBeUndefined();
+    await expectAsync(respuesta).toBeResolvedTo(undefined);
   });
 
   it('propaga un error funcional al actualizar aunque la respuesta HTTP sea exitosa', async () => {
@@ -95,7 +97,7 @@ describe('ListaRequisitosPlanificacionService', () => {
       errores: ['El requisito no pertenece al proyecto.'],
     });
 
-    await expect(respuesta).rejects.toThrow('El requisito no pertenece al proyecto.');
+    await expectAsync(respuesta).toBeRejectedWithError('El requisito no pertenece al proyecto.');
   });
 });
 

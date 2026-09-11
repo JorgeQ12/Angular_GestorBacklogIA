@@ -13,13 +13,13 @@ describe('RecorridoProyecto', () => {
 
   it('presenta el catálogo completo del proyecto', () => {
     fixture.detectChanges();
-    expect(fixture.nativeElement.querySelectorAll('li')).toHaveLength(PASOS_PROYECTO.length);
+    expect(fixture.nativeElement.querySelectorAll('li').length).toBe(PASOS_PROYECTO.length);
   });
 
   it('emite solamente pasos habilitados', () => {
     const siguiente = PASOS_PROYECTO[1].clave;
     fixture.componentRef.setInput('pasosNavegables', [siguiente]);
-    let emitido = null;
+    let emitido: unknown = null;
     fixture.componentInstance.pasoSeleccionado.subscribe((paso) => (emitido = paso));
     fixture.detectChanges();
     fixture.nativeElement.querySelectorAll('button')[1].click();

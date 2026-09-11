@@ -14,7 +14,7 @@ describe('IndicadoresProyectos', () => {
 
   it('presenta los cuatro indicadores y deriva los proyectos en seguimiento', () => {
     const elemento = fixture.nativeElement as HTMLElement;
-    expect(elemento.querySelectorAll('.indicador-proyecto')).toHaveLength(4);
+    expect(elemento.querySelectorAll('.indicador-proyecto').length).toBe(4);
     expect(elemento.textContent).toContain('En seguimiento');
     expect(elemento.textContent).toContain('5');
   });

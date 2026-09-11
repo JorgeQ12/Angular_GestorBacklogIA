@@ -10,18 +10,21 @@ import { PlanificacionProyectoService } from './planificacion-proyecto.service';
 
 describe('EstadoPublicacionAzurePlanificacionService', () => {
   const planificacion = signal<PlanificacionProyecto | null>(PLANIFICACION);
-  const api = { publicarEnAzure: vi.fn() };
+  const api = { publicarEnAzure: jasmine.createSpy('publicarEnAzure') };
   const estadoPlanificacion = { planificacion: planificacion.asReadonly() };
-  const mensajes = { confirmar: vi.fn(), exito: vi.fn() };
-  const notificador = { comunicar: vi.fn() };
+  const mensajes = { confirmar: jasmine.createSpy('confirmar'), exito: jasmine.createSpy('exito') };
+  const notificador = { comunicar: jasmine.createSpy('comunicar') };
   let servicio: EstadoPublicacionAzurePlanificacionService;
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    api.publicarEnAzure.calls.reset();
+    mensajes.confirmar.calls.reset();
+    mensajes.exito.calls.reset();
+    notificador.comunicar.calls.reset();
     planificacion.set(PLANIFICACION);
-    mensajes.confirmar.mockResolvedValue(true);
-    mensajes.exito.mockResolvedValue(undefined);
-    api.publicarEnAzure.mockReturnValue(of(RESULTADO_PUBLICACION));
+    mensajes.confirmar.and.returnValue(Promise.resolve(true));
+    mensajes.exito.and.returnValue(Promise.resolve(undefined));
+    api.publicarEnAzure.and.returnValue(of(RESULTADO_PUBLICACION));
     TestBed.configureTestingModule({
       providers: [
         EstadoPublicacionAzurePlanificacionService,
@@ -39,7 +42,7 @@ describe('EstadoPublicacionAzurePlanificacionService', () => {
 
     expect(mensajes.confirmar).toHaveBeenCalledWith(
       'Publicar en Azure DevOps',
-      expect.stringContaining('work items vigentes'),
+      jasmine.stringContaining('work items vigentes'),
       'Publicar',
     );
     expect(api.publicarEnAzure).toHaveBeenCalledWith(42);
@@ -51,7 +54,7 @@ describe('EstadoPublicacionAzurePlanificacionService', () => {
   });
 
   it('no consulta el backend cuando el usuario cancela', async () => {
-    mensajes.confirmar.mockResolvedValueOnce(false);
+    mensajes.confirmar.and.returnValue(Promise.resolve(false));
 
     await servicio.publicar(42);
 
@@ -82,13 +85,13 @@ describe('EstadoPublicacionAzurePlanificacionService', () => {
 
   it('comunica el error de publicación y libera la operación', async () => {
     const error = new Error('fallo');
-    api.publicarEnAzure.mockReturnValueOnce(throwError(() => error));
+    api.publicarEnAzure.and.returnValue(throwError(() => error));
 
     await servicio.publicar(42);
 
     expect(notificador.comunicar).toHaveBeenCalledWith(
       error,
-      expect.objectContaining({ titulo: 'No fue posible publicar en Azure DevOps' }),
+      jasmine.objectContaining({ titulo: 'No fue posible publicar en Azure DevOps' }),
     );
     expect(servicio.publicando()).toBe(false);
   });

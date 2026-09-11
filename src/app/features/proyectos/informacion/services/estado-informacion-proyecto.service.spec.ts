@@ -9,18 +9,22 @@ import { InformacionProyectoService } from './informacion-proyecto.service';
 
 describe('EstadoInformacionProyectoService', () => {
   const api = {
-    obtenerProyecto: vi.fn(),
-    obtenerVersiones: vi.fn(),
-    obtenerVersion: vi.fn(),
-    actualizarProyecto: vi.fn(),
+    obtenerProyecto: jasmine.createSpy('obtenerProyecto'),
+    obtenerVersiones: jasmine.createSpy('obtenerVersiones'),
+    obtenerVersion: jasmine.createSpy('obtenerVersion'),
+    actualizarProyecto: jasmine.createSpy('actualizarProyecto'),
   };
-  const notificador = { comunicar: vi.fn() };
+  const notificador = { comunicar: jasmine.createSpy('comunicar') };
   let servicio: EstadoInformacionProyectoService;
 
   beforeEach(() => {
-    vi.clearAllMocks();
-    api.obtenerProyecto.mockReturnValue(of(PROYECTO));
-    api.obtenerVersiones.mockReturnValue(
+    api.obtenerProyecto.calls.reset();
+    api.obtenerVersiones.calls.reset();
+    api.obtenerVersion.calls.reset();
+    api.actualizarProyecto.calls.reset();
+    notificador.comunicar.calls.reset();
+    api.obtenerProyecto.and.returnValue(of(PROYECTO));
+    api.obtenerVersiones.and.returnValue(
       of([{ id: 81, numero: 4, fechaCreacion: '2026-09-01', esActual: true }]),
     );
     TestBed.configureTestingModule({
@@ -36,12 +40,12 @@ describe('EstadoInformacionProyectoService', () => {
   it('carga en conjunto el proyecto y su historial', () => {
     servicio.cargar(42, null);
     expect(servicio.proyectoPresentado()).toEqual(PROYECTO);
-    expect(servicio.versiones()).toHaveLength(1);
+    expect(servicio.versiones().length).toBe(1);
     expect(servicio.errorCarga()).toBe(false);
   });
 
   it('distingue una falla de carga', () => {
-    api.obtenerProyecto.mockReturnValueOnce(throwError(() => new Error('fallo')));
+    api.obtenerProyecto.and.returnValue(throwError(() => new Error('fallo')));
     servicio.cargar(42, null);
     expect(servicio.errorCarga()).toBe(true);
     expect(servicio.proyectoPresentado()).toBeNull();
@@ -64,15 +68,15 @@ describe('EstadoInformacionProyectoService', () => {
       seccion: ClaveSeccionProyecto.Contexto,
       datos: proyectoActualizado.contexto,
     } as const;
-    const completado = vi.fn();
-    api.actualizarProyecto.mockReturnValueOnce(of(proyectoActualizado));
+    const completado = jasmine.createSpy('completado');
+    api.actualizarProyecto.and.returnValue(of(proyectoActualizado));
     servicio.cargar(42, null);
 
     servicio.guardar(actualizacion, completado);
 
     expect(servicio.proyectoActual()).toEqual(proyectoActualizado);
     expect(servicio.proyectoPresentado()).toEqual(proyectoActualizado);
-    expect(completado).toHaveBeenCalledOnce();
+    expect(completado).toHaveBeenCalledTimes(1);
   });
 });
 

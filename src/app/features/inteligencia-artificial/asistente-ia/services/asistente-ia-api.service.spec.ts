@@ -135,7 +135,7 @@ describe('AsistenteIAApiService', () => {
   });
 
   it('propaga como error una respuesta funcional sin datos', () => {
-    const error = vi.fn();
+    const error = jasmine.createSpy('error');
     servicio.obtenerConversacion(42).subscribe({ error });
 
     httpTesting
@@ -153,7 +153,7 @@ describe('AsistenteIAApiService', () => {
         errores: null,
       });
 
-    expect(error).toHaveBeenCalledOnce();
+    expect(error).toHaveBeenCalledTimes(1);
   });
 });
 

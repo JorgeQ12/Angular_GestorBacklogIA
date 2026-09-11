@@ -81,11 +81,11 @@ describe('NavegacionPanelService', () => {
       .find((item) => item.id === ClaveItemNavegacionPanel.Proyectos);
 
     expect(proyectos?.subitems).toEqual([
-      expect.objectContaining({
+      jasmine.objectContaining({
         id: ClaveItemNavegacionPanel.InformacionProyecto,
         ruta: '/panel/proyectos/42/informacion',
       }),
-      expect.objectContaining({
+      jasmine.objectContaining({
         id: ClaveItemNavegacionPanel.PlanificacionProyecto,
         ruta: '/panel/proyectos/42/planificacion',
       }),

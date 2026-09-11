@@ -13,7 +13,7 @@ describe('FormularioComponenteFlujoProyecto', () => {
       providers: [
         {
           provide: EstadoEditorFlujoProyectoService,
-          useValue: { roles: signal([]).asReadonly(), obtenerNombreRol: vi.fn() },
+          useValue: { roles: signal([]).asReadonly(), obtenerNombreRol: jasmine.createSpy('obtenerNombreRol') },
         },
       ],
     }).compileComponents();

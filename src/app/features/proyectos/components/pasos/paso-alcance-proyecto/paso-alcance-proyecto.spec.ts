@@ -19,7 +19,7 @@ describe('PasoAlcanceProyecto', () => {
   });
 
   it('envía el formulario desde el footer centralizado de la tarjeta', () => {
-    const guardar = vi.fn();
+    const guardar = jasmine.createSpy();
     fixture.componentInstance.guardar.subscribe(guardar);
     fixture.componentRef.setInput('modo', ModoFormularioProyecto.Edicion);
     fixture.componentRef.setInput('acciones', ACCIONES_CREACION_PASO_PROYECTO);

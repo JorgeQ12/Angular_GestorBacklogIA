@@ -91,13 +91,13 @@ describe('mapeadores de Equipo', () => {
     );
 
     expect(combinado.integrantes).toEqual([
-      expect.objectContaining({
+      jasmine.objectContaining({
         idAzure: 'u1',
         nombre: 'Nombre actualizado',
         perfilTecnicoId: 36,
         dedicacionCodigo: '50',
       }),
-      expect.objectContaining({
+      jasmine.objectContaining({
         idAzure: 'u2',
         perfilTecnicoId: 34,
         dedicacionCodigo: '',

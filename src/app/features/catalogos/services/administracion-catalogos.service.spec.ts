@@ -122,11 +122,11 @@ describe('Administración HTTP de catálogos', () => {
   });
   it('rechaza fallos funcionales aunque incluyan datos y rechaza datos nulos', async () => {
     const respuesta = firstValueFrom(api.obtenerTipos());
-    const rechazo = expect(respuesta).rejects.toBeDefined();
+    const rechazo = expectAsync(respuesta).toBeRejected();
     http.expectOne((r) => r.url === E.obtenerTipos).flush(resultado([tipo], false));
     await rechazo;
     const guardado = firstValueFrom(api.guardarTipo(tipo, null));
-    const sinDatos = expect(guardado).rejects.toBeDefined();
+    const sinDatos = expectAsync(guardado).toBeRejected();
     http.expectOne(E.crearTipo).flush(resultado(null));
     await sinDatos;
   });

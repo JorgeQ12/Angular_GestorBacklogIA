@@ -27,7 +27,7 @@ describe('FormularioObjetivosProyecto', () => {
   });
 
   it('emite los objetivos sin espacios exteriores', () => {
-    const guardar = vi.fn();
+    const guardar = jasmine.createSpy();
     fixture.componentInstance.guardar.subscribe(guardar);
     escribir('#objetivos-general', '  Reducir los tiempos  ');
     escribir('#objetivos-especifico-0', '  Automatizar validaciones  ');
@@ -49,7 +49,7 @@ describe('FormularioObjetivosProyecto', () => {
       fixture.detectChanges();
     }
 
-    expect(obtenerElemento().querySelectorAll('[id^="objetivos-especifico-"]')).toHaveLength(8);
+    expect(obtenerElemento().querySelectorAll('[id^="objetivos-especifico-"]').length).toBe(8);
     expect(
       (
         obtenerElemento().querySelector(
@@ -67,7 +67,7 @@ describe('FormularioObjetivosProyecto', () => {
     expect(eliminar.disabled).toBe(true);
     eliminar.click();
     fixture.detectChanges();
-    expect(obtenerElemento().querySelectorAll('[id^="objetivos-especifico-"]')).toHaveLength(1);
+    expect(obtenerElemento().querySelectorAll('[id^="objetivos-especifico-"]').length).toBe(1);
   });
 
   it('identifica cada control dinámico sin agregar una etiqueta visual redundante', () => {

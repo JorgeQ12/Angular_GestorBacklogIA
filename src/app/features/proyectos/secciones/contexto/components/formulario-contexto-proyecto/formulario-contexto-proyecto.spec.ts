@@ -38,7 +38,7 @@ describe('FormularioContextoProyecto', () => {
   });
 
   it('emite valores válidos sin espacios exteriores', () => {
-    const guardar = vi.fn();
+    const guardar = jasmine.createSpy();
     fixture.componentInstance.guardar.subscribe(guardar);
     escribir('#contexto-nombre', '  InterIA  ');
     escribir('#contexto-responsable', '  María Gómez  ');
@@ -58,7 +58,7 @@ describe('FormularioContextoProyecto', () => {
   });
 
   it('rechaza texto compuesto únicamente por espacios', () => {
-    const guardar = vi.fn();
+    const guardar = jasmine.createSpy();
     fixture.componentInstance.guardar.subscribe(guardar);
     escribir('#contexto-nombre', '   ');
     escribir('#contexto-responsable', 'María Gómez');
@@ -76,7 +76,7 @@ describe('FormularioContextoProyecto', () => {
   });
 
   it('comunica la fotografía vigente para previsualizar Contexto', () => {
-    const contextoCambiado = vi.fn();
+    const contextoCambiado = jasmine.createSpy();
     fixture.componentInstance.contextoCambiado.subscribe(contextoCambiado);
 
     escribir('#contexto-nombre', '  Portal de clientes  ');
@@ -84,17 +84,19 @@ describe('FormularioContextoProyecto', () => {
     establecerControl(SelectorFecha, '2026-08-30');
     establecerControl(SelectorCampo, 14);
 
-    expect(contextoCambiado).toHaveBeenLastCalledWith({
-      nombre: 'Portal de clientes',
-      responsable: 'Jorge Quintero',
-      fechaObjetivo: '2026-08-30',
-      prioridadCatalogoId: 14,
-      descripcion: '',
-    });
+    expect(contextoCambiado.calls.mostRecent().args).toEqual([
+      {
+        nombre: 'Portal de clientes',
+        responsable: 'Jorge Quintero',
+        fechaObjetivo: '2026-08-30',
+        prioridadCatalogoId: 14,
+        descripcion: '',
+      },
+    ]);
   });
 
   it('restaura la fotografía confirmada y bloquea el envío al volver a lectura', () => {
-    const guardar = vi.fn();
+    const guardar = jasmine.createSpy();
     fixture.componentInstance.guardar.subscribe(guardar);
     fixture.componentRef.setInput('datosIniciales', {
       nombre: 'Proyecto confirmado',

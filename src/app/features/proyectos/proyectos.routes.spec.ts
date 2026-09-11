@@ -3,7 +3,7 @@ import { RUTAS_PROYECTOS } from './proyectos.routes';
 
 describe('RUTAS_PROYECTOS', () => {
   it('expone listado, creación, información y planificación como casos de uso hermanos', () => {
-    expect(RUTAS_PROYECTOS).toHaveLength(4);
+    expect(RUTAS_PROYECTOS.length).toBe(4);
     expect(RUTAS_PROYECTOS[0].path).toBe(
       `:${PARAMETROS_RUTA.proyectoId}/${SEGMENTOS_RUTA.informacion}`,
     );

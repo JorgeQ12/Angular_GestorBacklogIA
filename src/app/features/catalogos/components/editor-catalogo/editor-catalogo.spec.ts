@@ -11,7 +11,7 @@ describe('Editor de catálogo', () => {
   }
   it('rechaza campos vacíos y presenta mensajes específicos', () => {
     const fixture = crear();
-    const emit = vi.fn();
+    const emit = jasmine.createSpy('emit');
     fixture.componentInstance.guardar.subscribe(emit);
     fixture.nativeElement
       .querySelector('form')
@@ -30,7 +30,7 @@ describe('Editor de catálogo', () => {
   });
   it('envía valores recortados mediante el botón externo del modal', () => {
     const fixture = crear();
-    const emit = vi.fn();
+    const emit = jasmine.createSpy('emit');
     fixture.componentInstance.guardar.subscribe(emit);
     escribir(fixture.nativeElement, '#catalogo-codigo', '  gestion_area  ');
     escribir(fixture.nativeElement, '#catalogo-nombre', '  Área  ');
@@ -44,7 +44,7 @@ describe('Editor de catálogo', () => {
   });
   it('solicita un código al crear una opción del catálogo seleccionado', () => {
     const fixture = crear();
-    const emit = vi.fn();
+    const emit = jasmine.createSpy('emit');
     fixture.componentRef.setInput('contexto', {
       clase: ClaseCatalogo.Valor,
       entidad: null,
@@ -78,7 +78,7 @@ describe('Editor de catálogo', () => {
   });
   it('rechaza espacios, códigos ajenos a snake_case y los límites reales del backend', () => {
     const fixture = crear();
-    const emit = vi.fn();
+    const emit = jasmine.createSpy('emit');
     fixture.componentInstance.guardar.subscribe(emit);
     escribir(fixture.nativeElement, '#catalogo-codigo', 'Gestión Área');
     escribir(fixture.nativeElement, '#catalogo-nombre', 'a'.repeat(101));
@@ -93,7 +93,7 @@ describe('Editor de catálogo', () => {
   });
   it('hidrata la edición y bloquea controles, cancelación y submit durante guardado', () => {
     const fixture = crear();
-    const emit = vi.fn();
+    const emit = jasmine.createSpy('emit');
     fixture.componentInstance.guardar.subscribe(emit);
     fixture.componentRef.setInput('contexto', {
       clase: ClaseCatalogo.Tipo,

@@ -1,6 +1,6 @@
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { provideRouter, Routes } from '@angular/router';
+import { provideRouter, Router, Routes } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import {
   PARAMETROS_RUTA,
@@ -27,6 +27,7 @@ import { EstadoSincronizacionEpicaAzurePlanificacionService } from '../../servic
 import { EstadoEliminacionRequisitosPlanificacionService } from '../../services/estado-eliminacion-requisitos-planificacion.service';
 import { EstadoGanttPlanificacionService } from '../../services/estado-gantt-planificacion.service';
 import { NivelGeneracionIaPlanificacion } from '../../models/generacion-ia-planificacion.model';
+import { PestanaElementoPlanificacion } from '../../models/historial-elemento-planificacion.model';
 import { OrigenVersionPlanificacion } from '../../models/version-planificacion.model';
 import type { ResultadoSincronizacionEpicaAzurePlanificacion } from '../../models/sincronizacion-epica-azure-planificacion.model';
 import { PaginaPlanificacionProyecto } from './pagina-planificacion-proyecto';
@@ -47,9 +48,9 @@ describe('PaginaPlanificacionProyecto', () => {
     seleccionando: signal(false).asReadonly(),
     incluirEliminados: incluirEliminados.asReadonly(),
     errorCarga: errorCarga.asReadonly(),
-    cargar: vi.fn(),
-    presentarVersion: vi.fn(),
-    actualizarInclusionEliminados: vi.fn(),
+    cargar: jasmine.createSpy('cargar'),
+    presentarVersion: jasmine.createSpy('presentarVersion'),
+    actualizarInclusionEliminados: jasmine.createSpy('actualizarInclusionEliminados'),
   };
   const editor = {
     abierto: editorAbierto.asReadonly(),
@@ -61,12 +62,12 @@ describe('PaginaPlanificacionProyecto', () => {
     soloLectura: signal(false).asReadonly(),
     puedeEditar: signal(false).asReadonly(),
     valoresFormulario: signal(null).asReadonly(),
-    abrirCreacion: vi.fn(),
-    abrirConsulta: vi.fn(),
-    abrirEdicion: vi.fn(),
-    iniciarEdicion: vi.fn(),
-    cerrar: vi.fn(),
-    guardar: vi.fn(),
+    abrirCreacion: jasmine.createSpy('abrirCreacion'),
+    abrirConsulta: jasmine.createSpy('abrirConsulta'),
+    abrirEdicion: jasmine.createSpy('abrirEdicion'),
+    iniciarEdicion: jasmine.createSpy('iniciarEdicion'),
+    cerrar: jasmine.createSpy('cerrar'),
+    guardar: jasmine.createSpy('guardar'),
   };
   const historial = {
     registros: signal([]).asReadonly(),
@@ -78,47 +79,47 @@ describe('PaginaPlanificacionProyecto', () => {
     cargandoVersion: signal(false).asReadonly(),
     errorHistorial: signal(false).asReadonly(),
     errorVersion: signal(false).asReadonly(),
-    abrir: vi.fn(),
-    seleccionar: vi.fn(),
-    cargarMas: vi.fn(),
-    reintentarHistorial: vi.fn(),
-    reintentarVersion: vi.fn(),
-    cerrar: vi.fn(),
+    abrir: jasmine.createSpy('abrir'),
+    seleccionar: jasmine.createSpy('seleccionar'),
+    cargarMas: jasmine.createSpy('cargarMas'),
+    reintentarHistorial: jasmine.createSpy('reintentarHistorial'),
+    reintentarVersion: jasmine.createSpy('reintentarVersion'),
+    cerrar: jasmine.createSpy('cerrar'),
   };
   const panelGeneracionAbierto = signal(false);
   const generarConIA = {
     panelAbierto: panelGeneracionAbierto.asReadonly(),
     procesando: signal(false).asReadonly(),
-    alternarPanel: vi.fn(() => panelGeneracionAbierto.update((abierto) => !abierto)),
-    generar: vi.fn(),
-    restablecer: vi.fn(() => panelGeneracionAbierto.set(false)),
+    alternarPanel: jasmine.createSpy('alternarPanel').and.callFake(() => panelGeneracionAbierto.update((abierto) => !abierto)),
+    generar: jasmine.createSpy('generar'),
+    restablecer: jasmine.createSpy('restablecer').and.callFake(() => panelGeneracionAbierto.set(false)),
   };
   const publicandoAzure = signal(false);
   const publicacionAzure = {
     publicando: publicandoAzure.asReadonly(),
-    publicar: vi.fn(),
-    restablecer: vi.fn(() => publicandoAzure.set(false)),
+    publicar: jasmine.createSpy('publicar'),
+    restablecer: jasmine.createSpy('restablecer').and.callFake(() => publicandoAzure.set(false)),
   };
   const sincronizandoAzure = signal(false);
-  const sincronizarEpica = vi.fn<
+  const sincronizarEpica = jasmine.createSpy<
     (
       proyectoId: number,
       completado: (resultado: ResultadoSincronizacionEpicaAzurePlanificacion) => void,
     ) => void
-  >();
+  >('sincronizarEpica');
   const sincronizacionAzure = {
     sincronizando: sincronizandoAzure.asReadonly(),
     sincronizar: sincronizarEpica,
-    restablecer: vi.fn(() => sincronizandoAzure.set(false)),
+    restablecer: jasmine.createSpy('restablecer').and.callFake(() => sincronizandoAzure.set(false)),
   };
   const eliminandoRequisito = signal(false);
-  const eliminarRequisito = vi.fn<
+  const eliminarRequisito = jasmine.createSpy<
     (elemento: ElementoPlanificacion, actualizarArbol: () => void) => Promise<void>
-  >();
+  >('eliminarRequisito');
   const eliminacionRequisitos = {
     eliminando: eliminandoRequisito.asReadonly(),
     eliminar: eliminarRequisito,
-    restablecer: vi.fn(() => eliminandoRequisito.set(false)),
+    restablecer: jasmine.createSpy('restablecer').and.callFake(() => eliminandoRequisito.set(false)),
   };
   const ganttAbierto = signal(false);
   const gantt = {
@@ -126,15 +127,43 @@ describe('PaginaPlanificacionProyecto', () => {
     cargando: signal(false).asReadonly(),
     error: signal(false).asReadonly(),
     datos: signal(null).asReadonly(),
-    abrir: vi.fn(() => ganttAbierto.set(true)),
-    cerrar: vi.fn(() => ganttAbierto.set(false)),
-    sincronizar: vi.fn(),
-    reintentar: vi.fn(),
-    restablecer: vi.fn(() => ganttAbierto.set(false)),
+    abrir: jasmine.createSpy('abrir').and.callFake(() => ganttAbierto.set(true)),
+    cerrar: jasmine.createSpy('cerrar').and.callFake(() => ganttAbierto.set(false)),
+    sincronizar: jasmine.createSpy('sincronizar'),
+    reintentar: jasmine.createSpy('reintentar'),
+    restablecer: jasmine.createSpy('restablecer').and.callFake(() => ganttAbierto.set(false)),
   };
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    estado.cargar.calls.reset();
+    estado.presentarVersion.calls.reset();
+    estado.actualizarInclusionEliminados.calls.reset();
+    editor.abrirCreacion.calls.reset();
+    editor.abrirConsulta.calls.reset();
+    editor.abrirEdicion.calls.reset();
+    editor.iniciarEdicion.calls.reset();
+    editor.cerrar.calls.reset();
+    editor.guardar.calls.reset();
+    historial.abrir.calls.reset();
+    historial.seleccionar.calls.reset();
+    historial.cargarMas.calls.reset();
+    historial.reintentarHistorial.calls.reset();
+    historial.reintentarVersion.calls.reset();
+    historial.cerrar.calls.reset();
+    generarConIA.alternarPanel.calls.reset();
+    generarConIA.generar.calls.reset();
+    generarConIA.restablecer.calls.reset();
+    publicacionAzure.publicar.calls.reset();
+    publicacionAzure.restablecer.calls.reset();
+    sincronizarEpica.calls.reset();
+    sincronizacionAzure.restablecer.calls.reset();
+    eliminarRequisito.calls.reset();
+    eliminacionRequisitos.restablecer.calls.reset();
+    gantt.abrir.calls.reset();
+    gantt.cerrar.calls.reset();
+    gantt.sincronizar.calls.reset();
+    gantt.reintentar.calls.reset();
+    gantt.restablecer.calls.reset();
     planificacion.set(PLANIFICACION);
     planificacionActual.set(PLANIFICACION);
     versiones.set(VERSIONES);
@@ -148,7 +177,7 @@ describe('PaginaPlanificacionProyecto', () => {
     sincronizandoAzure.set(false);
     eliminandoRequisito.set(false);
     ganttAbierto.set(false);
-    eliminarRequisito.mockResolvedValue(undefined);
+    eliminarRequisito.and.returnValue(Promise.resolve(undefined));
     TestBed.configureTestingModule({
       providers: [
         provideRouter(RUTAS),
@@ -400,7 +429,7 @@ describe('PaginaPlanificacionProyecto', () => {
       .find((actual) => actual.textContent?.includes('Sincronizar con Azure'));
 
     boton?.click();
-    const completado = sincronizarEpica.mock.calls[0]?.[1];
+    const completado = sincronizarEpica.calls.argsFor(0)?.[1];
     completado?.({
       epicaId: 1,
       azureWorkItemId: 1204,
@@ -410,7 +439,7 @@ describe('PaginaPlanificacionProyecto', () => {
       urlEpica: 'https://dev.azure.com/organizacion/proyecto/_workitems/edit/1204',
     });
 
-    expect(sincronizarEpica).toHaveBeenCalledWith(42, expect.any(Function));
+    expect(sincronizarEpica).toHaveBeenCalledWith(42, jasmine.any(Function));
     expect(estado.cargar).toHaveBeenCalledWith(42, false);
   });
 
@@ -456,7 +485,7 @@ describe('PaginaPlanificacionProyecto', () => {
     expect(dialogo?.textContent).toContain('Versión 4');
     expect(dialogo?.textContent).toContain('Solo lectura');
     expect(abrirAzure?.textContent).toContain('Abrir en Azure');
-    expect(sincronizarEpica).toHaveBeenCalledWith(42, expect.any(Function));
+    expect(sincronizarEpica).toHaveBeenCalledWith(42, jasmine.any(Function));
     expect(editor.iniciarEdicion).not.toHaveBeenCalled();
   });
 
@@ -482,7 +511,7 @@ describe('PaginaPlanificacionProyecto', () => {
 
     expect(eliminarRequisito).toHaveBeenCalledWith(
       ACTIVIDAD_REQUISITO,
-      expect.any(Function),
+      jasmine.any(Function),
     );
   });
 
@@ -512,12 +541,11 @@ describe('PaginaPlanificacionProyecto', () => {
     expect(historial.abrir).toHaveBeenCalledWith(TipoElementoPlanificacion.Tarea, 783);
   });
 
-  it.each([
+  ([
     [TipoElementoPlanificacion.Historia, 736],
     [TipoElementoPlanificacion.Tarea, 783],
-  ] as const)(
-    'mantiene funcionales Detalle e Historial al editar %s',
-    async (tipo, elementoId) => {
+  ] as const).forEach(([tipo, elementoId]) => {
+    it(`mantiene funcionales Detalle e Historial al editar ${tipo}`, async () => {
       editorAbierto.set(true);
       editorContexto.set({
         modo: ModoEditorElementoPlanificacion.Edicion,
@@ -556,8 +584,8 @@ describe('PaginaPlanificacionProyecto', () => {
 
       expect(historial.cerrar).toHaveBeenCalled();
       expect(botonDetalle?.getAttribute('aria-selected')).toBe('true');
-    },
-  );
+    });
+  });
 });
 
 function abrirPanelVista(elemento: HTMLElement | null): void {
@@ -732,3 +760,504 @@ const DETALLE_TAREA: DetalleElementoPlanificacion = {
   responsable: '',
   requisito: '',
 };
+
+describe('PaginaPlanificacionProyecto (cobertura adicional)', () => {
+  const planificacion = signal<PlanificacionProyecto | null>(PLANIFICACION);
+  const planificacionActual = signal<PlanificacionProyecto | null>(PLANIFICACION);
+  const versiones = signal(VERSIONES);
+  const incluirEliminados = signal(false);
+  const errorCarga = signal(false);
+  const editorAbierto = signal(false);
+  const editorContexto = signal<ContextoEditorElementoPlanificacion | null>(null);
+  const editorDetalle = signal<DetalleElementoPlanificacion | null>(null);
+  const editorSoloLectura = signal(false);
+  const editorPuedeEditar = signal(false);
+  const sincronizandoAzure = signal(false);
+
+  const estado = {
+    planificacion: planificacion.asReadonly(),
+    planificacionActual: planificacionActual.asReadonly(),
+    versiones: versiones.asReadonly(),
+    seleccionando: signal(false).asReadonly(),
+    incluirEliminados: incluirEliminados.asReadonly(),
+    errorCarga: errorCarga.asReadonly(),
+    cargar: jasmine.createSpy('cargar'),
+    presentarVersion: jasmine.createSpy('presentarVersion'),
+    actualizarInclusionEliminados: jasmine.createSpy('actualizarInclusionEliminados'),
+  };
+  const editor = {
+    abierto: editorAbierto.asReadonly(),
+    contexto: editorContexto.asReadonly(),
+    detalle: editorDetalle.asReadonly(),
+    catalogos: signal({ prioridades: [], riesgos: [], actividadesTarea: [], actividadesRequisito: [] }).asReadonly(),
+    cargando: signal(false).asReadonly(),
+    guardando: signal(false).asReadonly(),
+    soloLectura: editorSoloLectura.asReadonly(),
+    puedeEditar: editorPuedeEditar.asReadonly(),
+    valoresFormulario: signal(null).asReadonly(),
+    abrirCreacion: jasmine.createSpy('abrirCreacion'),
+    abrirConsulta: jasmine.createSpy('abrirConsulta'),
+    abrirEdicion: jasmine.createSpy('abrirEdicion'),
+    iniciarEdicion: jasmine.createSpy('iniciarEdicion'),
+    cerrar: jasmine.createSpy('cerrar'),
+    guardar: jasmine.createSpy('guardar'),
+  };
+  const historial = {
+    registros: signal([]).asReadonly(),
+    siguienteCursor: signal(null).asReadonly(),
+    hayMas: signal(false).asReadonly(),
+    versionSeleccionadaId: signal(null).asReadonly(),
+    versionSeleccionada: signal(null).asReadonly(),
+    cargandoHistorial: signal(false).asReadonly(),
+    cargandoVersion: signal(false).asReadonly(),
+    errorHistorial: signal(false).asReadonly(),
+    errorVersion: signal(false).asReadonly(),
+    abrir: jasmine.createSpy('abrir'),
+    seleccionar: jasmine.createSpy('seleccionar'),
+    cargarMas: jasmine.createSpy('cargarMas'),
+    reintentarHistorial: jasmine.createSpy('reintentarHistorial'),
+    reintentarVersion: jasmine.createSpy('reintentarVersion'),
+    cerrar: jasmine.createSpy('cerrar'),
+  };
+  const generarConIA = {
+    panelAbierto: signal(false).asReadonly(),
+    procesando: signal(false).asReadonly(),
+    alternarPanel: jasmine.createSpy('alternarPanel'),
+    generar: jasmine.createSpy('generar'),
+    restablecer: jasmine.createSpy('restablecer'),
+  };
+  const publicacionAzure = {
+    publicando: signal(false).asReadonly(),
+    publicar: jasmine.createSpy('publicar'),
+    restablecer: jasmine.createSpy('restablecer'),
+  };
+  const sincronizarEpica = jasmine.createSpy<
+    (
+      proyectoId: number,
+      completado: (resultado: ResultadoSincronizacionEpicaAzurePlanificacion) => void,
+    ) => void
+  >('sincronizarEpica');
+  const sincronizacionAzure = {
+    sincronizando: sincronizandoAzure.asReadonly(),
+    sincronizar: sincronizarEpica,
+    restablecer: jasmine.createSpy('restablecer'),
+  };
+  const eliminarRequisito = jasmine.createSpy<
+    (elemento: ElementoPlanificacion, actualizarArbol: () => void) => Promise<void>
+  >('eliminarRequisito');
+  const eliminacionRequisitos = {
+    eliminando: signal(false).asReadonly(),
+    eliminar: eliminarRequisito,
+    restablecer: jasmine.createSpy('restablecer'),
+  };
+  const gantt = {
+    abierto: signal(false).asReadonly(),
+    cargando: signal(false).asReadonly(),
+    error: signal(false).asReadonly(),
+    datos: signal(null).asReadonly(),
+    abrir: jasmine.createSpy('abrir'),
+    cerrar: jasmine.createSpy('cerrar'),
+    sincronizar: jasmine.createSpy('sincronizar'),
+    reintentar: jasmine.createSpy('reintentar'),
+    restablecer: jasmine.createSpy('restablecer'),
+  };
+
+  async function crearPagina(proyectoId: string | number = 42): Promise<any> {
+    const harness = await RouterTestingHarness.create();
+    const componente = await harness.navigateByUrl(
+      `/${SEGMENTOS_RUTA.proyectos}/${proyectoId}/${SEGMENTOS_RUTA.planificacion}`,
+      PaginaPlanificacionProyecto,
+    );
+    return componente as any;
+  }
+
+  beforeEach(() => {
+    estado.cargar.calls.reset();
+    estado.presentarVersion.calls.reset();
+    estado.actualizarInclusionEliminados.calls.reset();
+    editor.abrirCreacion.calls.reset();
+    editor.abrirConsulta.calls.reset();
+    editor.abrirEdicion.calls.reset();
+    editor.iniciarEdicion.calls.reset();
+    editor.cerrar.calls.reset();
+    editor.guardar.calls.reset();
+    historial.abrir.calls.reset();
+    historial.cerrar.calls.reset();
+    generarConIA.generar.calls.reset();
+    publicacionAzure.publicar.calls.reset();
+    sincronizarEpica.calls.reset();
+    eliminarRequisito.calls.reset();
+    gantt.abrir.calls.reset();
+    gantt.cerrar.calls.reset();
+    planificacion.set(PLANIFICACION);
+    planificacionActual.set(PLANIFICACION);
+    versiones.set(VERSIONES);
+    incluirEliminados.set(false);
+    errorCarga.set(false);
+    editorAbierto.set(false);
+    editorContexto.set(null);
+    editorDetalle.set(null);
+    editorSoloLectura.set(false);
+    editorPuedeEditar.set(false);
+    sincronizandoAzure.set(false);
+    eliminarRequisito.and.returnValue(Promise.resolve(undefined));
+    sincronizarEpica.and.stub();
+    TestBed.configureTestingModule({
+      providers: [
+        provideRouter(RUTAS),
+        { provide: EstadoPlanificacionProyectoService, useValue: estado },
+        { provide: EstadoEditorElementoPlanificacionService, useValue: editor },
+        { provide: EstadoHistorialElementoPlanificacionService, useValue: historial },
+        { provide: EstadoGeneracionIaPlanificacionService, useValue: generarConIA },
+        { provide: EstadoPublicacionAzurePlanificacionService, useValue: publicacionAzure },
+        { provide: EstadoSincronizacionEpicaAzurePlanificacionService, useValue: sincronizacionAzure },
+        { provide: EstadoEliminacionRequisitosPlanificacionService, useValue: eliminacionRequisitos },
+        { provide: EstadoGanttPlanificacionService, useValue: gantt },
+        EstadoExploracionPlanificacionService,
+      ],
+    });
+  });
+
+  it('recarga la planificación conservando la inclusión de eliminados', async () => {
+    const comp = await crearPagina();
+    estado.cargar.calls.reset();
+    incluirEliminados.set(true);
+    comp.recargar();
+    expect(estado.cargar).toHaveBeenCalledWith(42, true);
+  });
+
+  it('abre la creación de una épica en la raíz del proyecto', async () => {
+    const comp = await crearPagina();
+    comp.crearEpica();
+    expect(editor.abrirCreacion).toHaveBeenCalledWith(42, TipoElementoPlanificacion.Epica, 42);
+  });
+
+  it('abre la creación de un elemento solicitado desde el árbol', async () => {
+    const comp = await crearPagina();
+    comp.crearElemento({ tipo: TipoElementoPlanificacion.Tarea, padreId: 736 });
+    expect(editor.abrirCreacion).toHaveBeenCalledWith(42, TipoElementoPlanificacion.Tarea, 736);
+  });
+
+  it('abre la lista de requisitos al consultar ese nodo en la versión vigente', async () => {
+    const comp = await crearPagina();
+    comp.consultarElemento({
+      ...ACTIVIDAD_REQUISITO,
+      tipo: TipoElementoPlanificacion.ListaRequisitos,
+      id: 30,
+    });
+    expect(comp.listaRequisitosAbierta()).toBe(true);
+    expect(editor.abrirConsulta).not.toHaveBeenCalled();
+  });
+
+  it('consulta en solo lectura los elementos de una versión histórica', async () => {
+    planificacion.set({ ...PLANIFICACION, esHistorica: true, versionId: 80 });
+    const comp = await crearPagina();
+    comp.consultarElemento(ACTIVIDAD_REQUISITO);
+    expect(editor.abrirConsulta).toHaveBeenCalledWith(
+      42,
+      TipoElementoPlanificacion.ActividadRequisito,
+      501,
+      80,
+    );
+    expect(editor.abrirEdicion).not.toHaveBeenCalled();
+  });
+
+  it('consulta una épica vigente en lugar de abrirla en edición', async () => {
+    const comp = await crearPagina();
+    comp.consultarElemento(PLANIFICACION.elementos[0]);
+    expect(editor.abrirConsulta).toHaveBeenCalledWith(
+      42,
+      TipoElementoPlanificacion.Epica,
+      1,
+      null,
+    );
+  });
+
+  it('abre la lista de requisitos al editar ese nodo', async () => {
+    const comp = await crearPagina();
+    comp.editarElemento({
+      ...ACTIVIDAD_REQUISITO,
+      tipo: TipoElementoPlanificacion.ListaRequisitos,
+    });
+    expect(comp.listaRequisitosAbierta()).toBe(true);
+    expect(editor.abrirEdicion).not.toHaveBeenCalled();
+  });
+
+  it('edita un elemento vigente autorizado desde el árbol', async () => {
+    const comp = await crearPagina();
+    comp.editarElemento(ACTIVIDAD_REQUISITO);
+    expect(editor.abrirEdicion).toHaveBeenCalledWith(
+      42,
+      TipoElementoPlanificacion.ActividadRequisito,
+      501,
+    );
+  });
+
+  it('no edita elementos cuando la planificación es histórica', async () => {
+    planificacion.set({ ...PLANIFICACION, esHistorica: true });
+    const comp = await crearPagina();
+    comp.editarElemento(ACTIVIDAD_REQUISITO);
+    expect(editor.abrirEdicion).not.toHaveBeenCalled();
+  });
+
+  it('guarda un elemento y expande la rama del padre de requisitos', async () => {
+    editorContexto.set({
+      modo: ModoEditorElementoPlanificacion.Creacion,
+      tipo: TipoElementoPlanificacion.ActividadRequisito,
+      proyectoId: 42,
+      versionPlanificacionId: null,
+      padreId: 30,
+      elementoId: null,
+    });
+    editor.guardar.and.callFake((_valores: unknown, completado: () => void) => completado());
+    const comp = await crearPagina();
+    const exploracion = TestBed.inject(EstadoExploracionPlanificacionService);
+    const expandir = spyOn(exploracion, 'expandirRama');
+    estado.cargar.calls.reset();
+
+    comp.guardarElemento({});
+
+    expect(expandir).toHaveBeenCalledWith(`${TipoElementoPlanificacion.ListaRequisitos}:30`);
+    expect(estado.cargar).toHaveBeenCalled();
+    editor.guardar.and.stub();
+  });
+
+  it('solicita generar con IA solo con un proyecto válido', async () => {
+    const comp = await crearPagina();
+    comp.generarConIa(NivelGeneracionIaPlanificacion.Caracteristicas);
+    expect(generarConIA.generar).toHaveBeenCalledWith(
+      42,
+      NivelGeneracionIaPlanificacion.Caracteristicas,
+    );
+  });
+
+  it('no genera con IA cuando el identificador de la ruta es inválido', async () => {
+    planificacion.set(null);
+    const comp = await crearPagina('invalido');
+    comp.generarConIa(NivelGeneracionIaPlanificacion.Caracteristicas);
+    expect(generarConIA.generar).not.toHaveBeenCalled();
+  });
+
+  it('publica en Azure únicamente con un proyecto válido', async () => {
+    const comp = await crearPagina();
+    comp.publicarEnAzure();
+    expect(publicacionAzure.publicar).toHaveBeenCalledWith(42);
+  });
+
+  it('sincroniza la épica principal y reabre la consulta cuando coincide el contexto', async () => {
+    editorContexto.set({
+      modo: ModoEditorElementoPlanificacion.Consulta,
+      tipo: TipoElementoPlanificacion.Epica,
+      proyectoId: 42,
+      versionPlanificacionId: null,
+      padreId: null,
+      elementoId: 1,
+    });
+    sincronizarEpica.and.callFake((_id, completado) =>
+      completado({
+        epicaId: 1,
+        azureWorkItemId: 1204,
+        revisionesImportadas: 2,
+        revisionAzureActual: 9,
+        fechaSincronizacion: '2026-09-04T15:00:00Z',
+        urlEpica: 'https://dev.azure.com/x/_workitems/edit/1204',
+      }),
+    );
+    const comp = await crearPagina();
+    estado.cargar.calls.reset();
+    editor.abrirConsulta.calls.reset();
+
+    comp.sincronizarEpicaPrincipal();
+
+    expect(estado.cargar).toHaveBeenCalledWith(42, false);
+    expect(editor.abrirConsulta).toHaveBeenCalledWith(
+      42,
+      TipoElementoPlanificacion.Epica,
+      1,
+    );
+    sincronizarEpica.and.stub();
+  });
+
+  it('delega la eliminación de un elemento del árbol', async () => {
+    const comp = await crearPagina();
+    comp.eliminarElemento(ACTIVIDAD_REQUISITO);
+    expect(eliminarRequisito).toHaveBeenCalledWith(ACTIVIDAD_REQUISITO, jasmine.any(Function));
+  });
+
+  it('cierra y reabre la lista de requisitos y actualiza el árbol', async () => {
+    const comp = await crearPagina();
+    comp.listaRequisitosAbierta.set(true);
+    comp.cerrarListaRequisitos();
+    expect(comp.listaRequisitosAbierta()).toBe(false);
+    estado.cargar.calls.reset();
+    comp.actualizarArbolDesdeLista();
+    expect(estado.cargar).toHaveBeenCalled();
+  });
+
+  it('abre y cierra el Gantt con la planificación presentada', async () => {
+    const comp = await crearPagina();
+    comp.abrirGantt();
+    expect(gantt.abrir).toHaveBeenCalledWith(PLANIFICACION);
+    comp.cerrarGantt();
+    expect(gantt.cerrar).toHaveBeenCalledTimes(1);
+  });
+
+  it('actualiza la inclusión de eliminados desde los controles', async () => {
+    const comp = await crearPagina();
+    comp.cambiarInclusionEliminados(true);
+    expect(estado.actualizarInclusionEliminados).toHaveBeenCalledWith(true);
+  });
+
+  it('vuelve a la pestaña de detalle y cierra el historial', async () => {
+    const comp = await crearPagina();
+    comp.cambiarPestanaElemento(PestanaElementoPlanificacion.Detalle);
+    expect(comp.pestanaElemento()).toBe(PestanaElementoPlanificacion.Detalle);
+    expect(historial.cerrar).toHaveBeenCalled();
+  });
+
+  it('ignora el cambio a historial cuando el elemento no lo permite', async () => {
+    editorDetalle.set(null);
+    const comp = await crearPagina();
+    comp.cambiarPestanaElemento(PestanaElementoPlanificacion.Historial);
+    expect(historial.abrir).not.toHaveBeenCalled();
+  });
+
+  it('inicia la edición del elemento consultado cuando no procede sincronizar', async () => {
+    editorContexto.set({
+      modo: ModoEditorElementoPlanificacion.Consulta,
+      tipo: TipoElementoPlanificacion.Tarea,
+      proyectoId: 42,
+      versionPlanificacionId: null,
+      padreId: null,
+      elementoId: 783,
+    });
+    const comp = await crearPagina();
+    comp.iniciarEdicionElemento();
+    expect(editor.iniciarEdicion).toHaveBeenCalledTimes(1);
+    expect(sincronizarEpica).not.toHaveBeenCalled();
+  });
+
+  it('cierra el editor restableciendo la pestaña de detalle', async () => {
+    const comp = await crearPagina();
+    comp.cerrarEditor();
+    expect(historial.cerrar).toHaveBeenCalled();
+    expect(comp.pestanaElemento()).toBe(PestanaElementoPlanificacion.Detalle);
+    expect(editor.cerrar).toHaveBeenCalled();
+  });
+
+  it('navega para alternar entre la versión histórica y la vigente', async () => {
+    const comp = await crearPagina();
+    const router = TestBed.inject(Router);
+    const navegar = spyOn(router, 'navigate').and.resolveTo(true);
+
+    comp.cambiarVersionPlanificacion(80);
+    expect(navegar).toHaveBeenCalledWith(
+      [],
+      jasmine.objectContaining({
+        queryParams: { [PARAMETROS_RUTA.versionProyectoId]: 80 },
+      }),
+    );
+
+    comp.cambiarVersionPlanificacion(81);
+    expect(navegar).toHaveBeenCalledWith(
+      [],
+      jasmine.objectContaining({
+        queryParams: { [PARAMETROS_RUTA.versionProyectoId]: null },
+      }),
+    );
+  });
+
+  it('describe los metadatos y textos del editor según el detalle vigente', async () => {
+    editorContexto.set({
+      modo: ModoEditorElementoPlanificacion.Consulta,
+      tipo: TipoElementoPlanificacion.Tarea,
+      proyectoId: 42,
+      versionPlanificacionId: null,
+      padreId: null,
+      elementoId: 783,
+    });
+    editorDetalle.set(DETALLE_TAREA);
+    const comp = await crearPagina();
+    expect(comp.metadatosEditor()).toEqual(['Versión 4']);
+    expect(comp.tituloEditor()).toBe('Implementar servicio');
+    expect(comp.etiquetaEditor()).toBe('Tarea');
+    expect(comp.textoCancelarEditor()).toBe('Cerrar');
+    expect(comp.textoConfirmarEditor()).toBe('Editar');
+    expect(comp.iconoConfirmarEditor()).toBe('editar');
+    expect(comp.descripcionEditor()).toContain('versión vigente');
+  });
+
+  it('marca solo lectura y describe una versión histórica en el editor', async () => {
+    editorContexto.set({
+      modo: ModoEditorElementoPlanificacion.Consulta,
+      tipo: TipoElementoPlanificacion.Tarea,
+      proyectoId: 42,
+      versionPlanificacionId: 80,
+      padreId: null,
+      elementoId: 783,
+    });
+    editorDetalle.set(DETALLE_TAREA);
+    const comp = await crearPagina();
+    expect(comp.metadatosEditor()).toEqual(['Versión 4', 'Solo lectura']);
+    expect(comp.descripcionEditor()).toContain('versión histórica');
+  });
+
+  it('describe un elemento eliminado y su motivo de inactivación', async () => {
+    editorContexto.set({
+      modo: ModoEditorElementoPlanificacion.Consulta,
+      tipo: TipoElementoPlanificacion.Tarea,
+      proyectoId: 42,
+      versionPlanificacionId: null,
+      padreId: null,
+      elementoId: 783,
+    });
+    editorDetalle.set({ ...DETALLE_TAREA, activo: false });
+    const comp = await crearPagina();
+    expect(comp.detalleEliminado()).not.toBeNull();
+    expect(comp.descripcionEditor()).toContain('ya no permite cambios');
+    expect(comp.etiquetaMotivoInactivacion()).toBe('Sin motivo registrado');
+    expect(comp.metadatosEditor()).toEqual(['Versión 4', 'Solo lectura']);
+  });
+
+  it('describe la creación de un elemento en el editor', async () => {
+    editorContexto.set({
+      modo: ModoEditorElementoPlanificacion.Creacion,
+      tipo: TipoElementoPlanificacion.Tarea,
+      proyectoId: 42,
+      versionPlanificacionId: null,
+      padreId: 736,
+      elementoId: null,
+    });
+    editorDetalle.set(null);
+    const comp = await crearPagina();
+    expect(comp.tituloEditor()).toContain('Nueva');
+    expect(comp.textoConfirmarEditor()).toContain('Crear');
+    expect(comp.iconoConfirmarEditor()).toBe('guardar');
+    expect(comp.descripcionEditor()).toContain('nuevo elemento');
+    expect(comp.metadatosEditor()).toEqual([]);
+  });
+
+  it('devuelve textos vacíos cuando no hay contexto de editor', async () => {
+    const comp = await crearPagina();
+    expect(comp.tituloEditor()).toBe('');
+    expect(comp.etiquetaEditor()).toBe('');
+    expect(comp.descripcionEditor()).toBe('');
+    expect(comp.textoConfirmarEditor()).toBe('');
+    expect(comp.iconoEditor()).toBe('epica');
+  });
+
+  it('describe la edición de un elemento en el editor', async () => {
+    editorContexto.set({
+      modo: ModoEditorElementoPlanificacion.Edicion,
+      tipo: TipoElementoPlanificacion.Tarea,
+      proyectoId: 42,
+      versionPlanificacionId: null,
+      padreId: null,
+      elementoId: 783,
+    });
+    editorDetalle.set(DETALLE_TAREA);
+    const comp = await crearPagina();
+    expect(comp.descripcionEditor()).toContain('nueva versión');
+    expect(comp.textoConfirmarEditor()).toBe('Guardar nueva versión');
+  });
+});

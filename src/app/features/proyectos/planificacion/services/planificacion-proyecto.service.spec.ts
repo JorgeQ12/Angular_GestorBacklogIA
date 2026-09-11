@@ -40,12 +40,14 @@ describe('PlanificacionProyectoService', () => {
     expect(solicitud.request.params.has('versionBacklogId')).toBe(false);
     solicitud.flush(crearResultado(PLANIFICACION_DTO));
 
-    await expect(respuesta).resolves.toMatchObject({
-      proyectoId: 42,
-      nombre: 'Sistema de envíos',
-      numeroVersion: 4,
-      resumen: { totalElementos: 11 },
-    });
+    await expectAsync(respuesta).toBeResolvedTo(
+      jasmine.objectContaining({
+        proyectoId: 42,
+        nombre: 'Sistema de envíos',
+        numeroVersion: 4,
+        resumen: jasmine.objectContaining({ totalElementos: 11 }),
+      }),
+    );
   });
 
   it('rechaza una respuesta funcional fallida', async () => {
@@ -62,7 +64,7 @@ describe('PlanificacionProyectoService', () => {
       errores: null,
     } satisfies ResultadoApi<PlanificacionProyectoDto>);
 
-    await expect(respuesta).rejects.toThrow('No fue posible consultar la planificación.');
+    await expectAsync(respuesta).toBeRejectedWithError('No fue posible consultar la planificación.');
   });
 
   it('consulta una versión histórica con su identificador contractual', async () => {
@@ -83,7 +85,9 @@ describe('PlanificacionProyectoService', () => {
       }),
     );
 
-    await expect(respuesta).resolves.toMatchObject({ versionId: 80, esHistorica: true });
+    await expectAsync(respuesta).toBeResolvedTo(
+      jasmine.objectContaining({ versionId: 80, esHistorica: true }),
+    );
   });
 
   it('incluye elementos eliminados únicamente cuando la vista vigente lo solicita', async () => {
@@ -97,7 +101,7 @@ describe('PlanificacionProyectoService', () => {
     expect(solicitud.request.params.has('versionBacklogId')).toBe(false);
     solicitud.flush(crearResultado(PLANIFICACION_DTO));
 
-    await expect(respuesta).resolves.toMatchObject({ proyectoId: 42 });
+    await expectAsync(respuesta).toBeResolvedTo(jasmine.objectContaining({ proyectoId: 42 }));
   });
 
   it('consulta y adapta las versiones integrales del proyecto', async () => {
@@ -110,8 +114,8 @@ describe('PlanificacionProyectoService', () => {
     expect(solicitud.request.params.get('proyectoId')).toBe('42');
     solicitud.flush(crearResultado(VERSIONES_DTO));
 
-    await expect(respuesta).resolves.toEqual([
-      expect.objectContaining({
+    await expectAsync(respuesta).toBeResolvedTo([
+      jasmine.objectContaining({
         id: 81,
         numero: 4,
         origen: OrigenVersionPlanificacion.GeneracionHistorias,
@@ -143,7 +147,7 @@ describe('PlanificacionProyectoService', () => {
       }),
     );
 
-    await expect(respuesta).resolves.toEqual({
+    await expectAsync(respuesta).toBeResolvedTo({
       proyectoId: 42,
       nivel: NivelGeneracionIaPlanificacion.Historias,
       totalCreados: 8,
@@ -167,7 +171,7 @@ describe('PlanificacionProyectoService', () => {
       errores: null,
     } satisfies ResultadoApi<null>);
 
-    await expect(respuesta).rejects.toThrow('No existen historias para generar tareas.');
+    await expectAsync(respuesta).toBeRejectedWithError('No existen historias para generar tareas.');
   });
 
   it('publica la planificación en Azure DevOps con el contrato real', async () => {
@@ -192,11 +196,13 @@ describe('PlanificacionProyectoService', () => {
       }),
     );
 
-    await expect(respuesta).resolves.toMatchObject({
-      proyecto: 'Gestor IA',
-      totalElementos: 11,
-      totalHistorias: 3,
-    });
+    await expectAsync(respuesta).toBeResolvedTo(
+      jasmine.objectContaining({
+        proyecto: 'Gestor IA',
+        totalElementos: 11,
+        totalHistorias: 3,
+      }),
+    );
   });
 
   it('sincroniza la épica principal mediante el parámetro contractual', async () => {
@@ -219,11 +225,13 @@ describe('PlanificacionProyectoService', () => {
       }),
     );
 
-    await expect(respuesta).resolves.toMatchObject({
-      epicaId: 15,
-      revisionesImportadas: 3,
-      revisionAzureActual: 9,
-    });
+    await expectAsync(respuesta).toBeResolvedTo(
+      jasmine.objectContaining({
+        epicaId: 15,
+        revisionesImportadas: 3,
+        revisionAzureActual: 9,
+      }),
+    );
   });
 });
 

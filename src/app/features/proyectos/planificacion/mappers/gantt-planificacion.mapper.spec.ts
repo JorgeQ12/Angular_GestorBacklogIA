@@ -18,26 +18,30 @@ describe('gantt-planificacion.mapper', () => {
       'historia:3',
       'tarea:4',
     ]);
-    expect(referencias[2]).toMatchObject({
-      clavePadre: 'caracteristica:2',
-      tituloPadre: 'Característica',
-      nivel: 2,
-      orden: 2,
-      tieneHijos: true,
-    });
+    expect(referencias[2]).toEqual(
+      jasmine.objectContaining({
+        clavePadre: 'caracteristica:2',
+        tituloPadre: 'Característica',
+        nivel: 2,
+        orden: 2,
+        tieneHijos: true,
+      }),
+    );
   });
 
   it('combina el detalle y conserva dependencias únicamente para las tareas', () => {
     const referencia = crearReferenciasGantt(PLANIFICACION)[3]!;
     const elemento = mapearElementoGantt(referencia, crearDetalle(4, TipoElementoPlanificacion.Tarea));
 
-    expect(elemento).toMatchObject({
-      clave: 'tarea:4',
-      fechaInicio: '2026-09-08',
-      fechaFinal: '2026-09-10',
-      estimacionHoras: 8,
-      dependencias: 'Tarea previa',
-    });
+    expect(elemento).toEqual(
+      jasmine.objectContaining({
+        clave: 'tarea:4',
+        fechaInicio: '2026-09-08',
+        fechaFinal: '2026-09-10',
+        estimacionHoras: 8,
+        dependencias: 'Tarea previa',
+      }),
+    );
   });
 
   it('consolida el periodo y el esfuerzo de los hijos cuando el padre no tiene estimación', () => {
@@ -50,22 +54,26 @@ describe('gantt-planificacion.mapper', () => {
 
     const consolidados = consolidarPeriodosGantt([padre, hijo]);
 
-    expect(consolidados[0]).toMatchObject({
-      fechaInicio: '2026-09-08',
-      fechaFinal: '2026-09-10',
-      estimacionHoras: 8,
-    });
+    expect(consolidados[0]).toEqual(
+      jasmine.objectContaining({
+        fechaInicio: '2026-09-08',
+        fechaFinal: '2026-09-10',
+        estimacionHoras: 8,
+      }),
+    );
   });
 
   it('construye la fotografía final con la identidad de la versión presentada', () => {
-    expect(crearGanttPlanificacion(PLANIFICACION, [])).toMatchObject({
-      proyectoId: 42,
-      nombreProyecto: 'Proyecto',
-      versionId: 9,
-      numeroVersion: 4,
-      esHistorica: false,
-      elementos: [],
-    });
+    expect(crearGanttPlanificacion(PLANIFICACION, [])).toEqual(
+      jasmine.objectContaining({
+        proyectoId: 42,
+        nombreProyecto: 'Proyecto',
+        versionId: 9,
+        numeroVersion: 4,
+        esHistorica: false,
+        elementos: [],
+      }),
+    );
   });
 });
 

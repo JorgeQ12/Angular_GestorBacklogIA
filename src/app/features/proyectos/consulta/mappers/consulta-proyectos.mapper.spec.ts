@@ -29,7 +29,7 @@ describe('consulta-proyectos.mapper', () => {
 
     expect(proyecto.nombre).toBe('Proyecto sin nombre');
     expect(proyecto.responsable).toBe('Equipo por completar');
-    expect(proyecto.progresoCreacion).toMatchObject({ posicion: 5, total: 9 });
+    expect(proyecto.progresoCreacion).toEqual(jasmine.objectContaining({ posicion: 5, total: 9 }));
   });
 
   it('conserva los metadatos del paginado remoto', () => {
@@ -41,13 +41,13 @@ describe('consulta-proyectos.mapper', () => {
       paginas: 2,
     } satisfies PaginadoDto<ResumenProyectoDto>);
 
-    expect(pagina).toMatchObject({
+    expect(pagina).toEqual(jasmine.objectContaining({
       paginaActual: 2,
       paginaTamano: 10,
       totalRegistros: 17,
       totalPaginas: 2,
-    });
-    expect(pagina.proyectos).toHaveLength(1);
+    }));
+    expect(pagina.proyectos.length).toBe(1);
   });
 
   it('normaliza como vacío un paginado sin registros', () => {

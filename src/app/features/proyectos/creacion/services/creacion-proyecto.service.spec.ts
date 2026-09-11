@@ -69,11 +69,11 @@ describe('CreacionProyectoService', () => {
     });
     solicitud.flush(crearResultado(VINCULACION_DTO));
 
-    await expect(respuesta).resolves.toMatchObject({
+    await expectAsync(respuesta).toBeResolvedTo(jasmine.objectContaining({
       nombreProyecto: 'InterIA',
       idEpica: 321,
       nombreEquipo: 'Producto',
-    });
+    }));
   });
 
   it('crea el borrador encapsulando la vinculación validada', async () => {
@@ -90,7 +90,7 @@ describe('CreacionProyectoService', () => {
     });
     solicitud.flush(crearResultado(crearBorradorDto()));
 
-    await expect(respuesta).resolves.toEqual({ id: 42, revision: 1, pasoActual: 1 });
+    await expectAsync(respuesta).toBeResolvedTo({ id: 42, revision: 1, pasoActual: 1 });
   });
 
   it('obtiene la fotografía editable del borrador', async () => {
@@ -104,18 +104,18 @@ describe('CreacionProyectoService', () => {
     expect(solicitud.request.method).toBe('GET');
     solicitud.flush(crearResultado(crearBorradorDto()));
 
-    await expect(respuesta).resolves.toMatchObject({
+    await expectAsync(respuesta).toBeResolvedTo(jasmine.objectContaining({
       id: 42,
       revision: 1,
-      contexto: {
+      contexto: jasmine.objectContaining({
         nombre: 'InterIA',
         prioridadCatalogoId: null,
-      },
-      equipoAzure: {
+      }),
+      equipoAzure: jasmine.objectContaining({
         idEquipo: VINCULACION_DTO.teamId,
         nombreEquipo: 'Producto',
-      },
-    });
+      }),
+    }));
   });
 
   it('sincroniza el Team de Azure y adapta sus integrantes', async () => {
@@ -147,7 +147,7 @@ describe('CreacionProyectoService', () => {
       } satisfies SincronizarEquipoAzureRespuestaDto),
     );
 
-    await expect(respuesta).resolves.toEqual({
+    await expectAsync(respuesta).toBeResolvedTo({
       idEquipo: 'team-1',
       nombreEquipo: 'Producto',
       integrantes: [
@@ -223,11 +223,11 @@ describe('CreacionProyectoService', () => {
       }),
     );
 
-    await expect(respuesta).resolves.toMatchObject({
+    await expectAsync(respuesta).toBeResolvedTo(jasmine.objectContaining({
       revision: 2,
       pasoActual: 2,
-      contexto: { nombre: contexto.nombre, fechaObjetivo: '2026-09-30' },
-    });
+      contexto: jasmine.objectContaining({ nombre: contexto.nombre, fechaObjetivo: '2026-09-30' }),
+    }));
   });
 
   it('actualiza Tipo de solución con el formato canónico y conserva Contexto', async () => {
@@ -254,14 +254,14 @@ describe('CreacionProyectoService', () => {
     );
     const solicitud = httpTesting.expectOne(ENDPOINTS_CREACION_PROYECTO.actualizarBorrador);
 
-    expect(solicitud.request.body).toMatchObject({
+    expect(solicitud.request.body).toEqual(jasmine.objectContaining({
       proyectoId: 42,
       revisionEsperada: 1,
       pasoActual: 3,
       nombre: 'InterIA',
       tipoSolucionJson: '{"tieneInterfaz":true,"plataforma":"Web"}',
       necesidadJson: '{}',
-    });
+    }));
     solicitud.flush(
       crearResultado({
         ...borradorDto,
@@ -271,7 +271,7 @@ describe('CreacionProyectoService', () => {
       }),
     );
 
-    await expect(respuesta).resolves.toMatchObject({ revision: 2, pasoActual: 3 });
+    await expectAsync(respuesta).toBeResolvedTo(jasmine.objectContaining({ revision: 2, pasoActual: 3 }));
   });
 
   it('actualiza Necesidad con el formato canónico y conserva las demás secciones', async () => {
@@ -302,7 +302,7 @@ describe('CreacionProyectoService', () => {
     );
     const solicitud = httpTesting.expectOne(ENDPOINTS_CREACION_PROYECTO.actualizarBorrador);
 
-    expect(solicitud.request.body).toMatchObject({
+    expect(solicitud.request.body).toEqual(jasmine.objectContaining({
       proyectoId: 42,
       revisionEsperada: 1,
       pasoActual: 4,
@@ -310,7 +310,7 @@ describe('CreacionProyectoService', () => {
       necesidadJson:
         '{"situacionActual":"Registro manual","problemas":"Reprocesos","impacto":"Costos altos"}',
       objetivosJson: '{}',
-    });
+    }));
     solicitud.flush(
       crearResultado({
         ...borradorDto,
@@ -320,7 +320,7 @@ describe('CreacionProyectoService', () => {
       }),
     );
 
-    await expect(respuesta).resolves.toMatchObject({ revision: 2, pasoActual: 4 });
+    await expectAsync(respuesta).toBeResolvedTo(jasmine.objectContaining({ revision: 2, pasoActual: 4 }));
   });
 
   it('actualiza Objetivos con el formato canónico en español', async () => {
@@ -350,7 +350,7 @@ describe('CreacionProyectoService', () => {
     );
     const solicitud = httpTesting.expectOne(ENDPOINTS_CREACION_PROYECTO.actualizarBorrador);
 
-    expect(solicitud.request.body).toMatchObject({
+    expect(solicitud.request.body).toEqual(jasmine.objectContaining({
       proyectoId: 42,
       revisionEsperada: 1,
       pasoActual: 5,
@@ -358,7 +358,7 @@ describe('CreacionProyectoService', () => {
       objetivosJson:
         '{"objetivoGeneral":"Reducir tiempos","objetivosEspecificos":["Automatizar tareas","Medir resultados"]}',
       alcanceJson: '{}',
-    });
+    }));
     solicitud.flush(
       crearResultado({
         ...borradorDto,
@@ -368,7 +368,7 @@ describe('CreacionProyectoService', () => {
       }),
     );
 
-    await expect(respuesta).resolves.toMatchObject({ revision: 2, pasoActual: 5 });
+    await expectAsync(respuesta).toBeResolvedTo(jasmine.objectContaining({ revision: 2, pasoActual: 5 }));
   });
 
   it('actualiza Alcance con el formato canónico en español', async () => {
@@ -398,14 +398,14 @@ describe('CreacionProyectoService', () => {
     );
     const solicitud = httpTesting.expectOne(ENDPOINTS_CREACION_PROYECTO.actualizarBorrador);
 
-    expect(solicitud.request.body).toMatchObject({
+    expect(solicitud.request.body).toEqual(jasmine.objectContaining({
       proyectoId: 42,
       revisionEsperada: 1,
       pasoActual: 6,
       objetivosJson: '{}',
       alcanceJson: '{"incluido":"Seguimiento de envíos","excluido":"Pagos en línea"}',
       rolesJson: '[]',
-    });
+    }));
     solicitud.flush(
       crearResultado({
         ...borradorDto,
@@ -415,7 +415,7 @@ describe('CreacionProyectoService', () => {
       }),
     );
 
-    await expect(respuesta).resolves.toMatchObject({ revision: 2, pasoActual: 6 });
+    await expectAsync(respuesta).toBeResolvedTo(jasmine.objectContaining({ revision: 2, pasoActual: 6 }));
   });
 
   it('guarda el proyecto con el identificador y la revisión confirmada', async () => {
@@ -428,7 +428,7 @@ describe('CreacionProyectoService', () => {
     expect(solicitud.request.body).toEqual({ proyectoId: 42, revisionEsperada: 9 });
     solicitud.flush(crearResultado(crearProyectoGuardadoDto()));
 
-    await expect(respuesta).resolves.toBeUndefined();
+    await expectAsync(respuesta).toBeResolvedTo(undefined);
   });
 
   it('genera el diagrama con IA y entrega el contrato canónico del canvas', async () => {
@@ -439,7 +439,7 @@ describe('CreacionProyectoService', () => {
     expect(solicitud.request.body).toEqual({ proyectoId: 42 });
     solicitud.flush(crearResultado(FLUJO_GENERADO_IA));
 
-    await expect(respuesta).resolves.toEqual(FLUJO_GENERADO_IA);
+    await expectAsync(respuesta).toBeResolvedTo(FLUJO_GENERADO_IA);
   });
 
   it('rechaza una respuesta funcional que no contiene datos válidos', async () => {
@@ -455,7 +455,7 @@ describe('CreacionProyectoService', () => {
       errores: null,
     } satisfies ResultadoApi<ValidarVinculacionAzureRespuestaDto>);
 
-    await expect(respuesta).rejects.toThrow('La épica no existe.');
+    await expectAsync(respuesta).toBeRejectedWithError('La épica no existe.');
   });
 });
 

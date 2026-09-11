@@ -9,15 +9,16 @@ import { EstadoCreacionProyectoService } from './estado-creacion-proyecto.servic
 
 describe('EstadoCreacionProyectoService', () => {
   const creacionProyecto = {
-    obtenerBorrador: vi.fn(),
-    actualizarBorrador: vi.fn(),
+    obtenerBorrador: jasmine.createSpy('obtenerBorrador'),
+    actualizarBorrador: jasmine.createSpy('actualizarBorrador'),
   };
   let servicio: EstadoCreacionProyectoService;
 
   beforeEach(() => {
-    vi.clearAllMocks();
-    creacionProyecto.obtenerBorrador.mockReturnValue(of(BORRADOR));
-    creacionProyecto.actualizarBorrador.mockImplementation(
+    creacionProyecto.obtenerBorrador.calls.reset();
+    creacionProyecto.actualizarBorrador.calls.reset();
+    creacionProyecto.obtenerBorrador.and.returnValue(of(BORRADOR));
+    creacionProyecto.actualizarBorrador.and.callFake(
       (
         borrador: BorradorProyecto,
         actualizacion: ActualizacionSeccionProyecto,
@@ -53,7 +54,7 @@ describe('EstadoCreacionProyectoService', () => {
 
   it('descarta la fotografía anterior cuando cambia el proyecto vigente', async () => {
     await firstValueFrom(servicio.cargar(42));
-    creacionProyecto.obtenerBorrador.mockReturnValue(of({ ...BORRADOR, id: 84 }));
+    creacionProyecto.obtenerBorrador.and.returnValue(of({ ...BORRADOR, id: 84 }));
 
     servicio.seleccionarProyecto(84);
 
@@ -63,7 +64,7 @@ describe('EstadoCreacionProyectoService', () => {
     await firstValueFrom(servicio.cargar(84));
 
     expect(servicio.borrador()?.id).toBe(84);
-    expect(creacionProyecto.obtenerBorrador).toHaveBeenLastCalledWith(84);
+    expect(creacionProyecto.obtenerBorrador.calls.mostRecent().args).toEqual([84]);
   });
 
   it('conserva el nombre escrito para el encabezado del recorrido', () => {
@@ -91,7 +92,7 @@ describe('EstadoCreacionProyectoService', () => {
       BORRADOR,
       {
         seccion: ClaveSeccionProyecto.Contexto,
-        datos: expect.objectContaining({ responsable: 'María' }),
+        datos: jasmine.objectContaining({ responsable: 'María' }),
       },
       2,
     );
@@ -99,7 +100,7 @@ describe('EstadoCreacionProyectoService', () => {
   });
 
   it('no hace retroceder el avance al editar Contexto desde un paso posterior', async () => {
-    creacionProyecto.obtenerBorrador.mockReturnValue(of({ ...BORRADOR, pasoActual: 5 }));
+    creacionProyecto.obtenerBorrador.and.returnValue(of({ ...BORRADOR, pasoActual: 5 }));
     await firstValueFrom(servicio.cargar(42));
     await firstValueFrom(
       servicio.guardarSeccion({
@@ -109,7 +110,7 @@ describe('EstadoCreacionProyectoService', () => {
     );
 
     expect(creacionProyecto.actualizarBorrador).toHaveBeenCalledWith(
-      expect.objectContaining({ pasoActual: 5 }),
+      jasmine.objectContaining({ pasoActual: 5 }),
       { seccion: ClaveSeccionProyecto.Contexto, datos: BORRADOR.contexto },
       5,
     );
@@ -155,7 +156,7 @@ describe('EstadoCreacionProyectoService', () => {
   });
 
   it('no hace retroceder el avance al editar Necesidad desde un paso posterior', async () => {
-    creacionProyecto.obtenerBorrador.mockReturnValue(of({ ...BORRADOR, pasoActual: 7 }));
+    creacionProyecto.obtenerBorrador.and.returnValue(of({ ...BORRADOR, pasoActual: 7 }));
     await firstValueFrom(servicio.cargar(42));
     await firstValueFrom(
       servicio.guardarSeccion({
@@ -169,8 +170,8 @@ describe('EstadoCreacionProyectoService', () => {
     );
 
     expect(creacionProyecto.actualizarBorrador).toHaveBeenCalledWith(
-      expect.objectContaining({ pasoActual: 7 }),
-      expect.objectContaining({ seccion: ClaveSeccionProyecto.Necesidad }),
+      jasmine.objectContaining({ pasoActual: 7 }),
+      jasmine.objectContaining({ seccion: ClaveSeccionProyecto.Necesidad }),
       7,
     );
   });
@@ -194,7 +195,7 @@ describe('EstadoCreacionProyectoService', () => {
   });
 
   it('no hace retroceder el avance al editar Objetivos desde un paso posterior', async () => {
-    creacionProyecto.obtenerBorrador.mockReturnValue(of({ ...BORRADOR, pasoActual: 8 }));
+    creacionProyecto.obtenerBorrador.and.returnValue(of({ ...BORRADOR, pasoActual: 8 }));
     await firstValueFrom(servicio.cargar(42));
     await firstValueFrom(
       servicio.guardarSeccion({
@@ -207,8 +208,8 @@ describe('EstadoCreacionProyectoService', () => {
     );
 
     expect(creacionProyecto.actualizarBorrador).toHaveBeenCalledWith(
-      expect.objectContaining({ pasoActual: 8 }),
-      expect.objectContaining({ seccion: ClaveSeccionProyecto.Objetivos }),
+      jasmine.objectContaining({ pasoActual: 8 }),
+      jasmine.objectContaining({ seccion: ClaveSeccionProyecto.Objetivos }),
       8,
     );
   });
@@ -232,7 +233,7 @@ describe('EstadoCreacionProyectoService', () => {
   });
 
   it('no hace retroceder el avance al editar Alcance desde un paso posterior', async () => {
-    creacionProyecto.obtenerBorrador.mockReturnValue(of({ ...BORRADOR, pasoActual: 8 }));
+    creacionProyecto.obtenerBorrador.and.returnValue(of({ ...BORRADOR, pasoActual: 8 }));
     await firstValueFrom(servicio.cargar(42));
     await firstValueFrom(
       servicio.guardarSeccion({
@@ -242,8 +243,8 @@ describe('EstadoCreacionProyectoService', () => {
     );
 
     expect(creacionProyecto.actualizarBorrador).toHaveBeenCalledWith(
-      expect.objectContaining({ pasoActual: 8 }),
-      expect.objectContaining({ seccion: ClaveSeccionProyecto.Alcance }),
+      jasmine.objectContaining({ pasoActual: 8 }),
+      jasmine.objectContaining({ seccion: ClaveSeccionProyecto.Alcance }),
       8,
     );
   });

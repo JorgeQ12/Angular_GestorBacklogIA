@@ -14,7 +14,7 @@ describe('MensajesService', () => {
     const decision = servicio.confirmar('Crear proyecto', 'Se creará un nuevo borrador.');
 
     expect(servicio.mensajeActual()).toEqual(
-      expect.objectContaining({
+      jasmine.objectContaining({
         variante: VarianteMensaje.Confirmacion,
         mostrarCancelar: true,
         textoConfirmar: 'Confirmar',
@@ -23,7 +23,7 @@ describe('MensajesService', () => {
 
     servicio.aceptar();
 
-    await expect(decision).resolves.toBe(true);
+    await expectAsync(decision).toBeResolvedTo(true);
     expect(servicio.mensajeActual()).toBeNull();
   });
 
@@ -35,18 +35,18 @@ describe('MensajesService', () => {
 
     servicio.cancelar();
 
-    await expect(decision).resolves.toBe(false);
+    await expectAsync(decision).toBeResolvedTo(false);
   });
 
   it('resuelve el mensaje anterior antes de presentar uno nuevo', async () => {
     const primeraDecision = servicio.confirmar('Primera acción', 'Primer mensaje.');
     const segundaDecision = servicio.confirmar('Segunda acción', 'Segundo mensaje.');
 
-    await expect(primeraDecision).resolves.toBe(false);
+    await expectAsync(primeraDecision).toBeResolvedTo(false);
     expect(servicio.mensajeActual()?.titulo).toBe('Segunda acción');
 
     servicio.aceptar();
-    await expect(segundaDecision).resolves.toBe(true);
+    await expectAsync(segundaDecision).toBeResolvedTo(true);
   });
 
   it('conserva los detalles funcionales de un error', () => {

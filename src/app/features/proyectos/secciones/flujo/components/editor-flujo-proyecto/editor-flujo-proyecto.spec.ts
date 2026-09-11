@@ -14,6 +14,12 @@ describe('EditorFlujoProyecto', () => {
   let estadoEditor: EstadoEditorFlujoProyectoService;
 
   beforeEach(async () => {
+    // En un navegador real (Karma/Chrome) setPointerCapture exige un puntero activo real;
+    // los eventos sintéticos del test no lo tienen, así que se neutraliza la captura de puntero.
+    spyOn(Element.prototype, 'setPointerCapture').and.stub();
+    spyOn(Element.prototype, 'releasePointerCapture').and.stub();
+    spyOn(Element.prototype, 'hasPointerCapture').and.returnValue(false);
+
     await TestBed.configureTestingModule({ imports: [EditorFlujoProyecto] }).compileComponents();
     fixture = TestBed.createComponent(EditorFlujoProyecto);
     fixture.componentRef.setInput('flujo', FLUJO_VACIO);
@@ -29,7 +35,7 @@ describe('EditorFlujoProyecto', () => {
   });
 
   it('emite la fotografía completa cuando cambia un bloque', async () => {
-    const flujoCambiado = vi.fn();
+    const flujoCambiado = jasmine.createSpy();
     fixture.componentInstance.flujoCambiado.subscribe(flujoCambiado);
 
     estadoEditor.iniciarCreacionNodo(TipoBloqueFlujo.Accion);
@@ -45,9 +51,9 @@ describe('EditorFlujoProyecto', () => {
     await fixture.whenStable();
 
     expect(flujoCambiado).toHaveBeenCalledWith(
-      expect.objectContaining({
+      jasmine.objectContaining({
         proyectoId: '42',
-        nodos: [expect.objectContaining({ titulo: 'Consultar proyecto' })],
+        nodos: [jasmine.objectContaining({ titulo: 'Consultar proyecto' })],
       }),
     );
   });
@@ -132,7 +138,7 @@ describe('EditorFlujoProyecto', () => {
       opcion.style.getPropertyValue('--acento-bloque-flujo'),
     );
 
-    expect(opciones).toHaveLength(Object.values(TipoBloqueFlujo).length);
+    expect(opciones.length).toBe(Object.values(TipoBloqueFlujo).length);
     expect(new Set(acentosPaleta).size).toBe(Object.values(TipoBloqueFlujo).length);
 
     estadoEditor.cerrarPaletaBloques();
@@ -146,7 +152,7 @@ describe('EditorFlujoProyecto', () => {
       tarjeta.style.getPropertyValue('--acento-bloque-flujo'),
     );
 
-    expect(tarjetas).toHaveLength(Object.values(TipoBloqueFlujo).length);
+    expect(tarjetas.length).toBe(Object.values(TipoBloqueFlujo).length);
     expect(new Set(acentosLienzo)).toEqual(new Set(acentosPaleta));
   });
 
@@ -181,11 +187,11 @@ describe('EditorFlujoProyecto', () => {
       '.editor-flujo',
     )!;
     let elementoPantallaCompleta: Element | null = null;
-    const solicitarPantallaCompleta = vi.fn(async () => {
+    const solicitarPantallaCompleta = jasmine.createSpy('solicitarPantallaCompleta').and.callFake(async () => {
       elementoPantallaCompleta = contenedorEditor;
       documento.dispatchEvent(new Event('fullscreenchange'));
     });
-    const salirPantallaCompleta = vi.fn(async () => {
+    const salirPantallaCompleta = jasmine.createSpy('salirPantallaCompleta').and.callFake(async () => {
       elementoPantallaCompleta = null;
       documento.dispatchEvent(new Event('fullscreenchange'));
     });
@@ -211,7 +217,7 @@ describe('EditorFlujoProyecto', () => {
       await fixture.whenStable();
       fixture.detectChanges();
 
-      expect(solicitarPantallaCompleta).toHaveBeenCalledOnce();
+      expect(solicitarPantallaCompleta).toHaveBeenCalledTimes(1);
       const reducir = (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>(
         '[aria-label="Reducir canvas"]',
       )!;
@@ -219,7 +225,7 @@ describe('EditorFlujoProyecto', () => {
       await fixture.whenStable();
       fixture.detectChanges();
 
-      expect(salirPantallaCompleta).toHaveBeenCalledOnce();
+      expect(salirPantallaCompleta).toHaveBeenCalledTimes(1);
       expect(
         (fixture.nativeElement as HTMLElement).querySelector(
           '[aria-label="Ampliar canvas a pantalla completa"]',
@@ -232,23 +238,25 @@ describe('EditorFlujoProyecto', () => {
     }
   });
 
-  it.each([
+  [
     TipoBloqueFlujo.Modulo,
     TipoBloqueFlujo.Pagina,
     TipoBloqueFlujo.Accion,
     TipoBloqueFlujo.Componente,
-  ])('presenta los roles disponibles en el formulario de %s', (tipo) => {
-    fixture.componentRef.setInput('flujo', FLUJO_CON_ROLES);
-    fixture.detectChanges();
+  ].forEach((tipo) => {
+    it(`presenta los roles disponibles en el formulario de ${tipo}`, () => {
+      fixture.componentRef.setInput('flujo', FLUJO_CON_ROLES);
+      fixture.detectChanges();
 
-    estadoEditor.iniciarCreacionNodo(tipo);
-    fixture.detectChanges();
+      estadoEditor.iniciarCreacionNodo(tipo);
+      fixture.detectChanges();
 
-    const modal = (fixture.nativeElement as HTMLElement).querySelector(
-      'app-modal-nodo-flujo-proyecto',
-    );
-    expect(modal?.textContent).toContain('Administrador');
-    expect(modal?.querySelector<HTMLInputElement>('#flujo-rol-rol-administrador')).not.toBeNull();
+      const modal = (fixture.nativeElement as HTMLElement).querySelector(
+        'app-modal-nodo-flujo-proyecto',
+      );
+      expect(modal?.textContent).toContain('Administrador');
+      expect(modal?.querySelector<HTMLInputElement>('#flujo-rol-rol-administrador')).not.toBeNull();
+    });
   });
 
   it('elimina la asignación de roles de los bloques de decisión', () => {
@@ -291,10 +299,12 @@ describe('EditorFlujoProyecto', () => {
     botonGuardar?.click();
     fixture.detectChanges();
 
-    expect(estadoEditor.flujo().nodos[0]).toMatchObject({
-      tipo: TipoBloqueFlujo.Componente,
-      idsRoles: [],
-    });
+    expect(estadoEditor.flujo().nodos[0]).toEqual(
+      jasmine.objectContaining({
+        tipo: TipoBloqueFlujo.Componente,
+        idsRoles: [],
+      }),
+    );
   });
 
   it('conserva el último criterio requerido y permite eliminar filas adicionales', () => {
@@ -306,13 +316,13 @@ describe('EditorFlujoProyecto', () => {
       '[aria-label="Eliminar criterio de aceptación 1"]',
     );
 
-    expect(elemento.querySelectorAll('[id^="flujo-criterio-"]')).toHaveLength(1);
+    expect(elemento.querySelectorAll('[id^="flujo-criterio-"]').length).toBe(1);
     expect(eliminarPrimero?.disabled).toBe(true);
 
     elemento.querySelector<HTMLButtonElement>('button.ui-form-section__action')?.click();
     fixture.detectChanges();
 
-    expect(elemento.querySelectorAll('[id^="flujo-criterio-"]')).toHaveLength(2);
+    expect(elemento.querySelectorAll('[id^="flujo-criterio-"]').length).toBe(2);
     const eliminarSegundo = elemento.querySelector<HTMLButtonElement>(
       '[aria-label="Eliminar criterio de aceptación 2"]',
     );
@@ -321,7 +331,7 @@ describe('EditorFlujoProyecto', () => {
     eliminarSegundo?.click();
     fixture.detectChanges();
 
-    expect(elemento.querySelectorAll('[id^="flujo-criterio-"]')).toHaveLength(1);
+    expect(elemento.querySelectorAll('[id^="flujo-criterio-"]').length).toBe(1);
     expect(
       elemento.querySelector<HTMLButtonElement>('[aria-label="Eliminar criterio de aceptación 1"]')
         ?.disabled,

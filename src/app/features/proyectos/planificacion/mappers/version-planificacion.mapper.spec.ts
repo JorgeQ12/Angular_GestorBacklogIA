@@ -35,7 +35,7 @@ describe('mapearVersionesPlanificacion', () => {
           origen: 'desconocido' as OrigenVersionPlanificacionDto,
         },
       ]),
-    ).toThrow('Origen de versión de planificación no compatible');
+    ).toThrowError(/Origen de versión de planificación no compatible/);
   });
 });
 

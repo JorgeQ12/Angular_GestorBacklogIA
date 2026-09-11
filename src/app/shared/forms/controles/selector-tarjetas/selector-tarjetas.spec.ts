@@ -60,7 +60,7 @@ describe('SelectorTarjetas', () => {
     const grupo = (fixture.nativeElement as HTMLElement).querySelector('[role="radiogroup"]');
 
     expect(grupo?.getAttribute('aria-labelledby')).toBe('canal-label');
-    expect(obtenerControles()).toHaveLength(2);
+    expect(obtenerControles().length).toBe(2);
   });
 
   it('conserva la alternativa seleccionada en solo lectura', () => {
