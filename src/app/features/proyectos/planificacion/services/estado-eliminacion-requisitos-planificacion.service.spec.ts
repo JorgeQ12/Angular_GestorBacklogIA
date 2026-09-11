@@ -140,6 +140,126 @@ describe('EstadoEliminacionRequisitosPlanificacionService', () => {
     );
     expect(api.eliminar).toHaveBeenCalledWith(TipoElementoPlanificacion.ListaRequisitos, 700, 3);
   });
+
+  it('confirma y elimina una épica con el mensaje de descendientes históricos', async () => {
+    const epica: ElementoPlanificacion = {
+      ...TAREA,
+      clave: 'epica:800',
+      id: 800,
+      tipo: TipoElementoPlanificacion.Epica,
+      titulo: 'Épica principal',
+    };
+
+    await servicio.eliminar(epica, jasmine.createSpy('actualizarArbol'));
+
+    expect(mensajes.confirmarDestructiva).toHaveBeenCalledWith(
+      'Eliminar épica',
+      'La épica local y todos sus elementos descendientes dejarán de estar vigentes. Sus versiones se conservarán.',
+    );
+    expect(api.eliminar).toHaveBeenCalledWith(TipoElementoPlanificacion.Epica, 800, 3);
+  });
+
+  it('confirma y elimina una historia de usuario con su mensaje específico', async () => {
+    const historia: ElementoPlanificacion = {
+      ...TAREA,
+      clave: 'historia:801',
+      id: 801,
+      tipo: TipoElementoPlanificacion.Historia,
+      titulo: 'Registrar entrega',
+    };
+
+    await servicio.eliminar(historia, jasmine.createSpy('actualizarArbol'));
+
+    expect(mensajes.confirmarDestructiva).toHaveBeenCalledWith(
+      'Eliminar historia de usuario',
+      'La historia de usuario y sus tareas dejarán de estar vigentes. Sus versiones se conservarán.',
+    );
+    expect(api.eliminar).toHaveBeenCalledWith(TipoElementoPlanificacion.Historia, 801, 3);
+  });
+
+  it('confirma y elimina una tarea de requisitos con su mensaje específico', async () => {
+    await servicio.eliminar(TAREA, jasmine.createSpy('actualizarArbol'));
+
+    expect(mensajes.confirmarDestructiva).toHaveBeenCalledWith(
+      'Eliminar tarea de requisitos',
+      'La tarea dejará de estar vigente, pero sus versiones se conservarán.',
+    );
+    expect(api.eliminar).toHaveBeenCalledWith(TipoElementoPlanificacion.TareaRequisito, 502, 3);
+  });
+
+  it('confirma y elimina una tarea con su mensaje específico', async () => {
+    const tarea: ElementoPlanificacion = {
+      ...TAREA,
+      clave: 'tarea:802',
+      id: 802,
+      tipo: TipoElementoPlanificacion.Tarea,
+      titulo: 'Crear formulario',
+    };
+
+    await servicio.eliminar(tarea, jasmine.createSpy('actualizarArbol'));
+
+    expect(mensajes.confirmarDestructiva).toHaveBeenCalledWith(
+      'Eliminar tarea',
+      'La tarea dejará de estar vigente, pero sus versiones se conservarán.',
+    );
+    expect(api.eliminar).toHaveBeenCalledWith(TipoElementoPlanificacion.Tarea, 802, 3);
+  });
+
+  it('omite la eliminación cuando el elemento ya está inactivo', async () => {
+    await servicio.eliminar({ ...TAREA, activo: false }, jasmine.createSpy('actualizarArbol'));
+
+    expect(mensajes.confirmarDestructiva).not.toHaveBeenCalled();
+    expect(api.eliminar).not.toHaveBeenCalled();
+  });
+
+  it('omite la eliminación cuando el elemento es de solo lectura', async () => {
+    await servicio.eliminar(
+      { ...TAREA, capacidades: { ...TAREA.capacidades, soloLectura: true } },
+      jasmine.createSpy('actualizarArbol'),
+    );
+
+    expect(mensajes.confirmarDestructiva).not.toHaveBeenCalled();
+    expect(api.eliminar).not.toHaveBeenCalled();
+  });
+
+  it('omite la eliminación cuando no hay planificación cargada', async () => {
+    planificacion.set(null);
+
+    await servicio.eliminar(TAREA, jasmine.createSpy('actualizarArbol'));
+
+    expect(mensajes.confirmarDestructiva).not.toHaveBeenCalled();
+    expect(api.eliminar).not.toHaveBeenCalled();
+  });
+
+  it('omite la eliminación cuando la planificación es histórica', async () => {
+    planificacion.set({ ...PLANIFICACION, esHistorica: true });
+
+    await servicio.eliminar(TAREA, jasmine.createSpy('actualizarArbol'));
+
+    expect(mensajes.confirmarDestructiva).not.toHaveBeenCalled();
+    expect(api.eliminar).not.toHaveBeenCalled();
+  });
+
+  it('no actualiza el árbol ante un error distinto de conflicto de versión', async () => {
+    const actualizarArbol = jasmine.createSpy('actualizarArbol');
+    const error = new HttpErrorResponse({ status: 500 });
+    api.eliminar.and.returnValue(throwError(() => error));
+
+    await servicio.eliminar(TAREA, actualizarArbol);
+
+    expect(actualizarArbol).not.toHaveBeenCalled();
+    expect(notificador.comunicar).toHaveBeenCalledWith(
+      error,
+      jasmine.objectContaining({ titulo: 'No fue posible eliminar el elemento' }),
+    );
+    expect(servicio.eliminando()).toBe(false);
+  });
+
+  it('restablece el estado cancelando la operación en curso', () => {
+    servicio.restablecer();
+
+    expect(servicio.eliminando()).toBe(false);
+  });
 });
 
 const CAPACIDADES = {

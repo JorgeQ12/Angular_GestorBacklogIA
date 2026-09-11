@@ -5,7 +5,12 @@ import { firstValueFrom } from 'rxjs';
 import type { ResultadoApi } from '../../../../core/http/models/resultado-api.model';
 import { ClaveSeccionProyecto } from '../../config/secciones-proyecto.config';
 import { ENDPOINTS_INFORMACION_PROYECTO } from '../config/endpoints-informacion-proyecto.config';
-import type { ProyectoInformacionDto } from '../models/informacion-proyecto.dto';
+import type {
+  ProyectoInformacionDto,
+  VersionProyectoDto,
+  VersionProyectoResumenDto,
+} from '../models/informacion-proyecto.dto';
+import type { VinculacionAzureProyectoResumen } from '../../models/vinculacion-azure-proyecto.model';
 import { InformacionProyectoService } from './informacion-proyecto.service';
 
 describe('InformacionProyectoService', () => {
@@ -55,6 +60,56 @@ describe('InformacionProyectoService', () => {
     solicitud.flush(resultado({ ...DTO, versionActualId: 82, numeroVersionActual: 5 }));
     await expectAsync(respuesta).toBeResolvedTo(jasmine.objectContaining({ versionId: 82, numeroVersion: 5 }));
   });
+
+  it('propaga el error cuando la fotografía no llega con datos', async () => {
+    const respuesta = firstValueFrom(servicio.obtenerProyecto(42));
+    httpTesting
+      .expectOne((request) => request.url === ENDPOINTS_INFORMACION_PROYECTO.obtenerProyecto)
+      .flush({ exitoso: false, tipo: 0, datos: null, mensaje: 'sin datos', codigoError: 'X', errores: null });
+    await expectAsync(respuesta).toBeRejected();
+  });
+
+  it('consulta y adapta el historial de versiones para el selector', async () => {
+    const respuesta = firstValueFrom(servicio.obtenerVersiones(42));
+    const solicitud = httpTesting.expectOne(
+      (request) => request.url === ENDPOINTS_INFORMACION_PROYECTO.obtenerVersiones,
+    );
+    expect(solicitud.request.params.get('proyectoId')).toBe('42');
+    solicitud.flush(resultado(RESUMENES_VERSION));
+    await expectAsync(respuesta).toBeResolvedTo([
+      { id: 81, numero: 4, fechaCreacion: '2026-01-01', esActual: true },
+      { id: 80, numero: 3, fechaCreacion: '2025-12-01', esActual: false },
+    ]);
+  });
+
+  it('consulta una versión histórica conservando la vinculación de Azure', async () => {
+    const azure: VinculacionAzureProyectoResumen = {
+      organizacion: 'interia',
+      proyectoAzureNombre: 'PoC',
+      teamNombre: 'Team',
+      boardUrl: 'board',
+      epicaAzureId: 1,
+      urlEpica: 'epica',
+      tituloEpica: 'Pruebas',
+    };
+    const respuesta = firstValueFrom(servicio.obtenerVersion(42, 80, azure));
+    const solicitud = httpTesting.expectOne(
+      (request) => request.url === ENDPOINTS_INFORMACION_PROYECTO.obtenerVersion,
+    );
+    expect(solicitud.request.params.get('proyectoId')).toBe('42');
+    expect(solicitud.request.params.get('versionProyectoId')).toBe('80');
+    solicitud.flush(resultado(DTO_VERSION));
+    await expectAsync(respuesta).toBeResolvedTo(
+      jasmine.objectContaining({
+        id: 42,
+        versionId: 80,
+        numeroVersion: 3,
+        fechaVersion: '2025-12-01',
+        esVersionActual: false,
+        azure,
+      }),
+    );
+  });
 });
 
 function resultado<T>(datos: T): ResultadoApi<T> {
@@ -89,4 +144,33 @@ const DTO: ProyectoInformacionDto = {
     urlEpica: 'epica',
     tituloEpica: 'Pruebas',
   },
+};
+
+const RESUMENES_VERSION: readonly VersionProyectoResumenDto[] = [
+  { id: 81, numeroVersion: 4, fechaCreacion: '2026-01-01', esActual: true },
+  { id: 80, numeroVersion: 3, fechaCreacion: '2025-12-01', esActual: false },
+];
+
+const DTO_VERSION: VersionProyectoDto = {
+  id: 80,
+  proyectoId: 42,
+  numeroVersion: 3,
+  fechaCreacion: '2025-12-01',
+  esActual: false,
+  nombre: 'Portal',
+  responsable: 'Jorge',
+  descripcion: 'Descripción',
+  prioridadCatalogoId: 2,
+  prioridadCatalogo: { id: 2, codigo: 'alta', nombre: 'Alta', descripcion: '' },
+  estadoCatalogoId: 3,
+  estadoCatalogo: { id: 3, codigo: 'en_progreso', nombre: 'En Progreso', descripcion: '' },
+  fechaObjetivo: '2026-12-10',
+  tipoSolucionJson: DTO.tipoSolucionJson,
+  necesidadJson: DTO.necesidadJson,
+  objetivosJson: DTO.objetivosJson,
+  alcanceJson: DTO.alcanceJson,
+  rolesJson: DTO.rolesJson,
+  equipoJson: DTO.equipoJson,
+  diagramFlujoJson: DTO.diagramFlujoJson,
+  insumosJson: '[]',
 };

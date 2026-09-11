@@ -106,4 +106,5 @@ describe('CamposComunesNodoFlujoProyecto', () => {
 
     expect(componente.tienePermiso('rol-inexistente', AccionPermisoModulo.Ver)).toBe(false);
   });
+
 });

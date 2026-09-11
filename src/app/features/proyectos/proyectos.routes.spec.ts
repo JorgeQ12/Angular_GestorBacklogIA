@@ -16,4 +16,31 @@ describe('RUTAS_PROYECTOS', () => {
     expect(RUTAS_PROYECTOS[3].providers).toBeDefined();
     expect(RUTAS_PROYECTOS.every((ruta) => ruta.children === undefined)).toBe(true);
   });
+
+  it('carga diferida del componente de información', async () => {
+    const componente = await RUTAS_PROYECTOS[0].loadComponent!();
+    expect(componente).toBeTruthy();
+  });
+
+  it('carga diferida del componente de consulta', async () => {
+    const componente = await RUTAS_PROYECTOS[1].loadComponent!();
+    expect(componente).toBeTruthy();
+  });
+
+  it('carga diferida del componente de creación', async () => {
+    const componente = await RUTAS_PROYECTOS[2].loadComponent!();
+    expect(componente).toBeTruthy();
+  });
+
+  it('carga diferida del componente de planificación', async () => {
+    const componente = await RUTAS_PROYECTOS[3].loadComponent!();
+    expect(componente).toBeTruthy();
+  });
+
+  it('provee los servicios de estado de cada caso de uso en su ruta', () => {
+    expect(RUTAS_PROYECTOS[0].providers?.length).toBe(1);
+    expect(RUTAS_PROYECTOS[1].providers?.length).toBe(1);
+    expect(RUTAS_PROYECTOS[2].providers?.length).toBe(2);
+    expect(RUTAS_PROYECTOS[3].providers?.length).toBe(9);
+  });
 });

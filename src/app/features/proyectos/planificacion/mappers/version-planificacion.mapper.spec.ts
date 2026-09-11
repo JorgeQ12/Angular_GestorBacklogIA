@@ -37,6 +37,30 @@ describe('mapearVersionesPlanificacion', () => {
       ]),
     ).toThrowError(/Origen de versión de planificación no compatible/);
   });
+
+  ([
+    [OrigenVersionPlanificacionDto.Inicial, OrigenVersionPlanificacion.Inicial],
+    [
+      OrigenVersionPlanificacionDto.GeneracionCaracteristicas,
+      OrigenVersionPlanificacion.GeneracionCaracteristicas,
+    ],
+    [
+      OrigenVersionPlanificacionDto.GeneracionHistorias,
+      OrigenVersionPlanificacion.GeneracionHistorias,
+    ],
+    [OrigenVersionPlanificacionDto.GeneracionTareas, OrigenVersionPlanificacion.GeneracionTareas],
+    [OrigenVersionPlanificacionDto.GeneracionEpicas, OrigenVersionPlanificacion.GeneracionEpicas],
+    [OrigenVersionPlanificacionDto.ReemplazoManual, OrigenVersionPlanificacion.ReemplazoManual],
+    [
+      OrigenVersionPlanificacionDto.SincronizacionAzure,
+      OrigenVersionPlanificacion.SincronizacionAzure,
+    ],
+  ] as const).forEach(([dto, esperado]) => {
+    it(`traduce el origen ${dto} al valor interno de dominio`, () => {
+      const [version] = mapearVersionesPlanificacion([{ ...VERSIONES_DTO[0], origen: dto }]);
+      expect(version.origen).toBe(esperado);
+    });
+  });
 });
 
 const VERSIONES_DTO: readonly VersionPlanificacionDto[] = [

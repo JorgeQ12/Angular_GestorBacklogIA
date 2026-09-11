@@ -115,6 +115,105 @@ describe('ArbolPlanificacionProyecto', () => {
 
     expect(eliminar).toHaveBeenCalledWith(ACTIVIDAD_REQUISITO);
   });
+
+  it('emite la creación del hijo correcto para cada tipo de elemento padre', () => {
+    const creado = jasmine.createSpy('creado');
+    fixture.componentInstance.crearElemento.subscribe(creado);
+    const instancia = fixture.componentInstance as unknown as {
+      solicitarCreacion(elemento: ElementoPlanificacion): void;
+    };
+
+    instancia.solicitarCreacion(EPICA);
+    instancia.solicitarCreacion(CARACTERISTICA);
+    instancia.solicitarCreacion(LISTA_REQUISITOS);
+    instancia.solicitarCreacion(ACTIVIDAD_REQUISITO);
+    instancia.solicitarCreacion(HISTORIA);
+
+    expect(creado.calls.allArgs()).toEqual([
+      [{ tipo: TipoElementoPlanificacion.Caracteristica, padreId: 1 }],
+      [{ tipo: TipoElementoPlanificacion.Historia, padreId: 2 }],
+      [{ tipo: TipoElementoPlanificacion.ActividadRequisito, padreId: 5 }],
+      [{ tipo: TipoElementoPlanificacion.TareaRequisito, padreId: 6 }],
+      [{ tipo: TipoElementoPlanificacion.Tarea, padreId: 4 }],
+    ]);
+  });
+
+  it('no emite creación cuando el elemento es una rama terminal sin hijos posibles', () => {
+    const creado = jasmine.createSpy('creado');
+    fixture.componentInstance.crearElemento.subscribe(creado);
+    const instancia = fixture.componentInstance as unknown as {
+      solicitarCreacion(elemento: ElementoPlanificacion): void;
+    };
+
+    instancia.solicitarCreacion(TAREA);
+    instancia.solicitarCreacion(TAREA_REQUISITO);
+
+    expect(creado).not.toHaveBeenCalled();
+  });
+
+  it('identifica las ramas terminales de tipo tarea y tarea de requisito', () => {
+    const instancia = fixture.componentInstance as unknown as {
+      esRamaTerminal(elemento: ElementoPlanificacion): boolean;
+    };
+
+    expect(instancia.esRamaTerminal(TAREA)).toBe(true);
+    expect(instancia.esRamaTerminal(TAREA_REQUISITO)).toBe(true);
+    expect(instancia.esRamaTerminal(EPICA)).toBe(false);
+  });
+
+  it('alterna el menú de acciones abriéndolo y cerrándolo sobre la misma clave', () => {
+    const instancia = fixture.componentInstance as unknown as {
+      alternarMenuAcciones(clave: string): void;
+      estaAbiertoMenuAcciones(clave: string): boolean;
+      hayMenuAccionesAbierto(): boolean;
+    };
+
+    expect(instancia.hayMenuAccionesAbierto()).toBe(false);
+
+    instancia.alternarMenuAcciones('epica:1');
+    expect(instancia.estaAbiertoMenuAcciones('epica:1')).toBe(true);
+    expect(instancia.hayMenuAccionesAbierto()).toBe(true);
+
+    instancia.alternarMenuAcciones('epica:1');
+    expect(instancia.estaAbiertoMenuAcciones('epica:1')).toBe(false);
+    expect(instancia.hayMenuAccionesAbierto()).toBe(false);
+  });
+
+  it('cambia el menú abierto al alternar una clave distinta', () => {
+    const instancia = fixture.componentInstance as unknown as {
+      alternarMenuAcciones(clave: string): void;
+      estaAbiertoMenuAcciones(clave: string): boolean;
+    };
+
+    instancia.alternarMenuAcciones('epica:1');
+    instancia.alternarMenuAcciones('caracteristica:2');
+
+    expect(instancia.estaAbiertoMenuAcciones('epica:1')).toBe(false);
+    expect(instancia.estaAbiertoMenuAcciones('caracteristica:2')).toBe(true);
+  });
+
+  it('cierra el menú de acciones al hacer clic fuera y al presionar Escape', () => {
+    const instancia = fixture.componentInstance as unknown as {
+      alternarMenuAcciones(clave: string): void;
+      hayMenuAccionesAbierto(): boolean;
+    };
+
+    instancia.alternarMenuAcciones('epica:1');
+    document.dispatchEvent(new MouseEvent('click'));
+    expect(instancia.hayMenuAccionesAbierto()).toBe(false);
+
+    instancia.alternarMenuAcciones('epica:1');
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    expect(instancia.hayMenuAccionesAbierto()).toBe(false);
+  });
+
+  it('emite la creación de una épica bajo el proyecto', () => {
+    const crear = jasmine.createSpy('crearEpica');
+    fixture.componentInstance.crearEpica.subscribe(crear);
+    obtenerBoton(fixture.nativeElement as HTMLElement, 'Nueva épica').click();
+
+    expect(crear).toHaveBeenCalledTimes(1);
+  });
 });
 
 function obtenerBoton(elemento: HTMLElement, inicioEtiqueta: string): HTMLButtonElement {
