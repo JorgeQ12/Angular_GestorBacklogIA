@@ -14,6 +14,7 @@ describe('FormularioEquipoProyecto', () => {
     }).compileComponents();
     fixture = TestBed.createComponent(FormularioEquipoProyecto);
     overlay = TestBed.inject(OverlayContainer).getContainerElement();
+    fixture.componentRef.setInput('perfilesTecnicos', PERFILES_TECNICOS);
     fixture.componentRef.setInput('datosIniciales', EQUIPO);
     fixture.detectChanges();
   });
@@ -37,6 +38,7 @@ describe('FormularioEquipoProyecto', () => {
 
   it('actualiza la lista cuando los integrantes llegan después de la primera renderización', () => {
     const fixtureTardia = TestBed.createComponent(FormularioEquipoProyecto);
+    fixtureTardia.componentRef.setInput('perfilesTecnicos', PERFILES_TECNICOS);
     fixtureTardia.detectChanges();
     fixtureTardia.componentRef.setInput('datosIniciales', EQUIPO);
     fixtureTardia.detectChanges();
@@ -143,8 +145,16 @@ describe('FormularioEquipoProyecto', () => {
     enviarFormulario();
     expect(guardar).toHaveBeenCalledWith({
       integrantes: [
-        expect.objectContaining({ perfilTecnicoCodigo: 'qa', dedicacionCodigo: '75' }),
-        expect.objectContaining({ perfilTecnicoCodigo: 'qa', dedicacionCodigo: '75' }),
+        expect.objectContaining({
+          perfilTecnicoId: 36,
+          perfilTecnicoNombre: 'QA',
+          dedicacionCodigo: '75',
+        }),
+        expect.objectContaining({
+          perfilTecnicoId: 36,
+          perfilTecnicoNombre: 'QA',
+          dedicacionCodigo: '75',
+        }),
       ],
     });
   });
@@ -243,20 +253,29 @@ describe('FormularioEquipoProyecto', () => {
 const EQUIPO: EquipoProyecto = {
   integrantes: [
     {
+      idUsuario: 10,
       idAzure: 'u1',
       nombre: 'Jorge Quintero',
       correo: 'jorge@interia.co',
       esAdministradorAzure: true,
-      perfilTecnicoCodigo: 'devops',
+      perfilTecnicoId: 32,
+      perfilTecnicoNombre: 'DevOps',
       dedicacionCodigo: '100',
     },
     {
+      idUsuario: 11,
       idAzure: 'u2',
       nombre: 'María Gómez',
       correo: 'maria@interia.co',
       esAdministradorAzure: false,
-      perfilTecnicoCodigo: '',
+      perfilTecnicoId: null,
+      perfilTecnicoNombre: null,
       dedicacionCodigo: '',
     },
   ],
 };
+
+const PERFILES_TECNICOS = [
+  { valor: 32, etiqueta: 'DevOps' },
+  { valor: 36, etiqueta: 'QA' },
+] as const;

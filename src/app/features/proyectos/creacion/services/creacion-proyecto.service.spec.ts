@@ -5,10 +5,7 @@ import { firstValueFrom } from 'rxjs';
 import { ResultadoApi } from '../../../../core/http/models/resultado-api.model';
 import { ClaveSeccionProyecto } from '../../config/secciones-proyecto.config';
 import { PlataformaSolucion } from '../../secciones/tipo-solucion/models/tipo-solucion-proyecto.model';
-import {
-  FlujoProyecto,
-  TipoBloqueFlujo,
-} from '../../secciones/flujo/models/flujo-proyecto.model';
+import { FlujoProyecto, TipoBloqueFlujo } from '../../secciones/flujo/models/flujo-proyecto.model';
 import { ENDPOINTS_CREACION_PROYECTO } from '../config/endpoints-creacion-proyecto.config';
 import {
   CrearBorradorProyectoRespuestaDto,
@@ -133,7 +130,14 @@ describe('CreacionProyectoService', () => {
         teamId: 'team-1',
         teamNombre: 'Producto',
         miembros: [
-          { id: 'u1', nombre: 'Jorge', correo: 'jorge@interia.co', esAdministrador: true },
+          {
+            idUsuario: 10,
+            id: 'u1',
+            nombre: 'Jorge',
+            correo: 'jorge@interia.co',
+            esAdministrador: true,
+            perfilTecnico: { id: 36, codigo: 'perfil_tecnico_qa', nombre: 'QA' },
+          },
         ],
         grupos: [],
         fechaSincronizacion: '2026-08-27T10:00:00Z',
@@ -145,10 +149,13 @@ describe('CreacionProyectoService', () => {
       nombreEquipo: 'Producto',
       integrantes: [
         {
+          idUsuario: 10,
           idAzure: 'u1',
           nombre: 'Jorge',
           correo: 'jorge@interia.co',
           esAdministradorAzure: true,
+          perfilTecnicoId: 36,
+          perfilTecnicoNombre: 'QA',
         },
       ],
       fechaSincronizacion: '2026-08-27T10:00:00Z',

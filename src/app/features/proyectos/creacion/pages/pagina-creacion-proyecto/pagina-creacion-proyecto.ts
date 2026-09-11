@@ -25,6 +25,7 @@ import { URL_INICIO_PANEL, obtenerProyectoIdRuta } from '../../../../../core/nav
 import { EncabezadoPagina } from '../../../../../shared/components/encabezado-pagina/encabezado-pagina';
 import { EstadoError } from '../../../../../shared/components/estado-error/estado-error';
 import { IconoComponent } from '../../../../../shared/components/icono/icono.component';
+import type { OpcionSelector } from '../../../../../shared/forms/controles/selector-campo/models/opcion-selector.model';
 import {
   AsistenteIAFlotante,
   type ContextoAsistenteIA,
@@ -63,7 +64,9 @@ import type { ContextoProyecto } from '../../../secciones/contexto/models/contex
 import {
   combinarEquipoConAzure,
   deserializarEquipoProyecto,
+  mapearOpcionesPerfilTecnico,
 } from '../../../secciones/equipo/mappers/equipo-proyecto.mapper';
+import { CATALOGO_PERFILES_TECNICOS_EQUIPO } from '../../../secciones/equipo/config/equipo-proyecto.config';
 import type {
   EquipoProyecto,
   OrigenEquipoAzureProyecto,
@@ -148,6 +151,7 @@ export class PaginaCreacionProyecto {
   protected readonly recorridoListo = signal(false);
   protected readonly errorCargaRecorrido = signal(false);
   protected readonly prioridades = signal<readonly OpcionCatalogo[]>([]);
+  protected readonly perfilesTecnicos = signal<readonly OpcionSelector[]>([]);
   protected readonly datosVinculacion = signal<DatosVinculacionAzure | null>(null);
   protected readonly resultadoValidacion = signal<ResultadoVinculacionAzure | null>(null);
   protected readonly procesandoVinculacion = signal(false);
@@ -253,6 +257,7 @@ export class PaginaCreacionProyecto {
 
   public constructor() {
     this.cargarPrioridades();
+    this.cargarPerfilesTecnicos();
     effect(() => {
       const proyectoId = this.idProyecto();
       if (this.proyectoAnterior === proyectoId) return;
@@ -264,7 +269,7 @@ export class PaginaCreacionProyecto {
       const borrador = this.estadoCreacion.borrador();
       if (!esEquipo || !borrador || this.sincronizacionInicialEquipoSolicitada) return;
       this.sincronizacionInicialEquipoSolicitada = true;
-      if (!this.origenEquipo()?.integrantes.length) this.sincronizarEquipo(this.equipoGuardado());
+      this.sincronizarEquipo(this.equipoGuardado());
     });
   }
 
@@ -342,8 +347,7 @@ export class PaginaCreacionProyecto {
           }
           this.abrirPaso(siguiente);
         },
-        error: (error: unknown) =>
-          this.notificadorBorrador.comunicar(error, actualizacion.seccion),
+        error: (error: unknown) => this.notificadorBorrador.comunicar(error, actualizacion.seccion),
       });
   }
 
@@ -408,8 +412,7 @@ export class PaginaCreacionProyecto {
           if (this.estadoCreacion.proyectoId() !== proyectoId) return;
           this.flujoGeneradoConIA.set(null);
         },
-        error: (error: unknown) =>
-          this.notificadorBorrador.comunicar(error, actualizacion.seccion),
+        error: (error: unknown) => this.notificadorBorrador.comunicar(error, actualizacion.seccion),
       });
   }
 
@@ -485,6 +488,15 @@ export class PaginaCreacionProyecto {
       .obtenerOpciones(CATALOGO_PRIORIDADES_PROYECTO)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({ next: (opciones) => this.prioridades.set(opciones) });
+  }
+
+  private cargarPerfilesTecnicos(): void {
+    this.catalogos
+      .obtenerOpciones(CATALOGO_PERFILES_TECNICOS_EQUIPO)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (opciones) => this.perfilesTecnicos.set(mapearOpcionesPerfilTecnico(opciones)),
+      });
   }
 
   private prepararRecorrido(proyectoId: number | null): void {

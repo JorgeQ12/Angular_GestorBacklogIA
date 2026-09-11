@@ -13,16 +13,16 @@ import { OpcionCatalogo } from '../models/opcion-catalogo.model';
 export class CatalogosService {
   private readonly http = inject(HttpClient);
 
-  /** Obtiene las opciones activas del tipo de catálogo solicitado. */
-  public obtenerOpciones(nombreCatalogo: string): Observable<readonly OpcionCatalogo[]> {
-    const params = new HttpParams().set('catalogoTipoNombre', nombreCatalogo);
+  /** Obtiene las opciones activas del tipo identificado por su código técnico. */
+  public obtenerOpciones(codigoCatalogo: string): Observable<readonly OpcionCatalogo[]> {
+    const params = new HttpParams().set('catalogoTipoCodigo', codigoCatalogo);
 
     return this.http
       .get<ResultadoApi<readonly CatalogoValorDto[]>>(ENDPOINTS_CATALOGOS.obtenerValores, {
         params,
       })
       .pipe(
-        map((resultado) => exigirDatosResultadoApi(resultado, `el catálogo ${nombreCatalogo}`)),
+        map((resultado) => exigirDatosResultadoApi(resultado, `el catálogo ${codigoCatalogo}`)),
         map(mapearOpcionesCatalogo),
       );
   }

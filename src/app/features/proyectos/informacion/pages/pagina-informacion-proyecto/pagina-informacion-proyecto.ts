@@ -19,6 +19,7 @@ import {
 import { EncabezadoPagina } from '../../../../../shared/components/encabezado-pagina/encabezado-pagina';
 import { EstadoError } from '../../../../../shared/components/estado-error/estado-error';
 import { IconoComponent } from '../../../../../shared/components/icono/icono.component';
+import type { OpcionSelector } from '../../../../../shared/forms/controles/selector-campo/models/opcion-selector.model';
 import { FechaPipe } from '../../../../../shared/fechas/pipes/fecha.pipe';
 import { PasoAlcanceProyecto } from '../../../components/pasos/paso-alcance-proyecto/paso-alcance-proyecto';
 import { PasoContextoProyecto } from '../../../components/pasos/paso-contexto-proyecto/paso-contexto-proyecto';
@@ -42,6 +43,8 @@ import { ModoFormularioProyecto } from '../../../models/modo-formulario-proyecto
 import type { VersionamientoPasoProyecto } from '../../../models/versionamiento-proyecto.model';
 import { CATALOGO_PRIORIDADES_PROYECTO } from '../../../secciones/contexto/config/contexto-proyecto.config';
 import type { ContextoProyecto } from '../../../secciones/contexto/models/contexto-proyecto.model';
+import { CATALOGO_PERFILES_TECNICOS_EQUIPO } from '../../../secciones/equipo/config/equipo-proyecto.config';
+import { mapearOpcionesPerfilTecnico } from '../../../secciones/equipo/mappers/equipo-proyecto.mapper';
 import { MENSAJE_ERROR_CARGA_INFORMACION_PROYECTO } from '../../config/mensajes-informacion-proyecto.config';
 import {
   obtenerPasoInformacionProyecto,
@@ -102,6 +105,7 @@ export class PaginaInformacionProyecto {
       : ModoFormularioProyecto.Lectura,
   );
   protected readonly prioridades = signal<readonly OpcionCatalogo[]>([]);
+  protected readonly perfilesTecnicos = signal<readonly OpcionSelector[]>([]);
   protected readonly datosEncabezado = computed(() => {
     const proyecto = this.estado.proyectoPresentado();
     const temporal = this.contextoTemporal();
@@ -141,6 +145,12 @@ export class PaginaInformacionProyecto {
       .obtenerOpciones(CATALOGO_PRIORIDADES_PROYECTO)
       .pipe(takeUntilDestroyed())
       .subscribe({ next: (opciones) => this.prioridades.set(opciones) });
+    this.catalogos
+      .obtenerOpciones(CATALOGO_PERFILES_TECNICOS_EQUIPO)
+      .pipe(takeUntilDestroyed())
+      .subscribe({
+        next: (opciones) => this.perfilesTecnicos.set(mapearOpcionesPerfilTecnico(opciones)),
+      });
     effect(() => {
       const proyectoId = obtenerProyectoIdRuta(this.parametrosRuta());
       if (proyectoId === null) return;

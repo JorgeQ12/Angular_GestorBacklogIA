@@ -21,12 +21,12 @@ describe('CatalogosService', () => {
 
   afterEach(() => httpTesting.verify());
 
-  it('consulta por nombre y entrega únicamente opciones activas', async () => {
-    const respuesta = firstValueFrom(servicio.obtenerOpciones('Prioridad'));
+  it('consulta por código técnico y entrega únicamente opciones activas', async () => {
+    const respuesta = firstValueFrom(servicio.obtenerOpciones('gestion_producto_prioridad'));
     const solicitud = httpTesting.expectOne(
       (peticion) =>
         peticion.url === ENDPOINTS_CATALOGOS.obtenerValores &&
-        peticion.params.get('catalogoTipoNombre') === 'Prioridad',
+        peticion.params.get('catalogoTipoCodigo') === 'gestion_producto_prioridad',
     );
 
     solicitud.flush(crearResultado([crearValor(13, 'Alta', true), crearValor(14, 'Media', false)]));
@@ -40,7 +40,9 @@ describe('CatalogosService', () => {
 function crearValor(id: number, nombre: string, activo: boolean): CatalogoValorDto {
   return {
     id,
+    codigo: `prioridad_${nombre.toLowerCase()}`,
     catalogoTipoId: 3,
+    catalogoTipoCodigo: 'gestion_producto_prioridad',
     catalogoTipoNombre: 'Prioridad',
     nombre,
     descripcion: `Prioridad ${nombre}`,

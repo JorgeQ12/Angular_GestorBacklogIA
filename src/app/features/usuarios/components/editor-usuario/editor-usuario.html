@@ -1,0 +1,96 @@
+<app-modal
+  [titulo]="titulo()"
+  etiqueta="Administración de usuarios"
+  [descripcion]="descripcion()"
+  [icono]="usuario() ? 'editar' : 'agregar'"
+  tamano="lg"
+  idFormulario="formulario-usuario"
+  [descartable]="!ocupado()"
+  [mostrarCancelar]="!ocupado()"
+  [confirmacionDeshabilitada]="ocupado()"
+  [cierreExteriorHabilitado]="false"
+  iconoConfirmar="guardar"
+  (cerrar)="cerrar.emit()"
+>
+  <form
+    id="formulario-usuario"
+    class="ui-form-grid ui-form-grid--2"
+    [formGroup]="formulario"
+    [appMensajesFormulario]="mensajes"
+    appEnfocarPrimerControlInvalido
+    (ngSubmit)="enviar()"
+  >
+    <div class="ui-field ui-form-grid__full">
+      <label class="ui-label" for="usuario-id-azure">Identidad de Azure</label>
+      <input
+        class="ui-control"
+        id="usuario-id-azure"
+        formControlName="idAzure"
+        appErrorCampo
+        [readonly]="!!usuario()"
+        [attr.required]="usuario() ? null : ''"
+        [maxlength]="limites.idAzure"
+        autocomplete="off"
+      />
+      <small class="ui-hint">
+        Identificador estable de la persona en Azure. Después de crearla no se puede modificar.
+      </small>
+    </div>
+
+    <div class="ui-field">
+      <label class="ui-label" for="usuario-nombre">Nombre completo</label>
+      <input
+        class="ui-control"
+        id="usuario-nombre"
+        formControlName="nombre"
+        appErrorCampo
+        required
+        [maxlength]="limites.nombre"
+        autocomplete="name"
+      />
+    </div>
+
+    <div class="ui-field">
+      <label class="ui-label" for="usuario-correo">Correo</label>
+      <input
+        class="ui-control"
+        id="usuario-correo"
+        type="email"
+        formControlName="correo"
+        appErrorCampo
+        [maxlength]="limites.correo"
+        autocomplete="email"
+      />
+    </div>
+
+    <div class="ui-field">
+      <span id="etiqueta-usuario-perfil" class="ui-label">Perfil técnico</span>
+      <app-selector-campo
+        id="usuario-perfil"
+        formControlName="perfilTecnicoId"
+        appErrorCampo
+        required
+        etiquetadoPor="etiqueta-usuario-perfil"
+        placeholder="Selecciona un perfil técnico"
+        [opciones]="opcionesPerfil()"
+      />
+    </div>
+
+    <div class="ui-field">
+      <label class="ui-label" for="usuario-limite-tokens">Límite mensual de tokens</label>
+      <input
+        class="ui-control"
+        id="usuario-limite-tokens"
+        type="number"
+        inputmode="numeric"
+        min="0"
+        step="1"
+        [max]="limites.limiteTokensMensual"
+        formControlName="limiteTokensMensual"
+        appErrorCampo
+        placeholder="Usar límite general"
+      />
+      <small class="ui-hint">Déjalo vacío para usar el límite general; 0 bloquea el consumo.</small>
+    </div>
+  </form>
+</app-modal>

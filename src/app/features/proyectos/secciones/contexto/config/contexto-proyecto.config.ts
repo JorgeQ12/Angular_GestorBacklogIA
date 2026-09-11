@@ -9,7 +9,7 @@ export const LIMITES_CONTEXTO_PROYECTO = {
 } as const;
 
 /** Identifica el catálogo remoto utilizado por la prioridad del proyecto. */
-export const CATALOGO_PRIORIDADES_PROYECTO = 'Prioridad';
+export const CATALOGO_PRIORIDADES_PROYECTO = 'gestion_producto_prioridad';
 
 /** Proporciona mensajes propios del lenguaje de Contexto. */
 export const MENSAJES_CONTEXTO_PROYECTO = {

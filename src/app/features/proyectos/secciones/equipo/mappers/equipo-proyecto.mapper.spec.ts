@@ -8,16 +8,29 @@ describe('mapeadores de Equipo', () => {
   it('recupera únicamente el contrato canónico en español', () => {
     expect(
       deserializarEquipoProyecto(
-        '[{"idAzure":"u1","nombre":"Jorge","correo":null,"esAdministradorAzure":true,"perfilTecnicoCodigo":"devops","dedicacionCodigo":"100"}]',
+        JSON.stringify([
+          {
+            idUsuario: 10,
+            idAzure: 'u1',
+            nombre: 'Jorge',
+            correo: null,
+            esAdministradorAzure: true,
+            perfilTecnicoId: 32,
+            perfilTecnicoNombre: 'DevOps',
+            dedicacionCodigo: '100',
+          },
+        ]),
       ),
     ).toEqual({
       integrantes: [
         {
+          idUsuario: 10,
           idAzure: 'u1',
           nombre: 'Jorge',
           correo: null,
           esAdministradorAzure: true,
-          perfilTecnicoCodigo: 'devops',
+          perfilTecnicoId: 32,
+          perfilTecnicoNombre: 'DevOps',
           dedicacionCodigo: '100',
         },
       ],
@@ -30,17 +43,30 @@ describe('mapeadores de Equipo', () => {
       serializarEquipoProyecto({
         integrantes: [
           {
+            idUsuario: 10,
             idAzure: ' u1 ',
             nombre: ' Jorge ',
             correo: ' jorge@interia.co ',
             esAdministradorAzure: false,
-            perfilTecnicoCodigo: ' devops ',
+            perfilTecnicoId: 32,
+            perfilTecnicoNombre: ' DevOps ',
             dedicacionCodigo: ' 100 ',
           },
         ],
       }),
     ).toBe(
-      '[{"idAzure":"u1","nombre":"Jorge","correo":"jorge@interia.co","esAdministradorAzure":false,"perfilTecnicoCodigo":"devops","dedicacionCodigo":"100"}]',
+      JSON.stringify([
+        {
+          idUsuario: 10,
+          idAzure: 'u1',
+          nombre: 'Jorge',
+          correo: 'jorge@interia.co',
+          esAdministradorAzure: false,
+          perfilTecnicoId: 32,
+          perfilTecnicoNombre: 'DevOps',
+          dedicacionCodigo: '100',
+        },
+      ]),
     );
   });
 
@@ -52,35 +78,45 @@ describe('mapeadores de Equipo', () => {
         fechaSincronizacion: null,
         integrantes: [
           {
+            idUsuario: 10,
             idAzure: 'u1',
             nombre: 'Nombre actualizado',
             correo: 'nuevo@interia.co',
             esAdministradorAzure: true,
+            perfilTecnicoId: 32,
+            perfilTecnicoNombre: 'DevOps',
           },
           {
+            idUsuario: 11,
             idAzure: 'u2',
             nombre: 'Nueva persona',
             correo: null,
             esAdministradorAzure: false,
+            perfilTecnicoId: 32,
+            perfilTecnicoNombre: 'DevOps',
           },
         ],
       },
       {
         integrantes: [
           {
+            idUsuario: 10,
             idAzure: 'u1',
             nombre: 'Nombre anterior',
             correo: null,
             esAdministradorAzure: false,
-            perfilTecnicoCodigo: 'qa',
+            perfilTecnicoId: 36,
+            perfilTecnicoNombre: 'QA',
             dedicacionCodigo: '50',
           },
           {
+            idUsuario: 99,
             idAzure: 'retirado',
             nombre: 'Retirado',
             correo: null,
             esAdministradorAzure: false,
-            perfilTecnicoCodigo: 'devops',
+            perfilTecnicoId: 32,
+            perfilTecnicoNombre: 'DevOps',
             dedicacionCodigo: '100',
           },
         ],
@@ -91,12 +127,14 @@ describe('mapeadores de Equipo', () => {
       expect.objectContaining({
         idAzure: 'u1',
         nombre: 'Nombre actualizado',
-        perfilTecnicoCodigo: 'qa',
+        perfilTecnicoId: 36,
+        perfilTecnicoNombre: 'QA',
         dedicacionCodigo: '50',
       }),
       expect.objectContaining({
         idAzure: 'u2',
-        perfilTecnicoCodigo: '',
+        perfilTecnicoId: 32,
+        perfilTecnicoNombre: 'DevOps',
         dedicacionCodigo: '',
       }),
     ]);

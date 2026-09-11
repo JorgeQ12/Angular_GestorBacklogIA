@@ -54,10 +54,13 @@ export function mapearOrigenEquipoAzure(
     idEquipo: dto.teamId,
     nombreEquipo: dto.teamNombre,
     integrantes: dto.miembros.map((miembro) => ({
+      idUsuario: miembro.idUsuario ?? null,
       idAzure: miembro.id,
       nombre: miembro.nombre,
       correo: miembro.correo,
       esAdministradorAzure: miembro.esAdministrador,
+      perfilTecnicoId: miembro.perfilTecnico?.id ?? null,
+      perfilTecnicoNombre: miembro.perfilTecnico?.nombre ?? null,
     })),
     fechaSincronizacion: 'fechaSincronizacion' in dto ? dto.fechaSincronizacion : null,
   };

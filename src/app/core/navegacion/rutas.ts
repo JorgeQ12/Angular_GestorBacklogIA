@@ -11,6 +11,7 @@ export const SEGMENTOS_RUTA = {
   informacion: 'informacion',
   panel: 'panel',
   proyectos: 'proyectos',
+  usuarios: 'usuarios',
 } as const;
 
 /** Centraliza los nombres usados por los parámetros de ruta. */
@@ -56,6 +57,10 @@ export const URL_PANEL = `/${RUTA_PANEL}` as const;
 /** Proporciona la URL canónica de administración de catálogos. */
 export const URL_CATALOGOS =
   `${URL_PANEL}/${SEGMENTOS_RUTA.configuracion}/${SEGMENTOS_RUTA.catalogos}` as const;
+
+/** Proporciona la URL canónica de administración de usuarios. */
+export const URL_USUARIOS =
+  `${URL_PANEL}/${SEGMENTOS_RUTA.configuracion}/${SEGMENTOS_RUTA.usuarios}` as const;
 
 /** Identifica la ruta relativa del inicio del panel. */
 export const RUTA_INICIO_PANEL = `${RUTA_PANEL}/${SEGMENTOS_RUTA.inicio}` as const;

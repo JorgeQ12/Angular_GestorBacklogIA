@@ -7,10 +7,19 @@ export interface VinculacionAzureSolicitudDto {
 
 /** Describe un integrante recuperado desde el equipo de Azure. */
 export interface MiembroEquipoAzureDto {
+  idUsuario?: number | null;
   id: string;
   nombre: string;
   correo: string | null;
   esAdministrador: boolean;
+  perfilTecnico?: PerfilTecnicoUsuarioDto | null;
+}
+
+/** Describe el perfil técnico predeterminado asociado al usuario local. */
+export interface PerfilTecnicoUsuarioDto {
+  id: number;
+  codigo: string;
+  nombre: string;
 }
 
 /** Describe una revisión histórica de la épica vinculada. */

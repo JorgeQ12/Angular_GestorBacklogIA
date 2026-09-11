@@ -20,6 +20,8 @@ específicas se mantienen en documentos separados para evitar un archivo único 
   modos de formulario y versionamiento.
 - [Integración con el backend](INTEGRACION_BACKEND.md): environments, DTO, mappers, servicios y
   errores.
+- [Administración de usuarios](USUARIOS.md): identidad Azure, perfil técnico, límites de tokens y
+  estados administrativos.
 - [Consulta de proyectos](CONSULTA_PROYECTOS.md): filtros, paginación y acciones por
   proyecto.
 

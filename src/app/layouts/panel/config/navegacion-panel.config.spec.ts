@@ -1,4 +1,4 @@
-import { URL_CATALOGOS } from '../../../core/navegacion/rutas';
+import { URL_CATALOGOS, URL_USUARIOS } from '../../../core/navegacion/rutas';
 import { NAVEGACION_PANEL } from './navegacion-panel.config';
 import { ClaveItemNavegacionPanel } from '../models/item-navegacion-panel.model';
 
@@ -11,5 +11,19 @@ describe('Catálogo de navegación del panel', () => {
         icono: 'catalogos',
       }),
     );
+  });
+
+  it('expone la administración de usuarios sin declarar permisos ficticios', () => {
+    expect(NAVEGACION_PANEL).toContainEqual(
+      expect.objectContaining({
+        id: ClaveItemNavegacionPanel.Usuarios,
+        ruta: URL_USUARIOS,
+        icono: 'usuario',
+      }),
+    );
+    const usuarios = NAVEGACION_PANEL.find(
+      (item) => item.id === ClaveItemNavegacionPanel.Usuarios,
+    );
+    expect(usuarios).not.toHaveProperty('permisos');
   });
 });

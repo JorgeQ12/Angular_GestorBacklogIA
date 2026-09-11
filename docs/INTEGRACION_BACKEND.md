@@ -73,6 +73,13 @@ La administración reutiliza el endpoint y DTO de valores de `core/catalogos`, v
 `ResultadoApi` antes del mapeo y mantiene la autorización y las restricciones de integridad en el
 backend. La experiencia, los contratos y los estados se describen en [Catálogos](CATALOGOS.md).
 
+## Administración de usuarios
+
+La feature `usuarios` consume el CRUD local de Identidad y obtiene sus perfiles técnicos mediante
+`core/catalogos`; no replica opciones ni IDs de semillas. La identidad Azure solo viaja al crear,
+porque el contrato de actualización la considera inmutable. La experiencia, la activación y el
+límite mensual se describen en [Administración de usuarios](USUARIOS.md).
+
 ## Borradores y concurrencia
 
 Cuando una actualización exige la fotografía completa del borrador, el estado del flujo conserva

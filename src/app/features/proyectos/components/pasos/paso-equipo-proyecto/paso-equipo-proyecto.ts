@@ -9,6 +9,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { IconoComponent } from '../../../../../shared/components/icono/icono.component';
+import type { OpcionSelector } from '../../../../../shared/forms/controles/selector-campo/models/opcion-selector.model';
 import { construirIdFormularioPasoProyecto } from '../../../config/pasos-proyecto.config';
 import { ClaveSeccionProyecto } from '../../../config/secciones-proyecto.config';
 import type { AccionesPasoProyecto as ConfiguracionAccionesPasoProyecto } from '../../../models/acciones-paso-proyecto.model';
@@ -36,6 +37,7 @@ export class PasoEquipoProyecto {
   public readonly procesando = input(false);
   public readonly sincronizando = input(false);
   public readonly sincronizable = input(false);
+  public readonly perfilesTecnicos = input<readonly OpcionSelector[]>([]);
   public readonly acciones = input<ConfiguracionAccionesPasoProyecto | null>(null);
   public readonly versionamiento = input<VersionamientoPasoProyecto | null>(null);
   public readonly editar = output<void>();
@@ -78,7 +80,7 @@ export class PasoEquipoProyecto {
 
   private calcularProgreso(equipo: EquipoProyecto): ProgresoEquipoProyecto {
     const configurados = equipo.integrantes.filter(
-      (integrante) => integrante.perfilTecnicoCodigo && integrante.dedicacionCodigo,
+      (integrante) => integrante.perfilTecnicoId !== null && integrante.dedicacionCodigo,
     ).length;
     return { configurados, pendientes: equipo.integrantes.length - configurados };
   }

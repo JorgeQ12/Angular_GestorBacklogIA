@@ -1,0 +1,102 @@
+<section
+  class="usuarios"
+  [attr.aria-labelledby]="!cargando() && !errorCarga() ? 'titulo-usuarios' : null"
+  [attr.aria-label]="
+    errorCarga() ? 'Estado de carga de usuarios' : cargando() ? 'Cargando usuarios' : null
+  "
+>
+  @if (errorCarga()) {
+    <app-estado-error
+      [paginaCompleta]="true"
+      titulo="No fue posible obtener los usuarios"
+      descripcion="Verifica la conexión e intenta cargar nuevamente la información."
+      [reintentable]="true"
+      (reintentar)="cargar()"
+    />
+  } @else if (!cargando()) {
+    <app-encabezado-pagina
+      idTitulo="titulo-usuarios"
+      titulo="Usuarios"
+      etiqueta="Configuración"
+      descripcion="Administra las personas, su perfil técnico y el límite mensual de tokens."
+      icono="usuario"
+    >
+      <button
+        encabezadoPaginaAcciones
+        type="button"
+        class="ui-button ui-button--primary ui-button--on-inverse ui-button--md"
+        [disabled]="bloqueado()"
+        (click)="abrirEditor()"
+      >
+        <app-icono class="ui-button__icon" nombre="agregar" />
+        Crear usuario
+      </button>
+    </app-encabezado-pagina>
+
+    <section class="ui-card usuarios__panel" aria-labelledby="titulo-lista-usuarios">
+      <header class="ui-card__header usuarios__encabezado-lista">
+        <div class="ui-card__heading">
+          <span class="ui-card__icon" aria-hidden="true">
+            <app-icono nombre="equipo" />
+          </span>
+          <div>
+            <h2 id="titulo-lista-usuarios" class="ui-card__title">Personas registradas</h2>
+            <p class="usuarios__descripcion">Incluye usuarios activos e inactivos.</p>
+          </div>
+        </div>
+        <span class="ui-card__count" aria-label="Total de usuarios">{{ usuarios().length }}</span>
+      </header>
+
+      <div class="usuarios__herramientas">
+        <div class="ui-field usuarios__busqueda">
+          <span class="ui-label ui-label--compact">Buscar</span>
+          <app-campo-busqueda
+            id="busqueda-usuarios"
+            etiqueta="Buscar por nombre, correo, identidad o perfil técnico"
+            placeholder="Buscar por nombre, correo, identidad o perfil"
+            [formControl]="busqueda"
+          />
+        </div>
+        <span class="usuarios__resultado" aria-live="polite">
+          {{ usuariosVisibles().length }} de {{ usuarios().length }} visibles
+        </span>
+      </div>
+
+      <div class="ui-card__body usuarios__contenido">
+        @if (usuariosVisibles().length) {
+          <app-tabla-usuarios
+            [usuarios]="usuariosVisibles()"
+            [bloqueado]="bloqueado()"
+            (editarUsuario)="abrirEditor($event)"
+            (cambiarEstadoUsuario)="cambiarEstado($event)"
+          />
+        } @else if (usuarios().length) {
+          <app-estado-vacio
+            class="usuarios__estado-vacio"
+            icono="buscar"
+            titulo="Sin coincidencias"
+            descripcion="Prueba con otro nombre, correo, identidad Azure o perfil técnico."
+          />
+        } @else {
+          <app-estado-vacio
+            class="usuarios__estado-vacio"
+            icono="usuario"
+            titulo="Aún no hay usuarios"
+            descripcion="Crea el primer usuario o guarda el paso Equipo para comenzar a nutrir la base
+              de datos."
+          />
+        }
+      </div>
+    </section>
+  }
+
+  @if (editor() !== undefined) {
+    <app-editor-usuario
+      [usuario]="editor() ?? null"
+      [perfilesTecnicos]="perfilesTecnicos()"
+      [ocupado]="ocupado()"
+      (cerrar)="cerrarEditor()"
+      (guardar)="guardar($event)"
+    />
+  }
+</section>

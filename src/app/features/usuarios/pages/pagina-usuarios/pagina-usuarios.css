@@ -1,0 +1,64 @@
+:host {
+  display: block;
+}
+
+.usuarios {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.usuarios__panel,
+.usuarios__contenido {
+  min-width: 0;
+}
+
+.usuarios__encabezado-lista {
+  background: var(--card-footer-surface);
+}
+
+.usuarios__descripcion {
+  margin: var(--space-1) 0 0;
+  color: var(--text-muted);
+  font-size: var(--font-size-2xs);
+  line-height: var(--line-height-snug);
+}
+
+.usuarios__herramientas {
+  display: flex;
+  min-width: 0;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  border-bottom: var(--border-width) solid var(--card-divider);
+  background: var(--surface-default);
+}
+
+.usuarios__busqueda {
+  width: min(100%, 30rem);
+}
+
+.usuarios__resultado {
+  flex: 0 0 auto;
+  padding-bottom: var(--space-2);
+  color: var(--text-muted);
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+}
+
+.usuarios__estado-vacio {
+  --ui-empty-state-min-height: 20rem;
+}
+
+@media (max-width: 640px) {
+  .usuarios__herramientas {
+    align-items: stretch;
+    flex-direction: column;
+    padding: var(--space-4);
+  }
+
+  .usuarios__resultado {
+    padding-bottom: 0;
+  }
+}

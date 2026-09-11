@@ -198,7 +198,7 @@ creación.
 - El formulario es reactivo y estrictamente tipado, administra sus validaciones con
   `appErrorCampo` y emite valores sin espacios exteriores.
 - Los límites de 200, 150 y 2000 caracteres reflejan el contrato vigente del backend.
-- La prioridad se obtiene del catálogo remoto `Prioridad` y el formulario conserva su ID; no se
+- La prioridad se obtiene del catálogo remoto `gestion_producto_prioridad` y el formulario conserva su ID; no se
   queman IDs, códigos u opciones como Alta, Media o Baja.
 - La página carga el borrador y las prioridades y los proporciona al paso compartido.
 - El footer utiliza la configuración “Guardar y continuar” de Creación sobre la tarjeta común.
@@ -360,10 +360,10 @@ DevOps. No duplica los roles funcionales definidos en el paso anterior:
 
 - `proyectos/secciones/equipo` contiene el modelo, el formulario, la configuración y el mapper
   reutilizables.
-- La identidad de cada integrante (`idAzure`, nombre, correo y condición de administrador) es de
-  solo lectura y se origina en Azure.
-- La configuración local asigna `perfilTecnicoCodigo` y `dedicacionCodigo`; ambos son obligatorios
-  para guardar la sección.
+- La identidad de cada integrante (`idUsuario`, `idAzure`, nombre, correo y condición de
+  administrador) es de solo lectura y se origina en la sincronización con Azure y Usuarios.
+- La configuración asigna `perfilTecnicoId` desde el catálogo del backend y
+  `dedicacionCodigo`; ambos son obligatorios para guardar la sección.
 - El formulario presenta búsqueda por nombre o correo y filtros de todos, pendientes y
   configurados. No pagina el Team; comunica el progreso vigente al componente coordinador.
 - Equipo no crea una segunda tarjeta ni un encabezado interno. El nombre del Team, el progreso y
@@ -377,12 +377,12 @@ DevOps. No duplica los roles funcionales definidos en el paso anterior:
 - “Actualizar desde Azure” consulta nuevamente la membresía, relaciona integrantes mediante
   `idAzure`, conserva sus asignaciones, incorpora personas nuevas sin configurar y retira las que
   ya no pertenecen al Team.
-- `equipoJson` es la fuente de la configuración guardada. Si la consulta del borrador no incluye
-  integrantes de Azure, el paso presenta inmediatamente esa fotografía y sincroniza la membresía
-  en segundo plano, conservando las asignaciones mediante `idAzure`.
-- Cuando la consulta del borrador ya incluye la membresía de Azure, el paso la combina con
-  `equipoJson` sin ejecutar otra solicitud. Una sincronización explícita sí considera autoritativa
-  la colección recibida, incluso cuando esté vacía, para retirar integrantes que dejaron el Team.
+- `equipoJson` es la fuente de la configuración guardada. Al entrar en Equipo se presenta primero
+  esa fotografía y se sincroniza la membresía en segundo plano, conservando las asignaciones del
+  proyecto mediante `idAzure`.
+- La colección recibida de Azure es autoritativa para la membresía, incluso cuando esté vacía, y
+  permite retirar integrantes que dejaron el Team. La sincronización solo consulta Usuarios: no
+  crea ni actualiza identidades.
 - La acción “Actualizar desde Azure” queda disponible para renovar explícitamente la membresía
   después de restaurar una configuración existente.
 - El paso obtiene del formulario una fotografía de la edición antes de sincronizar. Así coordina
@@ -395,20 +395,26 @@ El formato persistido es una colección canónica en español:
 ```json
 [
   {
+    "idUsuario": 10,
     "idAzure": "usuario-1",
     "nombre": "María Gómez",
     "correo": "maria@empresa.co",
     "esAdministradorAzure": false,
-    "perfilTecnicoCodigo": "qa",
+    "perfilTecnicoId": 36,
+    "perfilTecnicoNombre": "INGENIERO AUTOMATIZADOR DE CALIDAD",
     "dedicacionCodigo": "75"
   }
 ]
 ```
 
-Los perfiles técnicos y dedicaciones viven temporalmente en
-`equipo/config/equipo-proyecto.config.ts`. Los componentes consumen códigos estables y no repiten
-literales. Cuando el backend exponga catálogos oficiales, el paso los proporcionará al formulario
-sin modificar el contrato persistido ni la composición de la sección.
+Los perfiles técnicos provienen únicamente del catálogo técnico `identidad_perfil_tecnico` expuesto
+por el backend; el nombre visible del catálogo no se utiliza como identificador.
+La configuración local conserva solo las dedicaciones admitidas y el nombre del catálogo; no
+mantiene una copia ni un mapeo legado de perfiles.
+El perfil habitual recibido desde Usuario se utiliza como valor inicial. Al guardar Equipo, el
+backend crea con el perfil seleccionado únicamente a las personas cuyo `idAzure` aún no existe en
+Usuarios. Para una persona existente, cualquier cambio de perfil pertenece exclusivamente al
+proyecto y no actualiza su perfil técnico habitual.
 
 En Información del proyecto, Equipo reutiliza el modelo, el mapper y el formulario. En lectura se
 muestran todas las identidades y asignaciones, pero se retiran búsqueda, filtros, selección múltiple

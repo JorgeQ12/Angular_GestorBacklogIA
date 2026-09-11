@@ -1,0 +1,43 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.tabla-usuarios__desplazamiento {
+  max-height: 31rem;
+}
+
+.tabla-usuarios {
+  min-width: 66rem;
+  table-layout: fixed;
+}
+
+.tabla-usuarios__columna-persona {
+  width: 20%;
+}
+
+.tabla-usuarios__columna-identidad {
+  width: 21%;
+}
+
+.tabla-usuarios__columna-perfil {
+  width: 20%;
+}
+
+.tabla-usuarios__columna-limite {
+  width: 10rem;
+}
+
+.tabla-usuarios__columna-estado {
+  width: 7rem;
+}
+
+.tabla-usuarios__columna-acciones {
+  width: 7.5rem;
+}
+
+.tabla-usuarios th {
+  position: sticky;
+  z-index: var(--z-raised);
+  top: 0;
+}

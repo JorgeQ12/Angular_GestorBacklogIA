@@ -10,36 +10,36 @@
     @if (controlesIntegrantes().length > 0) {
       @if (!esSoloLectura()) {
         <div class="formulario-equipo__herramientas">
-        <app-campo-busqueda
-          id="busqueda-integrantes-equipo"
-          class="formulario-equipo__buscar"
-          etiqueta="Buscar integrante"
-          placeholder="Buscar por nombre o correo"
-          [formControl]="controlBusqueda"
-        />
-        <div class="formulario-equipo__filtros" aria-label="Filtrar integrantes">
-          <button
-            type="button"
-            [class.formulario-equipo__filtro--activo]="filtro() === filtros.Todos"
-            (click)="cambiarFiltro(filtros.Todos)"
-          >
-            Todos <span>{{ controlesIntegrantes().length }}</span>
-          </button>
-          <button
-            type="button"
-            [class.formulario-equipo__filtro--activo]="filtro() === filtros.Pendientes"
-            (click)="cambiarFiltro(filtros.Pendientes)"
-          >
-            Pendientes <span>{{ cantidadPendientes() }}</span>
-          </button>
-          <button
-            type="button"
-            [class.formulario-equipo__filtro--activo]="filtro() === filtros.Configurados"
-            (click)="cambiarFiltro(filtros.Configurados)"
-          >
-            Configurados <span>{{ cantidadConfigurados() }}</span>
-          </button>
-        </div>
+          <app-campo-busqueda
+            id="busqueda-integrantes-equipo"
+            class="formulario-equipo__buscar"
+            etiqueta="Buscar integrante"
+            placeholder="Buscar por nombre o correo"
+            [formControl]="controlBusqueda"
+          />
+          <div class="formulario-equipo__filtros" aria-label="Filtrar integrantes">
+            <button
+              type="button"
+              [class.formulario-equipo__filtro--activo]="filtro() === filtros.Todos"
+              (click)="cambiarFiltro(filtros.Todos)"
+            >
+              Todos <span>{{ controlesIntegrantes().length }}</span>
+            </button>
+            <button
+              type="button"
+              [class.formulario-equipo__filtro--activo]="filtro() === filtros.Pendientes"
+              (click)="cambiarFiltro(filtros.Pendientes)"
+            >
+              Pendientes <span>{{ cantidadPendientes() }}</span>
+            </button>
+            <button
+              type="button"
+              [class.formulario-equipo__filtro--activo]="filtro() === filtros.Configurados"
+              (click)="cambiarFiltro(filtros.Configurados)"
+            >
+              Configurados <span>{{ cantidadConfigurados() }}</span>
+            </button>
+          </div>
         </div>
       }
 
@@ -50,8 +50,8 @@
             <app-selector-campo
               id="equipo-perfil-masivo"
               placeholder="Asignar perfil técnico"
-              [opciones]="perfilesTecnicos()"
-              [formControl]="asignacionMasiva.controls.perfilTecnicoCodigo"
+              [opciones]="opcionesPerfilesTecnicos()"
+              [formControl]="asignacionMasiva.controls.perfilTecnicoId"
             />
             <app-selector-campo
               id="equipo-dedicacion-masiva"
@@ -99,16 +99,18 @@
             <article class="formulario-equipo__fila" [formGroup]="integrante">
               @if (!esSoloLectura()) {
                 <label class="formulario-equipo__seleccion">
-                <input
-                  class="ui-checkbox"
-                  type="checkbox"
-                  [checked]="seleccionados().has(integrante.controls.idAzure.value)"
-                  [disabled]="procesando() || sincronizando()"
-                  (change)="alternarSeleccionDesdeEvento(integrante.controls.idAzure.value, $event)"
-                />
-                <span class="ui-visually-hidden">
-                  Seleccionar {{ integrante.controls.nombre.value }}
-                </span>
+                  <input
+                    class="ui-checkbox"
+                    type="checkbox"
+                    [checked]="seleccionados().has(integrante.controls.idAzure.value)"
+                    [disabled]="procesando() || sincronizando()"
+                    (change)="
+                      alternarSeleccionDesdeEvento(integrante.controls.idAzure.value, $event)
+                    "
+                  />
+                  <span class="ui-visually-hidden">
+                    Seleccionar {{ integrante.controls.nombre.value }}
+                  </span>
                 </label>
               } @else {
                 <span aria-hidden="true"></span>
@@ -136,10 +138,10 @@
                   [id]="'equipo-perfil-' + integrante.controls.idAzure.value"
                   [attr.id]="'equipo-perfil-' + integrante.controls.idAzure.value"
                   [etiquetadoPor]="'equipo-perfil-etiqueta-' + integrante.controls.idAzure.value"
-                  [opciones]="perfilesTecnicos()"
+                  [opciones]="opcionesPerfilesTecnicos()"
                   [soloLectura]="esSoloLectura()"
                   placeholder="Selecciona un perfil"
-                  formControlName="perfilTecnicoCodigo"
+                  formControlName="perfilTecnicoId"
                   [appMensajesError]="mensajesAsignacion"
                   appErrorCampo
                 />

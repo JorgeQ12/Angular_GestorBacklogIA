@@ -122,7 +122,9 @@ describe('PaginaCreacionProyecto', () => {
 
       const asistente = harness.routeDebugElement!.query(By.directive(AsistenteIAFlotante));
       expect(asistente).not.toBeNull();
-      expect(asistente.componentInstance.contexto().seccionActiva).toBe(ClaveSeccionProyecto.Necesidad);
+      expect(asistente.componentInstance.contexto().seccionActiva).toBe(
+        ClaveSeccionProyecto.Necesidad,
+      );
       expect(asistente.injector.get(EstadoAsistenteIAService)).toBe(estadoIA);
       expect(creacionProyecto.obtenerBorrador).toHaveBeenCalledTimes(1);
     },
@@ -194,8 +196,9 @@ describe('PaginaCreacionProyecto', () => {
     const router = TestBed.inject(Router);
     const navegar = vi.spyOn(router, 'navigate');
 
-    (componente as unknown as { datosVinculacion: { set: (datos: DatosVinculacionAzure) => void } })
-      .datosVinculacion.set(DATOS_VINCULACION);
+    (
+      componente as unknown as { datosVinculacion: { set: (datos: DatosVinculacionAzure) => void } }
+    ).datosVinculacion.set(DATOS_VINCULACION);
     (componente as unknown as { crearBorrador: () => void }).crearBorrador();
 
     expect(creacionProyecto.crearBorrador).toHaveBeenCalledWith(DATOS_VINCULACION);
@@ -298,6 +301,37 @@ describe('PaginaCreacionProyecto', () => {
     expect(pasoEquipoRestaurado.datos()).toEqual(EQUIPO_CONFIGURADO);
   });
 
+  it('sincroniza al entrar a Equipo para precargar el perfil almacenado en Usuario', async () => {
+    const origenConPerfilUsuario = {
+      ...ORIGEN_EQUIPO,
+      integrantes: [
+        {
+          ...ORIGEN_EQUIPO.integrantes[0],
+          perfilTecnicoId: 40,
+          perfilTecnicoNombre: 'INGENIERO DEVOPS',
+        },
+      ],
+    };
+    creacionProyecto.obtenerBorrador.mockReturnValue(
+      of({ ...BORRADOR_EQUIPO, equipoAzure: ORIGEN_EQUIPO }),
+    );
+    creacionProyecto.sincronizarEquipoAzure.mockReturnValue(of(origenConPerfilUsuario));
+
+    const harness = await RouterTestingHarness.create('/proyectos/creacion?proyectoId=42');
+    harness.detectChanges();
+
+    expect(creacionProyecto.sincronizarEquipoAzure).toHaveBeenCalledWith(42);
+    const pasoEquipo = harness.routeDebugElement?.query(By.directive(PasoEquipoProyecto))
+      .componentInstance as PasoEquipoProyecto;
+    expect(pasoEquipo.datos().integrantes[0]).toEqual(
+      expect.objectContaining({
+        perfilTecnicoId: 40,
+        perfilTecnicoNombre: 'INGENIERO DEVOPS',
+        dedicacionCodigo: '',
+      }),
+    );
+  });
+
   function obtenerPosicionRecorrido(elemento: HTMLElement): string {
     return elemento.querySelector('.recorrido-proyecto__posicion')?.textContent?.trim() ?? '';
   }
@@ -351,10 +385,13 @@ const ORIGEN_EQUIPO = {
   nombreEquipo: 'Producto digital',
   integrantes: [
     {
+      idUsuario: 10,
       idAzure: 'usuario-1',
       nombre: 'María Gómez',
       correo: 'maria@interia.co',
       esAdministradorAzure: false,
+      perfilTecnicoId: null,
+      perfilTecnicoNombre: null,
     },
   ],
   fechaSincronizacion: '2026-09-07T10:00:00.000Z',
@@ -364,7 +401,8 @@ const EQUIPO_CONFIGURADO: EquipoProyecto = {
   integrantes: [
     {
       ...ORIGEN_EQUIPO.integrantes[0],
-      perfilTecnicoCodigo: 'qa',
+      perfilTecnicoId: 36,
+      perfilTecnicoNombre: 'QA',
       dedicacionCodigo: '75',
     },
   ],

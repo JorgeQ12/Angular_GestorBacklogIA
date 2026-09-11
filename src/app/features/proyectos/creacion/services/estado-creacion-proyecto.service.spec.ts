@@ -268,11 +268,13 @@ describe('EstadoCreacionProyectoService', () => {
     const equipo = {
       integrantes: [
         {
+          idUsuario: 10,
           idAzure: 'u1',
           nombre: 'Jorge',
           correo: null,
           esAdministradorAzure: false,
-          perfilTecnicoCodigo: 'devops',
+          perfilTecnicoId: 32,
+          perfilTecnicoNombre: 'DevOps',
           dedicacionCodigo: '100',
         },
       ],

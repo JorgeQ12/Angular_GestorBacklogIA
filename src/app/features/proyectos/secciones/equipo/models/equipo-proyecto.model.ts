@@ -1,9 +1,12 @@
 /** Describe la identidad importada desde el Team vinculado en Azure DevOps. */
 export interface IntegranteOrigenEquipoAzureProyecto {
+  readonly idUsuario: number | null;
   readonly idAzure: string;
   readonly nombre: string;
   readonly correo: string | null;
   readonly esAdministradorAzure: boolean;
+  readonly perfilTecnicoId: number | null;
+  readonly perfilTecnicoNombre: string | null;
 }
 
 /** Conserva el origen vigente utilizado para configurar el equipo del proyecto. */
@@ -16,7 +19,6 @@ export interface OrigenEquipoAzureProyecto {
 
 /** Describe la configuración asignada a un integrante importado desde Azure. */
 export interface IntegranteEquipoProyecto extends IntegranteOrigenEquipoAzureProyecto {
-  readonly perfilTecnicoCodigo: string;
   readonly dedicacionCodigo: string;
 }
 

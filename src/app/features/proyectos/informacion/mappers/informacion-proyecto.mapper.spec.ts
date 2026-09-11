@@ -49,8 +49,18 @@ const DTO: ProyectoInformacionDto = {
   objetivosJson: '{"objetivoGeneral":"Mejorar","objetivosEspecificos":["Automatizar"]}',
   alcanceJson: '{"incluido":"Portal","excluido":"Pagos"}',
   rolesJson: '[{"nombre":"Administrador","descripcion":"Configura"}]',
-  equipoJson:
-    '[{"idAzure":"u1","nombre":"María","correo":null,"esAdministradorAzure":true,"perfilTecnicoCodigo":"qa","dedicacionCodigo":"100"}]',
+  equipoJson: JSON.stringify([
+    {
+      idUsuario: 10,
+      idAzure: 'u1',
+      nombre: 'María',
+      correo: null,
+      esAdministradorAzure: true,
+      perfilTecnicoId: 36,
+      perfilTecnicoNombre: 'QA',
+      dedicacionCodigo: '100',
+    },
+  ]),
   diagramFlujoJson: '{}',
   azure: {
     organizacion: 'interia',

@@ -103,10 +103,13 @@ describe('mapeadores de creación de proyecto', () => {
       nombreEquipo: 'Producto',
       integrantes: [
         {
+          idUsuario: null,
           idAzure: 'usuario-1',
           nombre: 'Jorge',
           correo: null,
           esAdministradorAzure: true,
+          perfilTecnicoId: null,
+          perfilTecnicoNombre: null,
         },
       ],
       fechaSincronizacion: null,
@@ -205,7 +208,7 @@ describe('mapeadores de creación de proyecto', () => {
 
   it('reemplaza únicamente el JSON de Equipo', () => {
     const borrador = mapearBorradorProyecto(crearBorradorDto());
-    const equipoJson = '[{"idAzure":"u1","perfilTecnicoCodigo":"qa"}]';
+    const equipoJson = '[{"idUsuario":10,"idAzure":"u1","perfilTecnicoId":36}]';
     const solicitud = mapearActualizacionBorrador(borrador, { equipoJson }, 8);
 
     expect(solicitud).toMatchObject({

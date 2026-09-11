@@ -65,7 +65,12 @@
               [acciones]="accionesCreacion"
               [procesando]="guardandoSeccion()"
               (contextoCambiado)="actualizarContextoTemporal($event)"
-              (guardar)="guardarSeccion({ seccion: secciones.Contexto, datos: $event }, secciones.TipoSolucion)"
+              (guardar)="
+                guardarSeccion(
+                  { seccion: secciones.Contexto, datos: $event },
+                  secciones.TipoSolucion
+                )
+              "
             />
           }
           @case (secciones.TipoSolucion) {
@@ -74,7 +79,12 @@
               [modo]="modoEdicion"
               [acciones]="accionesCreacion"
               [procesando]="guardandoSeccion()"
-              (guardar)="guardarSeccion({ seccion: secciones.TipoSolucion, datos: $event }, secciones.Necesidad)"
+              (guardar)="
+                guardarSeccion(
+                  { seccion: secciones.TipoSolucion, datos: $event },
+                  secciones.Necesidad
+                )
+              "
             />
           }
           @case (secciones.Necesidad) {
@@ -83,7 +93,9 @@
               [modo]="modoEdicion"
               [acciones]="accionesCreacion"
               [procesando]="guardandoSeccion()"
-              (guardar)="guardarSeccion({ seccion: secciones.Necesidad, datos: $event }, secciones.Objetivos)"
+              (guardar)="
+                guardarSeccion({ seccion: secciones.Necesidad, datos: $event }, secciones.Objetivos)
+              "
             />
           }
           @case (secciones.Objetivos) {
@@ -92,7 +104,9 @@
               [modo]="modoEdicion"
               [acciones]="accionesCreacion"
               [procesando]="guardandoSeccion()"
-              (guardar)="guardarSeccion({ seccion: secciones.Objetivos, datos: $event }, secciones.Alcance)"
+              (guardar)="
+                guardarSeccion({ seccion: secciones.Objetivos, datos: $event }, secciones.Alcance)
+              "
             />
           }
           @case (secciones.Alcance) {
@@ -101,7 +115,9 @@
               [modo]="modoEdicion"
               [acciones]="accionesCreacion"
               [procesando]="guardandoSeccion()"
-              (guardar)="guardarSeccion({ seccion: secciones.Alcance, datos: $event }, secciones.Roles)"
+              (guardar)="
+                guardarSeccion({ seccion: secciones.Alcance, datos: $event }, secciones.Roles)
+              "
             />
           }
           @case (secciones.Roles) {
@@ -110,7 +126,9 @@
               [modo]="modoEdicion"
               [acciones]="accionesCreacion"
               [procesando]="guardandoSeccion()"
-              (guardar)="guardarSeccion({ seccion: secciones.Roles, datos: $event }, secciones.Equipo)"
+              (guardar)="
+                guardarSeccion({ seccion: secciones.Roles, datos: $event }, secciones.Equipo)
+              "
             />
           }
           @case (secciones.Equipo) {
@@ -122,8 +140,11 @@
               [procesando]="guardandoSeccion()"
               [sincronizando]="sincronizandoEquipo()"
               [sincronizable]="true"
+              [perfilesTecnicos]="perfilesTecnicos()"
               (sincronizar)="sincronizarEquipo($event)"
-              (guardar)="guardarSeccion({ seccion: secciones.Equipo, datos: $event }, secciones.Flujo)"
+              (guardar)="
+                guardarSeccion({ seccion: secciones.Equipo, datos: $event }, secciones.Flujo)
+              "
             />
           }
           @case (secciones.Flujo) {

@@ -8,6 +8,7 @@ export enum ClaveItemNavegacionPanel {
   Catalogos = 'catalogos',
   Inicio = 'inicio',
   Proyectos = 'proyectos',
+  Usuarios = 'usuarios',
   InformacionProyecto = 'informacion-proyecto',
 }
 
