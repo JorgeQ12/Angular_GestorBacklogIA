@@ -12,6 +12,8 @@ let consecutivoEncabezadoPagina = 0;
   templateUrl: './encabezado-pagina.html',
 })
 export class EncabezadoPagina {
+
+  /** Conserva identificador predeterminado para coordinar esta responsabilidad. */
   private readonly identificadorPredeterminado = `encabezado-pagina-${++consecutivoEncabezadoPagina}`;
 
   /** Define el título principal de la página. */
@@ -23,7 +25,7 @@ export class EncabezadoPagina {
   /** Describe el propósito principal de la página. */
   public readonly descripcion = input<string | null>(null);
 
-  /** Selecciona el icono que identifica la capacidad presentada. */
+  /** Selecciona el ícono que identifica la capacidad presentada. */
   public readonly icono = input<NombreIconoAplicacion | null>(null);
 
   /** Presenta información complementaria sobre el contexto vigente. */

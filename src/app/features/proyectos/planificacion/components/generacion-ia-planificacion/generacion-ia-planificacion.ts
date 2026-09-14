@@ -25,8 +25,10 @@ export class GeneracionIaPlanificacionComponent {
   /** Comunica el nivel que debe generarse. */
   public readonly generar = output<NivelGeneracionIaPlanificacion>();
 
+  /** Conserva opciones para coordinar esta responsabilidad. */
   protected readonly opciones = OPCIONES_GENERACION_IA_PLANIFICACION;
 
+  /** Determina si ta deshabilitada. */
   protected estaDeshabilitada(opcion: OpcionGeneracionIaPlanificacion): boolean {
     if (this.procesando()) return true;
     if (opcion.nivel === NivelGeneracionIaPlanificacion.Historias) {
@@ -38,6 +40,7 @@ export class GeneracionIaPlanificacionComponent {
     return false;
   }
 
+  /** Obtiene resumen dentro del flujo actual. */
   protected obtenerResumen(opcion: OpcionGeneracionIaPlanificacion): string {
     const resumen = this.resumen();
     switch (opcion.nivel) {

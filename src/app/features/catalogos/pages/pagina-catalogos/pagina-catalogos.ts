@@ -47,18 +47,44 @@ import { AdministracionCatalogosService } from '../../services/administracion-ca
   styleUrl: './pagina-catalogos.css',
 })
 export class PaginaCatalogos implements OnInit {
+
+  /** Proporciona acceso al servicio remoto requerido por esta responsabilidad. */
   private readonly api = inject(AdministracionCatalogosService);
+
+  /** Proporciona acceso al servicio de mensajes. */
   private readonly mensajes = inject(MensajesService);
+
+  /** Proporciona acceso al servicio de notificador errores API. */
   private readonly errores = inject(NotificadorErroresApiService);
+
+  /** Coordina la finalización de recursos cuando se destruye la instancia. */
   private readonly destruir = inject(DestroyRef);
+
+  /** Conserva tipos como estado reactivo de la instancia. */
   protected readonly tipos = signal<Catalogo[]>([]);
+
+  /** Conserva valores como estado reactivo de la instancia. */
   protected readonly valores = signal<ValorCatalogo[]>([]);
+
+  /** Conserva seleccionado ID como estado reactivo de la instancia. */
   protected readonly seleccionadoId = signal<number | null>(null);
+
+  /** Conserva cargando como estado reactivo de la instancia. */
   protected readonly cargando = signal(false);
+
+  /** Conserva ocupado como estado reactivo de la instancia. */
   protected readonly ocupado = signal(false);
+
+  /** Conserva error carga como estado reactivo de la instancia. */
   protected readonly errorCarga = signal(false);
+
+  /** Conserva editor como estado reactivo de la instancia. */
   protected readonly editor = signal<ContextoEditor | null>(null);
+
+  /** Deriva bloqueado a partir del estado vigente. */
   protected readonly bloqueado = computed(() => this.cargando() || this.ocupado());
+
+  /** Conserva seleccionado para coordinar esta responsabilidad. */
   protected readonly seleccionado = computed<Catalogo | null>(
     () =>
       this.tipos().find((t) => t.id === this.seleccionadoId()) ??
@@ -66,9 +92,13 @@ export class PaginaCatalogos implements OnInit {
       this.tipos()[0] ??
       null,
   );
+
+  /** Deriva valores seleccionados a partir del estado vigente. */
   protected readonly valoresSeleccionados = computed(() =>
     this.valores().filter((valor) => valor.catalogoTipoId === this.seleccionado()?.id),
   );
+
+  /** Deriva opciones activas por tipo a partir del estado vigente. */
   private readonly opcionesActivasPorTipo = computed(() => {
     const cantidades = new Map<number, number>();
     for (const valor of this.valores()) {

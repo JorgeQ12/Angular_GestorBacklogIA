@@ -69,12 +69,26 @@ interface EstadoEditable {
   styleUrl: './lista-requisitos-planificacion.css',
 })
 export class ListaRequisitosPlanificacion implements OnInit {
+
+  /** Proporciona acceso al servicio remoto requerido por esta responsabilidad. */
   private readonly api = inject(ListaRequisitosPlanificacionService);
+
+  /** Proporciona acceso a non nullable form builder. */
   private readonly formularios = inject(NonNullableFormBuilder);
+
+  /** Proporciona acceso al servicio de mensajes. */
   private readonly mensajes = inject(MensajesService);
+
+  /** Proporciona acceso al servicio de notificador errores API. */
   private readonly notificador = inject(NotificadorErroresApiService);
+
+  /** Coordina la finalización de recursos cuando se destruye la instancia. */
   private readonly destroyRef = inject(DestroyRef);
+
+  /** Conserva carga requisitos para controlar el ciclo de vida de la operación. */
   private cargaRequisitos?: Subscription;
+
+  /** Conserva carga catálogo para controlar el ciclo de vida de la operación. */
   private cargaCatalogo?: Subscription;
 
   /** Identifica el proyecto dueño de la lista. */
@@ -86,32 +100,78 @@ export class ListaRequisitosPlanificacion implements OnInit {
   /** Informa que una creación o actualización quedó persistida. */
   public readonly cambiosGuardados = output<void>();
 
+  /** Conserva requisitos como estado reactivo de la instancia. */
   protected readonly requisitos = signal<readonly RequisitoProyecto[]>([]);
+
+  /** Deriva grupos a partir del estado vigente. */
   protected readonly grupos = computed(() => agruparRequisitos(this.requisitos()));
+
+  /** Conserva cargando como estado reactivo de la instancia. */
   protected readonly cargando = signal(true);
+
+  /** Conserva error carga como estado reactivo de la instancia. */
   protected readonly errorCarga = signal(false);
+
+  /** Conserva catálogo como estado reactivo de la instancia. */
   protected readonly catalogo = signal<CatalogoRequisitos | null>(null);
+
+  /** Conserva cargando catálogo como estado reactivo de la instancia. */
   protected readonly cargandoCatalogo = signal(true);
+
+  /** Conserva error catálogo como estado reactivo de la instancia. */
   protected readonly errorCatalogo = signal(false);
+
+  /** Conserva requisito abierto ID como estado reactivo de la instancia. */
   protected readonly requisitoAbiertoId = signal<number | null>(null);
+
+  /** Deriva requisito abierto a partir del estado vigente. */
   protected readonly requisitoAbierto = computed(
     () => this.requisitos().find((item) => item.id === this.requisitoAbiertoId()) ?? null,
   );
+
+  /** Conserva modal creación abierto como estado reactivo de la instancia. */
   protected readonly modalCreacionAbierto = signal(false);
+
+  /** Conserva creando como estado reactivo de la instancia. */
   protected readonly creando = signal(false);
+
+  /** Conserva guardando como estado reactivo de la instancia. */
   protected readonly guardando = signal(false);
+
+  /** Conserva guardando ids como estado reactivo de la instancia. */
   protected readonly guardandoIds = signal<ReadonlySet<number>>(new Set());
+
+  /** Conserva areas contraidas como estado reactivo de la instancia. */
   protected readonly areasContraidas = signal<ReadonlySet<string>>(new Set());
+
+  /** Conserva secciones contraidas como estado reactivo de la instancia. */
   protected readonly seccionesContraidas = signal<ReadonlySet<string>>(new Set());
+
+  /** Conserva estados como estado reactivo de la instancia. */
   protected readonly estados = signal<Record<number, EstadoEditable>>({});
+
+  /** Conserva estados persistidos como estado reactivo de la instancia. */
   private readonly estadosPersistidos = signal<Record<number, EstadoEditable>>({});
+
+  /** Conserva modo ubicacion como estado reactivo de la instancia. */
   protected readonly modoUbicacion = signal(ModoUbicacionRequisito.Existente);
+
+  /** Conserva modos ubicacion para coordinar esta responsabilidad. */
   protected readonly modosUbicacion = ModoUbicacionRequisito;
+
+  /** Conserva ID formulario para coordinar esta responsabilidad. */
   protected readonly idFormulario = 'formulario-nuevo-requisito';
+
+  /** Conserva mensajes formulario para coordinar esta responsabilidad. */
   protected readonly mensajesFormulario = MENSAJES_FORMULARIO_REQUISITO;
+
+  /** Conserva decisiones iniciales para coordinar esta responsabilidad. */
   protected readonly decisionesIniciales = DECISIONES_INICIALES_REQUISITO;
+
+  /** Conserva decisiones detalle para coordinar esta responsabilidad. */
   protected readonly decisionesDetalle = DECISIONES_DETALLE_REQUISITO;
 
+  /** Administra los valores y validaciones del formulario reactivo. */
   protected readonly formulario = this.formularios.group({
     areaId: this.formularios.control<number | null>(null, Validators.required),
     areaNombre: this.formularios.control('', [
@@ -141,29 +201,48 @@ export class ListaRequisitosPlanificacion implements OnInit {
     cumple: this.formularios.control(false),
   });
 
+  /** Conserva área seleccionada ID para coordinar esta responsabilidad. */
   private readonly areaSeleccionadaId = toSignal(
     this.formulario.controls.areaId.valueChanges.pipe(
       startWith(this.formulario.controls.areaId.value),
     ),
     { initialValue: null },
   );
+
+  /** Conserva opciones área para coordinar esta responsabilidad. */
   protected readonly opcionesArea = computed<readonly OpcionSelector[]>(
     () => this.catalogo()?.areas.map((item) => ({ valor: item.id, etiqueta: item.nombre })) ?? [],
   );
+
+  /** Conserva opciones seccion para coordinar esta responsabilidad. */
   protected readonly opcionesSeccion = computed<readonly OpcionSelector[]>(() => {
     const area = this.catalogo()?.areas.find((item) => item.id === this.areaSeleccionadaId());
     return area?.secciones.map((item) => ({ valor: item.id, etiqueta: item.nombre })) ?? [];
   });
+
+  /** Deriva opciones tipo a partir del estado vigente. */
   protected readonly opcionesTipo = computed(() => this.catalogo()?.tipos ?? []);
+
+  /** Deriva opciones responsable a partir del estado vigente. */
   protected readonly opcionesResponsable = computed(() => this.catalogo()?.responsables ?? []);
+
+  /** Deriva opciones validador a partir del estado vigente. */
   protected readonly opcionesValidador = computed(() => this.catalogo()?.validadores ?? []);
+
+  /** Deriva opciones agrupador a partir del estado vigente. */
   protected readonly opcionesAgrupador = computed(() => this.catalogo()?.agrupadores ?? []);
+
+  /** Deriva creando área a partir del estado vigente. */
   protected readonly creandoArea = computed(
     () => this.modoUbicacion() === ModoUbicacionRequisito.NuevaArea,
   );
+
+  /** Deriva creando seccion a partir del estado vigente. */
   protected readonly creandoSeccion = computed(
     () => this.modoUbicacion() !== ModoUbicacionRequisito.Existente,
   );
+
+  /** Deriva modificados a partir del estado vigente. */
   protected readonly modificados = computed(() =>
     this.requisitos()
       .filter((item) => {
@@ -207,6 +286,7 @@ export class ListaRequisitosPlanificacion implements OnInit {
     this.cargarCatalogo();
   }
 
+  /** Carga la operación solicitada dentro del flujo actual. */
   protected cargar(): void {
     this.cargando.set(true);
     this.errorCarga.set(false);
@@ -231,6 +311,7 @@ export class ListaRequisitosPlanificacion implements OnInit {
       });
   }
 
+  /** Carga catálogo dentro del flujo actual. */
   protected cargarCatalogo(): void {
     this.cargandoCatalogo.set(true);
     this.errorCatalogo.set(false);
@@ -250,30 +331,37 @@ export class ListaRequisitosPlanificacion implements OnInit {
       });
   }
 
+  /** Alterna área dentro del flujo actual. */
   protected alternarArea(nombre: string): void {
     this.areasContraidas.update((items) => this.alternarSet(items, nombre));
   }
 
+  /** Alterna seccion dentro del flujo actual. */
   protected alternarSeccion(area: string, seccion: string): void {
     this.seccionesContraidas.update((items) => this.alternarSet(items, `${area}::${seccion}`));
   }
 
+  /** Ejecuta área expandida como parte del flujo interno. */
   protected areaExpandida(nombre: string): boolean {
     return !this.areasContraidas().has(nombre);
   }
 
+  /** Ejecuta seccion expandida como parte del flujo interno. */
   protected seccionExpandida(area: string, seccion: string): boolean {
     return !this.seccionesContraidas().has(`${area}::${seccion}`);
   }
 
+  /** Abre detalle dentro del flujo actual. */
   protected abrirDetalle(id: number): void {
     this.requisitoAbiertoId.set(id);
   }
 
+  /** Cierra detalle dentro del flujo actual. */
   protected cerrarDetalle(): void {
     this.requisitoAbiertoId.set(null);
   }
 
+  /** Ejecuta estado como parte del flujo interno. */
   protected estado(id: number): EstadoEditable {
     return (
       this.estados()[id] ?? {
@@ -285,11 +373,13 @@ export class ListaRequisitosPlanificacion implements OnInit {
     );
   }
 
+  /** Actualiza binario dentro del flujo actual. */
   protected actualizarBinario(id: number, campo: CampoBinarioRequisito, valor: boolean): void {
     if (!this.guardandoIds().has(id))
       this.estados.update((items) => ({ ...items, [id]: { ...this.estado(id), [campo]: valor } }));
   }
 
+  /** Actualiza nombre dentro del flujo actual. */
   protected actualizarNombre(id: number, evento: Event): void {
     if (this.guardandoIds().has(id)) return;
     if (!(evento.target instanceof HTMLInputElement)) return;
@@ -301,6 +391,7 @@ export class ListaRequisitosPlanificacion implements OnInit {
     }));
   }
 
+  /** Abre creación dentro del flujo actual. */
   protected abrirCreacion(): void {
     this.formulario.reset({
       areaId: null,
@@ -321,10 +412,13 @@ export class ListaRequisitosPlanificacion implements OnInit {
     this.cambiarModo(ModoUbicacionRequisito.Existente);
     this.modalCreacionAbierto.set(true);
   }
+
+  /** Cierra creación dentro del flujo actual. */
   protected cerrarCreacion(): void {
     if (!this.creando()) this.modalCreacionAbierto.set(false);
   }
 
+  /** Ejecuta cambiar modo como parte del flujo interno. */
   protected cambiarModo(modo: ModoUbicacionRequisito): void {
     this.modoUbicacion.set(modo);
     const c = this.formulario.controls;
@@ -337,14 +431,18 @@ export class ListaRequisitosPlanificacion implements OnInit {
     c.seccionId.disable();
     modo === ModoUbicacionRequisito.NuevaArea ? c.areaNombre.enable() : c.areaNombre.disable();
   }
+
+  /** Establece inicial dentro del flujo actual. */
   protected establecerInicial(campo: CampoBinarioRequisito, valor: boolean): void {
     this.formulario.controls[campo].setValue(valor);
   }
 
+  /** Ejecuta valor inicial como parte del flujo interno. */
   protected valorInicial(campo: CampoBinarioRequisito): boolean {
     return this.formulario.controls[campo].value;
   }
 
+  /** Crea la operación solicitada dentro del flujo actual. */
   protected async crear(): Promise<void> {
     if (this.formulario.invalid || !this.catalogo()) {
       this.formulario.markAllAsTouched();
@@ -383,6 +481,7 @@ export class ListaRequisitosPlanificacion implements OnInit {
     }
   }
 
+  /** Ejecuta solicitar volver como parte del flujo interno. */
   protected async solicitarVolver(): Promise<void> {
     const ids = this.modificados();
     if (!ids.length) {
@@ -403,6 +502,7 @@ export class ListaRequisitosPlanificacion implements OnInit {
     await this.guardarCambios(ids);
   }
 
+  /** Guarda cambios dentro del flujo actual. */
   private async guardarCambios(ids: readonly number[]): Promise<void> {
     this.guardando.set(true);
     this.guardandoIds.set(new Set(ids));
@@ -449,6 +549,7 @@ export class ListaRequisitosPlanificacion implements OnInit {
     }
   }
 
+  /** Construye creación dentro del flujo actual. */
   private construirCreacion(): CreacionRequisito | null {
     const v = this.formulario.getRawValue();
     const catalogo = this.catalogo();
@@ -481,6 +582,7 @@ export class ListaRequisitosPlanificacion implements OnInit {
     };
   }
 
+  /** Crea estado dentro del flujo actual. */
   private crearEstado(item: RequisitoProyecto): EstadoEditable {
     return {
       cumple: item.cumple,
@@ -490,16 +592,19 @@ export class ListaRequisitosPlanificacion implements OnInit {
     };
   }
 
+  /** Ejecuta restaurar como parte del flujo interno. */
   private restaurar(): void {
     this.estados.set({ ...this.estadosPersistidos() });
   }
 
+  /** Alterna set dentro del flujo actual. */
   private alternarSet(items: ReadonlySet<string>, valor: string): ReadonlySet<string> {
     const copia = new Set(items);
     copia.has(valor) ? copia.delete(valor) : copia.add(valor);
     return copia;
   }
 
+  /** Aplica estado ubicacion dentro del flujo actual. */
   private aplicarEstadoUbicacion(): void {
     const controles = this.formulario.controls;
     const modo = this.modoUbicacion();

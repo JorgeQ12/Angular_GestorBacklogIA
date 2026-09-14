@@ -45,7 +45,11 @@ import { TipoSolucionProyecto } from '../../models/tipo-solucion-proyecto.model'
   styleUrl: './formulario-tipo-solucion-proyecto.css',
 })
 export class FormularioTipoSolucionProyecto {
+
+  /** Construye los controles reactivos administrados por el componente. */
   private readonly constructorFormulario = inject(NonNullableFormBuilder);
+
+  /** Coordina la finalización de recursos cuando se destruye la instancia. */
   private readonly destroyRef = inject(DestroyRef);
 
   /** Identifica el formulario para permitir acciones externas mediante el atributo form. */
@@ -63,10 +67,19 @@ export class FormularioTipoSolucionProyecto {
   /** Entrega un Tipo de solución válido al flujo consumidor. */
   public readonly guardar = output<TipoSolucionProyecto>();
 
+  /** Conserva opciones interfaz para coordinar esta responsabilidad. */
   protected readonly opcionesInterfaz = OPCIONES_INTERFAZ_SOLUCION;
+
+  /** Conserva opciones plataforma para coordinar esta responsabilidad. */
   protected readonly opcionesPlataforma = OPCIONES_PLATAFORMA_SOLUCION;
+
+  /** Conserva mensajes formulario para coordinar esta responsabilidad. */
   protected readonly mensajesFormulario = MENSAJES_TIPO_SOLUCION_PROYECTO;
+
+  /** Deriva es solo lectura a partir del estado vigente. */
   protected readonly esSoloLectura = computed(() => this.modo() === ModoFormularioProyecto.Lectura);
+
+  /** Administra los valores y validaciones del formulario reactivo. */
   protected readonly formulario: FormularioTipoSolucionProyectoTipado =
     this.constructorFormulario.group({
       tieneInterfaz: this.constructorFormulario.control<boolean | null>(null, [seleccionRequerida]),
@@ -114,6 +127,7 @@ export class FormularioTipoSolucionProyecto {
     });
   }
 
+  /** Actualiza plataforma dentro del flujo actual. */
   private actualizarPlataforma(tieneInterfaz: boolean | null): void {
     const plataforma = this.formulario.controls.plataforma;
     if (tieneInterfaz) {

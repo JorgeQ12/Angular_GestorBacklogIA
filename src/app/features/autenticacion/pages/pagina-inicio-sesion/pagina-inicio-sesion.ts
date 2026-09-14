@@ -15,10 +15,17 @@ import { AccesoMicrosoft } from '../../components/acceso-microsoft/acceso-micros
   styleUrl: './pagina-inicio-sesion.css',
 })
 export class PaginaInicioSesion {
+
+  /** Proporciona acceso al servicio de autenticación. */
   private readonly autenticacion = inject(AutenticacionService);
+
+  /** Proporciona acceso a la navegación administrada por Angular. */
   private readonly router = inject(Router);
+
+  /** Coordina la finalización de recursos cuando se destruye la instancia. */
   private readonly destroyRef = inject(DestroyRef);
 
+  /** Conserva autenticando como estado reactivo de la instancia. */
   protected readonly autenticando = signal(false);
 
   /** Coordina la ventana externa y continúa hacia el panel cuando regresa al aplicativo. */

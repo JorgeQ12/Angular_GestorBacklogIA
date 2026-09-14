@@ -15,6 +15,8 @@ const CONCURRENCIA_DETALLES_GANTT = 6;
 /** Recupera los detalles necesarios para representar la planificación como cronograma. */
 @Injectable({ providedIn: 'root' })
 export class GanttPlanificacionService {
+
+  /** Proporciona acceso al servicio de elemento planificación. */
   private readonly elementosApi = inject(ElementoPlanificacionService);
 
   /** Construye el Gantt vigente o histórico a partir del árbol ya consultado. */

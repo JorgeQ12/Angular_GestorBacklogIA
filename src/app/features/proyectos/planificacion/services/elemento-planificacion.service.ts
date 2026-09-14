@@ -38,6 +38,8 @@ import type {
 /** Encapsula las operaciones remotas de consulta y persistencia de elementos. */
 @Injectable({ providedIn: 'root' })
 export class ElementoPlanificacionService {
+
+  /** Ejecuta las solicitudes HTTP correspondientes a esta responsabilidad. */
   private readonly http = inject(HttpClient);
 
   /** Obtiene el detalle vigente de un elemento persistible. */

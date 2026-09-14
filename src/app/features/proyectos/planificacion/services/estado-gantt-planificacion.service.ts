@@ -11,15 +11,32 @@ import { GanttPlanificacionService } from './gantt-planificacion.service';
 /** Coordina la apertura, carga y recuperación de la vista Gantt. */
 @Injectable()
 export class EstadoGanttPlanificacionService {
+
+  /** Proporciona acceso al servicio remoto requerido por esta responsabilidad. */
   private readonly api = inject(GanttPlanificacionService);
+
+  /** Coordina la finalización de recursos cuando se destruye la instancia. */
   private readonly destroyRef = inject(DestroyRef);
+
+  /** Conserva operación actual para controlar el ciclo de vida de la operación. */
   private operacionActual: Subscription | null = null;
+
+  /** Conserva clave cargada para coordinar esta responsabilidad. */
   private claveCargada: string | null = null;
+
+  /** Conserva planificación solicitada para coordinar esta responsabilidad. */
   private planificacionSolicitada: PlanificacionProyecto | null = null;
 
+  /** Conserva abierto estado como estado reactivo de la instancia. */
   private readonly abiertoEstado = signal(false);
+
+  /** Conserva cargando estado como estado reactivo de la instancia. */
   private readonly cargandoEstado = signal(false);
+
+  /** Conserva error estado como estado reactivo de la instancia. */
   private readonly errorEstado = signal(false);
+
+  /** Conserva datos estado como estado reactivo de la instancia. */
   private readonly datosEstado = signal<GanttPlanificacion | null>(null);
 
   /** Indica si la vista Gantt reemplaza actualmente al árbol. */
@@ -72,6 +89,7 @@ export class EstadoGanttPlanificacionService {
     this.datosEstado.set(null);
   }
 
+  /** Carga la operación solicitada dentro del flujo actual. */
   private cargar(planificacion: PlanificacionProyecto, clave: string): void {
     this.operacionActual?.unsubscribe();
     this.planificacionSolicitada = planificacion;

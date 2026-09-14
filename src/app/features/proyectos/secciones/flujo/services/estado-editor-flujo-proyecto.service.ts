@@ -60,17 +60,41 @@ const VISTA_PREDETERMINADA: VistaLienzoFlujo = {
 /** Administra el estado local y las operaciones del editor visual del flujo. */
 @Injectable()
 export class EstadoEditorFlujoProyectoService {
+
+  /** Conserva flujo senal como estado reactivo de la instancia. */
   private readonly flujoSenal = signal<FlujoProyecto>(this.crearFlujoVacio(''));
+
+  /** Conserva vista senal como estado reactivo de la instancia. */
   private readonly vistaSenal = signal<VistaLienzoFlujo>(VISTA_PREDETERMINADA);
+
+  /** Conserva ID bloque seleccionado senal como estado reactivo de la instancia. */
   private readonly idBloqueSeleccionadoSenal = signal<string | null>(null);
+
+  /** Conserva ID conexión seleccionada senal como estado reactivo de la instancia. */
   private readonly idConexionSeleccionadaSenal = signal<string | null>(null);
+
+  /** Conserva ID origen conexión senal como estado reactivo de la instancia. */
   private readonly idOrigenConexionSenal = signal<string | null>(null);
+
+  /** Conserva etiqueta origen conexión senal como estado reactivo de la instancia. */
   private readonly etiquetaOrigenConexionSenal = signal<string | null>(null);
+
+  /** Conserva puntero conexión senal como estado reactivo de la instancia. */
   private readonly punteroConexionSenal = signal<PuntoPrevisualizacionConexion | null>(null);
+
+  /** Conserva ID destino conexión enfocado senal como estado reactivo de la instancia. */
   private readonly idDestinoConexionEnfocadoSenal = signal<string | null>(null);
+
+  /** Conserva lado destino conexión enfocado senal como estado reactivo de la instancia. */
   private readonly ladoDestinoConexionEnfocadoSenal = signal<LadoConexionFlujo | null>(null);
+
+  /** Conserva paleta bloques abierta senal como estado reactivo de la instancia. */
   private readonly paletaBloquesAbiertaSenal = signal(false);
+
+  /** Conserva estado editor nodo senal como estado reactivo de la instancia. */
   private readonly estadoEditorNodoSenal = signal<EstadoEditorNodo | null>(null);
+
+  /** Conserva solo lectura senal como estado reactivo de la instancia. */
   private readonly soloLecturaSenal = signal(false);
 
   /** Expone los límites compartidos del área editable. */
@@ -605,6 +629,7 @@ export class EstadoEditorFlujoProyectoService {
     } as BorradorNodoFlujo;
   }
 
+  /** Actualiza flujo dentro del flujo actual. */
   private actualizarFlujo(proyectar: (flujo: FlujoProyecto) => FlujoProyecto): void {
     if (this.soloLecturaSenal()) {
       return;
@@ -619,6 +644,7 @@ export class EstadoEditorFlujoProyectoService {
     this.flujoSenal.set(flujoFechado);
   }
 
+  /** Establece estado flujo dentro del flujo actual. */
   private establecerEstadoFlujo(flujo: FlujoProyecto, opciones?: OpcionesHidratacion): void {
     const conservarVista = opciones?.conservarVista ?? false;
     const conservarSeleccion = opciones?.conservarSeleccion ?? false;
@@ -649,6 +675,7 @@ export class EstadoEditorFlujoProyectoService {
     this.estadoEditorNodoSenal.set(null);
   }
 
+  /** Crea flujo vacio dentro del flujo actual. */
   private crearFlujoVacio(proyectoId: string): FlujoProyecto {
     return {
       proyectoId,
@@ -659,6 +686,7 @@ export class EstadoEditorFlujoProyectoService {
     };
   }
 
+  /** Normaliza flujo dentro del flujo actual. */
   private normalizarFlujo(flujo: FlujoProyecto, proyectoId?: string): FlujoProyecto {
     return {
       ...structuredClone(flujo),
@@ -676,6 +704,7 @@ export class EstadoEditorFlujoProyectoService {
     };
   }
 
+  /** Obtiene punto conector salida dentro del flujo actual. */
   private obtenerPuntoConectorSalida(
     idBloque: string,
     etiqueta?: string | null,
@@ -689,6 +718,7 @@ export class EstadoEditorFlujoProyectoService {
     return obtenerPuntoAnclajeBloque(bloque, LadoConexionFlujo.Derecha, etiqueta);
   }
 
+  /** Obtiene siguiente posición sugerida dentro del flujo actual. */
   private obtenerSiguientePosicionSugerida(): { x: number; y: number } {
     const nodos = this.flujoSenal().nodos;
     const bloqueAncla = this.bloqueSeleccionado() ?? nodos[nodos.length - 1];
@@ -729,6 +759,7 @@ export class EstadoEditorFlujoProyectoService {
     return { x, y };
   }
 
+  /** Resuelve roles dentro del flujo actual. */
   private resolverRoles(nombresRoles: string[]): { idsRoles: string[]; roles: RolFlujoProyecto[] } {
     const nombresRolesUnicos = [
       ...new Set(nombresRoles.map((nombre) => nombre.trim()).filter(Boolean)),
@@ -763,10 +794,12 @@ export class EstadoEditorFlujoProyectoService {
     };
   }
 
+  /** Crea ID dentro del flujo actual. */
   private crearId(prefijo: PrefijoIdentificadorFlujo): string {
     return `${prefijo}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
   }
 
+  /** Normaliza criterios aceptacion dentro del flujo actual. */
   private normalizarCriteriosAceptacion(valor: string[] | string | null | undefined): string[] {
     if (Array.isArray(valor)) {
       return valor.map((criterio) => String(criterio ?? '').trim()).filter(Boolean);
@@ -778,6 +811,7 @@ export class EstadoEditorFlujoProyectoService {
       .filter(Boolean);
   }
 
+  /** Limita la operación solicitada dentro del flujo actual. */
   private limitar(valor: number, minimo: number, maximo: number): number {
     return Math.min(maximo, Math.max(minimo, valor));
   }

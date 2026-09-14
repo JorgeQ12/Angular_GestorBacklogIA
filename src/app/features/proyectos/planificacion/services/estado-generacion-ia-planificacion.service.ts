@@ -12,15 +12,32 @@ import { PlanificacionProyectoService } from './planificacion-proyecto.service';
 /** Coordina la confirmación y ejecución de la generación mediante IA. */
 @Injectable()
 export class EstadoGeneracionIaPlanificacionService {
+
+  /** Proporciona acceso al servicio remoto requerido por esta responsabilidad. */
   private readonly api = inject(PlanificacionProyectoService);
+
+  /** Proporciona acceso al servicio de estado planificación proyecto. */
   private readonly estadoPlanificacion = inject(EstadoPlanificacionProyectoService);
+
+  /** Proporciona acceso al servicio de mensajes. */
   private readonly mensajes = inject(MensajesService);
+
+  /** Proporciona acceso al servicio de notificador errores API. */
   private readonly notificador = inject(NotificadorErroresApiService);
+
+  /** Coordina la finalización de recursos cuando se destruye la instancia. */
   private readonly destroyRef = inject(DestroyRef);
+
+  /** Conserva operación actual para controlar el ciclo de vida de la operación. */
   private operacionActual: Subscription | null = null;
+
+  /** Conserva confirmacion actual ID para coordinar esta responsabilidad. */
   private confirmacionActualId = 0;
 
+  /** Conserva panel abierto estado como estado reactivo de la instancia. */
   private readonly panelAbiertoEstado = signal(false);
+
+  /** Conserva procesando estado como estado reactivo de la instancia. */
   private readonly procesandoEstado = signal(false);
 
   /** Indica si se presentan las alternativas de generación. */

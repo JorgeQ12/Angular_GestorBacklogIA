@@ -76,36 +76,75 @@ import { EstadoInformacionProyectoService } from '../../services/estado-informac
   styleUrl: './pagina-informacion-proyecto.css',
 })
 export class PaginaInformacionProyecto {
+
+  /** Proporciona acceso a activated route. */
   private readonly route = inject(ActivatedRoute);
+
+  /** Proporciona acceso a la navegación administrada por Angular. */
   private readonly router = inject(Router);
+
+  /** Proporciona acceso al servicio de catálogos. */
   private readonly catalogos = inject(CatalogosService);
+
+  /** Proporciona acceso al servicio de mensajes. */
   private readonly mensajes = inject(MensajesService);
+
+  /** Proporciona acceso al servicio de estado información proyecto. */
   protected readonly estado = inject(EstadoInformacionProyectoService);
+
+  /** Conserva parámetros ruta para coordinar esta responsabilidad. */
   private readonly parametrosRuta = toSignal(this.route.paramMap, { requireSync: true });
+
+  /** Conserva parámetros consulta para coordinar esta responsabilidad. */
   private readonly parametrosConsulta = toSignal(this.route.queryParamMap, { requireSync: true });
+
+  /** Conserva proyecto cargado ID para coordinar esta responsabilidad. */
   private proyectoCargadoId: number | null = null;
 
+  /** Conserva paso azure para coordinar esta responsabilidad. */
   protected readonly pasoAzure = ClavePasoEspecialProyecto.VinculacionAzure;
+
+  /** Conserva secciones para coordinar esta responsabilidad. */
   protected readonly secciones = ClaveSeccionProyecto;
+
+  /** Conserva pasos navegables para coordinar esta responsabilidad. */
   protected readonly pasosNavegables = PASOS_PROYECTO.map((paso) => paso.clave);
+
+  /** Conserva acciones información para coordinar esta responsabilidad. */
   protected readonly accionesInformacion = ACCIONES_INFORMACION_PASO_PROYECTO;
+
+  /** Deriva paso activo a partir del estado vigente. */
   protected readonly pasoActivo = computed(() =>
     obtenerPasoInformacionProyecto(this.parametrosConsulta().get(PARAMETROS_RUTA.pasoProyecto)),
   );
+
+  /** Deriva version solicitada ID a partir del estado vigente. */
   protected readonly versionSolicitadaId = computed(() =>
     obtenerVersionIdInformacionProyecto(
       this.parametrosConsulta().get(PARAMETROS_RUTA.versionProyectoId),
     ),
   );
+
+  /** Conserva seccion editando como estado reactivo de la instancia. */
   protected readonly seccionEditando = signal<ClaveSeccionProyecto | null>(null);
+
+  /** Conserva contexto temporal como estado reactivo de la instancia. */
   private readonly contextoTemporal = signal<ContextoProyecto | null>(null);
+
+  /** Deriva modo formulario a partir del estado vigente. */
   protected readonly modoFormulario = computed(() =>
     this.seccionEditando() === this.pasoActivo()
       ? ModoFormularioProyecto.Edicion
       : ModoFormularioProyecto.Lectura,
   );
+
+  /** Conserva prioridades como estado reactivo de la instancia. */
   protected readonly prioridades = signal<readonly OpcionCatalogo[]>([]);
+
+  /** Conserva perfiles técnicos como estado reactivo de la instancia. */
   protected readonly perfilesTecnicos = signal<readonly OpcionSelector[]>([]);
+
+  /** Deriva datos encabezado a partir del estado vigente. */
   protected readonly datosEncabezado = computed(() => {
     const proyecto = this.estado.proyectoPresentado();
     const temporal = this.contextoTemporal();
@@ -128,6 +167,8 @@ export class PaginaInformacionProyecto {
       fechaObjetivo: contexto?.fechaObjetivo ?? '',
     };
   });
+
+  /** Conserva versionamiento paso para coordinar esta responsabilidad. */
   protected readonly versionamientoPaso = computed<VersionamientoPasoProyecto | null>(() => {
     const proyecto = this.estado.proyectoPresentado();
     if (!proyecto || this.seccionEditando() !== null) return null;
@@ -138,6 +179,8 @@ export class PaginaInformacionProyecto {
       deshabilitado: this.estado.guardando(),
     };
   });
+
+  /** Conserva mensaje error para coordinar esta responsabilidad. */
   protected readonly mensajeError = MENSAJE_ERROR_CARGA_INFORMACION_PROYECTO;
 
   public constructor() {
@@ -172,15 +215,18 @@ export class PaginaInformacionProyecto {
     });
   }
 
+  /** Ejecuta volver como parte del flujo interno. */
   protected volver(): void {
     void this.router.navigateByUrl(URL_PROYECTOS);
   }
 
+  /** Ejecuta recargar como parte del flujo interno. */
   protected recargar(): void {
     const proyectoId = obtenerProyectoIdRuta(this.parametrosRuta());
     if (proyectoId !== null) this.estado.cargar(proyectoId, this.versionSolicitadaId());
   }
 
+  /** Ejecuta cambiar paso como parte del flujo interno. */
   protected async cambiarPaso(paso: ClavePasoProyecto): Promise<void> {
     if (!(await this.descartarEdicionSiCorresponde())) return;
     void this.router.navigate([], {
@@ -193,6 +239,7 @@ export class PaginaInformacionProyecto {
     });
   }
 
+  /** Ejecuta cambiar version como parte del flujo interno. */
   protected async cambiarVersion(versionId: number): Promise<void> {
     if (!(await this.descartarEdicionSiCorresponde())) return;
     const actualId = this.estado.proyectoActual()?.versionId;
@@ -205,12 +252,14 @@ export class PaginaInformacionProyecto {
     });
   }
 
+  /** Ejecuta editar como parte del flujo interno. */
   protected editar(seccion: ClaveSeccionProyecto): void {
     if (!this.estado.proyectoPresentado()?.esVersionActual) return;
     this.contextoTemporal.set(null);
     this.seccionEditando.set(seccion);
   }
 
+  /** Cancela edicion dentro del flujo actual. */
   protected cancelarEdicion(): void {
     this.contextoTemporal.set(null);
     this.seccionEditando.set(null);
@@ -223,10 +272,12 @@ export class PaginaInformacionProyecto {
     }
   }
 
+  /** Guarda la operación solicitada dentro del flujo actual. */
   protected guardar(actualizacion: ActualizacionSeccionProyecto): void {
     this.estado.guardar(actualizacion, () => this.cancelarEdicion());
   }
 
+  /** Ejecuta descartar edicion si corresponde como parte del flujo interno. */
   private async descartarEdicionSiCorresponde(): Promise<boolean> {
     if (this.seccionEditando() === null) return true;
     const descartar = await this.mensajes.confirmar(

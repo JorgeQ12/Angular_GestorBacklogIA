@@ -32,6 +32,8 @@ import type { ResultadoSincronizacionEpicaAzurePlanificacion } from '../models/s
 /** Consulta la planificación y ejecuta sus operaciones de nivel general. */
 @Injectable({ providedIn: 'root' })
 export class PlanificacionProyectoService {
+
+  /** Ejecuta las solicitudes HTTP correspondientes a esta responsabilidad. */
   private readonly http = inject(HttpClient);
 
   /** Obtiene una fotografía de la planificación con el alcance de visualización solicitado. */

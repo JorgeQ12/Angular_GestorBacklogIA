@@ -13,7 +13,11 @@ const CONTEXTO_POR_VARIANTE = {
 /** Coordina los mensajes y las decisiones globales solicitadas por la aplicación. */
 @Injectable({ providedIn: 'root' })
 export class MensajesService {
+
+  /** Conserva mensaje como estado reactivo de la instancia. */
   private readonly mensaje = signal<EstadoMensaje | null>(null);
+
+  /** Conserva resolver pendiente para coordinar esta responsabilidad. */
   private resolverPendiente: ((aceptado: boolean) => void) | null = null;
 
   /** Expone el mensaje vigente a la única presentación montada en la raíz. */
@@ -120,6 +124,7 @@ export class MensajesService {
     this.cerrar(false);
   }
 
+  /** Cierra la operación solicitada dentro del flujo actual. */
   private cerrar(aceptado: boolean): void {
     if (!this.mensaje()) {
       return;
@@ -132,6 +137,7 @@ export class MensajesService {
     resolver?.(aceptado);
   }
 
+  /** Resuelve anterior dentro del flujo actual. */
   private resolverAnterior(aceptado: boolean): void {
     const resolver = this.resolverPendiente;
 

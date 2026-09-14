@@ -5,6 +5,8 @@ import { FormateadorFechaService, ValorFecha } from '../services/formateador-fec
 /** Expone los formatos compartidos de fecha dentro de las plantillas. */
 @Pipe({ name: 'fecha' })
 export class FechaPipe implements PipeTransform {
+
+  /** Proporciona acceso al servicio de formateador fecha. */
   private readonly formateador = inject(FormateadorFechaService);
 
   /** Representa un valor mediante el formato y alternativa solicitados. */

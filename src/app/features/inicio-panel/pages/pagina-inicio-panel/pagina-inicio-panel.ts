@@ -52,21 +52,36 @@ import { ResumenInicioPanelService } from '../../services/resumen-inicio-panel.s
   styleUrl: './pagina-inicio-panel.css',
 })
 export class PaginaInicioPanel {
+
+  /** Proporciona acceso al servicio de autenticación. */
   private readonly autenticacion = inject(AutenticacionService);
+
+  /** Proporciona acceso al servicio de resumen inicio panel. */
   private readonly resumenService = inject(ResumenInicioPanelService);
+
+  /** Proporciona acceso a la navegación administrada por Angular. */
   private readonly router = inject(Router);
+
+  /** Coordina la finalización de recursos cuando se destruye la instancia. */
   private readonly destroyRef = inject(DestroyRef);
+
+  /** Conserva hoy para coordinar esta responsabilidad. */
   private readonly hoy = new Date();
 
+  /** Conserva resumen como estado reactivo de la instancia. */
   protected readonly resumen = signal(RESUMEN_INICIO_PANEL_VACIO);
+
+  /** Conserva error resumen como estado reactivo de la instancia. */
   protected readonly errorResumen = signal(false);
 
+  /** Deriva descripción bienvenida a partir del estado vigente. */
   protected readonly descripcionBienvenida = computed(() => {
     const primerNombre = this.obtenerPrimerNombre(this.autenticacion.sesionActual()?.nombre);
     const saludo = primerNombre ? `Hola, ${primerNombre}. ` : '';
     return `${saludo}Revisa el estado de tus proyectos y continúa con tus actividades.`;
   });
 
+  /** Deriva fecha contexto a partir del estado vigente. */
   protected readonly fechaContexto = computed(() => this.resumen().fechaCorte ?? this.hoy);
 
   public constructor() {
@@ -108,6 +123,7 @@ export class PaginaInicioPanel {
     void this.router.navigateByUrl(crearUrlCreacionProyecto(borrador.id));
   }
 
+  /** Obtiene primer nombre dentro del flujo actual. */
   private obtenerPrimerNombre(nombre: string | null | undefined): string | null {
     const primerNombre = nombre?.trim().split(/\s+/)[0];
     return primerNombre ? `${primerNombre.charAt(0).toUpperCase()}${primerNombre.slice(1)}` : null;

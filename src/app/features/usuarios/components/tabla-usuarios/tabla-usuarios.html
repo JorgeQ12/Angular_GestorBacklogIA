@@ -1,0 +1,97 @@
+<app-region-desplazable class="ui-table-region tabla-usuarios__desplazamiento" etiqueta="Usuarios">
+  <table class="ui-table tabla-usuarios">
+    <caption class="ui-visually-hidden">
+      Usuarios registrados para perfiles técnicos y consumo del asistente
+    </caption>
+    <colgroup>
+      <col class="tabla-usuarios__columna-persona" />
+      <col class="tabla-usuarios__columna-identidad" />
+      <col class="tabla-usuarios__columna-perfil" />
+      <col class="tabla-usuarios__columna-limite" />
+      <col class="tabla-usuarios__columna-estado" />
+      <col class="tabla-usuarios__columna-fecha" />
+      <col class="tabla-usuarios__columna-acciones" />
+    </colgroup>
+    <thead>
+      <tr>
+        <th scope="col">Usuario</th>
+        <th scope="col">Identidad Azure</th>
+        <th scope="col">Perfil técnico</th>
+        <th scope="col">Límite mensual</th>
+        <th scope="col">Estado</th>
+        <th scope="col">Actualización</th>
+        <th scope="col" class="ui-table__actions">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (usuario of usuarios(); track usuario.id) {
+        <tr>
+          <td data-label="Usuario">
+            <strong class="ui-table__primary-text">{{ usuario.nombre }}</strong>
+            <span class="ui-table__secondary-text">{{ usuario.correo || 'Sin correo' }}</span>
+          </td>
+          <td data-label="Identidad Azure">
+            <span class="ui-table__secondary-text" [title]="usuario.idAzure || 'Sin identidad'">
+              {{ usuario.idAzure || 'Sin identidad' }}
+            </span>
+          </td>
+          <td data-label="Perfil técnico">
+            <strong class="ui-table__primary-text">
+              {{ usuario.perfilTecnicoNombre || 'Sin perfil' }}
+            </strong>
+            @if (usuario.perfilTecnicoCodigo) {
+              <span class="ui-table__secondary-text">{{ usuario.perfilTecnicoCodigo }}</span>
+            }
+          </td>
+          <td data-label="Límite mensual">
+            <span class="ui-table__secondary-text">{{ presentarLimite(usuario.limiteTokensMensual) }}</span>
+          </td>
+          <td data-label="Estado">
+            <app-indicador-estado
+              [texto]="usuario.activo ? 'Activo' : 'Inactivo'"
+              [tono]="usuario.activo ? 'neutral' : 'advertencia'"
+              [presentacion]="usuario.activo ? 'discreta' : 'etiqueta'"
+            />
+          </td>
+          <td data-label="Actualización">
+            <span class="ui-table__secondary-text">
+              {{ (usuario.fechaActualizacion || usuario.fechaCreacion) | fecha: 'breve' }}
+            </span>
+          </td>
+          <td class="ui-table__actions" data-label="Acciones">
+            <div class="ui-table__action-group">
+              <button
+                type="button"
+                class="ui-button ui-button--secondary ui-button--md ui-table__icon-action"
+                [attr.aria-label]="'Editar usuario ' + usuario.nombre"
+                [attr.title]="'Editar usuario ' + usuario.nombre"
+                [disabled]="bloqueado()"
+                (click)="editarUsuario.emit(usuario)"
+              >
+                <app-icono nombre="editar" />
+              </button>
+              <button
+                type="button"
+                class="ui-button ui-button--secondary ui-button--md ui-table__icon-action"
+                [attr.aria-label]="
+                  !usuario.activo && !usuario.perfilTecnicoId
+                    ? 'Asigna un perfil técnico antes de activar ' + usuario.nombre
+                    : (usuario.activo ? 'Inactivar ' : 'Activar ') + usuario.nombre
+                "
+                [attr.title]="
+                  !usuario.activo && !usuario.perfilTecnicoId
+                    ? 'Asigna un perfil técnico antes de activar'
+                    : (usuario.activo ? 'Inactivar ' : 'Activar ') + usuario.nombre
+                "
+                [disabled]="bloqueado() || (!usuario.activo && !usuario.perfilTecnicoId)"
+                (click)="cambiarEstadoUsuario.emit(usuario)"
+              >
+                <app-icono [nombre]="usuario.activo ? 'ocultar' : 'mostrar'" />
+              </button>
+            </div>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</app-region-desplazable>

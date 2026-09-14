@@ -34,7 +34,11 @@ import {
   styleUrl: './panel-asistente-ia.css',
 })
 export class PanelAsistenteIA {
+
+  /** Construye los controles reactivos administrados por el componente. */
   private readonly constructorFormulario = inject(NonNullableFormBuilder);
+
+  /** Referencia lista mensajes dentro de la vista. */
   private readonly listaMensajes = viewChild<ElementRef<HTMLElement>>('listaMensajes');
 
   /** Recibe el historial confirmado que debe presentar el panel. */
@@ -73,14 +77,27 @@ export class PanelAsistenteIA {
   /** Solicita rechazar una propuesta identificada por su mensaje. */
   public readonly propuestaRechazada = output<number>();
 
+  /** Conserva límite mensaje para coordinar esta responsabilidad. */
   protected readonly limiteMensaje = LIMITE_MENSAJE_ASISTENTE_IA;
+
+  /** Conserva acciones rápidas para coordinar esta responsabilidad. */
   protected readonly accionesRapidas = ACCIONES_RAPIDAS_ASISTENTE_IA;
+
+  /** Conserva mensajes campo mensaje para coordinar esta responsabilidad. */
   protected readonly mensajesCampoMensaje = MENSAJES_CAMPO_MENSAJE_ASISTENTE_IA;
+
+  /** Conserva roles para coordinar esta responsabilidad. */
   protected readonly roles = RolMensajeAsistenteIA;
+
+  /** Indica estados propuesta dentro del estado actual. */
   protected readonly estadosPropuesta = EstadoPropuestaAsistenteIA;
+
+  /** Administra los valores y validaciones del formulario reactivo. */
   protected readonly formulario = this.constructorFormulario.group({
     mensaje: ['', [validarTextoRequerido, Validators.maxLength(this.limiteMensaje)]],
   });
+
+  /** Deriva operación bloqueada a partir del estado vigente. */
   protected readonly operacionBloqueada = computed(
     () =>
       this.cargando() ||
@@ -107,6 +124,7 @@ export class PanelAsistenteIA {
     });
   }
 
+  /** Ejecuta enviar como parte del flujo interno. */
   protected enviar(): void {
     if (this.operacionBloqueada()) return;
     if (this.formulario.invalid) {

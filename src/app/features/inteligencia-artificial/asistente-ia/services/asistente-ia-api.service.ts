@@ -28,7 +28,11 @@ import type {
 /** Encapsula exclusivamente el transporte HTTP del Asistente IA. */
 @Injectable({ providedIn: 'root' })
 export class AsistenteIAApiService {
+
+  /** Ejecuta las solicitudes HTTP correspondientes a esta responsabilidad. */
   private readonly http = inject(HttpClient);
+
+  /** Conserva contexto HTTP para coordinar esta responsabilidad. */
   private readonly contextoHttp = new HttpContext().set(OMITIR_CARGA_GLOBAL, true);
 
   /** Recupera y adapta la conversación persistida del borrador indicado. */
@@ -91,6 +95,7 @@ export class AsistenteIAApiService {
     return this.resolverPropuesta(ENDPOINTS_ASISTENTE_IA.rechazarPropuesta, solicitud);
   }
 
+  /** Resuelve propuesta dentro del flujo actual. */
   private resolverPropuesta(
     endpoint: string,
     solicitud:

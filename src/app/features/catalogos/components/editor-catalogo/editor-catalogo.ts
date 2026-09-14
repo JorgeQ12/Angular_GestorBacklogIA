@@ -57,13 +57,22 @@ export class EditorCatalogo {
   /** Solicita cerrar el editor sin alterar datos persistidos. */
   public readonly cerrar = output<void>();
 
+  /** Conserva límites para coordinar esta responsabilidad. */
   protected readonly limites = LIMITES_CATALOGO;
+
+  /** Conserva mensajes para coordinar esta responsabilidad. */
   protected readonly mensajes = MENSAJES_CATALOGO;
+
+  /** Deriva título a partir del estado vigente. */
   protected readonly titulo = computed(
     () =>
       `${this.contexto().entidad ? 'Editar' : 'Crear'} ${this.contexto().clase === ClaseCatalogo.Tipo ? 'catálogo' : 'opción'}`,
   );
+
+  /** Deriva es edicion a partir del estado vigente. */
   protected readonly esEdicion = computed(() => this.contexto().entidad !== null);
+
+  /** Deriva ayuda código a partir del estado vigente. */
   protected readonly ayudaCodigo = computed(
     () => AYUDAS_CODIGO_CATALOGO[this.contexto().clase],
   );
@@ -82,6 +91,7 @@ export class EditorCatalogo {
   /** Distingue visualmente una creación de una edición existente. */
   protected readonly icono = computed(() => (this.contexto().entidad ? 'editar' : 'agregar'));
 
+  /** Administra los valores y validaciones del formulario reactivo. */
   protected readonly formulario: FormGroup<ControlesFormularioPlano<DatosCatalogo>> = inject(
     FormBuilder,
   ).nonNullable.group({

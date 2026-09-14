@@ -15,6 +15,8 @@ import type { VersionPlanificacion } from '../../models/version-planificacion.mo
   styleUrl: './selector-version-planificacion.css',
 })
 export class SelectorVersionPlanificacionComponent {
+
+  /** Proporciona acceso al servicio de formateador fecha. */
   private readonly formateadorFecha = inject(FormateadorFechaService);
 
   /** Proporciona las versiones ordenadas disponibles para el proyecto. */
@@ -28,7 +30,10 @@ export class SelectorVersionPlanificacionComponent {
   /** Solicita presentar una versión distinta. */
   public readonly versionCambiada = output<number>();
 
+  /** Administra control mediante formularios reactivos. */
   protected readonly control = new FormControl<number | null>(null);
+
+  /** Conserva opciones para coordinar esta responsabilidad. */
   protected readonly opciones = computed<readonly OpcionSelector[]>(() =>
     this.versiones().map((version) => ({
       valor: version.id,
@@ -57,6 +62,7 @@ export class SelectorVersionPlanificacionComponent {
     });
   }
 
+  /** Ejecuta fecha breve como parte del flujo interno. */
   private fechaBreve(fecha: string): string {
     const formateada = this.formateadorFecha.formatear(fecha, 'breve');
     return this.aparienciaGantt() ? formateada.replaceAll(' de ', ' ') : formateada;

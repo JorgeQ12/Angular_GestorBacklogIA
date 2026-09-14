@@ -9,12 +9,26 @@ import { CreacionProyectoService } from './creacion-proyecto.service';
 /** Conserva el borrador y su revisión mientras permanece activo el recorrido. */
 @Injectable()
 export class EstadoCreacionProyectoService {
+
+  /** Proporciona acceso al servicio de creación proyecto. */
   private readonly creacionProyecto = inject(CreacionProyectoService);
+
+  /** Conserva estado proyecto ID como estado reactivo de la instancia. */
   private readonly estadoProyectoId = signal<number | null>(null);
+
+  /** Conserva estado borrador como estado reactivo de la instancia. */
   private readonly estadoBorrador = signal<BorradorProyecto | null>(null);
+
+  /** Conserva estado nombre proyecto como estado reactivo de la instancia. */
   private readonly estadoNombreProyecto = signal('');
+
+  /** Conserva proyecto ID activo para coordinar esta responsabilidad. */
   private proyectoIdActivo: number | null = null;
+
+  /** Conserva carga en curso para coordinar esta responsabilidad. */
   private cargaEnCurso: Observable<BorradorProyecto> | null = null;
+
+  /** Conserva secuencia carga para coordinar esta responsabilidad. */
   private secuenciaCarga = 0;
 
   /** Expone la fotografía vigente sin permitir su modificación externa. */
@@ -54,6 +68,7 @@ export class EstadoCreacionProyectoService {
     return this.crearCarga(proyectoId);
   }
 
+  /** Crea carga dentro del flujo actual. */
   private crearCarga(proyectoId: number): Observable<BorradorProyecto> {
     const secuencia = ++this.secuenciaCarga;
     const solicitud = this.creacionProyecto.obtenerBorrador(proyectoId).pipe(

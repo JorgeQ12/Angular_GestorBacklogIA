@@ -27,11 +27,16 @@ export enum ModoCapaConexionesFlujo {
   styleUrl: './capa-conexiones-flujo-proyecto.css',
 })
 export class CapaConexionesFlujoProyecto {
+
+  /** Proporciona acceso al servicio de estado editor flujo proyecto. */
   protected readonly estadoEditor = inject(EstadoEditorFlujoProyectoService);
   /** Selecciona la superficie visual de conexiones que debe representarse. */
   public readonly modo = input<ModoCapaConexionesFlujo>(ModoCapaConexionesFlujo.Lineas);
+
+  /** Conserva modos capa para coordinar esta responsabilidad. */
   protected readonly modosCapa = ModoCapaConexionesFlujo;
 
+  /** Deriva conexiones representadas a partir del estado vigente. */
   protected readonly conexionesRepresentadas = computed(() => {
     const bloques = new Map(
       this.estadoEditor.bloquesVisibles().map((bloque) => [bloque.id, bloque]),
@@ -84,10 +89,13 @@ export class CapaConexionesFlujoProyecto {
       })
       .filter((conexion): conexion is NonNullable<typeof conexion> => conexion !== null);
   });
+
+  /** Deriva previsualización conexión a partir del estado vigente. */
   protected readonly previsualizacionConexion = computed(() =>
     this.estadoEditor.previsualizacionConexionActiva(),
   );
 
+  /** Selecciona conexión dentro del flujo actual. */
   protected seleccionarConexion(idConexion: string): void {
     if (!this.estadoEditor.soloLectura()) this.estadoEditor.seleccionarConexion(idConexion);
   }
@@ -102,10 +110,12 @@ export class CapaConexionesFlujoProyecto {
     this.seleccionarConexion(idConexion);
   }
 
+  /** Elimina conexión dentro del flujo actual. */
   protected eliminarConexion(idConexion: string): void {
     this.estadoEditor.eliminarConexion(idConexion);
   }
 
+  /** Determina si rama decision. */
   protected esRamaDecision(etiqueta: string | null): boolean {
     return esEtiquetaRamaDecision(etiqueta);
   }

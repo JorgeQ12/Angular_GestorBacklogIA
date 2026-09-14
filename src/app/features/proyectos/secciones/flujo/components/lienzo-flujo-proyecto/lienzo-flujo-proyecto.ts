@@ -28,8 +28,14 @@ import { TarjetaBloqueFlujoProyecto } from '../tarjeta-bloque-flujo-proyecto/tar
   styleUrl: './lienzo-flujo-proyecto.css',
 })
 export class LienzoFlujoProyecto {
+
+  /** Proporciona acceso a destroy ref. */
   private readonly referenciaDestruccion = inject(DestroyRef);
+
+  /** Proporciona acceso al servicio de estado editor flujo proyecto. */
   protected readonly estadoEditor = inject(EstadoEditorFlujoProyectoService);
+
+  /** Conserva modos capa conexiones para coordinar esta responsabilidad. */
   protected readonly modosCapaConexiones = ModoCapaConexionesFlujo;
 
   /** Indica si el editor que contiene el lienzo ocupa la pantalla completa. */
@@ -50,18 +56,24 @@ export class LienzoFlujoProyecto {
   /** Solicita generar el primer diagrama a partir del contexto del proyecto. */
   public readonly generarConIASolicitado = output<void>();
 
+  /** Conserva elemento vista para coordinar esta responsabilidad. */
   @ViewChild('elementoVista', { static: true })
   private readonly elementoVista?: ElementRef<HTMLDivElement>;
 
+  /** Deriva transformacion escena a partir del estado vigente. */
   protected readonly transformacionEscena = computed(() => {
     const vista = this.estadoEditor.vista();
     return `translate(${vista.desplazamientoX}px, ${vista.desplazamientoY}px) scale(${vista.escala})`;
   });
+
+  /** Deriva estilo tamaño lienzo a partir del estado vigente. */
   protected readonly estiloTamanoLienzo = computed(() => ({
     width: `${this.estadoEditor.tamanoLienzo.ancho}px`,
     height: `${this.estadoEditor.tamanoLienzo.alto}px`,
     transform: this.transformacionEscena(),
   }));
+
+  /** Deriva estilo cuadricula vista a partir del estado vigente. */
   protected readonly estiloCuadriculaVista = computed(() => {
     const vista = this.estadoEditor.vista();
     const tamanoCuadricula = 40 * vista.escala;
@@ -70,26 +82,33 @@ export class LienzoFlujoProyecto {
       backgroundPosition: `${vista.desplazamientoX}px ${vista.desplazamientoY}px`,
     };
   });
+
+  /** Deriva etiqueta escala a partir del estado vigente. */
   protected readonly etiquetaEscala = computed(
     () => `${Math.round(this.estadoEditor.vista().escala * 100)}%`,
   );
 
+  /** Ejecuta acercar como parte del flujo interno. */
   protected acercar(): void {
     this.estadoEditor.ajustarEscala(0.1);
   }
 
+  /** Ejecuta alejar como parte del flujo interno. */
   protected alejar(): void {
     this.estadoEditor.ajustarEscala(-0.1);
   }
 
+  /** Restablece vista dentro del flujo actual. */
   protected restablecerVista(): void {
     this.estadoEditor.restablecerVista();
   }
 
+  /** Abre paleta bloques dentro del flujo actual. */
   protected abrirPaletaBloques(): void {
     this.estadoEditor.abrirPaletaBloques();
   }
 
+  /** Selecciona superficie dentro del flujo actual. */
   protected seleccionarSuperficie(evento: MouseEvent): void {
     const objetivo = evento.target;
     if (
@@ -105,6 +124,7 @@ export class LienzoFlujoProyecto {
     this.estadoEditor.cancelarConexion();
   }
 
+  /** Inicia desplazamiento dentro del flujo actual. */
   protected iniciarDesplazamiento(evento: PointerEvent): void {
     if (this.estadoEditor.arrastrandoConexion()) return;
 
@@ -138,6 +158,7 @@ export class LienzoFlujoProyecto {
     this.referenciaDestruccion.onDestroy(detenerDesplazamiento);
   }
 
+  /** Ejecuta mover puntero documento como parte del flujo interno. */
   @HostListener('document:pointermove', ['$event'])
   protected moverPunteroDocumento(evento: PointerEvent): void {
     if (!this.estadoEditor.arrastrandoConexion()) return;
@@ -146,16 +167,19 @@ export class LienzoFlujoProyecto {
     );
   }
 
+  /** Ejecuta soltar puntero documento como parte del flujo interno. */
   @HostListener('document:pointerup')
   protected soltarPunteroDocumento(): void {
     if (this.estadoEditor.arrastrandoConexion()) this.estadoEditor.completarArrastreConexion();
   }
 
+  /** Ejecuta pulsar escape como parte del flujo interno. */
   @HostListener('document:keydown.escape')
   protected pulsarEscape(): void {
     if (this.estadoEditor.arrastrandoConexion()) this.estadoEditor.cancelarConexion();
   }
 
+  /** Convierte en punto lienzo dentro del flujo actual. */
   private convertirEnPuntoLienzo(clienteX: number, clienteY: number): { x: number; y: number } {
     const rectanguloVista = this.elementoVista?.nativeElement.getBoundingClientRect();
     const vista = this.estadoEditor.vista();

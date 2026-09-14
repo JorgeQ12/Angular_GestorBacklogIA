@@ -29,21 +29,43 @@ export class ErrorCampoDirective implements AfterViewInit, OnChanges, OnDestroy 
   /** Permite personalizar los mensajes de un control particular. */
   @Input() public appMensajesError: MensajesError | undefined;
 
+  /** Proporciona acceso a ng control, { self: true }. */
   private readonly controlDirectiva = inject(NgControl, { self: true });
+
+  /** Proporciona acceso a form group directive, { optional: true }. */
   private readonly formularioReactivo = inject(FormGroupDirective, { optional: true });
+
+  /** Proporciona acceso a ng form, { optional: true }. */
   private readonly formularioPlantilla = inject(NgForm, { optional: true });
+
+  /** Proporciona acceso a mensajes formulario directive, { optional: true }. */
   private readonly mensajesFormulario = inject(MensajesFormularioDirective, { optional: true });
+
+  /** Conserva elemento para coordinar esta responsabilidad. */
   private readonly elemento = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  /** Conserva control personalizado para coordinar esta responsabilidad. */
   private readonly controlPersonalizado = inject<ControlCampoPersonalizado>(
     CONTROL_CAMPO_PERSONALIZADO,
     { optional: true, self: true },
   );
+
+  /** Proporciona acceso a renderer2. */
   private readonly renderer = inject(Renderer2);
+
+  /** Coordina la finalización de recursos cuando se destruye la instancia. */
   private readonly destroyRef = inject(DestroyRef);
+
+  /** Proporciona acceso a mensajes_error_formulario. */
   private readonly mensajesPredeterminados = inject(MENSAJES_ERROR_FORMULARIO);
 
+  /** Conserva contenedor campo para coordinar esta responsabilidad. */
   private contenedorCampo: HTMLElement | undefined;
+
+  /** Conserva elemento error para coordinar esta responsabilidad. */
   private elementoError: HTMLElement | undefined;
+
+  /** Conserva vista inicializada para coordinar esta responsabilidad. */
   private vistaInicializada = false;
 
   /** Expone el formulario que administra el control anfitrión. */

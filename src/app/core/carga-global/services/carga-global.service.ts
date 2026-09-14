@@ -3,6 +3,8 @@ import { Injectable, computed, signal } from '@angular/core';
 /** Administra la visibilidad compartida del cargador durante operaciones concurrentes. */
 @Injectable({ providedIn: 'root' })
 export class CargaGlobalService {
+
+  /** Conserva operaciones pendientes como estado reactivo de la instancia. */
   private readonly operacionesPendientes = signal(0);
 
   /** Indica si existe al menos una operación pendiente. */

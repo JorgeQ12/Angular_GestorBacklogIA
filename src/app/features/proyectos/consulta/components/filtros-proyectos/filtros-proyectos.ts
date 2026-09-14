@@ -40,8 +40,14 @@ import type {
   styleUrl: './filtros-proyectos.css',
 })
 export class FormularioFiltrosProyectos {
+
+  /** Construye los controles reactivos administrados por el componente. */
   private readonly constructorFormulario = inject(FormBuilder);
+
+  /** Coordina la finalización de recursos cuando se destruye la instancia. */
   private readonly destroyRef = inject(DestroyRef);
+
+  /** Conserva filtros representados para coordinar esta responsabilidad. */
   private filtrosRepresentados: FiltrosProyectos = FILTROS_PROYECTOS_VACIOS;
 
   /** Proporciona los criterios derivados de la URL vigente. */
@@ -50,8 +56,13 @@ export class FormularioFiltrosProyectos {
   /** Comunica una fotografía completa después de modificar los criterios. */
   public readonly filtrosCambiados = output<FiltrosProyectos>();
 
+  /** Conserva longitud minima búsqueda para coordinar esta responsabilidad. */
   protected readonly longitudMinimaBusqueda = LONGITUD_MINIMA_BUSQUEDA_PROYECTOS;
+
+  /** Conserva opciones estado para coordinar esta responsabilidad. */
   protected readonly opcionesEstado = OPCIONES_FILTRO_ESTADO_PROYECTOS;
+
+  /** Administra los valores y validaciones del formulario reactivo. */
   protected readonly formulario: FormularioFiltrosProyectosTipado =
     this.constructorFormulario.group<ControlesFiltrosProyectos>({
       busqueda: this.constructorFormulario.nonNullable.control(''),

@@ -15,8 +15,14 @@ const INTERVALO_COMPROBACION_RETORNO = 400;
 /** Coordina el acceso externo y la sesión mantenida por Kong. */
 @Injectable({ providedIn: 'root' })
 export class AutenticacionService {
+
+  /** Ejecuta las solicitudes HTTP correspondientes a esta responsabilidad. */
   private readonly http = inject(HttpClient);
+
+  /** Proporciona acceso seguro al documento activo. */
   private readonly documento = inject(DOCUMENT);
+
+  /** Conserva sesión como estado reactivo de la instancia. */
   private readonly sesion = signal<SesionUsuario | null>(null);
 
   /** Expone la última sesión confirmada por el backend. */
@@ -96,6 +102,7 @@ export class AutenticacionService {
       );
   }
 
+  /** Ejecuta exigir sesión como parte del flujo interno. */
   private exigirSesion(headers: HttpHeaders): SesionUsuario {
     const sesion = this.obtenerSesion(headers);
 
@@ -106,6 +113,7 @@ export class AutenticacionService {
     return sesion;
   }
 
+  /** Obtiene sesión dentro del flujo actual. */
   private obtenerSesion(headers: HttpHeaders): SesionUsuario | null {
     const nombre = headers.get('X-User-Name')?.trim();
     return nombre ? { nombre } : null;
@@ -117,6 +125,7 @@ export class AutenticacionService {
     this.obtenerVentana().location.assign(ENDPOINTS_AUTENTICACION.cerrarSesion);
   }
 
+  /** Obtiene ventana dentro del flujo actual. */
   private obtenerVentana(): Window {
     const ventana = this.documento.defaultView;
 
@@ -127,6 +136,7 @@ export class AutenticacionService {
     return ventana;
   }
 
+  /** Construye caracteristicas ventana dentro del flujo actual. */
   private construirCaracteristicasVentana(ventana: Window): string {
     const izquierda = Math.max(
       0,

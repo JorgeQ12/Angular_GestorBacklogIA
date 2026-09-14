@@ -119,79 +119,161 @@ import { NotificadorErroresBorradorProyectoService } from '../../services/notifi
   styleUrl: './pagina-creacion-proyecto.css',
 })
 export class PaginaCreacionProyecto {
+
+  /** Proporciona acceso a activated route. */
   private readonly ruta = inject(ActivatedRoute);
+
+  /** Proporciona acceso a la navegación administrada por Angular. */
   private readonly router = inject(Router);
+
+  /** Proporciona acceso al servicio de catálogos. */
   private readonly catalogos = inject(CatalogosService);
+
+  /** Proporciona acceso al servicio de creación proyecto. */
   private readonly creacionProyecto = inject(CreacionProyectoService);
+
+  /** Proporciona acceso al servicio de notificador errores API. */
   private readonly notificadorErrores = inject(NotificadorErroresApiService);
+
+  /** Proporciona acceso al servicio de notificador errores borrador proyecto. */
   private readonly notificadorBorrador = inject(NotificadorErroresBorradorProyectoService);
+
+  /** Proporciona acceso al servicio de estado creación proyecto. */
   private readonly estadoCreacion = inject(EstadoCreacionProyectoService);
+
+  /** Coordina la finalización de recursos cuando se destruye la instancia. */
   private readonly destroyRef = inject(DestroyRef);
+
+  /** Conserva ID proyecto para coordinar esta responsabilidad. */
   private readonly idProyecto = toSignal(
     this.ruta.queryParamMap.pipe(map(obtenerProyectoIdRuta), distinctUntilChanged()),
     { initialValue: null },
   );
+
+  /** Conserva paso seleccionado como estado reactivo de la instancia. */
   private readonly pasoSeleccionado = signal<ClavePasoProyecto | null>(null);
+
+  /** Conserva carga recorrido actual para controlar el ciclo de vida de la operación. */
   private cargaRecorridoActual: Subscription | null = null;
+
+  /** Conserva guardado actual para controlar el ciclo de vida de la operación. */
   private guardadoActual: Subscription | null = null;
+
+  /** Conserva generación flujo actual para controlar el ciclo de vida de la operación. */
   private generacionFlujoActual: Subscription | null = null;
+
+  /** Conserva proyecto anterior para coordinar esta responsabilidad. */
   private proyectoAnterior: number | null | undefined;
+
+  /** Conserva sincronización inicial equipo solicitada para coordinar esta responsabilidad. */
   private sincronizacionInicialEquipoSolicitada = false;
 
+  /** Conserva paso azure para coordinar esta responsabilidad. */
   protected readonly pasoAzure = ClavePasoEspecialProyecto.VinculacionAzure;
+
+  /** Conserva secciones para coordinar esta responsabilidad. */
   protected readonly secciones = ClaveSeccionProyecto;
+
+  /** Conserva modo edicion para coordinar esta responsabilidad. */
   protected readonly modoEdicion = ModoFormularioProyecto.Edicion;
+
+  /** Conserva acciones creación para coordinar esta responsabilidad. */
   protected readonly accionesCreacion = ACCIONES_CREACION_PASO_PROYECTO;
+
+  /** Conserva acciones flujo para coordinar esta responsabilidad. */
   protected readonly accionesFlujo: AccionesPasoProyecto = {
     ...ACCIONES_CREACION_PASO_PROYECTO,
     textoPrincipal: 'Guardar proyecto',
     iconoPrincipal: 'guardar',
     nota: 'El diagrama completo se guardará en el borrador del proyecto.',
   };
+
+  /** Conserva recorrido listo como estado reactivo de la instancia. */
   protected readonly recorridoListo = signal(false);
+
+  /** Conserva error carga recorrido como estado reactivo de la instancia. */
   protected readonly errorCargaRecorrido = signal(false);
+
+  /** Conserva prioridades como estado reactivo de la instancia. */
   protected readonly prioridades = signal<readonly OpcionCatalogo[]>([]);
+
+  /** Conserva perfiles técnicos como estado reactivo de la instancia. */
   protected readonly perfilesTecnicos = signal<readonly OpcionSelector[]>([]);
+
+  /** Conserva datos vinculación como estado reactivo de la instancia. */
   protected readonly datosVinculacion = signal<DatosVinculacionAzure | null>(null);
+
+  /** Conserva resultado validación como estado reactivo de la instancia. */
   protected readonly resultadoValidacion = signal<ResultadoVinculacionAzure | null>(null);
+
+  /** Conserva procesando vinculación como estado reactivo de la instancia. */
   protected readonly procesandoVinculacion = signal(false);
+
+  /** Conserva guardando seccion como estado reactivo de la instancia. */
   protected readonly guardandoSeccion = signal(false);
+
+  /** Conserva generando diagrama con IA como estado reactivo de la instancia. */
   protected readonly generandoDiagramaConIA = signal(false);
+
+  /** Conserva sincronizando equipo como estado reactivo de la instancia. */
   protected readonly sincronizandoEquipo = signal(false);
+
+  /** Conserva origen equipo actualizado como estado reactivo de la instancia. */
   private readonly origenEquipoActualizado = signal<OrigenEquipoAzureProyecto | null>(null);
+
+  /** Conserva equipo actualizado como estado reactivo de la instancia. */
   private readonly equipoActualizado = signal<EquipoProyecto | null>(null);
+
+  /** Conserva flujo generado con IA como estado reactivo de la instancia. */
   protected readonly flujoGeneradoConIA = signal<FlujoProyecto | null>(null);
 
+  /** Deriva contexto a partir del estado vigente. */
   protected readonly contexto = computed(() => this.estadoCreacion.borrador()?.contexto ?? null);
+
+  /** Deriva tipo solución a partir del estado vigente. */
   protected readonly tipoSolucion = computed(() => {
     const borrador = this.estadoCreacion.borrador();
     return borrador ? deserializarTipoSolucionProyecto(borrador.tipoSolucionJson) : null;
   });
+
+  /** Deriva necesidad a partir del estado vigente. */
   protected readonly necesidad = computed(() => {
     const borrador = this.estadoCreacion.borrador();
     return borrador ? deserializarNecesidadProyecto(borrador.necesidadJson) : null;
   });
+
+  /** Deriva objetivos a partir del estado vigente. */
   protected readonly objetivos = computed(() => {
     const borrador = this.estadoCreacion.borrador();
     return borrador ? deserializarObjetivosProyecto(borrador.objetivosJson) : null;
   });
+
+  /** Deriva alcance a partir del estado vigente. */
   protected readonly alcance = computed(() => {
     const borrador = this.estadoCreacion.borrador();
     return borrador ? deserializarAlcanceProyecto(borrador.alcanceJson) : null;
   });
+
+  /** Deriva roles a partir del estado vigente. */
   protected readonly roles = computed(() => {
     const borrador = this.estadoCreacion.borrador();
     return borrador ? deserializarRolesProyecto(borrador.rolesJson) : null;
   });
+
+  /** Conserva equipo guardado para coordinar esta responsabilidad. */
   private readonly equipoGuardado = computed<EquipoProyecto>(() => {
     const borrador = this.estadoCreacion.borrador();
     return borrador
       ? (deserializarEquipoProyecto(borrador.equipoJson) ?? { integrantes: [] })
       : { integrantes: [] };
   });
+
+  /** Deriva origen equipo a partir del estado vigente. */
   private readonly origenEquipo = computed(
     () => this.origenEquipoActualizado() ?? this.estadoCreacion.borrador()?.equipoAzure ?? null,
   );
+
+  /** Conserva equipo para coordinar esta responsabilidad. */
   protected readonly equipo = computed<EquipoProyecto>(() => {
     const actualizado = this.equipoActualizado();
     if (actualizado) return actualizado;
@@ -199,9 +281,13 @@ export class PaginaCreacionProyecto {
     const guardado = this.equipoGuardado();
     return origen?.integrantes.length ? combinarEquipoConAzure(origen, guardado) : guardado;
   });
+
+  /** Deriva nombre equipo a partir del estado vigente. */
   protected readonly nombreEquipo = computed(
     () => this.origenEquipo()?.nombreEquipo || 'Team de Azure DevOps',
   );
+
+  /** Conserva flujo para coordinar esta responsabilidad. */
   protected readonly flujo = computed<FlujoProyecto | null>(() => {
     const generado = this.flujoGeneradoConIA();
     if (generado) return generado;
@@ -215,6 +301,7 @@ export class PaginaCreacionProyecto {
       : null;
   });
 
+  /** Deriva estado recorrido a partir del estado vigente. */
   protected readonly estadoRecorrido = computed(() => {
     const proyectoId = this.idProyecto();
     if (!proyectoId) return construirEstadoRecorridoCreacion(this.pasoAzure, null);
@@ -223,14 +310,22 @@ export class PaginaCreacionProyecto {
       this.pasoSeleccionado() ?? obtenerUltimoPasoCreacion(borrador?.pasoActual ?? 1);
     return construirEstadoRecorridoCreacion(pasoActual, borrador?.pasoActual ?? 1);
   });
+
+  /** Deriva etiqueta encabezado a partir del estado vigente. */
   protected readonly etiquetaEncabezado = computed(() =>
     this.idProyecto() ? `Borrador #${this.idProyecto()}` : 'Creación de proyectos',
   );
+
+  /** Conserva descripción encabezado para coordinar esta responsabilidad. */
   protected readonly descripcionEncabezado =
     'Completa los pasos para definir la información esencial del proyecto.';
+
+  /** Deriva título encabezado a partir del estado vigente. */
   protected readonly tituloEncabezado = computed(
     () => this.estadoCreacion.nombreProyecto() || 'Nuevo proyecto',
   );
+
+  /** Deriva mostrar asistente IA a partir del estado vigente. */
   protected readonly mostrarAsistenteIA = computed(() => {
     const borrador = this.estadoCreacion.borrador();
     const avancePasoVisible = AVANCE_BORRADOR_POR_PASO[this.estadoRecorrido().pasoActual];
@@ -240,6 +335,8 @@ export class PaginaCreacionProyecto {
       avancePasoVisible >= AVANCE_BORRADOR_POR_PASO[ClaveSeccionProyecto.Necesidad]
     );
   });
+
+  /** Conserva contexto asistente IA para coordinar esta responsabilidad. */
   protected readonly contextoAsistenteIA = computed<ContextoAsistenteIA | null>(() => {
     const borrador = this.estadoCreacion.borrador();
     const proyectoId = this.idProyecto();
@@ -272,16 +369,19 @@ export class PaginaCreacionProyecto {
     });
   }
 
+  /** Ejecuta volver al inicio como parte del flujo interno. */
   protected volverAlInicio(): void {
     void this.router.navigateByUrl(URL_INICIO_PANEL);
   }
 
+  /** Abre paso dentro del flujo actual. */
   protected abrirPaso(clave: ClavePasoProyecto): void {
     const borrador = this.estadoCreacion.borrador();
     if (!borrador || !puedeAbrirPasoCreacion(clave, borrador.pasoActual)) return;
     this.pasoSeleccionado.set(clave);
   }
 
+  /** Valida vinculación dentro del flujo actual. */
   protected validarVinculacion(datos: DatosVinculacionAzure): void {
     if (this.procesandoVinculacion()) return;
     this.datosVinculacion.set(datos);
@@ -298,10 +398,12 @@ export class PaginaCreacionProyecto {
       });
   }
 
+  /** Ejecuta editar vinculación como parte del flujo interno. */
   protected editarVinculacion(): void {
     this.resultadoValidacion.set(null);
   }
 
+  /** Crea borrador dentro del flujo actual. */
   protected crearBorrador(): void {
     const datos = this.datosVinculacion();
     if (!datos || this.procesandoVinculacion()) return;
@@ -325,6 +427,7 @@ export class PaginaCreacionProyecto {
       });
   }
 
+  /** Guarda seccion dentro del flujo actual. */
   protected guardarSeccion(
     actualizacion: ActualizacionSeccionProyecto,
     siguiente: ClavePasoProyecto,
@@ -439,10 +542,12 @@ export class PaginaCreacionProyecto {
       });
   }
 
+  /** Actualiza contexto temporal dentro del flujo actual. */
   protected actualizarContextoTemporal(contexto: ContextoProyecto): void {
     this.estadoCreacion.actualizarNombreProyecto(contexto.nombre);
   }
 
+  /** Sincroniza equipo dentro del flujo actual. */
   protected sincronizarEquipo(equipoVigente: EquipoProyecto): void {
     const proyectoId = this.estadoCreacion.proyectoId();
     if (proyectoId === null || this.sincronizandoEquipo()) return;
@@ -463,6 +568,7 @@ export class PaginaCreacionProyecto {
       });
   }
 
+  /** Carga recorrido dentro del flujo actual. */
   protected cargarRecorrido(): void {
     const proyectoId = this.idProyecto();
     if (proyectoId !== null) this.prepararRecorrido(proyectoId);
@@ -484,6 +590,7 @@ export class PaginaCreacionProyecto {
       });
   }
 
+  /** Carga catálogos proyecto dentro del flujo actual. */
   private cargarCatalogosProyecto(): void {
     this.catalogos
       .obtenerOpciones(CATALOGO_PRIORIDADES_PROYECTO)
@@ -497,6 +604,7 @@ export class PaginaCreacionProyecto {
       });
   }
 
+  /** Ejecuta preparar recorrido como parte del flujo interno. */
   private prepararRecorrido(proyectoId: number | null): void {
     this.cargaRecorridoActual?.unsubscribe();
     this.guardadoActual?.unsubscribe();

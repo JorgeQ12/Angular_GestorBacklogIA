@@ -26,6 +26,8 @@ import { EstadoEditorFlujoProyectoService } from '../../../services/estado-edito
   styleUrl: './campos-comunes-nodo-flujo-proyecto.css',
 })
 export class CamposComunesNodoFlujoProyecto {
+
+  /** Proporciona acceso al servicio de estado editor flujo proyecto. */
   private readonly estadoEditor = inject(EstadoEditorFlujoProyectoService);
 
   /** Formulario de nodo compartido por todos los editores especializados. */
@@ -58,15 +60,23 @@ export class CamposComunesNodoFlujoProyecto {
   /** Cambia la selección simple por la matriz de permisos por rol. */
   public readonly usarPermisosRoles = input(false);
 
+  /** Deriva roles disponibles a partir del estado vigente. */
   protected readonly rolesDisponibles = computed(() => this.estadoEditor.roles());
+
+  /** Conserva opciones permiso para coordinar esta responsabilidad. */
   protected readonly opcionesPermiso = ACCIONES_PERMISO_MODULO;
+
+  /** Deriva controles criterios a partir del estado vigente. */
   protected readonly controlesCriterios = computed(
     () => this.formulario().controls.criteriosAceptacion.controls,
   );
+
+  /** Conserva mensajes criterio para coordinar esta responsabilidad. */
   protected readonly mensajesCriterio: MensajesError = {
     required: 'Escribe un criterio válido o elimina esta fila.',
   };
 
+  /** Agrega criterio aceptacion dentro del flujo actual. */
   protected agregarCriterioAceptacion(): void {
     this.formulario().controls.criteriosAceptacion.push(
       new FormControl('', { nonNullable: true, validators: [validarTextoRequerido] }),
@@ -74,6 +84,7 @@ export class CamposComunesNodoFlujoProyecto {
     this.formulario().controls.criteriosAceptacion.markAsDirty();
   }
 
+  /** Elimina criterio aceptacion dentro del flujo actual. */
   protected eliminarCriterioAceptacion(indice: number): void {
     const criterios = this.formulario().controls.criteriosAceptacion;
     if (criterios.length <= 1) return;
@@ -83,6 +94,7 @@ export class CamposComunesNodoFlujoProyecto {
     criterios.updateValueAndValidity();
   }
 
+  /** Determina si ta seleccionado rol. */
   protected estaSeleccionadoRol(idRol: string): boolean {
     if (this.usarPermisosRoles()) {
       return this.obtenerPermisosRoles().some((permisoRol) => permisoRol.idRol === idRol);
@@ -90,6 +102,7 @@ export class CamposComunesNodoFlujoProyecto {
     return this.obtenerIdsRolesSeleccionados().includes(idRol);
   }
 
+  /** Determina si permiso. */
   protected tienePermiso(idRol: string, permiso: AccionPermisoModulo): boolean {
     return (
       this.obtenerPermisosRoles()
@@ -98,6 +111,7 @@ export class CamposComunesNodoFlujoProyecto {
     );
   }
 
+  /** Ejecuta cambiar selección rol como parte del flujo interno. */
   protected cambiarSeleccionRol(rol: RolFlujoProyecto, evento: Event): void {
     const control = evento.target;
     if (!(control instanceof HTMLInputElement)) return;
@@ -117,6 +131,7 @@ export class CamposComunesNodoFlujoProyecto {
     this.actualizarNombresRolesDesdeIds(idsSiguientes);
   }
 
+  /** Alterna permiso dentro del flujo actual. */
   protected alternarPermiso(idRol: string, permiso: AccionPermisoModulo): void {
     const permisosSiguientes = this.obtenerPermisosRoles()
       .map((permisoRol) => {
@@ -131,6 +146,7 @@ export class CamposComunesNodoFlujoProyecto {
     this.actualizarPermisosRoles(permisosSiguientes);
   }
 
+  /** Obtiene ids roles seleccionados dentro del flujo actual. */
   private obtenerIdsRolesSeleccionados(): string[] {
     const nombresSeleccionados = this.formulario()
       .controls.nombresRoles.value.split(/[\n,]/)
@@ -141,6 +157,7 @@ export class CamposComunesNodoFlujoProyecto {
       .map((rol) => rol.id);
   }
 
+  /** Actualiza nombres roles desde ids dentro del flujo actual. */
   private actualizarNombresRolesDesdeIds(idsRoles: string[]): void {
     const nombresRoles = idsRoles
       .map((idRol) => this.estadoEditor.obtenerNombreRol(idRol))
@@ -153,10 +170,12 @@ export class CamposComunesNodoFlujoProyecto {
     control.updateValueAndValidity();
   }
 
+  /** Obtiene permisos roles dentro del flujo actual. */
   private obtenerPermisosRoles(): PermisoRolModulo[] {
     return this.formulario().controls.permisosRoles.value;
   }
 
+  /** Actualiza permisos roles dentro del flujo actual. */
   private actualizarPermisosRoles(permisosRoles: PermisoRolModulo[]): void {
     const control = this.formulario().controls.permisosRoles;
     control.setValue(permisosRoles);

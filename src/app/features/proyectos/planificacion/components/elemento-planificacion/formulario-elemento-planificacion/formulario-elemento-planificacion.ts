@@ -50,6 +50,8 @@ import { TipoElementoPlanificacion } from '../../../models/planificacion-proyect
   styleUrl: './formulario-elemento-planificacion.css',
 })
 export class FormularioElementoPlanificacionComponent {
+
+  /** Construye los controles reactivos administrados por el componente. */
   private readonly constructorFormulario = inject(NonNullableFormBuilder);
 
   /** Identifica el formulario para conectarlo con las acciones del modal compartido. */
@@ -70,23 +72,38 @@ export class FormularioElementoPlanificacionComponent {
   /** Entrega únicamente valores válidos y normalizados al estado consumidor. */
   public readonly guardar = output<ValoresFormularioElementoPlanificacion>();
 
+  /** Conserva tipos para coordinar esta responsabilidad. */
   protected readonly tipos = TipoElementoPlanificacion;
+
+  /** Conserva límites para coordinar esta responsabilidad. */
   protected readonly limites = LIMITES_FORMULARIO_ELEMENTO_PLANIFICACION;
+
+  /** Conserva mensajes formulario para coordinar esta responsabilidad. */
   protected readonly mensajesFormulario = MENSAJES_FORMULARIO_ELEMENTO_PLANIFICACION;
+
+  /** Deriva es solo lectura a partir del estado vigente. */
   protected readonly esSoloLectura = computed(
     () => this.modo() === ModoEditorElementoPlanificacion.Consulta,
   );
+
+  /** Deriva es elemento requisito a partir del estado vigente. */
   protected readonly esElementoRequisito = computed(
     () =>
       this.tipo() === TipoElementoPlanificacion.ActividadRequisito ||
       this.tipo() === TipoElementoPlanificacion.TareaRequisito,
   );
+
+  /** Deriva opciones actividad tarea a partir del estado vigente. */
   protected readonly opcionesActividadTarea = computed(() =>
     mapearOpciones(this.catalogos().actividadesTarea),
   );
+
+  /** Deriva opciones actividad requisito a partir del estado vigente. */
   protected readonly opcionesActividadRequisito = computed(() =>
     mapearOpciones(this.catalogos().actividadesRequisito),
   );
+
+  /** Conserva opciones prioridad requisito para coordinar esta responsabilidad. */
   protected readonly opcionesPrioridadRequisito: readonly OpcionSelector[] = [
     { valor: 1, etiqueta: '1 · Crítica' },
     { valor: 2, etiqueta: '2 · Alta' },
@@ -94,6 +111,7 @@ export class FormularioElementoPlanificacionComponent {
     { valor: 4, etiqueta: '4 · Normal' },
   ];
 
+  /** Administra los valores y validaciones del formulario reactivo. */
   protected readonly formulario: FormGroup<FormularioElementoPlanificacion> =
     this.constructorFormulario.group(
       {
@@ -148,6 +166,7 @@ export class FormularioElementoPlanificacionComponent {
     this.guardar.emit(this.formulario.getRawValue());
   }
 
+  /** Ejecuta configurar validadores como parte del flujo interno. */
   private configurarValidadores(tipo: TipoItemPlanificacion): void {
     const controles = this.formulario.controls;
     Object.values(controles).forEach((control) => control.clearValidators());

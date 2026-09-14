@@ -16,12 +16,26 @@ import { PlanificacionProyectoService } from './planificacion-proyecto.service';
 /** Coordina la importación de revisiones de la épica principal desde Azure DevOps. */
 @Injectable()
 export class EstadoSincronizacionEpicaAzurePlanificacionService {
+
+  /** Proporciona acceso al servicio remoto requerido por esta responsabilidad. */
   private readonly api = inject(PlanificacionProyectoService);
+
+  /** Proporciona acceso al servicio de estado planificación proyecto. */
   private readonly estadoPlanificacion = inject(EstadoPlanificacionProyectoService);
+
+  /** Proporciona acceso al servicio de mensajes. */
   private readonly mensajes = inject(MensajesService);
+
+  /** Proporciona acceso al servicio de notificador errores API. */
   private readonly notificador = inject(NotificadorErroresApiService);
+
+  /** Coordina la finalización de recursos cuando se destruye la instancia. */
   private readonly destroyRef = inject(DestroyRef);
+
+  /** Conserva operación actual para controlar el ciclo de vida de la operación. */
   private operacionActual: Subscription | null = null;
+
+  /** Conserva sincronizando estado como estado reactivo de la instancia. */
   private readonly sincronizandoEstado = signal(false);
 
   /** Impide iniciar otra sincronización mientras la actual continúa. */

@@ -26,18 +26,44 @@ import { AsistenteIAApiService } from './asistente-ia-api.service';
 /** Conserva una única conversación de IA durante la vida de la ruta del proyecto. */
 @Injectable()
 export class EstadoAsistenteIAService {
+
+  /** Proporciona acceso al servicio remoto requerido por esta responsabilidad. */
   private readonly api = inject(AsistenteIAApiService);
+
+  /** Proporciona acceso al servicio de notificador errores API. */
   private readonly notificador = inject(NotificadorErroresApiService);
+
+  /** Coordina la finalización de recursos cuando se destruye la instancia. */
   private readonly destroyRef = inject(DestroyRef);
+
+  /** Conserva estado mensajes como estado reactivo de la instancia. */
   private readonly estadoMensajes = signal<readonly MensajeAsistenteIA[]>([]);
+
+  /** Conserva estado cargando como estado reactivo de la instancia. */
   private readonly estadoCargando = signal(false);
+
+  /** Conserva estado error carga como estado reactivo de la instancia. */
   private readonly estadoErrorCarga = signal(false);
+
+  /** Conserva estado enviando como estado reactivo de la instancia. */
   private readonly estadoEnviando = signal(false);
+
+  /** Conserva estado mensaje pendiente como estado reactivo de la instancia. */
   private readonly estadoMensajePendiente = signal<string | null>(null);
+
+  /** Conserva estado propuesta procesando como estado reactivo de la instancia. */
   private readonly estadoPropuestaProcesando = signal<number | null>(null);
+
+  /** Conserva cambio proyecto para coordinar esta responsabilidad. */
   private readonly cambioProyecto = new Subject<void>();
+
+  /** Conserva proyecto activo para coordinar esta responsabilidad. */
   private proyectoActivo: number | null = null;
+
+  /** Conserva historial cargado para coordinar esta responsabilidad. */
   private historialCargado = false;
+
+  /** Conserva carga actual para controlar el ciclo de vida de la operación. */
   private cargaActual: Subscription | null = null;
 
   /** Expone el historial confirmado del proyecto activo. */
@@ -187,16 +213,19 @@ export class EstadoAsistenteIAService {
     );
   }
 
+  /** Determina si operar. */
   private puedeOperar(proyectoId: number): boolean {
     return (
       this.proyectoActivo === proyectoId && !this.estadoCargando() && !this.estadoErrorCarga()
     );
   }
 
+  /** Determina si operación en curso. */
   private hayOperacionEnCurso(): boolean {
     return this.estadoEnviando() || this.estadoPropuestaProcesando() !== null;
   }
 
+  /** Ejecuta exigir proyecto resultado como parte del flujo interno. */
   private exigirProyectoResultado(
     resultado: ResultadoResolucionPropuestaIA,
     proyectoEsperado: number,
@@ -206,6 +235,7 @@ export class EstadoAsistenteIAService {
     }
   }
 
+  /** Actualiza estado propuesta dentro del flujo actual. */
   private actualizarEstadoPropuesta(resultado: ResultadoResolucionPropuestaIA): void {
     this.estadoMensajes.update((mensajes) =>
       mensajes.map((mensaje) =>

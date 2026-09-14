@@ -11,6 +11,8 @@ import { ResumenInicioPanel } from '../models/resumen-inicio-panel.model';
 /** Consulta y adapta el resumen administrativo utilizado por el inicio. */
 @Injectable({ providedIn: 'root' })
 export class ResumenInicioPanelService {
+
+  /** Ejecuta las solicitudes HTTP correspondientes a esta responsabilidad. */
   private readonly http = inject(HttpClient);
 
   /** Obtiene el resumen de proyectos disponible para el usuario vigente. */

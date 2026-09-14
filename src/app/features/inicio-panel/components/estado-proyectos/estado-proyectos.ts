@@ -62,6 +62,7 @@ export class EstadoProyectos {
     this.calcularPorcentaje(this.indicadores().conBacklog),
   );
 
+  /** Construye estado dentro del flujo actual. */
   private construirEstado(
     estado: EstadoCatalogoProyecto,
     etiqueta: string,
@@ -77,6 +78,7 @@ export class EstadoProyectos {
     };
   }
 
+  /** Calcula porcentaje dentro del flujo actual. */
   private calcularPorcentaje(cantidad: number): number {
     const total = this.indicadores().totalProyectos;
     return total > 0 ? Math.min(100, Math.round((cantidad / total) * 100)) : 0;

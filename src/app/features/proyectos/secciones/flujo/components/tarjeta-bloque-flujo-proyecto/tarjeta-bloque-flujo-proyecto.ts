@@ -32,27 +32,51 @@ import { EstadoEditorFlujoProyectoService } from '../../services/estado-editor-f
   styleUrl: './tarjeta-bloque-flujo-proyecto.css',
 })
 export class TarjetaBloqueFlujoProyecto {
+
+  /** Proporciona acceso a destroy ref. */
   private readonly referenciaDestruccion = inject(DestroyRef);
+
+  /** Proporciona acceso al servicio de mensajes. */
   private readonly mensajes = inject(MensajesService);
+
+  /** Proporciona acceso al servicio de estado editor flujo proyecto. */
   protected readonly estadoEditor = inject(EstadoEditorFlujoProyectoService);
 
   /** Bloque normalizado que debe representarse y manipularse en el lienzo. */
   public readonly bloque = input.required<NodoFlujoProyecto>();
+
+  /** Conserva se movio durante arrastre para coordinar esta responsabilidad. */
   private seMovioDuranteArrastre = false;
+
+  /** Conserva acciones abiertas como estado reactivo de la instancia. */
   protected readonly accionesAbiertas = signal(false);
+
+  /** Conserva ramas decision para coordinar esta responsabilidad. */
   protected readonly ramasDecision = RAMAS_DECISION_FLUJO;
+
+  /** Conserva etiquetas rama decision para coordinar esta responsabilidad. */
   protected readonly etiquetasRamaDecision = EtiquetaRamaDecision;
+
+  /** Conserva etiquetas tipo para coordinar esta responsabilidad. */
   protected readonly etiquetasTipo = ETIQUETAS_TIPO_BLOQUE_FLUJO;
+
+  /** Conserva iconos tipo para coordinar esta responsabilidad. */
   protected readonly iconosTipo = ICONOS_TIPO_BLOQUE_FLUJO;
+
+  /** Conserva acentos tipo para coordinar esta responsabilidad. */
   protected readonly acentosTipo = ACENTOS_TIPO_BLOQUE_FLUJO;
+
+  /** Deriva nombres roles a partir del estado vigente. */
   protected readonly nombresRoles = computed(() =>
     this.bloque().idsRoles.map((idRol) => this.estadoEditor.obtenerNombreRol(idRol)),
   );
 
+  /** Determina si bloque decision. */
   protected esBloqueDecision(): boolean {
     return this.bloque().tipo === TipoBloqueFlujo.Decision;
   }
 
+  /** Abre editor dentro del flujo actual. */
   protected abrirEditor(): void {
     if (this.seMovioDuranteArrastre || this.estadoEditor.arrastrandoConexion()) {
       this.seMovioDuranteArrastre = false;
@@ -69,6 +93,7 @@ export class TarjetaBloqueFlujoProyecto {
     this.abrirEditor();
   }
 
+  /** Inicia arrastre conexión dentro del flujo actual. */
   protected iniciarArrastreConexion(evento: PointerEvent, etiqueta?: EtiquetaRamaDecision): void {
     evento.preventDefault();
     evento.stopPropagation();
@@ -85,17 +110,20 @@ export class TarjetaBloqueFlujoProyecto {
     this.estadoEditor.iniciarArrastreConexion(this.bloque().id, etiqueta);
   }
 
+  /** Alterna acciones dentro del flujo actual. */
   protected alternarAcciones(evento: MouseEvent): void {
     evento.stopPropagation();
     this.accionesAbiertas.update((abiertas) => !abiertas);
   }
 
+  /** Ejecuta editar bloque como parte del flujo interno. */
   protected editarBloque(evento: MouseEvent): void {
     evento.stopPropagation();
     this.accionesAbiertas.set(false);
     this.estadoEditor.abrirEditorNodo(this.bloque().id);
   }
 
+  /** Elimina bloque dentro del flujo actual. */
   protected async eliminarBloque(evento: MouseEvent): Promise<void> {
     evento.stopPropagation();
     this.accionesAbiertas.set(false);
@@ -108,19 +136,23 @@ export class TarjetaBloqueFlujoProyecto {
     if (confirmado) this.estadoEditor.eliminarBloque(bloque.id);
   }
 
+  /** Cierra acciones dentro del flujo actual. */
   @HostListener('document:click')
   protected cerrarAcciones(): void {
     this.accionesAbiertas.set(false);
   }
 
+  /** Enfoca destino dentro del flujo actual. */
   protected enfocarDestino(): void {
     this.estadoEditor.establecerDestinoConexionEnfocado(this.bloque().id);
   }
 
+  /** Retira el foco de destino dentro del flujo actual. */
   protected desenfocarDestino(): void {
     this.estadoEditor.establecerDestinoConexionEnfocado(null);
   }
 
+  /** Ejecuta entrar tarjeta como parte del flujo interno. */
   protected entrarTarjeta(): void {
     if (
       this.estadoEditor.arrastrandoConexion() &&
@@ -130,6 +162,7 @@ export class TarjetaBloqueFlujoProyecto {
     }
   }
 
+  /** Ejecuta salir tarjeta como parte del flujo interno. */
   protected salirTarjeta(): void {
     if (
       this.estadoEditor.arrastrandoConexion() &&
@@ -139,6 +172,7 @@ export class TarjetaBloqueFlujoProyecto {
     }
   }
 
+  /** Ejecuta completar arrastre conexión como parte del flujo interno. */
   protected completarArrastreConexion(evento: PointerEvent): void {
     if (!this.estadoEditor.arrastrandoConexion()) return;
     evento.preventDefault();
@@ -156,6 +190,7 @@ export class TarjetaBloqueFlujoProyecto {
     this.estadoEditor.completarArrastreConexion();
   }
 
+  /** Inicia arrastre bloque dentro del flujo actual. */
   protected iniciarArrastreBloque(evento: PointerEvent): void {
     if (this.estadoEditor.soloLectura()) return;
 

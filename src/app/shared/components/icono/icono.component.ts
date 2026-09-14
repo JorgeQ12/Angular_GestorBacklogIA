@@ -21,10 +21,10 @@ import { ICONOS_APLICACION, NombreIconoAplicacion } from './iconos-aplicacion';
   styleUrl: './icono.component.css',
 })
 export class IconoComponent {
-  /** Selecciona el icono semántico que se presentará. */
+  /** Selecciona el ícono semántico que se presentará. */
   public readonly nombre = input.required<NombreIconoAplicacion>();
 
-  /** Proporciona una descripción cuando el icono comunica información. */
+  /** Proporciona una descripción cuando el ícono comunica información. */
   public readonly etiqueta = input<string | null>(null);
 
   /** Resuelve la definición gráfica asociada al nombre solicitado. */

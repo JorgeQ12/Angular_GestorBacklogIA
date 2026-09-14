@@ -12,6 +12,8 @@ import { Catalogo, DatosCatalogo, ValorCatalogo } from '../models/catalogo.model
 /** Administra catálogos mediante contratos explícitos y la carga HTTP global. */
 @Injectable({ providedIn: 'root' })
 export class AdministracionCatalogosService {
+
+  /** Ejecuta las solicitudes HTTP correspondientes a esta responsabilidad. */
   private readonly http = inject(HttpClient);
 
   /** Recupera tipos activos e inactivos para su administración. */

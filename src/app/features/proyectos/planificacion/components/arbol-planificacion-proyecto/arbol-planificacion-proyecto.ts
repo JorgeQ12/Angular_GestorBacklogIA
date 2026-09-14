@@ -29,6 +29,8 @@ import { ElementoPlanificacion } from '../elemento-planificacion/elemento-planif
   styleUrl: './arbol-planificacion-proyecto.css',
 })
 export class ArbolPlanificacionProyecto {
+
+  /** Conserva menu acciones clave como estado reactivo de la instancia. */
   private readonly menuAccionesClave = signal<string | null>(null);
   /** Proporciona la planificación y su jerarquía adaptada. */
   public readonly planificacion = input.required<PlanificacionProyecto>();
@@ -55,15 +57,18 @@ export class ArbolPlanificacionProyecto {
   /** Comunica la actividad o tarea de requisitos que se debe eliminar lógicamente. */
   public readonly eliminarElemento = output<ElementoPlanificacionModel>();
 
+  /** Deriva resumen proyecto a partir del estado vigente. */
   protected readonly resumenProyecto = computed(() => {
     const resumen = this.planificacion().resumen;
     return `${resumen.epicas} épicas · ${resumen.caracteristicas} características · ${resumen.historias} historias de usuario · ${resumen.tareas} tareas`;
   });
 
+  /** Determina si ta expandido. */
   protected estaExpandido(clave: string): boolean {
     return this.expandidos().has(clave);
   }
 
+  /** Determina si rama terminal. */
   protected esRamaTerminal(elemento: ElementoPlanificacionModel): boolean {
     return (
       elemento.tipo === TipoElementoPlanificacion.Tarea ||
@@ -71,36 +76,44 @@ export class ArbolPlanificacionProyecto {
     );
   }
 
+  /** Alterna la operación solicitada dentro del flujo actual. */
   protected alternar(clave: string): void {
     this.expansionAlternada.emit(clave);
   }
 
+  /** Determina si ta abierto menu acciones. */
   protected estaAbiertoMenuAcciones(clave: string): boolean {
     return this.menuAccionesClave() === clave;
   }
 
+  /** Determina si menu acciones abierto. */
   protected hayMenuAccionesAbierto(): boolean {
     return this.menuAccionesClave() !== null;
   }
 
+  /** Alterna menu acciones dentro del flujo actual. */
   protected alternarMenuAcciones(clave: string): void {
     this.menuAccionesClave.update((actual) => actual === clave ? null : clave);
   }
 
+  /** Cierra menu acciones dentro del flujo actual. */
   protected cerrarMenuAcciones(): void {
     this.menuAccionesClave.set(null);
   }
 
+  /** Cierra menu desde exterior dentro del flujo actual. */
   @HostListener('document:click')
   protected cerrarMenuDesdeExterior(): void {
     this.cerrarMenuAcciones();
   }
 
+  /** Cierra menu con escape dentro del flujo actual. */
   @HostListener('document:keydown.escape')
   protected cerrarMenuConEscape(): void {
     this.cerrarMenuAcciones();
   }
 
+  /** Ejecuta solicitar creación como parte del flujo interno. */
   protected solicitarCreacion(elemento: ElementoPlanificacionModel): void {
     const tipo = obtenerTipoHijo(elemento.tipo);
     if (tipo) this.crearElemento.emit({ tipo, padreId: elemento.id });

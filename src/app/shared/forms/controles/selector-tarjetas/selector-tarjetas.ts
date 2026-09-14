@@ -47,12 +47,22 @@ export class SelectorTarjetas implements ControlValueAccessor, ControlCampoPerso
   /** Conserva la alternativa seleccionada sin permitir cambios. */
   public readonly soloLectura = input(false);
 
+  /** Conserva valor como estado reactivo de la instancia. */
   protected readonly valor = signal<ValorSelectorTarjeta | null>(null);
+
+  /** Conserva deshabilitado como estado reactivo de la instancia. */
   protected readonly deshabilitado = signal(false);
+
+  /** Conserva con error como estado reactivo de la instancia. */
   protected readonly conError = signal(false);
 
+  /** Referencia grupo dentro de la vista. */
   private readonly grupo = viewChild<ElementRef<HTMLElement>>('grupo');
+
+  /** Conserva la función que atenderá notificar cambio. */
   private notificarCambio: (valor: ValorSelectorTarjeta | null) => void = () => undefined;
+
+  /** Conserva la función que atenderá notificar tocado. */
   private notificarTocado: () => void = () => undefined;
 
   /** Sincroniza el valor recibido desde el formulario. */

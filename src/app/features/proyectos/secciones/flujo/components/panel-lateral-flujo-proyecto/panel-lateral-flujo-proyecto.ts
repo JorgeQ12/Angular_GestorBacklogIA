@@ -11,5 +11,7 @@ import { EstadoEditorFlujoProyectoService } from '../../services/estado-editor-f
   styleUrl: './panel-lateral-flujo-proyecto.css',
 })
 export class PanelLateralFlujoProyecto {
+
+  /** Proporciona acceso al servicio de estado editor flujo proyecto. */
   protected readonly estadoEditor = inject(EstadoEditorFlujoProyectoService);
 }

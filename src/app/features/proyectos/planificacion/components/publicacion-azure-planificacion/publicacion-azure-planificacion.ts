@@ -25,16 +25,25 @@ export class PublicacionAzurePlanificacionComponent {
   /** Solicita publicar la planificación en Azure DevOps. */
   public readonly publicar = output<void>();
 
+  /** Conserva textos para coordinar esta responsabilidad. */
   protected readonly textos = TEXTOS_PUBLICACION_AZURE_PLANIFICACION;
+
+  /** Deriva mensaje a partir del estado vigente. */
   protected readonly mensaje = computed(() =>
     this.procesando()
       ? this.textos.procesando
       : obtenerMensajeDisponibilidadPublicacionAzure(this.disponibilidad()),
   );
+
+  /** Deriva esta deshabilitado a partir del estado vigente. */
   protected readonly estaDeshabilitado = computed(
     () => this.deshabilitado() || this.procesando() || !this.disponibilidad().puedePublicar,
   );
+
+  /** Deriva etiqueta accesible a partir del estado vigente. */
   protected readonly etiquetaAccesible = computed(() => `${this.textos.titulo}. ${this.mensaje()}`);
+
+  /** Conserva ícono estado para coordinar esta responsabilidad. */
   protected readonly iconoEstado = computed<NombreIconoAplicacion>(() =>
     this.disponibilidad().puedePublicar ? 'continuar' : 'bloqueado',
   );

@@ -33,9 +33,17 @@ import { ModoFormularioProyecto } from '../../../../models/modo-formulario-proye
   styleUrl: './editor-flujo-proyecto.css',
 })
 export class EditorFlujoProyecto {
+
+  /** Proporciona acceso seguro al documento activo. */
   private readonly documento = inject(DOCUMENT);
+
+  /** Referencia contenedor editor dentro de la vista. */
   private readonly contenedorEditor = viewChild.required<ElementRef<HTMLElement>>('contenedorEditor');
+
+  /** Proporciona acceso al servicio de estado editor flujo proyecto. */
   protected readonly estadoEditor = inject(EstadoEditorFlujoProyectoService);
+
+  /** Conserva pantalla completa como estado reactivo de la instancia. */
   protected readonly pantallaCompleta = signal(false);
 
   /** Proporciona la fotografía canónica que debe presentar el editor. */
@@ -62,10 +70,16 @@ export class EditorFlujoProyecto {
   /** Solicita al caso de uso generar el primer diagrama con IA. */
   public readonly generarConIASolicitado = output<void>();
 
+  /** Deriva es solo lectura a partir del estado vigente. */
   protected readonly esSoloLectura = computed(() => this.modo() === ModoFormularioProyecto.Lectura);
 
+  /** Conserva fotografia hidratada para coordinar esta responsabilidad. */
   private fotografiaHidratada = '';
+
+  /** Conserva fotografia emitida para coordinar esta responsabilidad. */
   private fotografiaEmitida = '';
+
+  /** Conserva editor hidratado para coordinar esta responsabilidad. */
   private editorHidratado = false;
 
   public constructor() {
@@ -121,6 +135,7 @@ export class EditorFlujoProyecto {
     }
   }
 
+  /** Sincroniza pantalla completa dentro del flujo actual. */
   @HostListener('document:fullscreenchange')
   protected sincronizarPantallaCompleta(): void {
     this.pantallaCompleta.set(

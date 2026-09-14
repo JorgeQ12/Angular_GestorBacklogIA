@@ -4,6 +4,8 @@ import { FormateadorFechaService, ValorFecha } from '../services/formateador-fec
 /** Expone el tiempo transcurrido desde una fecha dentro de las plantillas. */
 @Pipe({ name: 'tiempoRelativo' })
 export class TiempoRelativoPipe implements PipeTransform {
+
+  /** Proporciona acceso al servicio de formateador fecha. */
   private readonly formateador = inject(FormateadorFechaService);
 
   /** Representa el tiempo transcurrido o la alternativa indicada. */

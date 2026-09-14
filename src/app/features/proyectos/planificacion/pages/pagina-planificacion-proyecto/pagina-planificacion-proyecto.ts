@@ -85,47 +85,102 @@ import type { ResultadoSincronizacionEpicaAzurePlanificacion } from '../../model
   styleUrl: './pagina-planificacion-proyecto.css',
 })
 export class PaginaPlanificacionProyecto {
+
+  /** Proporciona acceso a activated route. */
   private readonly ruta = inject(ActivatedRoute);
+
+  /** Proporciona acceso a la navegación administrada por Angular. */
   private readonly router = inject(Router);
+
+  /** Proporciona acceso al servicio de estado planificación proyecto. */
   protected readonly estado = inject(EstadoPlanificacionProyectoService);
+
+  /** Proporciona acceso al servicio de estado editor elemento planificación. */
   protected readonly editor = inject(EstadoEditorElementoPlanificacionService);
+
+  /** Proporciona acceso al servicio de estado historial elemento planificación. */
   protected readonly historial = inject(EstadoHistorialElementoPlanificacionService);
+
+  /** Proporciona acceso al servicio de estado generacion IA planificación. */
   protected readonly generarConIA = inject(EstadoGeneracionIaPlanificacionService);
+
+  /** Proporciona acceso al servicio de estado exploracion planificación. */
   protected readonly exploracion = inject(EstadoExploracionPlanificacionService);
+
+  /** Proporciona acceso al servicio de estado publicacion azure planificación. */
   protected readonly publicacionAzure = inject(EstadoPublicacionAzurePlanificacionService);
+
+  /** Proporciona acceso al servicio de estado sincronizacion epica azure planificación. */
   protected readonly sincronizacionAzure = inject(EstadoSincronizacionEpicaAzurePlanificacionService);
+
+  /** Proporciona acceso al servicio de estado eliminacion requisitos planificación. */
   protected readonly eliminacionRequisitos = inject(EstadoEliminacionRequisitosPlanificacionService);
+
+  /** Proporciona acceso al servicio de estado gantt planificación. */
   protected readonly gantt = inject(EstadoGanttPlanificacionService);
+
+  /** Conserva parametros ruta para coordinar esta responsabilidad. */
   private readonly parametrosRuta = toSignal(this.ruta.paramMap, { requireSync: true });
+
+  /** Conserva parametros consulta para coordinar esta responsabilidad. */
   private readonly parametrosConsulta = toSignal(this.ruta.queryParamMap, { requireSync: true });
+
+  /** Conserva proyecto cargado ID para coordinar esta responsabilidad. */
   private proyectoCargadoId: number | null = null;
+
+  /** Conserva solicitud version procesada para coordinar esta responsabilidad. */
   private solicitudVersionProcesada: string | null = null;
 
+  /** Deriva proyecto ID a partir del estado vigente. */
   protected readonly proyectoId = computed(() => obtenerProyectoIdRuta(this.parametrosRuta()));
+
+  /** Deriva version solicitada ID a partir del estado vigente. */
   protected readonly versionSolicitadaId = computed(() =>
     obtenerVersionIdPlanificacionProyecto(
       this.parametrosConsulta().get(PARAMETROS_RUTA.versionProyectoId),
     ),
   );
+
+  /** Deriva error carga a partir del estado vigente. */
   protected readonly errorCarga = computed(
     () => this.proyectoId() === null || this.estado.errorCarga(),
   );
+
+  /** Conserva mensaje error para coordinar esta responsabilidad. */
   protected readonly mensajeError = MENSAJE_ERROR_CARGA_PLANIFICACION_PROYECTO;
+
+  /** Conserva mensaje error gantt para coordinar esta responsabilidad. */
   protected readonly mensajeErrorGantt = MENSAJE_ERROR_CARGA_GANTT_PLANIFICACION;
+
+  /** Conserva ID formulario elemento para coordinar esta responsabilidad. */
   protected readonly idFormularioElemento = 'formulario-elemento-planificacion';
+
+  /** Conserva pestanas elemento para coordinar esta responsabilidad. */
   protected readonly pestanasElemento = PestanaElementoPlanificacion;
+
+  /** Conserva pestana elemento como estado reactivo de la instancia. */
   protected readonly pestanaElemento = signal(PestanaElementoPlanificacion.Detalle);
+
+  /** Conserva lista requisitos abierta como estado reactivo de la instancia. */
   protected readonly listaRequisitosAbierta = signal(false);
+
+  /** Deriva es historial elemento a partir del estado vigente. */
   protected readonly esHistorialElemento = computed(
     () => this.pestanaElemento() === PestanaElementoPlanificacion.Historial,
   );
+
+  /** Deriva es consulta elemento a partir del estado vigente. */
   protected readonly esConsultaElemento = computed(
     () => this.editor.contexto()?.modo === ModoEditorElementoPlanificacion.Consulta,
   );
+
+  /** Deriva detalle eliminado a partir del estado vigente. */
   protected readonly detalleEliminado = computed(() => {
     const detalle = this.editor.detalle();
     return detalle && !detalle.activo ? detalle : null;
   });
+
+  /** Deriva es epica azure seleccionada a partir del estado vigente. */
   protected readonly esEpicaAzureSeleccionada = computed(() => {
     const detalle = this.editor.detalle();
     return (
@@ -133,9 +188,13 @@ export class PaginaPlanificacionProyecto {
       (detalle.urlAzure !== null || detalle.capacidades.puedeSincronizar)
     );
   });
+
+  /** Deriva url azure epica seleccionada a partir del estado vigente. */
   protected readonly urlAzureEpicaSeleccionada = computed(() =>
     this.esEpicaAzureSeleccionada() ? this.editor.detalle()?.urlAzure ?? null : null,
   );
+
+  /** Conserva metadatos editor para coordinar esta responsabilidad. */
   protected readonly metadatosEditor = computed<readonly string[]>(() => {
     const contexto = this.editor.contexto();
     const detalle = this.editor.detalle();
@@ -151,12 +210,16 @@ export class PaginaPlanificacionProyecto {
     }
     return metadatos;
   });
+
+  /** Deriva etiqueta motivo inactivacion a partir del estado vigente. */
   protected readonly etiquetaMotivoInactivacion = computed(() => {
     const motivo = this.detalleEliminado()?.motivoInactivacion;
     return motivo
       ? ETIQUETAS_MOTIVO_INACTIVACION_PLANIFICACION[motivo]
       : 'Sin motivo registrado';
   });
+
+  /** Deriva puede ver historial a partir del estado vigente. */
   protected readonly puedeVerHistorial = computed(() => {
     const detalle = this.editor.detalle();
     return (
@@ -165,6 +228,8 @@ export class PaginaPlanificacionProyecto {
       esTipoElementoVersionable(detalle.tipo)
     );
   });
+
+  /** Deriva puede sincronizar epica seleccionada a partir del estado vigente. */
   protected readonly puedeSincronizarEpicaSeleccionada = computed(() => {
     const contexto = this.editor.contexto();
     const detalle = this.editor.detalle();
@@ -176,12 +241,18 @@ export class PaginaPlanificacionProyecto {
       this.esEpicaAzureSeleccionada()
     );
   });
+
+  /** Deriva rol panel detalle a partir del estado vigente. */
   protected readonly rolPanelDetalle = computed(() =>
     this.puedeVerHistorial() ? 'tabpanel' : null,
   );
+
+  /** Deriva etiqueta panel detalle a partir del estado vigente. */
   protected readonly etiquetaPanelDetalle = computed(() =>
     this.puedeVerHistorial() ? 'pestana-detalle-elemento' : null,
   );
+
+  /** Deriva titulo editor a partir del estado vigente. */
   protected readonly tituloEditor = computed(() => {
     const contexto = this.editor.contexto();
     if (!contexto) return '';
@@ -189,10 +260,14 @@ export class PaginaPlanificacionProyecto {
     if (contexto.modo === ModoEditorElementoPlanificacion.Creacion) return `Nueva ${nombre.toLowerCase()}`;
     return this.editor.detalle()?.titulo ?? nombre;
   });
+
+  /** Deriva etiqueta editor a partir del estado vigente. */
   protected readonly etiquetaEditor = computed(() => {
     const contexto = this.editor.contexto();
     return contexto ? obtenerNombreTipo(contexto.tipo) : '';
   });
+
+  /** Deriva descripción editor a partir del estado vigente. */
   protected readonly descripcionEditor = computed(() => {
     const contexto = this.editor.contexto();
     if (!contexto) return '';
@@ -216,6 +291,8 @@ export class PaginaPlanificacionProyecto {
     }
     return 'Consulta la información registrada en la versión vigente.';
   });
+
+  /** Deriva texto confirmar editor a partir del estado vigente. */
   protected readonly textoConfirmarEditor = computed(() => {
     const contexto = this.editor.contexto();
     if (!contexto) return '';
@@ -228,9 +305,13 @@ export class PaginaPlanificacionProyecto {
     }
     return 'Guardar nueva versión';
   });
+
+  /** Deriva texto cancelar editor a partir del estado vigente. */
   protected readonly textoCancelarEditor = computed(() =>
     this.esConsultaElemento() ? 'Cerrar' : 'Cancelar',
   );
+
+  /** Conserva icono confirmar editor para coordinar esta responsabilidad. */
   protected readonly iconoConfirmarEditor = computed<NombreIconoAplicacion>(() =>
     this.puedeSincronizarEpicaSeleccionada()
       ? 'sincronizar'
@@ -238,6 +319,8 @@ export class PaginaPlanificacionProyecto {
         ? 'editar'
         : 'guardar',
   );
+
+  /** Conserva icono editor para coordinar esta responsabilidad. */
   protected readonly iconoEditor = computed<NombreIconoAplicacion>(() =>
     obtenerIconoTipo(this.editor.contexto()?.tipo ?? TipoElementoPlanificacion.Epica),
   );
@@ -284,6 +367,7 @@ export class PaginaPlanificacionProyecto {
     });
   }
 
+  /** Ejecuta recargar como parte del flujo interno. */
   protected recargar(): void {
     const proyectoId = this.proyectoId();
     if (proyectoId !== null) {
@@ -292,6 +376,7 @@ export class PaginaPlanificacionProyecto {
     }
   }
 
+  /** Crea epica dentro del flujo actual. */
   protected crearEpica(): void {
     this.prepararDetalleEditor();
     const proyectoId = this.proyectoId();
@@ -300,6 +385,7 @@ export class PaginaPlanificacionProyecto {
     }
   }
 
+  /** Crea elemento dentro del flujo actual. */
   protected crearElemento(solicitud: CreacionElementoDesdeArbol): void {
     this.prepararDetalleEditor();
     const proyectoId = this.proyectoId();
@@ -308,6 +394,7 @@ export class PaginaPlanificacionProyecto {
     }
   }
 
+  /** Ejecuta consultar elemento como parte del flujo interno. */
   protected consultarElemento(elemento: ElementoPlanificacion): void {
     if (
       elemento.tipo === TipoElementoPlanificacion.ListaRequisitos &&
@@ -344,6 +431,7 @@ export class PaginaPlanificacionProyecto {
     );
   }
 
+  /** Ejecuta editar elemento como parte del flujo interno. */
   protected editarElemento(elemento: ElementoPlanificacion): void {
     if (elemento.tipo === TipoElementoPlanificacion.ListaRequisitos) {
       this.listaRequisitosAbierta.set(true);
@@ -360,6 +448,7 @@ export class PaginaPlanificacionProyecto {
     }
   }
 
+  /** Guarda elemento dentro del flujo actual. */
   protected guardarElemento(valores: ValoresFormularioElementoPlanificacion): void {
     const contexto = this.editor.contexto();
     this.editor.guardar(valores, () => {
@@ -369,16 +458,19 @@ export class PaginaPlanificacionProyecto {
     });
   }
 
+  /** Ejecuta generar con IA como parte del flujo interno. */
   protected generarConIa(nivel: NivelGeneracionIaPlanificacion): void {
     const proyectoId = this.proyectoId();
     if (proyectoId !== null) void this.generarConIA.generar(proyectoId, nivel);
   }
 
+  /** Ejecuta publicar en azure como parte del flujo interno. */
   protected publicarEnAzure(): void {
     const proyectoId = this.proyectoId();
     if (proyectoId !== null) void this.publicacionAzure.publicar(proyectoId);
   }
 
+  /** Sincroniza epica principal dentro del flujo actual. */
   protected sincronizarEpicaPrincipal(): void {
     const proyectoId = this.proyectoId();
     if (proyectoId === null) return;
@@ -387,27 +479,33 @@ export class PaginaPlanificacionProyecto {
     );
   }
 
+  /** Elimina elemento dentro del flujo actual. */
   protected eliminarElemento(elemento: ElementoPlanificacion): void {
     void this.eliminacionRequisitos.eliminar(elemento, () => this.recargar());
   }
 
+  /** Cierra lista requisitos dentro del flujo actual. */
   protected cerrarListaRequisitos(): void {
     this.listaRequisitosAbierta.set(false);
   }
 
+  /** Actualiza arbol desde lista dentro del flujo actual. */
   protected actualizarArbolDesdeLista(): void {
     this.recargar();
   }
 
+  /** Abre gantt dentro del flujo actual. */
   protected abrirGantt(): void {
     const planificacion = this.estado.planificacion();
     if (planificacion) this.gantt.abrir(planificacion);
   }
 
+  /** Cierra gantt dentro del flujo actual. */
   protected cerrarGantt(): void {
     this.gantt.cerrar();
   }
 
+  /** Ejecuta cambiar version planificación como parte del flujo interno. */
   protected cambiarVersionPlanificacion(versionId: number): void {
     const actualId = this.estado.planificacionActual()?.versionId;
     void this.router.navigate([], {
@@ -419,10 +517,12 @@ export class PaginaPlanificacionProyecto {
     });
   }
 
+  /** Ejecuta cambiar inclusion eliminados como parte del flujo interno. */
   protected cambiarInclusionEliminados(incluirEliminados: boolean): void {
     this.estado.actualizarInclusionEliminados(incluirEliminados);
   }
 
+  /** Ejecuta cambiar pestana elemento como parte del flujo interno. */
   protected cambiarPestanaElemento(pestana: PestanaElementoPlanificacion): void {
     if (pestana === PestanaElementoPlanificacion.Detalle) {
       this.pestanaElemento.set(pestana);
@@ -436,6 +536,7 @@ export class PaginaPlanificacionProyecto {
     this.historial.abrir(detalle.tipo, detalle.id);
   }
 
+  /** Inicia edicion elemento dentro del flujo actual. */
   protected iniciarEdicionElemento(): void {
     if (this.puedeSincronizarEpicaSeleccionada()) {
       this.sincronizarEpicaPrincipal();
@@ -445,17 +546,20 @@ export class PaginaPlanificacionProyecto {
     this.editor.iniciarEdicion();
   }
 
+  /** Cierra editor dentro del flujo actual. */
   protected cerrarEditor(): void {
     this.historial.cerrar();
     this.pestanaElemento.set(PestanaElementoPlanificacion.Detalle);
     this.editor.cerrar();
   }
 
+  /** Ejecuta preparar detalle editor como parte del flujo interno. */
   private prepararDetalleEditor(): void {
     this.historial.cerrar();
     this.pestanaElemento.set(PestanaElementoPlanificacion.Detalle);
   }
 
+  /** Ejecuta completar sincronizacion epica como parte del flujo interno. */
   private completarSincronizacionEpica(
     resultado: ResultadoSincronizacionEpicaAzurePlanificacion,
   ): void {

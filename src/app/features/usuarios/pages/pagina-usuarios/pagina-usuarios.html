@@ -1,0 +1,100 @@
+<section
+  class="usuarios"
+  [attr.aria-labelledby]="!cargando() && !errorCarga() ? 'titulo-usuarios' : null"
+  [attr.aria-label]="
+    errorCarga() ? 'Estado de carga de usuarios' : cargando() ? 'Cargando usuarios' : null
+  "
+>
+  @if (errorCarga()) {
+    <app-estado-error
+      [paginaCompleta]="true"
+      titulo="No fue posible obtener los usuarios"
+      descripcion="Verifica la conexión e intenta cargar nuevamente la información."
+      [reintentable]="true"
+      (reintentar)="cargar()"
+    />
+  } @else if (!cargando()) {
+    <app-encabezado-pagina
+      idTitulo="titulo-usuarios"
+      titulo="Usuarios"
+      etiqueta="Configuración"
+      descripcion="Administra perfiles técnicos y límites mensuales para las personas registradas."
+      icono="usuario"
+    >
+      <div encabezadoPaginaAcciones>
+        <button
+          type="button"
+          class="ui-button ui-button--primary ui-button--on-inverse ui-button--md"
+          [disabled]="!puedeCrear()"
+          (click)="crear()"
+        >
+          <app-icono class="ui-button__icon" nombre="agregar" />
+          Crear usuario
+        </button>
+      </div>
+    </app-encabezado-pagina>
+
+    <section class="ui-card usuarios__contenido" aria-labelledby="titulo-listado-usuarios">
+      <header class="ui-card__header usuarios__encabezado-listado">
+        <div class="ui-card__heading">
+          <span class="ui-card__icon" aria-hidden="true">
+            <app-icono nombre="usuario" />
+          </span>
+          <div>
+            <h2 id="titulo-listado-usuarios" class="ui-card__title">Personas registradas</h2>
+            <p class="usuarios__descripcion">
+              {{ usuariosVisibles().length }} de {{ usuarios().length }} usuarios
+            </p>
+          </div>
+        </div>
+        <app-campo-busqueda
+          id="buscar-usuarios"
+          etiqueta="Buscar usuarios"
+          placeholder="Nombre, correo, identidad o perfil"
+          [formControl]="terminoBusqueda"
+        />
+      </header>
+
+      <div class="ui-card__body usuarios__cuerpo">
+        @if (!perfilesTecnicos().length) {
+          <div class="usuarios__aviso" role="status">
+            <app-icono nombre="alerta" />
+            No hay perfiles técnicos activos. Puedes consultar usuarios, pero necesitas configurar
+            el catálogo para crear o completar registros.
+          </div>
+        }
+
+        @if (usuariosVisibles().length) {
+          <app-tabla-usuarios
+            [usuarios]="usuariosVisibles()"
+            [bloqueado]="bloqueado()"
+            (editarUsuario)="editar($event)"
+            (cambiarEstadoUsuario)="cambiarEstado($event)"
+          />
+        } @else if (usuarios().length) {
+          <app-estado-vacio
+            icono="buscar"
+            titulo="Sin coincidencias"
+            descripcion="No encontramos usuarios con el criterio ingresado."
+          />
+        } @else {
+          <app-estado-vacio
+            icono="usuario"
+            titulo="Sin usuarios registrados"
+            descripcion="Crea el primer usuario para reutilizar su perfil técnico y configurar su límite mensual."
+          />
+        }
+      </div>
+    </section>
+  }
+
+  @if (editor(); as contextoEditor) {
+    <app-editor-usuario
+      [contexto]="contextoEditor"
+      [perfilesTecnicos]="perfilesTecnicosEditor()"
+      [ocupado]="ocupado()"
+      (cerrar)="cerrarEditor()"
+      (guardar)="guardar($event)"
+    />
+  }
+</section>

@@ -6,6 +6,7 @@ export type ClavePermisoNavegacion = string;
 /** Identifica de forma estable las entradas conocidas del panel. */
 export enum ClaveItemNavegacionPanel {
   Catalogos = 'catalogos',
+  Usuarios = 'usuarios',
   Inicio = 'inicio',
   Proyectos = 'proyectos',
   InformacionProyecto = 'informacion-proyecto',

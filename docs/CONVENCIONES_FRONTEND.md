@@ -24,6 +24,8 @@ específicas se mantienen en documentos separados para evitar un archivo único 
   IA y publicación en Azure.
 - [Consulta de proyectos](CONSULTA_PROYECTOS.md): filtros, paginación y acciones por
   proyecto.
+- [Administración de usuarios](USUARIOS.md): identidad local, perfil técnico, límites mensuales y
+  estados administrativos.
 
 ## Organización principal
 
@@ -167,12 +169,17 @@ export enum PlataformaSolucion {
 
 - Las clases, directivas y servicios exportados describen su responsabilidad.
 - Los contratos públicos (`input`, `output`, modelos y constantes) describen su finalidad.
-- Los métodos indican para qué existen dentro del flujo.
+- Todos los miembros de clase se documentan sin importar su visibilidad. Esto incluye dependencias
+  inyectadas, señales, estados derivados, controles de formulario, referencias de vista, callbacks,
+  métodos y accesores.
+- La descripción explica la responsabilidad o el significado del miembro; no repite únicamente su
+  nombre, tipo o modificadores.
 - Los métodos y constructores se separan de los miembros contiguos mediante una línea en blanco.
 - Los comentarios son breves y no narran la implementación interna.
 - Cada bloque JSDoc de un miembro de clase se separa del miembro anterior mediante una línea en
   blanco y permanece inmediatamente unido a la declaración que documenta.
-- Los callbacks, asignaciones y propiedades privadas evidentes no requieren comentarios.
+- No se exige documentar cada instrucción interna: el bloque JSDoc del miembro cubre su contrato y
+  su finalidad dentro del flujo.
 - Los pendientes reales usan `TODO` e indican el punto de integración faltante.
 
 Ejemplo:
@@ -198,6 +205,7 @@ protected iniciarSesionConMicrosoft(): void {}
 Antes de cerrar una migración o refactorización:
 
 ```powershell
+npm run docs:check
 npm run build
 npm test -- --watch=false
 git diff --check

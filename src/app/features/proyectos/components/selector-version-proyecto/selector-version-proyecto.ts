@@ -23,6 +23,8 @@ import type { VersionProyectoResumen } from '../../models/versionamiento-proyect
   styleUrl: './selector-version-proyecto.css',
 })
 export class SelectorVersionProyecto {
+
+  /** Proporciona acceso al servicio de formateador fecha. */
   private readonly formateadorFecha = inject(FormateadorFechaService);
 
   /** Proporciona el historial ordenado disponible. */
@@ -37,8 +39,10 @@ export class SelectorVersionProyecto {
   /** Solicita presentar una fotografía distinta. */
   public readonly versionCambiada = output<number>();
 
+  /** Administra control mediante formularios reactivos. */
   protected readonly control = new FormControl<number | null>(null);
 
+  /** Conserva opciones para coordinar esta responsabilidad. */
   protected readonly opciones = computed<readonly OpcionSelector[]>(() =>
     this.versiones().map((version) => ({
       valor: version.id,

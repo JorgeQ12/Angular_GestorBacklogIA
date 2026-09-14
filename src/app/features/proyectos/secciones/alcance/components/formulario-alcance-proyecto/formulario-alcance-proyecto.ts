@@ -30,6 +30,8 @@ import { FormularioAlcanceProyectoTipado } from '../../models/formulario-alcance
   styleUrl: './formulario-alcance-proyecto.css',
 })
 export class FormularioAlcanceProyecto {
+
+  /** Construye los controles reactivos administrados por el componente. */
   private readonly constructorFormulario = inject(NonNullableFormBuilder);
 
   /** Identifica el formulario para permitir acciones externas mediante el atributo form. */
@@ -47,9 +49,16 @@ export class FormularioAlcanceProyecto {
   /** Entrega un Alcance válido y normalizado al flujo consumidor. */
   public readonly guardar = output<AlcanceProyecto>();
 
+  /** Conserva límites para coordinar esta responsabilidad. */
   protected readonly limites = LIMITES_ALCANCE_PROYECTO;
+
+  /** Conserva mensajes formulario para coordinar esta responsabilidad. */
   protected readonly mensajesFormulario = MENSAJES_ALCANCE_PROYECTO;
+
+  /** Deriva es solo lectura a partir del estado vigente. */
   protected readonly esSoloLectura = computed(() => this.modo() === ModoFormularioProyecto.Lectura);
+
+  /** Administra los valores y validaciones del formulario reactivo. */
   protected readonly formulario: FormularioAlcanceProyectoTipado = this.constructorFormulario.group(
     {
       incluido: ['', [validarTextoRequerido, Validators.maxLength(this.limites.incluido)]],
