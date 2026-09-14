@@ -38,8 +38,8 @@ El componente se monta una sola vez en `app.html`, antes del `router-outlet`:
 
 ## Presentación
 
-El overlay contiene únicamente el camión, su humo y un estado breve. El camión entra, se detiene en
-el centro y continúa su recorrido. Sus estilos consumen los tokens del sistema visual y contemplan
+El overlay contiene el camión, su humo, una guía vial segmentada y un estado breve. El camión recorre
+la guía de lado a lado. Sus estilos consumen los tokens del sistema visual y contemplan
 `prefers-reduced-motion`.
 
 La presentación utiliza `public/brand/camion_carga.webp`, optimizado para el tamaño real del
