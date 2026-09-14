@@ -6,13 +6,13 @@ import { exigirDatosResultadoApi } from '../../http/mappers/resultado-api.mapper
 import { ENDPOINTS_CATALOGOS } from '../config/endpoints-catalogos.config';
 import { mapearOpcionesCatalogo } from '../mappers/catalogo.mapper';
 import { CatalogoValorDto } from '../models/catalogo-valor.dto';
-import { CodigoTipoCatalogoIdentidad } from '../models/codigo-tipo-catalogo-identidad.enum';
+import { CodigoTipoCatalogoUsuarios } from '../models/codigo-tipo-catalogo-usuarios.enum';
 import { CodigoTipoCatalogoGestionProducto } from '../models/codigo-tipo-catalogo-gestion-producto.enum';
 import { OpcionCatalogo } from '../models/opcion-catalogo.model';
 
 type CodigoTipoCatalogo =
   | CodigoTipoCatalogoGestionProducto
-  | CodigoTipoCatalogoIdentidad;
+  | CodigoTipoCatalogoUsuarios;
 
 /** Proporciona los catálogos transversales requeridos por las features. */
 @Injectable({ providedIn: 'root' })

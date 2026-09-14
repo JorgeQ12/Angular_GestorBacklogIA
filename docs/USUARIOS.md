@@ -34,7 +34,7 @@ La capacidad consume el grupo `/api/Usuario`:
 
 `IdAzure` identifica el cruce con Azure DevOps, es obligatorio al crear y no se modifica durante la
 edición. Nombre y correo admiten hasta 200 y 320 caracteres. El perfil técnico es obligatorio y
-procede del catálogo activo `identidad_perfil_tecnico`.
+procede del catálogo activo `usuarios_perfil_tecnico`.
 
 `limiteTokensMensual` acepta un entero mayor o igual que cero. `null` significa que no existe un
 límite individual configurado; cero es un valor explícito y no se transforma en ausencia de límite.

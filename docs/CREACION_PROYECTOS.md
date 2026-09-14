@@ -406,7 +406,7 @@ El formato persistido es una colección canónica en español:
 ]
 ```
 
-Los perfiles técnicos provienen del catálogo remoto `identidad_perfil_tecnico` y el control
+Los perfiles técnicos provienen del catálogo remoto `usuarios_perfil_tecnico` y el control
 conserva su ID; no se queman los 40 valores ni los identificadores de sus semillas en Angular. Las
 dedicaciones permanecen centralizadas en `equipo/config/equipo-proyecto.config.ts` porque todavía
 son una regla local del formulario.

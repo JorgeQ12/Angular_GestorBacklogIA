@@ -25,25 +25,30 @@ describe('Página de usuarios', () => {
     fechaActualizacion: null,
   };
   const api = {
-    obtenerTodos: vi.fn(),
-    obtener: vi.fn(),
-    guardar: vi.fn(),
-    inactivar: vi.fn(),
-    activar: vi.fn(),
+    obtenerTodos: jasmine.createSpy('obtenerTodos'),
+    obtener: jasmine.createSpy('obtener'),
+    guardar: jasmine.createSpy('guardar'),
+    inactivar: jasmine.createSpy('inactivar'),
+    activar: jasmine.createSpy('activar'),
   };
-  const catalogos = { obtenerOpciones: vi.fn() };
-  const confirmar = vi.fn();
-  const exito = vi.fn();
-  const comunicar = vi.fn();
+  const catalogos = { obtenerOpciones: jasmine.createSpy('obtenerOpciones') };
+  const confirmar = jasmine.createSpy('confirmar');
+  const exito = jasmine.createSpy('exito');
+  const comunicar = jasmine.createSpy('comunicar');
 
   beforeEach(() => {
-    vi.resetAllMocks();
-    api.obtenerTodos.mockReturnValue(of([usuario]));
-    catalogos.obtenerOpciones.mockReturnValue(
+    [...Object.values(api), catalogos.obtenerOpciones, confirmar, exito, comunicar].forEach(
+      (espia) => {
+        espia.calls.reset();
+        espia.and.stub();
+      },
+    );
+    api.obtenerTodos.and.returnValue(of([usuario]));
+    catalogos.obtenerOpciones.and.returnValue(
       of([{ id: 32, nombre: 'Arquitectura', descripcion: 'Diseño técnico' }]),
     );
-    confirmar.mockResolvedValue(true);
-    exito.mockResolvedValue(undefined);
+    confirmar.and.resolveTo(true);
+    exito.and.resolveTo(undefined);
     TestBed.configureTestingModule({
       providers: [
         { provide: UsuariosService, useValue: api },
@@ -76,7 +81,7 @@ describe('Página de usuarios', () => {
   });
 
   it('filtra por correo, identidad y perfil desde el buscador compartido', () => {
-    api.obtenerTodos.mockReturnValue(
+    api.obtenerTodos.and.returnValue(
       of([usuario, { ...usuario, id: 8, nombre: 'Grace Hopper', correo: 'grace@empresa.com' }]),
     );
     const fixture = crear();
@@ -93,7 +98,7 @@ describe('Página de usuarios', () => {
   });
 
   it('reemplaza toda la composición por un error reintentable cuando falla la carga', () => {
-    api.obtenerTodos.mockReturnValueOnce(throwError(() => new Error('fallo')));
+    api.obtenerTodos.and.returnValues(throwError(() => new Error('fallo')), of([usuario]));
     const fixture = crear();
     const root = fixture.nativeElement as HTMLElement;
 
@@ -109,7 +114,7 @@ describe('Página de usuarios', () => {
   });
 
   it('impide crear sin perfiles activos y explica el bloqueo', () => {
-    catalogos.obtenerOpciones.mockReturnValue(of([]));
+    catalogos.obtenerOpciones.and.returnValue(of([]));
     const fixture = crear();
     const root = fixture.nativeElement as HTMLElement;
     const boton = Array.from(
@@ -122,7 +127,7 @@ describe('Página de usuarios', () => {
 
   it('conserva el editor y bloquea envíos duplicados cuando falla el guardado', () => {
     const pendiente = new Subject<Usuario>();
-    api.guardar.mockReturnValue(pendiente);
+    api.guardar.and.returnValue(pendiente);
     const fixture = crear();
     pulsar(fixture.nativeElement, 'Crear usuario');
     fixture.detectChanges();
@@ -153,7 +158,7 @@ describe('Página de usuarios', () => {
   });
 
   it('confirma la inactivación y aplica la respuesta del backend', async () => {
-    api.inactivar.mockReturnValue(of({ ...usuario, activo: false }));
+    api.inactivar.and.returnValue(of({ ...usuario, activo: false }));
     const fixture = crear();
     (
       fixture.nativeElement.querySelector('[aria-label="Inactivar Ada Lovelace"]') as HTMLButtonElement
@@ -168,7 +173,7 @@ describe('Página de usuarios', () => {
 
   it('cancela la consulta al destruir la página', () => {
     const consulta = new Subject<Usuario[]>();
-    api.obtenerTodos.mockReturnValue(consulta);
+    api.obtenerTodos.and.returnValue(consulta);
     const fixture = crear();
     expect(consulta.observed).toBe(true);
     fixture.destroy();

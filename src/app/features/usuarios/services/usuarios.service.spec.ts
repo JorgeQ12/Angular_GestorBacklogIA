@@ -77,7 +77,7 @@ describe('Administración HTTP de usuarios', () => {
       activo: true,
     });
     req.flush(resultado(usuario));
-    await expect(promesa).resolves.toEqual(usuario);
+    expect(await promesa).toEqual(usuario);
   });
 
   it('actualiza sin enviar IdAzure y conserva el estado vigente', async () => {

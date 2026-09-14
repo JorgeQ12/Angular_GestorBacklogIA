@@ -19,8 +19,8 @@ describe('Tabla de usuarios', () => {
 
   it('presenta valores opcionales y emite acciones por usuario', () => {
     const fixture = TestBed.createComponent(TablaUsuarios);
-    const editar = vi.fn();
-    const cambiarEstado = vi.fn();
+    const editar = jasmine.createSpy('editar');
+    const cambiarEstado = jasmine.createSpy('cambiarEstado');
     fixture.componentRef.setInput('usuarios', [usuario]);
     fixture.componentInstance.editarUsuario.subscribe(editar);
     fixture.componentInstance.cambiarEstadoUsuario.subscribe(cambiarEstado);

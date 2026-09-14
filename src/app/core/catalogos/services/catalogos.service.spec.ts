@@ -5,7 +5,7 @@ import { firstValueFrom } from 'rxjs';
 import { ResultadoApi } from '../../http/models/resultado-api.model';
 import { ENDPOINTS_CATALOGOS } from '../config/endpoints-catalogos.config';
 import { CatalogoValorDto } from '../models/catalogo-valor.dto';
-import { CodigoTipoCatalogoIdentidad } from '../models/codigo-tipo-catalogo-identidad.enum';
+import { CodigoTipoCatalogoUsuarios } from '../models/codigo-tipo-catalogo-usuarios.enum';
 import { CodigoTipoCatalogoGestionProducto } from '../models/codigo-tipo-catalogo-gestion-producto.enum';
 import { CatalogosService } from './catalogos.service';
 
@@ -49,12 +49,12 @@ describe('CatalogosService', () => {
 
   it('permite consultar catálogos de identidad sin quemar sus valores', async () => {
     const respuesta = firstValueFrom(
-      servicio.obtenerOpciones(CodigoTipoCatalogoIdentidad.PerfilTecnico),
+      servicio.obtenerOpciones(CodigoTipoCatalogoUsuarios.PerfilTecnico),
     );
     const solicitud = httpTesting.expectOne(
       (peticion) =>
         peticion.url === ENDPOINTS_CATALOGOS.obtenerValores &&
-        peticion.params.get('catalogoTipoCodigo') === CodigoTipoCatalogoIdentidad.PerfilTecnico,
+        peticion.params.get('catalogoTipoCodigo') === CodigoTipoCatalogoUsuarios.PerfilTecnico,
     );
 
     solicitud.flush(
@@ -63,7 +63,7 @@ describe('CatalogosService', () => {
           32,
           'Ingeniero senior cloud',
           true,
-          CodigoTipoCatalogoIdentidad.PerfilTecnico,
+          CodigoTipoCatalogoUsuarios.PerfilTecnico,
           'Perfil técnico',
         ),
       ]),

@@ -1,9 +1,9 @@
-import { CodigoTipoCatalogoIdentidad } from '../../../../../core/catalogos/models/codigo-tipo-catalogo-identidad.enum';
+import { CodigoTipoCatalogoUsuarios } from '../../../../../core/catalogos/models/codigo-tipo-catalogo-usuarios.enum';
 import { OpcionSelector } from '../../../../../shared/forms/controles/selector-campo/models/opcion-selector.model';
 import { MensajesError } from '../../../../../shared/forms/errores-validacion';
 
 /** Identifica el catálogo remoto que alimenta los perfiles técnicos de Equipo. */
-export const CATALOGO_PERFILES_TECNICOS_EQUIPO = CodigoTipoCatalogoIdentidad.PerfilTecnico;
+export const CATALOGO_PERFILES_TECNICOS_EQUIPO = CodigoTipoCatalogoUsuarios.PerfilTecnico;
 
 /** Centraliza las dedicaciones admitidas para cada integrante. */
 export const OPCIONES_DEDICACION_EQUIPO = [

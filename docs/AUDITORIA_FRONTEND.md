@@ -17,7 +17,7 @@ autenticación.
 | Frente | Estado | Evidencia o decisión |
 | --- | --- | --- |
 | Arquitectura | Conforme | Las capacidades permanecen separadas en `core`, `shared`, `layouts` y `features`; no se introdujeron dependencias hacia administración de usuarios. |
-| Contrato de Equipo | Conforme | El perfil técnico usa el ID del catálogo remoto `identidad_perfil_tecnico`. La sincronización puede proponer el perfil del usuario, pero prevalece la asignación ya guardada en el proyecto. |
+| Contrato de Equipo | Conforme | El perfil técnico usa el ID del catálogo remoto `usuarios_perfil_tecnico`. La sincronización puede proponer el perfil del usuario, pero prevalece la asignación ya guardada en el proyecto. |
 | Catálogos | Conforme | El servicio compartido admite catálogos de gestión e identidad sin duplicar clientes HTTP ni opciones locales. |
 | Usuarios | Conforme | La ruta administrativa implementa consulta, alta, edición, activación e inactivación con perfiles remotos, identidad Azure inmutable y límite mensual nullable. |
 | Estados de interfaz | Conforme | Los errores de carga de página reemplazan encabezado y contenido; los errores locales permanecen dentro de su región y no se duplican con modales. |

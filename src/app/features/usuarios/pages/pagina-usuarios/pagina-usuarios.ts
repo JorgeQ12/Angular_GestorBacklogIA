@@ -11,7 +11,7 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Observable, finalize, forkJoin } from 'rxjs';
 import { CatalogosService } from '../../../../core/catalogos/services/catalogos.service';
-import { CodigoTipoCatalogoIdentidad } from '../../../../core/catalogos/models/codigo-tipo-catalogo-identidad.enum';
+import { CodigoTipoCatalogoUsuarios } from '../../../../core/catalogos/models/codigo-tipo-catalogo-usuarios.enum';
 import { MensajesService } from '../../../../core/mensajes/services/mensajes.service';
 import { NotificadorErroresApiService } from '../../../../core/mensajes/services/notificador-errores-api.service';
 import { EncabezadoPagina } from '../../../../shared/components/encabezado-pagina/encabezado-pagina';
@@ -142,7 +142,7 @@ export class PaginaUsuarios implements OnInit {
     this.errorCarga.set(false);
     forkJoin({
       usuarios: this.api.obtenerTodos(),
-      perfiles: this.catalogos.obtenerOpciones(CodigoTipoCatalogoIdentidad.PerfilTecnico),
+      perfiles: this.catalogos.obtenerOpciones(CodigoTipoCatalogoUsuarios.PerfilTecnico),
     })
       .pipe(
         finalize(() => this.cargando.set(false)),

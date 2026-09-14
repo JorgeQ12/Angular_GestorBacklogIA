@@ -14,8 +14,8 @@ describe('Catálogo de navegación del panel', () => {
   });
 
   it('expone la administración de usuarios mediante su URL canónica', () => {
-    expect(NAVEGACION_PANEL).toContainEqual(
-      expect.objectContaining({
+    expect(NAVEGACION_PANEL).toContain(
+      jasmine.objectContaining({
         id: ClaveItemNavegacionPanel.Usuarios,
         ruta: URL_USUARIOS,
         icono: 'usuario',

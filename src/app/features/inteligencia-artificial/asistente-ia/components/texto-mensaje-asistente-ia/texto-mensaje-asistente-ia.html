@@ -1,0 +1,53 @@
+<ng-template #contenidoEnLinea let-segmentos>
+  @for (segmento of segmentos; track $index) {
+    @if (segmento.resaltado) {
+      <strong>{{ segmento.texto }}</strong>
+    } @else {
+      {{ segmento.texto }}
+    }
+  }
+</ng-template>
+
+<div class="texto-mensaje-asistente">
+  @for (bloque of bloques(); track $index) {
+    @switch (bloque.tipo) {
+      @case (tiposBloque.Parrafo) {
+        <p>
+          @for (linea of bloque.contenidos; track $index) {
+            <ng-container
+              [ngTemplateOutlet]="contenidoEnLinea"
+              [ngTemplateOutletContext]="{ $implicit: linea }"
+            />
+            @if (!$last) {
+              <br />
+            }
+          }
+        </p>
+      }
+      @case (tiposBloque.ListaOrdenada) {
+        <ol [attr.start]="bloque.inicioLista">
+          @for (elemento of bloque.contenidos; track $index) {
+            <li>
+              <ng-container
+                [ngTemplateOutlet]="contenidoEnLinea"
+                [ngTemplateOutletContext]="{ $implicit: elemento }"
+              />
+            </li>
+          }
+        </ol>
+      }
+      @case (tiposBloque.ListaNoOrdenada) {
+        <ul>
+          @for (elemento of bloque.contenidos; track $index) {
+            <li>
+              <ng-container
+                [ngTemplateOutlet]="contenidoEnLinea"
+                [ngTemplateOutletContext]="{ $implicit: elemento }"
+              />
+            </li>
+          }
+        </ul>
+      }
+    }
+  }
+</div>

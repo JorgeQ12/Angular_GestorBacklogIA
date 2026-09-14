@@ -24,17 +24,23 @@ import {
   RolMensajeAsistenteIA,
   type MensajeAsistenteIA,
 } from '../../models/asistente-ia.model';
+import { TextoMensajeAsistenteIA } from '../texto-mensaje-asistente-ia/texto-mensaje-asistente-ia';
 
 /** Presenta el historial y emite acciones sin conocer HTTP ni modelos de Proyectos. */
 @Component({
   selector: 'app-panel-asistente-ia',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, ErrorCampoDirective, IconoComponent, FechaPipe],
+  imports: [
+    ReactiveFormsModule,
+    ErrorCampoDirective,
+    IconoComponent,
+    FechaPipe,
+    TextoMensajeAsistenteIA,
+  ],
   templateUrl: './panel-asistente-ia.html',
   styleUrl: './panel-asistente-ia.css',
 })
 export class PanelAsistenteIA {
-
   /** Construye los controles reactivos administrados por el componente. */
   private readonly constructorFormulario = inject(NonNullableFormBuilder);
 

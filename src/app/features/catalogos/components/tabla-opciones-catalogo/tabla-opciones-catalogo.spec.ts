@@ -46,7 +46,7 @@ const OPCIONES: readonly ValorCatalogo[] = [
     descripcion: 'Calidad',
     activo: false,
     catalogoTipoId: 6,
-    catalogoTipoCodigo: 'identidad_perfil_tecnico',
+    catalogoTipoCodigo: 'usuarios_perfil_tecnico',
     catalogoTipoNombre: 'Perfil técnico',
   },
 ];

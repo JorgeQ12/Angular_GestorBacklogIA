@@ -27,6 +27,9 @@ el estado de la conversación se conserva en el inyector de la ruta del proyecto
 - El estado de bienvenida ofrece acciones sugeridas accesibles para detectar vacíos, mejorar la
   claridad o solicitar una propuesta. Cada botón inicia directamente el turno correspondiente y
   se bloquea mientras exista una operación remota.
+- Las respuestas del modelo presentan párrafos, listas numeradas, viñetas y negritas mediante un
+  formato Markdown acotado. El renderizado usa interpolación de Angular y nunca interpreta HTML
+  recibido desde la conversación.
 - Las respuestas pueden orientar, hacer preguntas o presentar una propuesta. El modelo nunca
   aplica directamente un cambio.
 

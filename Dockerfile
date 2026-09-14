@@ -25,5 +25,5 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 # Copiar los estaticos compilados (Angular 21 -> subcarpeta browser)
 COPY --from=build /app/dist/Angular_GestorBacklogIA/browser /usr/share/nginx/html
 
-EXPOSE 4200
+EXPOSE 4300
 CMD ["nginx", "-g", "daemon off;"]

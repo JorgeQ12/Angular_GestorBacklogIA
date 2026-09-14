@@ -30,7 +30,7 @@ describe('Editor de usuario', () => {
 
   it('rechaza el formulario vacío y presenta mensajes accesibles', () => {
     const fixture = crear();
-    const emitir = vi.fn();
+    const emitir = jasmine.createSpy('emitir');
     fixture.componentInstance.guardar.subscribe(emitir);
 
     fixture.nativeElement.querySelector('form').dispatchEvent(new Event('submit'));
@@ -44,7 +44,7 @@ describe('Editor de usuario', () => {
 
   it('normaliza y emite un alta válida', () => {
     const fixture = crear();
-    const emitir = vi.fn();
+    const emitir = jasmine.createSpy('emitir');
     fixture.componentInstance.guardar.subscribe(emitir);
     const formulario = Reflect.get(fixture.componentInstance, 'formulario') as FormGroup;
     formulario.setValue({
