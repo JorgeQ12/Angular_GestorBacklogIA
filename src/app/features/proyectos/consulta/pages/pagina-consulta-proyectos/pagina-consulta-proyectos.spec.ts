@@ -135,6 +135,68 @@ describe('PaginaConsultaProyectos', () => {
 
     expect(router.navigateByUrl).toHaveBeenCalledWith('/panel/proyectos/creacion?proyectoId=42');
   });
+
+  it('abre la consulta versionada de un proyecto publicado', () => {
+    const instancia = fixture.componentInstance as unknown as {
+      consultarProyecto(proyecto: { id: number }): void;
+    };
+
+    instancia.consultarProyecto({ id: 42 });
+
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/panel/proyectos/42/informacion');
+  });
+
+  it('no navega cuando los filtros aplicados no cambian', () => {
+    const instancia = fixture.componentInstance as unknown as {
+      actualizarFiltros(filtros: {
+        nombre: string;
+        responsable: string;
+        estado: string | null;
+      }): void;
+    };
+
+    instancia.actualizarFiltros({ nombre: '', responsable: '', estado: 'En Progreso' });
+
+    expect(router.navigate).not.toHaveBeenCalled();
+  });
+
+  it('cambia únicamente la página conservando los filtros vigentes', () => {
+    const instancia = fixture.componentInstance as unknown as {
+      cambiarPagina(cambio: { pagina: number }): void;
+    };
+
+    instancia.cambiarPagina({ pagina: 3 });
+
+    expect(router.navigate).toHaveBeenCalledWith([], {
+      relativeTo: route,
+      queryParams: { [PARAMETROS_RUTA.pagina]: 3 },
+      queryParamsHandling: 'merge',
+    });
+  });
+
+  it('normaliza la primera página como ausencia del parámetro', () => {
+    const instancia = fixture.componentInstance as unknown as {
+      cambiarPagina(cambio: { pagina: number }): void;
+    };
+
+    instancia.cambiarPagina({ pagina: 1 });
+
+    expect(router.navigate).toHaveBeenCalledWith([], {
+      relativeTo: route,
+      queryParams: { [PARAMETROS_RUTA.pagina]: null },
+      queryParamsHandling: 'merge',
+    });
+  });
+
+  it('no navega al solicitar la página que ya está activa', () => {
+    const instancia = fixture.componentInstance as unknown as {
+      cambiarPagina(cambio: { pagina: number }): void;
+    };
+
+    instancia.cambiarPagina({ pagina: 2 });
+
+    expect(router.navigate).not.toHaveBeenCalled();
+  });
 });
 
 const PAGINA: PaginaProyectos = {

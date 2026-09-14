@@ -52,6 +52,43 @@ describe('generacionIaPlanificacionMapper', () => {
     });
   });
 
+  (
+    [
+      [NivelGeneracionIaPlanificacion.Epicas, NivelGeneracionIaPlanificacionDto.Epicas],
+      [
+        NivelGeneracionIaPlanificacion.Caracteristicas,
+        NivelGeneracionIaPlanificacionDto.Caracteristicas,
+      ],
+      [NivelGeneracionIaPlanificacion.Historias, NivelGeneracionIaPlanificacionDto.Historias],
+      [NivelGeneracionIaPlanificacion.Tareas, NivelGeneracionIaPlanificacionDto.Tareas],
+    ] as const
+  ).forEach(([nivel, nivelDto]) => {
+    it(`convierte el nivel de dominio ${nivel} al valor serializado del backend`, () => {
+      expect(crearSolicitudGeneracionIaPlanificacion(7, nivel)).toEqual({
+        proyectoId: 7,
+        nivel: nivelDto,
+      });
+    });
+  });
+
+  (
+    [
+      [NivelGeneracionIaPlanificacionDto.Epicas, NivelGeneracionIaPlanificacion.Epicas],
+      [NivelGeneracionIaPlanificacionDto.Tareas, NivelGeneracionIaPlanificacion.Tareas],
+    ] as const
+  ).forEach(([nivelDto, nivelEsperado]) => {
+    it(`adapta el nivel restante ${nivelDto} recibido del backend`, () => {
+      expect(
+        mapearResultadoGeneracionIaPlanificacion({
+          proyectoId: 7,
+          nivel: nivelDto,
+          totalCreados: 1,
+          mensaje: 'ok',
+        }),
+      ).toEqual(jasmine.objectContaining({ nivel: nivelEsperado }));
+    });
+  });
+
   it('rechaza un nivel desconocido recibido desde el backend', () => {
     expect(() =>
       mapearResultadoGeneracionIaPlanificacion({

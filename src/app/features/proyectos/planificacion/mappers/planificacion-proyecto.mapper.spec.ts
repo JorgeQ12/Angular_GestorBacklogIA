@@ -1,6 +1,7 @@
 import { mapearPlanificacionProyecto } from './planificacion-proyecto.mapper';
 import {
   MotivoBloqueoPublicacionAzureDto,
+  MotivoInactivacionElementoDto,
   OrigenEpicaDto,
   TipoElementoPlanificacionDto,
   type CapacidadesElementoPlanificacionDto,
@@ -127,6 +128,354 @@ describe('mapearPlanificacionProyecto', () => {
         puedeCrearHijo: false,
         puedeSincronizar: false,
       }),
+    );
+  });
+
+  it('marca la épica como no vinculada a Azure cuando es de origen manual sin identificadores', () => {
+    const epicaAzure = PLANIFICACION_JERARQUICA_DTO.epicas?.[0];
+    if (!epicaAzure) throw new Error('La prueba requiere una épica base.');
+    const dto = {
+      ...PLANIFICACION_JERARQUICA_DTO,
+      epicas: [
+        {
+          ...epicaAzure,
+          origen: OrigenEpicaDto.Manual,
+          esPrincipal: false,
+          azureWorkItemId: null,
+          urlAzure: null,
+          capacidades: { ...CAPACIDADES, puedeSincronizar: false },
+        },
+      ],
+    };
+
+    const epica = mapearPlanificacionProyecto(dto).elementos[0];
+
+    expect(epica.vinculadaAzure).toBe(false);
+    expect(epica.capacidades).toEqual(
+      jasmine.objectContaining({
+        puedeCrearHijo: true,
+        puedeSincronizar: false,
+      }),
+    );
+  });
+
+  it('conserva los datos de inactivación en los elementos inactivos', () => {
+    const epicaAzure = PLANIFICACION_JERARQUICA_DTO.epicas?.[0];
+    if (!epicaAzure) throw new Error('La prueba requiere una épica base.');
+    const dto = {
+      ...PLANIFICACION_JERARQUICA_DTO,
+      esHistorica: false,
+      epicas: [
+        {
+          ...epicaAzure,
+          activo: false,
+          fechaInactivacion: '2026-10-01T08:00:00',
+          motivoInactivacion: MotivoInactivacionElementoDto.Eliminacion,
+        },
+      ],
+    };
+
+    const epica = mapearPlanificacionProyecto(dto).elementos[0];
+
+    expect(epica.activo).toBe(false);
+    expect(epica.capacidades).toEqual(
+      jasmine.objectContaining({
+        puedeCrearHijo: true,
+        puedeSincronizar: true,
+      }),
+    );
+  });
+
+  it('no habilita operaciones de vínculo Azure cuando la épica vinculada está inactiva', () => {
+    const epicaAzure = PLANIFICACION_JERARQUICA_DTO.epicas?.[0];
+    if (!epicaAzure) throw new Error('La prueba requiere una épica Azure.');
+    const dto = {
+      ...PLANIFICACION_JERARQUICA_DTO,
+      epicas: [
+        {
+          ...epicaAzure,
+          activo: false,
+          capacidades: {
+            ...CAPACIDADES,
+            puedeCrearHijo: false,
+            puedeSincronizar: false,
+          },
+        },
+      ],
+    };
+
+    const epica = mapearPlanificacionProyecto(dto).elementos[0];
+
+    expect(epica.vinculadaAzure).toBe(true);
+    expect(epica.capacidades).toEqual(
+      jasmine.objectContaining({
+        puedeCrearHijo: false,
+        puedeSincronizar: false,
+      }),
+    );
+  });
+
+  it('omite la lista de requisitos cuando la característica no la incluye', () => {
+    const epicaAzure = PLANIFICACION_JERARQUICA_DTO.epicas?.[0];
+    const caracteristica = epicaAzure?.caracteristicas[0];
+    if (!epicaAzure || !caracteristica) throw new Error('La prueba requiere una característica base.');
+    const dto = {
+      ...PLANIFICACION_JERARQUICA_DTO,
+      epicas: [
+        {
+          ...epicaAzure,
+          caracteristicas: [{ ...caracteristica, listaRequisitos: null }],
+        },
+      ],
+    };
+
+    const caracteristicaMapeada = mapearPlanificacionProyecto(dto).elementos[0].hijos[0];
+
+    expect(caracteristicaMapeada.hijos.length).toBe(1);
+    expect(caracteristicaMapeada.hijos[0].tipo).toBe(TipoElementoPlanificacion.Historia);
+  });
+
+  it('usa el nombre de la actividad como detalle cuando difiere del título', () => {
+    const listaMapeada = mapearPlanificacionProyecto(PLANIFICACION_JERARQUICA_DTO)
+      .elementos[0].hijos[0].hijos[0];
+    const actividad = listaMapeada.hijos[0];
+
+    expect(actividad.titulo).toBe('Analizar cobertura');
+    expect(actividad.detalle).toBe('Análisis');
+  });
+
+  it('recurre al nombre de la actividad cuando el título está vacío y no fija detalle', () => {
+    const epicaAzure = PLANIFICACION_JERARQUICA_DTO.epicas?.[0];
+    const caracteristica = epicaAzure?.caracteristicas[0];
+    const lista = caracteristica?.listaRequisitos;
+    const actividad = lista?.actividades[0];
+    if (!epicaAzure || !caracteristica || !lista || !actividad) {
+      throw new Error('La prueba requiere una actividad base.');
+    }
+    const dto = {
+      ...PLANIFICACION_JERARQUICA_DTO,
+      epicas: [
+        {
+          ...epicaAzure,
+          caracteristicas: [
+            {
+              ...caracteristica,
+              listaRequisitos: {
+                ...lista,
+                actividades: [{ ...actividad, titulo: '', nombreActividad: 'Análisis' }],
+              },
+            },
+          ],
+        },
+      ],
+    };
+
+    const actividadMapeada = mapearPlanificacionProyecto(dto)
+      .elementos[0].hijos[0].hijos[0].hijos[0];
+
+    expect(actividadMapeada.titulo).toBe('Análisis');
+    expect(actividadMapeada.detalle).toBeNull();
+  });
+
+  it('deja sin términos de búsqueda a la tarea de requisito sin requisito asociado', () => {
+    const epicaAzure = PLANIFICACION_JERARQUICA_DTO.epicas?.[0];
+    const caracteristica = epicaAzure?.caracteristicas[0];
+    const lista = caracteristica?.listaRequisitos;
+    const actividad = lista?.actividades[0];
+    const tarea = actividad?.tareasRequisitos[0];
+    if (!epicaAzure || !caracteristica || !lista || !actividad || !tarea) {
+      throw new Error('La prueba requiere una tarea de requisito base.');
+    }
+    const dto = {
+      ...PLANIFICACION_JERARQUICA_DTO,
+      epicas: [
+        {
+          ...epicaAzure,
+          caracteristicas: [
+            {
+              ...caracteristica,
+              listaRequisitos: {
+                ...lista,
+                actividades: [
+                  {
+                    ...actividad,
+                    tareasRequisitos: [{ ...tarea, requisito: null }],
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      ],
+    };
+
+    const tareaMapeada = mapearPlanificacionProyecto(dto)
+      .elementos[0].hijos[0].hijos[0].hijos[0].hijos[0];
+
+    expect(tareaMapeada.tipo).toBe(TipoElementoPlanificacion.TareaRequisito);
+    expect(tareaMapeada.terminosBusqueda).toEqual([]);
+  });
+
+  it('mapea una historia sin tareas a un elemento sin hijos', () => {
+    const epicaAzure = PLANIFICACION_JERARQUICA_DTO.epicas?.[0];
+    const caracteristica = epicaAzure?.caracteristicas[0];
+    const historia = caracteristica?.historias[0];
+    if (!epicaAzure || !caracteristica || !historia) {
+      throw new Error('La prueba requiere una historia base.');
+    }
+    const dto = {
+      ...PLANIFICACION_JERARQUICA_DTO,
+      epicas: [
+        {
+          ...epicaAzure,
+          caracteristicas: [
+            {
+              ...caracteristica,
+              listaRequisitos: null,
+              historias: [{ ...historia, tareas: [] }],
+            },
+          ],
+        },
+      ],
+    };
+
+    const historiaMapeada = mapearPlanificacionProyecto(dto).elementos[0].hijos[0].hijos[0];
+
+    expect(historiaMapeada.tipo).toBe(TipoElementoPlanificacion.Historia);
+    expect(historiaMapeada.hijos).toEqual([]);
+  });
+
+  it('deriva capacidades vacías cuando el backend no entrega capacidades', () => {
+    const epicaAzure = PLANIFICACION_JERARQUICA_DTO.epicas?.[0];
+    const caracteristica = epicaAzure?.caracteristicas[0];
+    const historia = caracteristica?.historias[0];
+    if (!epicaAzure || !caracteristica || !historia) {
+      throw new Error('La prueba requiere una historia base.');
+    }
+    const dto = {
+      ...PLANIFICACION_JERARQUICA_DTO,
+      epicas: [
+        {
+          ...epicaAzure,
+          caracteristicas: [
+            {
+              ...caracteristica,
+              listaRequisitos: null,
+              historias: [{ ...historia, capacidades: null }],
+            },
+          ],
+        },
+      ],
+    };
+
+    const historiaMapeada = mapearPlanificacionProyecto(dto).elementos[0].hijos[0].hijos[0];
+
+    expect(historiaMapeada.capacidades).toEqual({
+      puedeConsultar: true,
+      puedeEditar: false,
+      puedeEliminar: false,
+      puedeCrearHijo: false,
+      puedeSincronizar: false,
+      soloLectura: false,
+    });
+  });
+
+  it('anula edición, eliminación y creación cuando el elemento es de solo lectura', () => {
+    const epicaAzure = PLANIFICACION_JERARQUICA_DTO.epicas?.[0];
+    const caracteristica = epicaAzure?.caracteristicas[0];
+    const historia = caracteristica?.historias[0];
+    const tarea = historia?.tareas[0];
+    if (!epicaAzure || !caracteristica || !historia || !tarea) {
+      throw new Error('La prueba requiere una tarea base.');
+    }
+    const dto = {
+      ...PLANIFICACION_JERARQUICA_DTO,
+      epicas: [
+        {
+          ...epicaAzure,
+          caracteristicas: [
+            {
+              ...caracteristica,
+              listaRequisitos: null,
+              historias: [
+                {
+                  ...historia,
+                  tareas: [
+                    {
+                      ...tarea,
+                      capacidades: {
+                        ...CAPACIDADES,
+                        puedeEditar: true,
+                        puedeEliminar: true,
+                        puedeCrearHijo: true,
+                        soloLectura: true,
+                      },
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+
+    const tareaMapeada = mapearPlanificacionProyecto(dto).elementos[0].hijos[0].hijos[0].hijos[0];
+
+    expect(tareaMapeada.capacidades).toEqual({
+      puedeConsultar: true,
+      puedeEditar: false,
+      puedeEliminar: false,
+      puedeCrearHijo: false,
+      puedeSincronizar: false,
+      soloLectura: true,
+    });
+  });
+
+  it('adapta los demás motivos de bloqueo de publicación conocidos', () => {
+    const resultado = mapearPlanificacionProyecto({
+      ...PLANIFICACION_DTO,
+      publicacionAzure: {
+        puedePublicar: false,
+        bloqueos: [
+          { motivo: MotivoBloqueoPublicacionAzureDto.VersionHistorica, cantidad: 1 },
+          { motivo: MotivoBloqueoPublicacionAzureDto.SinCaracteristicas, cantidad: 2 },
+          { motivo: MotivoBloqueoPublicacionAzureDto.CaracteristicasSinHistorias, cantidad: 3 },
+        ],
+      },
+    });
+
+    expect(resultado.publicacionAzure.bloqueos).toEqual([
+      { motivo: MotivoBloqueoPublicacionAzure.VersionHistorica, cantidad: 1 },
+      { motivo: MotivoBloqueoPublicacionAzure.SinCaracteristicas, cantidad: 2 },
+      { motivo: MotivoBloqueoPublicacionAzure.CaracteristicasSinHistorias, cantidad: 3 },
+    ]);
+  });
+
+  it('rechaza un motivo de bloqueo de publicación no compatible', () => {
+    expect(() =>
+      mapearPlanificacionProyecto({
+        ...PLANIFICACION_DTO,
+        publicacionAzure: {
+          puedePublicar: false,
+          bloqueos: [
+            { motivo: 'motivoDesconocido' as MotivoBloqueoPublicacionAzureDto, cantidad: 1 },
+          ],
+        },
+      }),
+    ).toThrowError(/Motivo de bloqueo de publicación no compatible/);
+  });
+
+  it('rechaza un elemento cuyo tipo no coincide con el esperado', () => {
+    const epicaAzure = PLANIFICACION_JERARQUICA_DTO.epicas?.[0];
+    if (!epicaAzure) throw new Error('La prueba requiere una épica base.');
+    const dto = {
+      ...PLANIFICACION_JERARQUICA_DTO,
+      epicas: [{ ...epicaAzure, tipo: TipoElementoPlanificacionDto.Tarea as never }],
+    };
+
+    expect(() => mapearPlanificacionProyecto(dto)).toThrowError(
+      /Tipo de elemento de planificación no compatible/,
     );
   });
 });

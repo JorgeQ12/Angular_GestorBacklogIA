@@ -112,4 +112,99 @@ describe('AsistenteIAFlotante', () => {
       fixture.nativeElement.querySelector('.asistente-ia-flotante__activador'),
     );
   });
+
+  it('alterna el panel cerrándolo cuando ya estaba abierto', () => {
+    const fixture = TestBed.createComponent(AsistenteIAFlotante);
+    fixture.componentRef.setInput('contexto', {
+      proyectoId: 10,
+      revisionContexto: 2,
+      seccionActiva: 'necesidad',
+      nombreSeccion: 'Necesidad de negocio',
+    });
+    fixture.detectChanges();
+    const activador = fixture.nativeElement.querySelector(
+      '.asistente-ia-flotante__activador',
+    ) as HTMLButtonElement;
+
+    activador.click();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('app-panel-asistente-ia')).not.toBeNull();
+
+    const instancia = fixture.componentInstance as unknown as { alternar(): void };
+    estado.cargar.calls.reset();
+    instancia.alternar();
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('app-panel-asistente-ia')).toBeNull();
+    expect(estado.cargar).not.toHaveBeenCalled();
+  });
+
+  it('no hace nada al cerrar cuando el panel ya está cerrado', () => {
+    const fixture = TestBed.createComponent(AsistenteIAFlotante);
+    fixture.componentRef.setInput('contexto', {
+      proyectoId: 10,
+      revisionContexto: 2,
+      seccionActiva: 'necesidad',
+      nombreSeccion: 'Necesidad de negocio',
+    });
+    fixture.detectChanges();
+
+    const instancia = fixture.componentInstance as unknown as { cerrar(): void };
+    expect(() => instancia.cerrar()).not.toThrow();
+    expect(fixture.nativeElement.querySelector('app-panel-asistente-ia')).toBeNull();
+  });
+
+  it('cierra el panel al presionar Escape', () => {
+    const fixture = TestBed.createComponent(AsistenteIAFlotante);
+    fixture.componentRef.setInput('contexto', {
+      proyectoId: 10,
+      revisionContexto: 2,
+      seccionActiva: 'necesidad',
+      nombreSeccion: 'Necesidad de negocio',
+    });
+    fixture.detectChanges();
+    (fixture.nativeElement.querySelector(
+      '.asistente-ia-flotante__activador',
+    ) as HTMLButtonElement).click();
+    fixture.detectChanges();
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('app-panel-asistente-ia')).toBeNull();
+  });
+
+  it('delega el envío de mensajes al estado con el contexto vigente', () => {
+    const contexto = {
+      proyectoId: 10,
+      revisionContexto: 2,
+      seccionActiva: 'necesidad',
+      nombreSeccion: 'Necesidad de negocio',
+    };
+    const fixture = TestBed.createComponent(AsistenteIAFlotante);
+    fixture.componentRef.setInput('contexto', contexto);
+    fixture.detectChanges();
+
+    (fixture.componentInstance as unknown as { enviarMensaje(m: string): void }).enviarMensaje(
+      'Hola',
+    );
+
+    expect(estado.enviar).toHaveBeenCalledWith(jasmine.objectContaining(contexto), 'Hola');
+  });
+
+  it('delega el rechazo de propuestas al estado con el proyecto vigente', () => {
+    const fixture = TestBed.createComponent(AsistenteIAFlotante);
+    fixture.componentRef.setInput('contexto', {
+      proyectoId: 10,
+      revisionContexto: 2,
+      seccionActiva: 'necesidad',
+      nombreSeccion: 'Necesidad de negocio',
+    });
+    fixture.detectChanges();
+
+    (fixture.componentInstance as unknown as { rechazarPropuesta(id: number): void })
+      .rechazarPropuesta(7);
+
+    expect(estado.rechazar).toHaveBeenCalledWith(10, 7);
+  });
 });
