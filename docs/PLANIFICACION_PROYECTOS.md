@@ -66,6 +66,12 @@ de entidades Azure son tokens globales; el componente no define decisiones crom�
 búsqueda y la escala son estado local tipado y la obtención de datos se coordina desde su servicio
 de estado.
 
+El árbol comparte el lenguaje visual de sus relaciones: los conectores son segmentados y permanecen
+neutros en reposo. Al señalar una rama o enfocarla con teclado, la ruta activa adopta el color de
+cada categoría y anima el recorrido. El fondo de la fila comienza después del control para conservar
+visible el ramal; el alternador y el punto terminal reciben el mismo acento. La animación se
+desactiva con `prefers-reduced-motion`.
+
 ## Azure DevOps
 
 La publicación del proyecto y la sincronización de la épica principal tienen estados independientes
