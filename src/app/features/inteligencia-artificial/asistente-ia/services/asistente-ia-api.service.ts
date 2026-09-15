@@ -28,7 +28,6 @@ import type {
 /** Encapsula exclusivamente el transporte HTTP del Asistente IA. */
 @Injectable({ providedIn: 'root' })
 export class AsistenteIAApiService {
-
   /** Ejecuta las solicitudes HTTP correspondientes a esta responsabilidad. */
   private readonly http = inject(HttpClient);
 
@@ -39,10 +38,10 @@ export class AsistenteIAApiService {
   public obtenerConversacion(proyectoId: number): Observable<ConversacionAsistenteIA> {
     const params = new HttpParams().set('proyectoId', proyectoId);
     return this.http
-      .get<ResultadoApi<ConversacionAsistenteIADto>>(
-        ENDPOINTS_ASISTENTE_IA.obtenerConversacion,
-        { params, context: this.contextoHttp },
-      )
+      .get<ResultadoApi<ConversacionAsistenteIADto>>(ENDPOINTS_ASISTENTE_IA.obtenerConversacion, {
+        params,
+        context: this.contextoHttp,
+      })
       .pipe(
         map((resultado) => exigirDatosResultadoApi(resultado, 'la conversación del Asistente IA')),
         map(mapearConversacionAsistenteIA),
@@ -58,7 +57,9 @@ export class AsistenteIAApiService {
       proyectoId: contexto.proyectoId,
       revisionContexto: contexto.revisionContexto,
       seccionContexto: contexto.seccionActiva,
+      etiquetaSeccionContexto: contexto.nombreSeccion,
       mensaje: mensaje.trim(),
+      contenidoSeccionTemporalJson: contexto.contenidoSeccionTemporalJson,
     };
 
     return this.http
@@ -77,11 +78,13 @@ export class AsistenteIAApiService {
   public aplicarPropuesta(
     contexto: ContextoAsistenteIA,
     mensajeId: number,
+    contenidoSeccionActualJson: string | null,
   ): Observable<ResultadoResolucionPropuestaIA> {
     const solicitud: AplicarPropuestaAsistenteIASolicitudDto = {
       proyectoId: contexto.proyectoId,
       mensajeId,
       revisionEsperada: contexto.revisionContexto,
+      contenidoSeccionActualJson,
     };
     return this.resolverPropuesta(ENDPOINTS_ASISTENTE_IA.aplicarPropuesta, solicitud);
   }
@@ -98,9 +101,7 @@ export class AsistenteIAApiService {
   /** Resuelve propuesta dentro del flujo actual. */
   private resolverPropuesta(
     endpoint: string,
-    solicitud:
-      | AplicarPropuestaAsistenteIASolicitudDto
-      | RechazarPropuestaAsistenteIASolicitudDto,
+    solicitud: AplicarPropuestaAsistenteIASolicitudDto | RechazarPropuestaAsistenteIASolicitudDto,
   ): Observable<ResultadoResolucionPropuestaIA> {
     return this.http
       .post<ResultadoApi<ResolverPropuestaAsistenteIARespuestaDto>>(endpoint, solicitud, {

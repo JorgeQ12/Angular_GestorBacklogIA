@@ -43,6 +43,19 @@ describe('FormularioObjetivosProyecto', () => {
     });
   });
 
+  it('comunica el borrador temporal de la colección antes de guardarlo', () => {
+    const datosCambiados = jasmine.createSpy();
+    fixture.componentInstance.datosCambiados.subscribe(datosCambiados);
+
+    escribir('#objetivos-general', '  Mejorar trazabilidad  ');
+    escribir('#objetivos-especifico-0', '  Medir tiempos  ');
+
+    expect(datosCambiados).toHaveBeenCalledWith({
+      objetivoGeneral: 'Mejorar trazabilidad',
+      objetivosEspecificos: ['Medir tiempos'],
+    });
+  });
+
   it('limita la colección a ocho objetivos específicos', () => {
     for (let indice = 1; indice < 10; indice += 1) {
       pulsar('.formulario-objetivos__acciones-lista button');

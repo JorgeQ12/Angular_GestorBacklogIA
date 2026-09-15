@@ -40,6 +40,18 @@ describe('FormularioAlcanceProyecto', () => {
     });
   });
 
+  it('comunica el límite editado sin exigir que el otro esté completo', () => {
+    const datosCambiados = jasmine.createSpy();
+    fixture.componentInstance.datosCambiados.subscribe(datosCambiados);
+
+    escribir('#alcance-excluido', '  Integraciones contables  ');
+
+    expect(datosCambiados).toHaveBeenCalledWith({
+      incluido: '',
+      excluido: 'Integraciones contables',
+    });
+  });
+
   it('no admite contenido compuesto únicamente por espacios', () => {
     const guardar = jasmine.createSpy();
     fixture.componentInstance.guardar.subscribe(guardar);

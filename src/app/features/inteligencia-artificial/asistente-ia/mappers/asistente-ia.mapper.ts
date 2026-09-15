@@ -1,20 +1,20 @@
 import type {
   ConversacionAsistenteIADto,
+  DetallePropuestaAsistenteIADto,
   EnviarMensajeAsistenteIARespuestaDto,
   MensajeAsistenteIADto,
+  PropuestaAsistenteIADto,
   ResolverPropuestaAsistenteIARespuestaDto,
 } from '../models/asistente-ia.dto';
 import type {
   ConversacionAsistenteIA,
   DetallePropuestaAsistenteIA,
   MensajeAsistenteIA,
+  PropuestaAsistenteIA,
   RespuestaEnvioAsistenteIA,
   ResultadoResolucionPropuestaIA,
 } from '../models/asistente-ia.model';
-import {
-  EstadoPropuestaAsistenteIA,
-  RolMensajeAsistenteIA,
-} from '../models/asistente-ia.model';
+import { EstadoPropuestaAsistenteIA, RolMensajeAsistenteIA } from '../models/asistente-ia.model';
 
 /** Adapta el historial HTTP a los modelos consumidos por el panel. */
 export function mapearConversacionAsistenteIA(
@@ -59,15 +59,26 @@ function mapearMensajeAsistenteIA(dto: MensajeAsistenteIADto): MensajeAsistenteI
     fechaCreacion: dto.fechaCreacion,
     seccionContexto: dto.seccionContexto,
     revisionContexto: dto.revisionContexto,
-    propuesta: dto.propuesta
-      ? {
-          seccion: dto.propuesta.seccion,
-          resumen: dto.propuesta.resumen,
-          contenidoJson: dto.propuesta.contenidoJson,
-          estado: normalizarEstado(dto.propuesta.estado),
-          detalles: crearDetallesPropuesta(dto.propuesta.seccion, dto.propuesta.contenidoJson),
-        }
-      : null,
+    propuesta: dto.propuesta ? mapearPropuesta(dto.propuesta) : null,
+  };
+}
+
+function mapearPropuesta(dto: PropuestaAsistenteIADto): PropuestaAsistenteIA {
+  return {
+    seccion: exigirTexto(dto.seccion, 'sección'),
+    etiquetaSeccion: exigirTexto(dto.etiquetaSeccion, 'etiqueta de sección'),
+    campoObjetivo: normalizarTextoOpcional(dto.campoObjetivo),
+    etiquetaObjetivo: normalizarTextoOpcional(dto.etiquetaObjetivo),
+    resumen: exigirTexto(dto.resumen, 'resumen'),
+    estado: normalizarEstado(dto.estado),
+    detalles: dto.detalles.map(mapearDetalle),
+  };
+}
+
+function mapearDetalle(dto: DetallePropuestaAsistenteIADto): DetallePropuestaAsistenteIA {
+  return {
+    etiqueta: exigirTexto(dto.etiqueta, 'etiqueta de detalle'),
+    valores: dto.valores.map((valor) => exigirTexto(valor, 'valor de detalle')),
   };
 }
 
@@ -92,66 +103,13 @@ function normalizarEstado(estado: string): EstadoPropuestaAsistenteIA {
   throw new Error(`Estado desconocido en una propuesta del Asistente IA: ${estado}`);
 }
 
-function crearDetallesPropuesta(
-  seccion: string,
-  contenidoJson: string,
-): readonly DetallePropuestaAsistenteIA[] {
-  try {
-    const contenido: unknown = JSON.parse(contenidoJson);
-    switch (seccion.toLocaleLowerCase()) {
-      case 'necesidad':
-        return detallesObjeto(contenido, [
-          ['Proceso actual', 'situacionActual'],
-          ['Problemas', 'problemas'],
-          ['Impacto', 'impacto'],
-        ]);
-      case 'objetivos':
-        return detallesObjeto(contenido, [
-          ['Objetivo general', 'objetivoGeneral'],
-          ['Objetivos específicos', 'objetivosEspecificos'],
-        ]);
-      case 'alcance':
-        return detallesObjeto(contenido, [
-          ['Incluido', 'incluido'],
-          ['Excluido', 'excluido'],
-        ]);
-      case 'roles':
-        return detallesRoles(contenido);
-      default:
-        return [];
-    }
-  } catch {
-    return [];
-  }
+function normalizarTextoOpcional(valor: string | null): string | null {
+  const normalizado = valor?.trim();
+  return normalizado ? normalizado : null;
 }
 
-function detallesObjeto(
-  contenido: unknown,
-  campos: readonly (readonly [string, string])[],
-): readonly DetallePropuestaAsistenteIA[] {
-  if (!esObjeto(contenido)) return [];
-  return campos
-    .map(([etiqueta, clave]) => ({ etiqueta, valores: normalizarValores(contenido[clave]) }))
-    .filter((detalle) => detalle.valores.length > 0);
-}
-
-function detallesRoles(contenido: unknown): readonly DetallePropuestaAsistenteIA[] {
-  if (!Array.isArray(contenido)) return [];
-  return contenido.flatMap((rol, indice) => {
-    if (!esObjeto(rol)) return [];
-    const nombre = typeof rol['nombre'] === 'string' ? rol['nombre'].trim() : '';
-    const descripcion = typeof rol['descripcion'] === 'string' ? rol['descripcion'].trim() : '';
-    if (!nombre && !descripcion) return [];
-    return [{ etiqueta: nombre || `Rol ${indice + 1}`, valores: descripcion ? [descripcion] : [] }];
-  });
-}
-
-function normalizarValores(valor: unknown): readonly string[] {
-  if (typeof valor === 'string') return valor.trim() ? [valor.trim()] : [];
-  if (!Array.isArray(valor)) return [];
-  return valor.filter((item): item is string => typeof item === 'string' && !!item.trim());
-}
-
-function esObjeto(valor: unknown): valor is Record<string, unknown> {
-  return valor !== null && typeof valor === 'object' && !Array.isArray(valor);
+function exigirTexto(valor: string, campo: string): string {
+  const normalizado = valor.trim();
+  if (normalizado) return normalizado;
+  throw new Error(`El contrato del Asistente IA no contiene ${campo}.`);
 }

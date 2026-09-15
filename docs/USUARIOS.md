@@ -12,8 +12,9 @@ navegación del panel. La ruta carga `PaginaUsuarios` de forma diferida.
 Una carga correcta presenta:
 
 - encabezado de Configuración con la acción Crear usuario;
-- tarjeta con total, búsqueda por nombre, correo, identidad Azure o perfil;
-- tabla responsiva con identidad, perfil técnico, límite mensual, estado y fecha de actualización;
+- tarjeta con total y búsqueda remota por nombre, correo, identidad Azure o perfil;
+- tabla responsiva y paginada con identidad, perfil técnico, límite mensual, estado y fecha de
+  actualización;
 - estado vacío diferenciado para una colección sin registros y para una búsqueda sin resultados.
 
 Si falla la consulta de usuarios o perfiles, el error reemplaza toda la composición y permite
@@ -25,16 +26,21 @@ explicación visible.
 
 La capacidad consume el grupo `/api/Usuario`:
 
-| Operación | Método | Contrato |
-| --- | --- | --- |
-| `ObtenerUsuarios` | GET | Envía `IncluirInactivos=true`. |
-| `CrearUsuario` | POST | Envía identidad Azure, datos personales, perfil, límite y estado activo. |
-| `ActualizarUsuario` | PUT | Envía ID local, datos editables, perfil, límite y estado; no envía `IdAzure`. |
-| `InactivarUsuario` | PATCH | Envía `Id` como query param y cuerpo nulo. |
+| Operación           | Método | Contrato                                                                      |
+| ------------------- | ------ | ----------------------------------------------------------------------------- |
+| `ObtenerUsuarios`   | GET    | Envía `incluirInactivos=true`, `busqueda`, `paginaActual` y `paginaTamano`.   |
+| `CrearUsuario`      | POST   | Envía identidad Azure, datos personales, perfil, límite y estado activo.      |
+| `ActualizarUsuario` | PUT    | Envía ID local, datos editables, perfil, límite y estado; no envía `IdAzure`. |
+| `InactivarUsuario`  | PATCH  | Envía `Id` como query param y cuerpo nulo.                                    |
 
 `IdAzure` identifica el cruce con Azure DevOps, es obligatorio al crear y no se modifica durante la
 edición. Nombre y correo admiten hasta 200 y 320 caracteres. El perfil técnico es obligatorio y
 procede del catálogo activo `usuarios_perfil_tecnico`.
+
+El listado solicita diez registros por página. La búsqueda se aplica en el backend sobre nombre,
+correo, identidad Azure, nombre del perfil y código del perfil; al cambiar el criterio se regresa a
+la primera página. Una consulta nueva cancela la anterior para impedir que una respuesta tardía
+reemplace el criterio vigente.
 
 `limiteTokensMensual` acepta un entero mayor o igual que cero. `null` significa que no existe un
 límite individual configurado; cero es un valor explícito y no se transforma en ausencia de límite.
@@ -43,9 +49,10 @@ expone todavía esa medición.
 
 ## Estado y mutaciones
 
-La página conserva una fotografía confirmada por el backend. Crear, editar, activar o inactivar
-reemplaza un registro local solamente después de una respuesta exitosa. Un fallo mantiene abierto
-el editor y conserva los valores ingresados.
+La página conserva una fotografía paginada confirmada por el backend. Crear, editar, activar o
+inactivar recarga la página vigente solamente después de una respuesta exitosa para respetar el
+orden y el total calculados en servidor. Un fallo mantiene abierto el editor y conserva los valores
+ingresados.
 
 El formulario completo se deshabilita durante el guardado y cada función vuelve a comprobar el
 bloqueo para impedir envíos duplicados por clic, teclado o llamadas programáticas. Inactivar exige
@@ -63,9 +70,10 @@ ejecuta cambios después de abandonar la ruta.
 
 ## Verificación
 
-Las pruebas cubren mapeo, los cuatro endpoints consumidos, identidad inmutable, nulabilidad, formulario válido
-e inválido, límites enteros, bloqueo remoto, búsqueda, estados vacíos, error y reintento,
-conservación ante fallos, confirmación de inactivación y cancelación al destruir la página.
+Las pruebas cubren mapeo paginado, los cuatro endpoints consumidos, parámetros de consulta,
+identidad inmutable, nulabilidad, formulario válido e inválido, límites enteros, bloqueo remoto,
+búsqueda, navegación entre páginas, estados vacíos, error y reintento, conservación ante fallos,
+confirmación de inactivación y cancelación al destruir la página.
 
 Una verificación completa ejecuta:
 

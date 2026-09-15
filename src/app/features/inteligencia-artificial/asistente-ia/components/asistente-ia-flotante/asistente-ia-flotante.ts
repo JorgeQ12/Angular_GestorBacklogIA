@@ -26,7 +26,6 @@ import { PanelAsistenteIA } from '../panel-asistente-ia/panel-asistente-ia';
   styleUrl: './asistente-ia-flotante.css',
 })
 export class AsistenteIAFlotante {
-
   /** Coordina la finalización de recursos cuando se destruye la instancia. */
   private readonly destroyRef = inject(DestroyRef);
 

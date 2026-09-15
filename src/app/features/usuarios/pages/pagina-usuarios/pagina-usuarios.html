@@ -43,7 +43,7 @@
           <div>
             <h2 id="titulo-listado-usuarios" class="ui-card__title">Personas registradas</h2>
             <p class="usuarios__descripcion">
-              {{ usuariosVisibles().length }} de {{ usuarios().length }} usuarios
+              {{ usuarios().length }} de {{ pagina()?.totalRegistros ?? 0 }} usuarios
             </p>
           </div>
         </div>
@@ -64,14 +64,17 @@
           </div>
         }
 
-        @if (usuariosVisibles().length) {
+        @if (usuarios().length && pagina(); as paginaActual) {
           <app-tabla-usuarios
-            [usuarios]="usuariosVisibles()"
+            [usuarios]="usuarios()"
+            [paginaActual]="paginaActual.paginaActual"
+            [totalPaginas]="paginaActual.totalPaginas"
             [bloqueado]="bloqueado()"
             (editarUsuario)="editar($event)"
             (cambiarEstadoUsuario)="cambiarEstado($event)"
+            (paginaCambiada)="cambiarPagina($event)"
           />
-        } @else if (usuarios().length) {
+        } @else if (busqueda()) {
           <app-estado-vacio
             icono="buscar"
             titulo="Sin coincidencias"

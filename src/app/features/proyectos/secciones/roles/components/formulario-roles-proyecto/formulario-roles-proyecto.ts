@@ -43,7 +43,6 @@ import { RolProyecto, RolesProyecto } from '../../models/roles-proyecto.model';
   styleUrl: './formulario-roles-proyecto.css',
 })
 export class FormularioRolesProyecto {
-
   /** Construye los controles reactivos administrados por el componente. */
   private readonly constructorFormulario = inject(NonNullableFormBuilder);
 
@@ -64,6 +63,9 @@ export class FormularioRolesProyecto {
 
   /** Entrega Roles válidos y normalizados al flujo consumidor. */
   public readonly guardar = output<RolesProyecto>();
+
+  /** Comunica la fotografía vigente aunque la sección todavía esté incompleta. */
+  public readonly datosCambiados = output<RolesProyecto>();
 
   /** Conserva mensajes nombre para coordinar esta responsabilidad. */
   protected readonly mensajesNombre = MENSAJES_NOMBRE_ROL_PROYECTO;
@@ -87,7 +89,10 @@ export class FormularioRolesProyecto {
   public constructor() {
     this.formulario.controls.roles.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.validarNombresRepetidos());
+      .subscribe(() => {
+        this.validarNombresRepetidos();
+        this.datosCambiados.emit(this.obtenerDatosTemporales());
+      });
 
     effect(() => {
       this.modo();
@@ -131,13 +136,18 @@ export class FormularioRolesProyecto {
       return;
     }
 
+    this.guardar.emit(this.obtenerDatosTemporales());
+  }
+
+  /** Construye el contrato canónico a partir de todos los controles, incluso si están bloqueados. */
+  private obtenerDatosTemporales(): RolesProyecto {
     const valores = this.formulario.getRawValue();
-    this.guardar.emit({
+    return {
       roles: valores.roles.map((rol) => ({
         nombre: rol.nombre.trim(),
         descripcion: rol.descripcion.trim(),
       })),
-    });
+    };
   }
 
   /** Presenta la colección persistida sin conservar controles obsoletos. */

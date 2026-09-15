@@ -44,7 +44,9 @@
             }
           </td>
           <td data-label="Límite mensual">
-            <span class="ui-table__secondary-text">{{ presentarLimite(usuario.limiteTokensMensual) }}</span>
+            <span class="ui-table__secondary-text">{{
+              presentarLimite(usuario.limiteTokensMensual)
+            }}</span>
           </td>
           <td data-label="Estado">
             <app-indicador-estado
@@ -55,7 +57,7 @@
           </td>
           <td data-label="Actualización">
             <span class="ui-table__secondary-text">
-              {{ (usuario.fechaActualizacion || usuario.fechaCreacion) | fecha: 'breve' }}
+              {{ usuario.fechaActualizacion || usuario.fechaCreacion | fecha: 'breve' }}
             </span>
           </td>
           <td class="ui-table__actions" data-label="Acciones">
@@ -95,3 +97,29 @@
     </tbody>
   </table>
 </app-region-desplazable>
+
+@if (totalPaginas() > 1) {
+  <footer class="tabla-usuarios__paginacion" aria-label="Paginación de usuarios">
+    <button
+      type="button"
+      class="ui-button ui-button--text ui-button--md"
+      [disabled]="bloqueado() || paginaActual() <= 1"
+      (click)="anterior()"
+    >
+      <app-icono class="ui-button__icon" nombre="volver" />
+      Anterior
+    </button>
+    <span>
+      Página <strong>{{ paginaActual() }}</strong> de <strong>{{ totalPaginas() }}</strong>
+    </span>
+    <button
+      type="button"
+      class="ui-button ui-button--text ui-button--md"
+      [disabled]="bloqueado() || paginaActual() >= totalPaginas()"
+      (click)="siguiente()"
+    >
+      Siguiente
+      <app-icono class="ui-button__icon ui-button__icon--trailing" nombre="continuar" />
+    </button>
+  </footer>
+}

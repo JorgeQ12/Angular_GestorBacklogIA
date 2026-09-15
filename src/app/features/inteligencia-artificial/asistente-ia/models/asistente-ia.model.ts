@@ -20,8 +20,10 @@ export interface DetallePropuestaAsistenteIA {
 /** Conserva el cambio sugerido y su estado de resolución. */
 export interface PropuestaAsistenteIA {
   readonly seccion: string;
+  readonly etiquetaSeccion: string;
+  readonly campoObjetivo: string | null;
+  readonly etiquetaObjetivo: string | null;
   readonly resumen: string;
-  readonly contenidoJson: string;
   readonly estado: EstadoPropuestaAsistenteIA;
   readonly detalles: readonly DetallePropuestaAsistenteIA[];
 }
@@ -51,6 +53,7 @@ export interface ContextoAsistenteIA {
   readonly revisionContexto: number;
   readonly seccionActiva: string;
   readonly nombreSeccion: string;
+  readonly contenidoSeccionTemporalJson: string | null;
 }
 
 /** Entrega los dos turnos confirmados después de consultar el modelo. */

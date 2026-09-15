@@ -44,6 +44,23 @@
   white-space: nowrap;
 }
 
+.tabla-usuarios__paginacion {
+  display: flex;
+  min-height: var(--control-height-xl);
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border-top: var(--border-width) solid var(--card-divider);
+  background: var(--card-footer-surface);
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.tabla-usuarios__paginacion strong {
+  color: var(--text-primary);
+}
+
 @media (max-width: 900px) {
   .tabla-usuarios__desplazamiento {
     max-height: none;
@@ -88,5 +105,13 @@
 
   .tabla-usuarios .ui-table__action-group {
     justify-content: flex-start;
+  }
+}
+
+@media (max-width: 640px) {
+  .tabla-usuarios__paginacion {
+    align-items: stretch;
+    flex-direction: column;
+    text-align: center;
   }
 }

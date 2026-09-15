@@ -43,13 +43,17 @@ interface ContextoAsistenteIA {
   revisionContexto: number;
   seccionActiva: string;
   nombreSeccion: string;
+  contenidoSeccionTemporalJson: string | null;
 }
 ```
 
 La capacidad IA no importa modelos, mappers ni formularios de Proyectos. La página de creación,
-como anfitriona, traduce su paso vigente a ese contrato genérico. Después de aplicar una propuesta
-emite `contextoActualizado` con el identificador del proyecto que originó la operación; la página
-solo acepta el evento si ese proyecto continúa activo y recarga el borrador mediante
+como anfitriona, traduce su paso vigente a ese contrato genérico. Los formularios de Necesidad,
+Objetivos, Alcance y Roles emiten además su fotografía tipada mientras se escribe; sus pasos la
+propagan y la página utiliza los mappers canónicos para entregarla al asistente, sin guardarla ni
+acoplar los formularios a IA. Después de aplicar una propuesta emite `contextoActualizado` con el
+identificador del proyecto que originó la operación; la página solo acepta el evento si ese
+proyecto continúa activo y recarga el borrador mediante
 `EstadoCreacionProyectoService` y los formularios se hidratan desde la fotografía confirmada por
 el backend.
 
@@ -85,7 +89,10 @@ Las operaciones viven bajo `/api/GeneracionIA/Asistente`:
 | `RechazarPropuesta`   | POST   | Marcar explícitamente que la propuesta no se utilizará.             |
 
 Todas las respuestas conservan `ResultadoApi<T>`. El frontend utiliza DTO, mapper y modelos
-separados y no expone el JSON técnico directamente en el panel.
+separados. El contrato público de una propuesta no expone `ContenidoJson`: el backend entrega la
+etiqueta legible de la sección, la etiqueta opcional del campo objetivo y los detalles ya
+preparados para presentación. El JSON canónico permanece como dato interno persistido porque solo
+el backend debe interpretarlo y aplicarlo.
 Los roles y estados recibidos se validan de forma exhaustiva; un valor externo desconocido produce
 un error de integración y nunca se convierte implícitamente en una propuesta pendiente.
 La respuesta de aplicar o rechazar también debe identificar el mismo proyecto que originó la
@@ -93,17 +100,26 @@ solicitud antes de modificar el historial local o pedir una recarga del borrador
 
 ## Propuestas seguras
 
-La primera versión permite propuestas aplicables únicamente para secciones narrativas con un
-contrato canónico estable:
+Las capacidades aplicables se registran en el backend mediante una estrategia por sección. La
+versión actual incluye los siguientes contratos canónicos estables:
 
 - `necesidad`: `situacionActual`, `problemas`, `impacto`.
 - `objetivos`: `objetivoGeneral`, `objetivosEspecificos`.
 - `alcance`: `incluido`, `excluido`.
 - `roles`: colección de `nombre` y `descripcion`.
 
-En Equipo, Flujo y cualquier otra sección el asistente puede orientar, pero la respuesta
-estructurada debe devolver la propuesta en `null`. Ampliar esta lista exige definir primero un
-contrato de aplicación seguro para la sección; no se acepta JSON arbitrario del modelo.
+El usuario puede pedir naturalmente una mejora integral o una ayuda puntual, por ejemplo
+“Ayúdame solo con alcance excluido”; no se agregan activadores junto a cada campo. Una propuesta
+puntual identifica `campoObjetivo`, muestra solo ese cambio como “Sugerencia puntual” y conserva el
+resto del contenido temporal sin modificaciones. Los campos admitidos son `situacionActual`,
+`problemas`, `impacto`, `objetivoGeneral`, `objetivosEspecificos`, `incluido`, `excluido` y la
+colección `roles`.
+
+En Equipo, Flujo y cualquier otra sección sin estrategia aplicable el asistente puede orientar,
+pero la respuesta estructurada debe devolver la propuesta en `null`. Ampliar las propuestas a una
+nueva sección exige agregar una implementación de `IEstrategiaSeccionAsistenteIA` con su identidad,
+campos, contrato, reglas, normalización, lectura y reemplazo. El registro por reflexión la incorpora
+al catálogo sin modificar manejadores, prompt ni frontend; no se acepta JSON arbitrario del modelo.
 
 Antes de persistir una propuesta, el backend comprueba la sección y normaliza el JSON a su contrato
 canónico. Al aplicarla vuelve a validar:
@@ -115,14 +131,22 @@ canónico. Al aplicarla vuelve a validar:
 
 La actualización reemplaza solamente la sección propuesta, conserva las demás propiedades del
 borrador, incrementa `RevisionEdicion` y cambia el estado de la propuesta dentro de la misma
-transacción.
+transacción. Para una sugerencia puntual, el frontend envía la fotografía viva únicamente si la
+propuesta pertenece a la sección visible. El backend toma solo el campo objetivo de la propuesta y
+lo combina con los campos hermanos de esa fotografía; si ya se cambió de sección, usa la fotografía
+persistida. Así una propuesta antigua no sobrescribe ediciones locales posteriores.
 
 ## Contexto del modelo y seguridad
 
-`AsistenteIAProyectoPrompt.md` es la instrucción estable del sistema. La aplicación entrega una fotografía
-autoritativa del borrador, la sección activa, la revisión y un máximo de doce mensajes recientes.
-Proyecto, historial y mensaje se serializan como datos no confiables; el prompt prohíbe seguir
-instrucciones incrustadas que intenten reemplazar las reglas o revelar configuración interna.
+`AsistenteIAProyectoPrompt.md` es una instrucción estable y agnóstica de las secciones. En cada
+turno el catálogo del backend incorpora solo la capacidad activa: identidad, campos, contrato JSON,
+reglas y permiso para generar propuestas. También se entregan una fotografía autoritativa del
+borrador, el contenido temporal del formulario cuando existe, la revisión y hasta doce mensajes
+recientes. Proyecto, historial, contenido temporal y mensaje se serializan como datos no confiables;
+el prompt prohíbe seguir instrucciones incrustadas que intenten reemplazar las reglas o revelar
+configuración interna. Cuando el contexto es suficiente debe responder directamente; solo puede
+formular una pregunta agrupada si falta información indispensable y no vuelve a solicitar campos
+ya diligenciados.
 
 No se envían secretos, PAT de Azure, credenciales ni configuración del proveedor. La conversación
 completa permanece en SQL Server; el límite de historial enviado al modelo controla el tamaño de
@@ -141,9 +165,9 @@ El panel usa un formulario reactivo tipado, límite de 4000 caracteres, región 
 mensajes, etiquetas accesibles y botones nativos. La API del formulario deshabilita el compositor
 durante carga, error, envío o resolución de propuestas, y la función de envío verifica las mismas
 precondiciones para cubrir clic, submit y teclado. `Enter` envía el mensaje, `Shift + Enter` agrega
-una nueva línea y el compositor se limpia al aceptar el envío porque el turno ya se representa
-como pendiente en el historial. La propuesta requiere los botones visibles Aplicar o Rechazar;
-cerrar el panel nunca resuelve una propuesta.
+una nueva línea y el compositor restablece tanto su valor como el estado de envío al aceptar el
+mensaje, porque el turno ya se representa como pendiente en el historial. La propuesta requiere
+los botones visibles Aplicar o Rechazar; cerrar el panel nunca resuelve una propuesta.
 
 ## Verificación
 
@@ -154,4 +178,4 @@ cerrar el panel nunca resuelve una propuesta.
 - Probar el estado ante error, reintento, operaciones superpuestas, respuestas tardías y cambio de
   proyecto.
 - Probar visibilidad desde Necesidad y recarga exclusiva del borrador que aplicó la propuesta.
-- Compilar frontend y backend y validar la migración de EF Core.
+- Compilar frontend y backend; esta capacidad no requiere cambios de esquema ni migraciones.

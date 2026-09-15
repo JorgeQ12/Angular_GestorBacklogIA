@@ -34,6 +34,8 @@ export class PasoNecesidadProyecto {
   public readonly cancelar = output<void>();
   /** Entrega la necesidad validada para persistirla. */
   public readonly guardar = output<NecesidadProyecto>();
+  /** Comunica el contenido temporal utilizado como contexto por consumidores externos. */
+  public readonly datosCambiados = output<NecesidadProyecto>();
   /** Comunica la versión seleccionada por el usuario. */
   public readonly versionCambiada = output<number>();
 

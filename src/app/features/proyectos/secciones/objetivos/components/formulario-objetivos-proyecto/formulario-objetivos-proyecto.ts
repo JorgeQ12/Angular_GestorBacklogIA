@@ -1,12 +1,14 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   computed,
   effect,
   inject,
   input,
   output,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   FormControl,
   NonNullableFormBuilder,
@@ -44,9 +46,11 @@ import { ObjetivosProyecto } from '../../models/objetivos-proyecto.model';
   styleUrl: './formulario-objetivos-proyecto.css',
 })
 export class FormularioObjetivosProyecto {
-
   /** Construye los controles reactivos administrados por el componente. */
   private readonly constructorFormulario = inject(NonNullableFormBuilder);
+
+  /** Coordina la finalización de la observación del borrador temporal. */
+  private readonly destroyRef = inject(DestroyRef);
 
   /** Identifica el formulario para permitir acciones externas mediante el atributo form. */
   public readonly idFormulario = input<string | null>(null);
@@ -62,6 +66,9 @@ export class FormularioObjetivosProyecto {
 
   /** Entrega Objetivos válidos y normalizados al flujo consumidor. */
   public readonly guardar = output<ObjetivosProyecto>();
+
+  /** Comunica la fotografía vigente aunque la sección todavía esté incompleta. */
+  public readonly datosCambiados = output<ObjetivosProyecto>();
 
   /** Conserva límites para coordinar esta responsabilidad. */
   protected readonly limites = LIMITES_OBJETIVOS_PROYECTO;
@@ -94,6 +101,10 @@ export class FormularioObjetivosProyecto {
   }
 
   public constructor() {
+    this.formulario.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.datosCambiados.emit(this.obtenerDatosTemporales()));
+
     effect(() => {
       this.modo();
       const datos = this.datosIniciales();
@@ -137,11 +148,16 @@ export class FormularioObjetivosProyecto {
       return;
     }
 
+    this.guardar.emit(this.obtenerDatosTemporales());
+  }
+
+  /** Construye el contrato canónico a partir de todos los controles, incluso si están bloqueados. */
+  private obtenerDatosTemporales(): ObjetivosProyecto {
     const valores = this.formulario.getRawValue();
-    this.guardar.emit({
+    return {
       objetivoGeneral: valores.objetivoGeneral.trim(),
       objetivosEspecificos: valores.objetivosEspecificos.map((objetivo) => objetivo.trim()),
-    });
+    };
   }
 
   /** Presenta una fotografía persistida sin conservar controles obsoletos. */

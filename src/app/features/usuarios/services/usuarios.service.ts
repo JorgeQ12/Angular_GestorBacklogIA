@@ -2,26 +2,35 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { exigirDatosResultadoApi } from '../../../core/http/mappers/resultado-api.mapper';
+import type { PaginadoDto } from '../../../core/http/models/paginado.dto';
 import type { ResultadoApi } from '../../../core/http/models/resultado-api.model';
 import { ENDPOINTS_USUARIOS as E } from '../config/endpoints-usuarios.config';
-import { mapearUsuario } from '../mappers/usuario.mapper';
+import { mapearPaginaUsuarios, mapearUsuario } from '../mappers/usuario.mapper';
 import type { UsuarioDto } from '../models/usuario.dto';
-import type { DatosUsuario, Usuario } from '../models/usuario.model';
+import type {
+  ConsultaUsuarios,
+  DatosUsuario,
+  PaginaUsuarios,
+  Usuario,
+} from '../models/usuario.model';
 
 /** Ejecuta las operaciones administrativas de usuarios mediante la carga HTTP global. */
 @Injectable({ providedIn: 'root' })
 export class UsuariosService {
-
   /** Ejecuta las solicitudes HTTP correspondientes a esta responsabilidad. */
   private readonly http = inject(HttpClient);
 
-  /** Recupera la fotografía completa para administrar activos e inactivos. */
-  public obtenerTodos(): Observable<readonly Usuario[]> {
+  /** Recupera una página de usuarios según el criterio administrativo vigente. */
+  public obtenerTodos(consulta: ConsultaUsuarios): Observable<PaginaUsuarios> {
+    let parametros = new HttpParams()
+      .set('incluirInactivos', consulta.incluirInactivos)
+      .set('paginaActual', consulta.paginaActual)
+      .set('paginaTamano', consulta.paginaTamano);
+    if (consulta.busqueda) parametros = parametros.set('busqueda', consulta.busqueda);
+
     return this.http
-      .get<ResultadoApi<UsuarioDto[]>>(E.obtenerUsuarios, {
-        params: new HttpParams().set('IncluirInactivos', true),
-      })
-      .pipe(map((r) => exigirDatosResultadoApi(r, 'los usuarios').map(mapearUsuario)));
+      .get<ResultadoApi<PaginadoDto<UsuarioDto>>>(E.obtenerUsuarios, { params: parametros })
+      .pipe(map((r) => mapearPaginaUsuarios(exigirDatosResultadoApi(r, 'los usuarios'))));
   }
 
   /** Crea o actualiza un usuario respetando la inmutabilidad de IdAzure. */

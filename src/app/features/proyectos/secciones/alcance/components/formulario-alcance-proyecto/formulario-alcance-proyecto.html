@@ -8,7 +8,7 @@
   <div class="formulario-alcance__contenido">
     <div class="ui-field">
       <div class="formulario-alcance__label">
-        <label class="ui-label" for="alcance-incluido">Incluido en el proyecto</label>
+        <label class="ui-label" for="alcance-incluido">Alcance Incluido</label>
         @if (!esSoloLectura()) {
           <span>{{ formulario.controls.incluido.value.length }}/{{ limites.incluido }}</span>
         }
@@ -28,7 +28,7 @@
 
     <div class="ui-field">
       <div class="formulario-alcance__label">
-        <label class="ui-label" for="alcance-excluido">Fuera del alcance</label>
+        <label class="ui-label" for="alcance-excluido">Alcance Excluido</label>
         @if (!esSoloLectura()) {
           <span>{{ formulario.controls.excluido.value.length }}/{{ limites.excluido }}</span>
         }

@@ -138,15 +138,25 @@
             @if (mensaje.propuesta; as propuesta) {
               <section
                 class="propuesta-ia"
-                [attr.aria-label]="'Propuesta para ' + propuesta.seccion"
+                [attr.aria-label]="'Propuesta para ' + propuesta.etiquetaSeccion"
               >
                 <div class="propuesta-ia__titulo">
                   <span class="propuesta-ia__icono" aria-hidden="true">
                     <app-icono nombre="asistenteIA" />
                   </span>
                   <div>
-                    <span class="propuesta-ia__etiqueta">Sugerencia estructurada</span>
-                    <strong>Propuesta para {{ propuesta.seccion }}</strong>
+                    <span class="propuesta-ia__etiqueta">
+                      {{
+                        propuesta.campoObjetivo ? 'Sugerencia puntual' : 'Sugerencia estructurada'
+                      }}
+                    </span>
+                    <strong>
+                      @if (propuesta.etiquetaObjetivo; as etiquetaObjetivo) {
+                        Sugerencia para {{ etiquetaObjetivo }}
+                      } @else {
+                        Propuesta para {{ propuesta.etiquetaSeccion }}
+                      }
+                    </strong>
                     <p>{{ propuesta.resumen }}</p>
                   </div>
                 </div>
@@ -173,7 +183,7 @@
                       (click)="propuestaAplicada.emit(mensaje.id)"
                     >
                       <app-icono class="ui-button__icon" nombre="confirmar" />
-                      Aplicar propuesta
+                      {{ propuesta.campoObjetivo ? 'Aplicar sugerencia' : 'Aplicar propuesta' }}
                     </button>
                     <button
                       type="button"
@@ -198,8 +208,12 @@
                     />
                     {{
                       propuesta.estado === estadosPropuesta.Aplicada
-                        ? 'Propuesta aplicada'
-                        : 'Propuesta rechazada'
+                        ? propuesta.campoObjetivo
+                          ? 'Sugerencia aplicada'
+                          : 'Propuesta aplicada'
+                        : propuesta.campoObjetivo
+                          ? 'Sugerencia rechazada'
+                          : 'Propuesta rechazada'
                     }}
                   </p>
                 }

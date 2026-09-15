@@ -34,6 +34,8 @@ export class PasoObjetivosProyecto {
   public readonly cancelar = output<void>();
   /** Entrega los objetivos validados para persistirlos. */
   public readonly guardar = output<ObjetivosProyecto>();
+  /** Comunica el contenido temporal utilizado como contexto por consumidores externos. */
+  public readonly datosCambiados = output<ObjetivosProyecto>();
   /** Comunica la versión seleccionada por el usuario. */
   public readonly versionCambiada = output<number>();
 

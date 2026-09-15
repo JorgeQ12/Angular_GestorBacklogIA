@@ -45,6 +45,19 @@ describe('FormularioNecesidadProyecto', () => {
     });
   });
 
+  it('comunica el borrador temporal aunque todavía existan campos vacíos', () => {
+    const datosCambiados = jasmine.createSpy();
+    fixture.componentInstance.datosCambiados.subscribe(datosCambiados);
+
+    escribir('#necesidad-impacto', '  Retrasos operativos  ');
+
+    expect(datosCambiados).toHaveBeenCalledWith({
+      situacionActual: '',
+      problemas: '',
+      impacto: 'Retrasos operativos',
+    });
+  });
+
   it('no admite respuestas compuestas únicamente por espacios', () => {
     const guardar = jasmine.createSpy();
     fixture.componentInstance.guardar.subscribe(guardar);

@@ -6,7 +6,10 @@ import { CatalogosService } from '../../../../core/catalogos/services/catalogos.
 import { MensajesService } from '../../../../core/mensajes/services/mensajes.service';
 import { NotificadorErroresApiService } from '../../../../core/mensajes/services/notificador-errores-api.service';
 import { EditorUsuario } from '../../components/editor-usuario/editor-usuario';
-import type { Usuario } from '../../models/usuario.model';
+import type {
+  PaginaUsuarios as ResultadoPaginaUsuarios,
+  Usuario,
+} from '../../models/usuario.model';
 import { UsuariosService } from '../../services/usuarios.service';
 import { PaginaUsuarios } from './pagina-usuarios';
 
@@ -43,7 +46,7 @@ describe('Página de usuarios', () => {
         espia.and.stub();
       },
     );
-    api.obtenerTodos.and.returnValue(of([usuario]));
+    api.obtenerTodos.and.returnValue(of(crearPagina([usuario])));
     catalogos.obtenerOpciones.and.returnValue(
       of([{ id: 32, nombre: 'Arquitectura', descripcion: 'Diseño técnico' }]),
     );
@@ -69,7 +72,12 @@ describe('Página de usuarios', () => {
     const fixture = crear();
     const root = fixture.nativeElement as HTMLElement;
 
-    expect(api.obtenerTodos).toHaveBeenCalledTimes(1);
+    expect(api.obtenerTodos).toHaveBeenCalledOnceWith({
+      busqueda: '',
+      incluirInactivos: true,
+      paginaActual: 1,
+      paginaTamano: 10,
+    });
     expect(catalogos.obtenerOpciones).toHaveBeenCalledTimes(1);
     expect(root.textContent).toContain('Ada Lovelace');
     expect(root.textContent).toContain('Arquitectura');
@@ -80,9 +88,10 @@ describe('Página de usuarios', () => {
     expect(botonCrear?.classList).toContain('ui-button--on-inverse');
   });
 
-  it('filtra por correo, identidad y perfil desde el buscador compartido', () => {
-    api.obtenerTodos.and.returnValue(
-      of([usuario, { ...usuario, id: 8, nombre: 'Grace Hopper', correo: 'grace@empresa.com' }]),
+  it('reinicia la paginación y consulta el backend al buscar', async () => {
+    const grace = { ...usuario, id: 8, nombre: 'Grace Hopper', correo: 'grace@empresa.com' };
+    api.obtenerTodos.and.callFake((consulta: { busqueda: string }) =>
+      of(consulta.busqueda ? crearPagina([grace]) : crearPagina([usuario, grace], 12, 2)),
     );
     const fixture = crear();
     const buscador = fixture.nativeElement.querySelector(
@@ -90,15 +99,25 @@ describe('Página de usuarios', () => {
     ) as HTMLInputElement;
     buscador.value = 'grace@empresa.com';
     buscador.dispatchEvent(new Event('input', { bubbles: true }));
+    await esperar(350);
     fixture.detectChanges();
 
+    expect(api.obtenerTodos).toHaveBeenCalledWith({
+      busqueda: 'grace@empresa.com',
+      incluirInactivos: true,
+      paginaActual: 1,
+      paginaTamano: 10,
+    });
     expect(fixture.nativeElement.textContent).toContain('Grace Hopper');
     expect(fixture.nativeElement.textContent).not.toContain('Ada Lovelace');
-    expect(fixture.nativeElement.textContent).toContain('1 de 2 usuarios');
+    expect(fixture.nativeElement.textContent).toContain('1 de 1 usuarios');
   });
 
   it('reemplaza toda la composición por un error reintentable cuando falla la carga', () => {
-    api.obtenerTodos.and.returnValues(throwError(() => new Error('fallo')), of([usuario]));
+    api.obtenerTodos.and.returnValues(
+      throwError(() => new Error('fallo')),
+      of(crearPagina([usuario])),
+    );
     const fixture = crear();
     const root = fixture.nativeElement as HTMLElement;
 
@@ -117,9 +136,9 @@ describe('Página de usuarios', () => {
     catalogos.obtenerOpciones.and.returnValue(of([]));
     const fixture = crear();
     const root = fixture.nativeElement as HTMLElement;
-    const boton = Array.from(
-      root.querySelectorAll<HTMLButtonElement>('button'),
-    ).find((actual) => actual.textContent?.includes('Crear usuario'))!;
+    const boton = Array.from(root.querySelectorAll<HTMLButtonElement>('button')).find((actual) =>
+      actual.textContent?.includes('Crear usuario'),
+    )!;
 
     expect(boton.disabled).toBe(true);
     expect(fixture.nativeElement.textContent).toContain('No hay perfiles técnicos activos');
@@ -131,7 +150,8 @@ describe('Página de usuarios', () => {
     const fixture = crear();
     pulsar(fixture.nativeElement, 'Crear usuario');
     fixture.detectChanges();
-    const editor = fixture.debugElement.query(By.directive(EditorUsuario)).componentInstance as EditorUsuario;
+    const editor = fixture.debugElement.query(By.directive(EditorUsuario))
+      .componentInstance as EditorUsuario;
     const formulario = Reflect.get(editor, 'formulario') as FormGroup;
     formulario.setValue({
       idAzure: 'azure-8',
@@ -148,9 +168,9 @@ describe('Página de usuarios', () => {
     fixture.detectChanges();
 
     expect(api.guardar).toHaveBeenCalledTimes(1);
-    expect((fixture.nativeElement.querySelector('#usuario-nombre') as HTMLInputElement).disabled).toBe(
-      true,
-    );
+    expect(
+      (fixture.nativeElement.querySelector('#usuario-nombre') as HTMLInputElement).disabled,
+    ).toBe(true);
     pendiente.error(new Error('conflicto'));
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('app-editor-usuario')).not.toBeNull();
@@ -158,10 +178,16 @@ describe('Página de usuarios', () => {
   });
 
   it('confirma la inactivación y aplica la respuesta del backend', async () => {
+    api.obtenerTodos.and.returnValues(
+      of(crearPagina([usuario])),
+      of(crearPagina([{ ...usuario, activo: false }])),
+    );
     api.inactivar.and.returnValue(of({ ...usuario, activo: false }));
     const fixture = crear();
     (
-      fixture.nativeElement.querySelector('[aria-label="Inactivar Ada Lovelace"]') as HTMLButtonElement
+      fixture.nativeElement.querySelector(
+        '[aria-label="Inactivar Ada Lovelace"]',
+      ) as HTMLButtonElement
     ).click();
     await fixture.whenStable();
     fixture.detectChanges();
@@ -171,8 +197,30 @@ describe('Página de usuarios', () => {
     expect(fixture.nativeElement.textContent).toContain('Inactivo');
   });
 
+  it('consulta la página solicitada desde la tabla', () => {
+    api.obtenerTodos.and.returnValues(
+      of(crearPagina([usuario], 11, 2)),
+      of(crearPagina([{ ...usuario, id: 8, nombre: 'Grace Hopper' }], 11, 2, 2)),
+    );
+    const fixture = crear();
+    const siguiente = Array.from(
+      (fixture.nativeElement as HTMLElement).querySelectorAll<HTMLButtonElement>('button'),
+    ).find((boton) => boton.textContent?.includes('Siguiente'))!;
+
+    siguiente.click();
+    fixture.detectChanges();
+
+    expect(api.obtenerTodos).toHaveBeenCalledWith({
+      busqueda: '',
+      incluirInactivos: true,
+      paginaActual: 2,
+      paginaTamano: 10,
+    });
+    expect(fixture.nativeElement.textContent).toContain('Grace Hopper');
+  });
+
   it('cancela la consulta al destruir la página', () => {
-    const consulta = new Subject<Usuario[]>();
+    const consulta = new Subject<ResultadoPaginaUsuarios>();
     api.obtenerTodos.and.returnValue(consulta);
     const fixture = crear();
     expect(consulta.observed).toBe(true);
@@ -180,6 +228,25 @@ describe('Página de usuarios', () => {
     expect(consulta.observed).toBe(false);
   });
 });
+
+function crearPagina(
+  usuarios: readonly Usuario[],
+  totalRegistros = usuarios.length,
+  totalPaginas = totalRegistros ? 1 : 0,
+  paginaActual = 1,
+): ResultadoPaginaUsuarios {
+  return {
+    usuarios,
+    paginaActual,
+    paginaTamano: 10,
+    totalRegistros,
+    totalPaginas,
+  };
+}
+
+function esperar(ms: number): Promise<void> {
+  return new Promise((resolver) => setTimeout(resolver, ms));
+}
 
 function pulsar(root: HTMLElement, texto: string): void {
   const boton = Array.from(root.querySelectorAll('button')).find(

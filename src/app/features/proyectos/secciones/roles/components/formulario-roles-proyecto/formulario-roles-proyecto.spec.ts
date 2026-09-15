@@ -45,6 +45,17 @@ describe('FormularioRolesProyecto', () => {
     });
   });
 
+  it('comunica los roles temporales aunque una descripción continúe vacía', () => {
+    const datosCambiados = jasmine.createSpy();
+    fixture.componentInstance.datosCambiados.subscribe(datosCambiados);
+
+    escribir('#rol-nombre-0', '  Supervisor  ');
+
+    expect(datosCambiados).toHaveBeenCalledWith({
+      roles: [{ nombre: 'Supervisor', descripcion: '' }],
+    });
+  });
+
   it('rechaza nombres repetidos ignorando mayúsculas y espacios', () => {
     escribir('#rol-nombre-0', 'Administrador');
     escribir('#rol-descripcion-0', 'Configura');

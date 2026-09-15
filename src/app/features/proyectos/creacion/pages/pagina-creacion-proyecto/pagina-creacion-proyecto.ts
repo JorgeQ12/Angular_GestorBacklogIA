@@ -49,6 +49,7 @@ import {
   SECCIONES_PROYECTO,
 } from '../../../config/secciones-proyecto.config';
 import type { ActualizacionSeccionProyecto } from '../../../models/actualizacion-seccion-proyecto.model';
+import { obtenerContenidoJsonSeccionProyecto } from '../../../mappers/actualizacion-seccion-proyecto.mapper';
 import {
   ACCIONES_CREACION_PASO_PROYECTO,
   type AccionesPasoProyecto,
@@ -119,7 +120,6 @@ import { NotificadorErroresBorradorProyectoService } from '../../services/notifi
   styleUrl: './pagina-creacion-proyecto.css',
 })
 export class PaginaCreacionProyecto {
-
   /** Proporciona acceso a activated route. */
   private readonly ruta = inject(ActivatedRoute);
 
@@ -152,6 +152,12 @@ export class PaginaCreacionProyecto {
 
   /** Conserva paso seleccionado como estado reactivo de la instancia. */
   private readonly pasoSeleccionado = signal<ClavePasoProyecto | null>(null);
+
+  /** Conserva el contenido todavía no guardado de la sección visible para el Asistente IA. */
+  private readonly contenidoTemporalAsistenteIA = signal<{
+    readonly seccion: ClaveSeccionProyecto;
+    readonly contenidoJson: string;
+  } | null>(null);
 
   /** Conserva carga recorrido actual para controlar el ciclo de vida de la operación. */
   private cargaRecorridoActual: Subscription | null = null;
@@ -344,11 +350,14 @@ export class PaginaCreacionProyecto {
 
     const seccionActiva = this.estadoRecorrido().pasoActual;
     const seccion = SECCIONES_PROYECTO.find((item) => item.clave === seccionActiva);
+    const contenidoTemporal = this.contenidoTemporalAsistenteIA();
     return {
       proyectoId,
       revisionContexto: borrador.revision,
       seccionActiva,
       nombreSeccion: seccion?.titulo ?? 'Creación del proyecto',
+      contenidoSeccionTemporalJson:
+        contenidoTemporal?.seccion === seccionActiva ? contenidoTemporal.contenidoJson : null,
     };
   });
 
@@ -378,7 +387,18 @@ export class PaginaCreacionProyecto {
   protected abrirPaso(clave: ClavePasoProyecto): void {
     const borrador = this.estadoCreacion.borrador();
     if (!borrador || !puedeAbrirPasoCreacion(clave, borrador.pasoActual)) return;
+    if (this.estadoRecorrido().pasoActual !== clave) this.contenidoTemporalAsistenteIA.set(null);
     this.pasoSeleccionado.set(clave);
+  }
+
+  /** Actualiza la fotografía de la sección que el asistente debe considerar antes de guardarla. */
+  protected actualizarContenidoTemporalAsistenteIA(
+    actualizacion: ActualizacionSeccionProyecto,
+  ): void {
+    const contenidoJson = obtenerContenidoJsonSeccionProyecto(actualizacion);
+    this.contenidoTemporalAsistenteIA.set(
+      contenidoJson === null ? null : { seccion: actualizacion.seccion, contenidoJson },
+    );
   }
 
   /** Valida vinculación dentro del flujo actual. */
@@ -449,8 +469,7 @@ export class PaginaCreacionProyecto {
           }
           this.abrirPaso(siguiente);
         },
-        error: (error: unknown) =>
-          this.notificadorBorrador.comunicar(error, actualizacion.seccion),
+        error: (error: unknown) => this.notificadorBorrador.comunicar(error, actualizacion.seccion),
       });
   }
 
@@ -515,8 +534,7 @@ export class PaginaCreacionProyecto {
           if (this.estadoCreacion.proyectoId() !== proyectoId) return;
           this.flujoGeneradoConIA.set(null);
         },
-        error: (error: unknown) =>
-          this.notificadorBorrador.comunicar(error, actualizacion.seccion),
+        error: (error: unknown) => this.notificadorBorrador.comunicar(error, actualizacion.seccion),
       });
   }
 
@@ -578,6 +596,7 @@ export class PaginaCreacionProyecto {
   protected recargarBorradorDesdeIA(proyectoId: number): void {
     if (this.idProyecto() !== proyectoId) return;
 
+    this.contenidoTemporalAsistenteIA.set(null);
     this.estadoCreacion
       .recargar(proyectoId)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -610,6 +629,7 @@ export class PaginaCreacionProyecto {
     this.guardadoActual?.unsubscribe();
     this.generacionFlujoActual?.unsubscribe();
     this.pasoSeleccionado.set(null);
+    this.contenidoTemporalAsistenteIA.set(null);
     this.errorCargaRecorrido.set(false);
     this.origenEquipoActualizado.set(null);
     this.equipoActualizado.set(null);

@@ -22,6 +22,28 @@ export interface Usuario {
   readonly fechaActualizacion: string | null;
 }
 
+/** Describe los criterios enviados al listado paginado de usuarios. */
+export interface ConsultaUsuarios {
+  readonly busqueda: string;
+  readonly incluirInactivos: boolean;
+  readonly paginaActual: number;
+  readonly paginaTamano: number;
+}
+
+/** Representa una página de usuarios independiente del contrato HTTP. */
+export interface PaginaUsuarios {
+  readonly usuarios: readonly Usuario[];
+  readonly paginaActual: number;
+  readonly paginaTamano: number;
+  readonly totalRegistros: number;
+  readonly totalPaginas: number;
+}
+
+/** Describe una solicitud de navegación entre páginas de usuarios. */
+export interface CambioPaginaUsuarios {
+  readonly pagina: number;
+}
+
 /** Contexto inmutable utilizado para crear o editar un usuario. */
 export interface EditorUsuario {
   readonly entidad: Usuario | null;

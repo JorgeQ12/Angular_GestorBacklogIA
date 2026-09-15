@@ -1,12 +1,14 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   computed,
   effect,
   inject,
   input,
   output,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
   ErrorCampoDirective,
@@ -30,9 +32,11 @@ import { FormularioAlcanceProyectoTipado } from '../../models/formulario-alcance
   styleUrl: './formulario-alcance-proyecto.css',
 })
 export class FormularioAlcanceProyecto {
-
   /** Construye los controles reactivos administrados por el componente. */
   private readonly constructorFormulario = inject(NonNullableFormBuilder);
+
+  /** Coordina la finalización de la observación del borrador temporal. */
+  private readonly destroyRef = inject(DestroyRef);
 
   /** Identifica el formulario para permitir acciones externas mediante el atributo form. */
   public readonly idFormulario = input<string | null>(null);
@@ -48,6 +52,9 @@ export class FormularioAlcanceProyecto {
 
   /** Entrega un Alcance válido y normalizado al flujo consumidor. */
   public readonly guardar = output<AlcanceProyecto>();
+
+  /** Comunica la fotografía vigente aunque la sección todavía esté incompleta. */
+  public readonly datosCambiados = output<AlcanceProyecto>();
 
   /** Conserva límites para coordinar esta responsabilidad. */
   protected readonly limites = LIMITES_ALCANCE_PROYECTO;
@@ -67,6 +74,10 @@ export class FormularioAlcanceProyecto {
   );
 
   public constructor() {
+    this.formulario.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.datosCambiados.emit(this.obtenerDatosTemporales()));
+
     effect(() => {
       this.modo();
       const datos = this.datosIniciales();
@@ -90,10 +101,15 @@ export class FormularioAlcanceProyecto {
       return;
     }
 
+    this.guardar.emit(this.obtenerDatosTemporales());
+  }
+
+  /** Construye el contrato canónico a partir de todos los controles, incluso si están bloqueados. */
+  private obtenerDatosTemporales(): AlcanceProyecto {
     const valores = this.formulario.getRawValue();
-    this.guardar.emit({
+    return {
       incluido: valores.incluido.trim(),
       excluido: valores.excluido.trim(),
-    });
+    };
   }
 }

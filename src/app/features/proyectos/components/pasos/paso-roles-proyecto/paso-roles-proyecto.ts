@@ -34,6 +34,8 @@ export class PasoRolesProyecto {
   public readonly cancelar = output<void>();
   /** Entrega los roles validados para persistirlos. */
   public readonly guardar = output<RolesProyecto>();
+  /** Comunica el contenido temporal utilizado como contexto por consumidores externos. */
+  public readonly datosCambiados = output<RolesProyecto>();
   /** Comunica la versión seleccionada por el usuario. */
   public readonly versionCambiada = output<number>();
 

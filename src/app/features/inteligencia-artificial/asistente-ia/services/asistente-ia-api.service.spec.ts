@@ -71,6 +71,8 @@ describe('AsistenteIAApiService', () => {
       revisionContexto: 4,
       seccionActiva: 'objetivos',
       nombreSeccion: 'Objetivos',
+      contenidoSeccionTemporalJson:
+        '{"objetivoGeneral":"Reducir tiempos","objetivosEspecificos":["Automatizar"]}',
     };
     let textoRespuesta = '';
     servicio.enviarMensaje(contexto, '  Ayúdame  ').subscribe((respuesta) => {
@@ -86,7 +88,10 @@ describe('AsistenteIAApiService', () => {
       proyectoId: 42,
       revisionContexto: 4,
       seccionContexto: 'objetivos',
+      etiquetaSeccionContexto: 'Objetivos',
       mensaje: 'Ayúdame',
+      contenidoSeccionTemporalJson:
+        '{"objetivoGeneral":"Reducir tiempos","objetivosEspecificos":["Automatizar"]}',
     });
     expect(solicitud.request.context.get(OMITIR_CARGA_GLOBAL)).toBe(true);
     solicitud.flush({
@@ -107,7 +112,8 @@ describe('AsistenteIAApiService', () => {
 
   it('aplica una propuesta con la revisión observada por el cliente', () => {
     let revision = 0;
-    servicio.aplicarPropuesta(CONTEXTO, 9).subscribe((resultado) => {
+    const contenidoActual = '{"objetivoGeneral":"Reducir","objetivosEspecificos":[]}';
+    servicio.aplicarPropuesta(CONTEXTO, 9, contenidoActual).subscribe((resultado) => {
       revision = resultado.revision;
     });
 
@@ -117,6 +123,7 @@ describe('AsistenteIAApiService', () => {
       proyectoId: 42,
       mensajeId: 9,
       revisionEsperada: 4,
+      contenidoSeccionActualJson: contenidoActual,
     });
     expect(solicitud.request.context.get(OMITIR_CARGA_GLOBAL)).toBe(true);
     solicitud.flush(crearResultadoResolucion('Aplicada', 5));
@@ -162,6 +169,7 @@ const CONTEXTO: ContextoAsistenteIA = {
   revisionContexto: 4,
   seccionActiva: 'objetivos',
   nombreSeccion: 'Objetivos',
+  contenidoSeccionTemporalJson: null,
 };
 
 function crearResultadoResolucion(estado: string, revision: number) {

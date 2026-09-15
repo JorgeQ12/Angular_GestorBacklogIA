@@ -23,9 +23,13 @@ describe('PanelAsistenteIA', () => {
     textarea.value = 'Ayúdame a mejorar el impacto';
     textarea.dispatchEvent(new Event('input'));
     formulario.dispatchEvent(new Event('submit'));
+    fixture.detectChanges();
 
     expect(emitido).toHaveBeenCalledWith('Ayúdame a mejorar el impacto');
     expect(textarea.value).toBe('');
+    expect(formulario.classList.contains('ng-submitted')).toBe(false);
+    expect(fixture.nativeElement.querySelector('.ui-field-error')).toBeNull();
+    expect(textarea.hasAttribute('aria-invalid')).toBe(false);
   });
 
   it('no emite un mensaje vacío al enviar un formulario inválido', () => {
@@ -213,8 +217,10 @@ describe('PanelAsistenteIA', () => {
         revisionContexto: 4,
         propuesta: {
           seccion: 'alcance',
+          etiquetaSeccion: 'Alcance',
+          campoObjetivo: null,
+          etiquetaObjetivo: null,
           resumen: 'Aclara los límites.',
-          contenidoJson: '{}',
           estado: 'pendiente',
           detalles: [{ etiqueta: 'Incluido', valores: ['Seguimiento de envíos'] }],
         },
@@ -236,6 +242,37 @@ describe('PanelAsistenteIA', () => {
     expect(emitido).toHaveBeenCalledWith(9);
   });
 
+  it('distingue una sugerencia puntual y mantiene su aplicación explícita', () => {
+    const fixture = TestBed.createComponent(PanelAsistenteIA);
+    fixture.componentRef.setInput('nombreSeccion', 'Alcance');
+    fixture.componentRef.setInput('mensajes', [
+      {
+        id: 10,
+        rol: 'asistente',
+        texto: 'Ajusté únicamente el alcance excluido.',
+        orden: 1,
+        fechaCreacion: '2026-09-04T12:00:00Z',
+        seccionContexto: 'alcance',
+        revisionContexto: 4,
+        propuesta: {
+          seccion: 'alcance',
+          etiquetaSeccion: 'Alcance',
+          campoObjetivo: 'excluido',
+          etiquetaObjetivo: 'Alcance excluido',
+          resumen: 'Precisa lo que no se desarrollará.',
+          estado: 'pendiente',
+          detalles: [{ etiqueta: 'Excluido', valores: ['Aplicación móvil'] }],
+        },
+      },
+    ]);
+    fixture.detectChanges();
+
+    const contenido = (fixture.nativeElement as HTMLElement).textContent;
+    expect(contenido).toContain('Sugerencia puntual');
+    expect(contenido).toContain('Sugerencia para Alcance excluido');
+    expect(contenido).toContain('Aplicar sugerencia');
+  });
+
   it('bloquea las decisiones de propuesta mientras existe otra operación remota', () => {
     const fixture = TestBed.createComponent(PanelAsistenteIA);
     fixture.componentRef.setInput('nombreSeccion', 'Alcance');
@@ -250,8 +287,10 @@ describe('PanelAsistenteIA', () => {
         revisionContexto: 4,
         propuesta: {
           seccion: 'alcance',
+          etiquetaSeccion: 'Alcance',
+          campoObjetivo: null,
+          etiquetaObjetivo: null,
           resumen: 'Aclara los límites.',
-          contenidoJson: '{}',
           estado: 'pendiente',
           detalles: [],
         },

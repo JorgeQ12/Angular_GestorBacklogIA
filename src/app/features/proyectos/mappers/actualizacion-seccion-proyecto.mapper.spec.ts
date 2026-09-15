@@ -4,92 +4,95 @@ import type { ContenidoPersistibleProyecto } from '../models/actualizacion-secci
 import {
   aplicarActualizacionSeccionProyecto,
   mapearCambioSeccionProyecto,
+  obtenerContenidoJsonSeccionProyecto,
 } from './actualizacion-seccion-proyecto.mapper';
 
 describe('mapearCambioSeccionProyecto', () => {
-  ([
-    {
-      actualizacion: {
-        seccion: ClaveSeccionProyecto.Contexto,
-        datos: {
-          nombre: 'Portal',
-          responsable: 'María',
-          fechaObjetivo: '2026-10-01',
-          prioridadCatalogoId: 2,
-          descripcion: 'Autoservicio',
+  (
+    [
+      {
+        actualizacion: {
+          seccion: ClaveSeccionProyecto.Contexto,
+          datos: {
+            nombre: 'Portal',
+            responsable: 'María',
+            fechaObjetivo: '2026-10-01',
+            prioridadCatalogoId: 2,
+            descripcion: 'Autoservicio',
+          },
+        },
+        esperado: {
+          contexto: {
+            nombre: 'Portal',
+            responsable: 'María',
+            fechaObjetivo: '2026-10-01',
+            prioridadCatalogoId: 2,
+            descripcion: 'Autoservicio',
+          },
         },
       },
-      esperado: {
-        contexto: {
-          nombre: 'Portal',
-          responsable: 'María',
-          fechaObjetivo: '2026-10-01',
-          prioridadCatalogoId: 2,
-          descripcion: 'Autoservicio',
+      {
+        actualizacion: {
+          seccion: ClaveSeccionProyecto.TipoSolucion,
+          datos: { tieneInterfaz: true, plataforma: PlataformaSolucion.Web },
+        },
+        esperado: { tipoSolucionJson: '{"tieneInterfaz":true,"plataforma":"Web"}' },
+      },
+      {
+        actualizacion: {
+          seccion: ClaveSeccionProyecto.Necesidad,
+          datos: { situacionActual: 'Manual', problemas: 'Retrasos', impacto: 'Costos' },
+        },
+        esperado: {
+          necesidadJson: '{"situacionActual":"Manual","problemas":"Retrasos","impacto":"Costos"}',
         },
       },
-    },
-    {
-      actualizacion: {
-        seccion: ClaveSeccionProyecto.TipoSolucion,
-        datos: { tieneInterfaz: true, plataforma: PlataformaSolucion.Web },
-      },
-      esperado: { tipoSolucionJson: '{"tieneInterfaz":true,"plataforma":"Web"}' },
-    },
-    {
-      actualizacion: {
-        seccion: ClaveSeccionProyecto.Necesidad,
-        datos: { situacionActual: 'Manual', problemas: 'Retrasos', impacto: 'Costos' },
-      },
-      esperado: {
-        necesidadJson: '{"situacionActual":"Manual","problemas":"Retrasos","impacto":"Costos"}',
-      },
-    },
-    {
-      actualizacion: {
-        seccion: ClaveSeccionProyecto.Objetivos,
-        datos: { objetivoGeneral: '  Mejorar  ', objetivosEspecificos: [' Automatizar '] },
-      },
-      esperado: {
-        objetivosJson: '{"objetivoGeneral":"Mejorar","objetivosEspecificos":["Automatizar"]}',
-      },
-    },
-    {
-      actualizacion: {
-        seccion: ClaveSeccionProyecto.Alcance,
-        datos: { incluido: ' Portal ', excluido: ' Pagos ' },
-      },
-      esperado: { alcanceJson: '{"incluido":"Portal","excluido":"Pagos"}' },
-    },
-    {
-      actualizacion: {
-        seccion: ClaveSeccionProyecto.Roles,
-        datos: { roles: [{ nombre: ' Admin ', descripcion: ' Configura ' }] },
-      },
-      esperado: { rolesJson: '[{"nombre":"Admin","descripcion":"Configura"}]' },
-    },
-    {
-      actualizacion: {
-        seccion: ClaveSeccionProyecto.Equipo,
-        datos: {
-          integrantes: [
-            {
-              idAzure: ' az-1 ',
-              nombre: ' Ana ',
-              correo: ' ana@x.com ',
-              esAdministradorAzure: true,
-              perfilTecnicoId: 3,
-              dedicacionCodigo: ' full ',
-            },
-          ],
+      {
+        actualizacion: {
+          seccion: ClaveSeccionProyecto.Objetivos,
+          datos: { objetivoGeneral: '  Mejorar  ', objetivosEspecificos: [' Automatizar '] },
+        },
+        esperado: {
+          objetivosJson: '{"objetivoGeneral":"Mejorar","objetivosEspecificos":["Automatizar"]}',
         },
       },
-      esperado: {
-        equipoJson:
-          '[{"idAzure":"az-1","nombre":"Ana","correo":"ana@x.com","esAdministradorAzure":true,"perfilTecnicoId":3,"dedicacionCodigo":"full"}]',
+      {
+        actualizacion: {
+          seccion: ClaveSeccionProyecto.Alcance,
+          datos: { incluido: ' Portal ', excluido: ' Pagos ' },
+        },
+        esperado: { alcanceJson: '{"incluido":"Portal","excluido":"Pagos"}' },
       },
-    },
-  ] as const).forEach(({ actualizacion, esperado }) => {
+      {
+        actualizacion: {
+          seccion: ClaveSeccionProyecto.Roles,
+          datos: { roles: [{ nombre: ' Admin ', descripcion: ' Configura ' }] },
+        },
+        esperado: { rolesJson: '[{"nombre":"Admin","descripcion":"Configura"}]' },
+      },
+      {
+        actualizacion: {
+          seccion: ClaveSeccionProyecto.Equipo,
+          datos: {
+            integrantes: [
+              {
+                idAzure: ' az-1 ',
+                nombre: ' Ana ',
+                correo: ' ana@x.com ',
+                esAdministradorAzure: true,
+                perfilTecnicoId: 3,
+                dedicacionCodigo: ' full ',
+              },
+            ],
+          },
+        },
+        esperado: {
+          equipoJson:
+            '[{"idAzure":"az-1","nombre":"Ana","correo":"ana@x.com","esAdministradorAzure":true,"perfilTecnicoId":3,"dedicacionCodigo":"full"}]',
+        },
+      },
+    ] as const
+  ).forEach(({ actualizacion, esperado }) => {
     it(`reemplaza únicamente ${actualizacion.seccion}`, () => {
       expect(mapearCambioSeccionProyecto(actualizacion)).toEqual(esperado);
     });
@@ -159,5 +162,31 @@ describe('aplicarActualizacionSeccionProyecto', () => {
 
     expect(resultado.contexto).toEqual(contextoNuevo);
     expect(resultado.alcanceJson).toBe(CONTENIDO.alcanceJson);
+  });
+});
+
+describe('obtenerContenidoJsonSeccionProyecto', () => {
+  it('reutiliza el serializador canónico de la sección sin conocerla desde IA', () => {
+    expect(
+      obtenerContenidoJsonSeccionProyecto({
+        seccion: ClaveSeccionProyecto.Alcance,
+        datos: { incluido: ' Portal ', excluido: ' Móvil ' },
+      }),
+    ).toBe('{"incluido":"Portal","excluido":"Móvil"}');
+  });
+
+  it('devuelve null cuando la actualización no produce contenido JSON', () => {
+    expect(
+      obtenerContenidoJsonSeccionProyecto({
+        seccion: ClaveSeccionProyecto.Contexto,
+        datos: {
+          nombre: 'Portal',
+          responsable: 'María',
+          descripcion: 'Autoservicio',
+          prioridadCatalogoId: 2,
+          fechaObjetivo: '2026-10-01',
+        },
+      }),
+    ).toBeNull();
   });
 });

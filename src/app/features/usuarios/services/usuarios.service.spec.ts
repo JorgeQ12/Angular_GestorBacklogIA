@@ -41,16 +41,40 @@ describe('Administración HTTP de usuarios', () => {
 
   afterEach(() => http.verify());
 
-  it('consulta la colección incluyendo usuarios inactivos', async () => {
-    const promesa = firstValueFrom(api.obtenerTodos());
+  it('consulta una página incluyendo filtros e inactivos', async () => {
+    const promesa = firstValueFrom(
+      api.obtenerTodos({
+        busqueda: 'Ada',
+        incluirInactivos: true,
+        paginaActual: 2,
+        paginaTamano: 10,
+      }),
+    );
     const req = http.expectOne(
       (solicitud) =>
         solicitud.url === E.obtenerUsuarios &&
-        solicitud.params.get('IncluirInactivos') === 'true',
+        solicitud.params.get('incluirInactivos') === 'true' &&
+        solicitud.params.get('busqueda') === 'Ada' &&
+        solicitud.params.get('paginaActual') === '2' &&
+        solicitud.params.get('paginaTamano') === '10',
     );
     expect(req.request.method).toBe('GET');
-    req.flush(resultado([usuario]));
-    expect(await promesa).toEqual([usuario]);
+    req.flush(
+      resultado({
+        registros: [usuario],
+        paginaActual: 2,
+        paginaTamano: 10,
+        totalRegistros: 11,
+        paginas: 2,
+      }),
+    );
+    expect(await promesa).toEqual({
+      usuarios: [usuario],
+      paginaActual: 2,
+      paginaTamano: 10,
+      totalRegistros: 11,
+      totalPaginas: 2,
+    });
   });
 
   it('crea un usuario con IdAzure y normaliza el correo vacío', async () => {
@@ -110,8 +134,7 @@ describe('Administración HTTP de usuarios', () => {
   it('inactiva mediante PATCH y reactiva mediante PUT con la fotografía vigente', async () => {
     const inactivar = firstValueFrom(api.inactivar(7));
     const patch = http.expectOne(
-      (solicitud) =>
-        solicitud.url === E.inactivarUsuario && solicitud.params.get('Id') === '7',
+      (solicitud) => solicitud.url === E.inactivarUsuario && solicitud.params.get('Id') === '7',
     );
     expect(patch.request.method).toBe('PATCH');
     expect(patch.request.body).toBeNull();

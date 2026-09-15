@@ -15,6 +15,7 @@
     [datosIniciales]="datos()"
     [procesando]="procesando()"
     [modo]="modo()"
+    (datosCambiados)="datosCambiados.emit($event)"
     (guardar)="guardar.emit($event)"
   />
 </app-tarjeta-paso-proyecto>

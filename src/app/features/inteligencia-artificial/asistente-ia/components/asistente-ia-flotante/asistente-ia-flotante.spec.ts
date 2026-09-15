@@ -83,8 +83,9 @@ describe('AsistenteIAFlotante', () => {
     const actualizado = jasmine.createSpy('actualizado');
     fixture.componentInstance.contextoActualizado.subscribe(actualizado);
 
-    (fixture.componentInstance as unknown as { aplicarPropuesta(id: number): void })
-      .aplicarPropuesta(9);
+    (
+      fixture.componentInstance as unknown as { aplicarPropuesta(id: number): void }
+    ).aplicarPropuesta(9);
 
     expect(estado.seleccionarProyecto).toHaveBeenCalledWith(10);
     expect(actualizado).toHaveBeenCalledWith(10);
@@ -99,9 +100,9 @@ describe('AsistenteIAFlotante', () => {
       nombreSeccion: 'Necesidad de negocio',
     });
     fixture.detectChanges();
-    (fixture.nativeElement.querySelector(
-      '.asistente-ia-flotante__activador',
-    ) as HTMLButtonElement).click();
+    (
+      fixture.nativeElement.querySelector('.asistente-ia-flotante__activador') as HTMLButtonElement
+    ).click();
     fixture.detectChanges();
 
     (fixture.nativeElement.querySelector('.panel-asistente__cerrar') as HTMLButtonElement).click();
@@ -163,9 +164,9 @@ describe('AsistenteIAFlotante', () => {
       nombreSeccion: 'Necesidad de negocio',
     });
     fixture.detectChanges();
-    (fixture.nativeElement.querySelector(
-      '.asistente-ia-flotante__activador',
-    ) as HTMLButtonElement).click();
+    (
+      fixture.nativeElement.querySelector('.asistente-ia-flotante__activador') as HTMLButtonElement
+    ).click();
     fixture.detectChanges();
 
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
@@ -202,8 +203,9 @@ describe('AsistenteIAFlotante', () => {
     });
     fixture.detectChanges();
 
-    (fixture.componentInstance as unknown as { rechazarPropuesta(id: number): void })
-      .rechazarPropuesta(7);
+    (
+      fixture.componentInstance as unknown as { rechazarPropuesta(id: number): void }
+    ).rechazarPropuesta(7);
 
     expect(estado.rechazar).toHaveBeenCalledWith(10, 7);
   });

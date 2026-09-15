@@ -9,7 +9,12 @@ import {
   output,
   viewChild,
 } from '@angular/core';
-import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormGroupDirective,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { IconoComponent } from '../../../../../shared/components/icono/icono.component';
 import { FechaPipe } from '../../../../../shared/fechas/pipes/fecha.pipe';
 import { ErrorCampoDirective } from '../../../../../shared/forms/errores-validacion';
@@ -46,6 +51,9 @@ export class PanelAsistenteIA {
 
   /** Referencia lista mensajes dentro de la vista. */
   private readonly listaMensajes = viewChild<ElementRef<HTMLElement>>('listaMensajes');
+
+  /** Permite restablecer también el estado de envío del formulario. */
+  private readonly directivaFormulario = viewChild(FormGroupDirective);
 
   /** Recibe el historial confirmado que debe presentar el panel. */
   public readonly mensajes = input.required<readonly MensajeAsistenteIA[]>();
@@ -140,7 +148,7 @@ export class PanelAsistenteIA {
 
     const mensaje = this.formulario.controls.mensaje.value.trim();
     this.mensajeEnviado.emit(mensaje);
-    this.formulario.reset();
+    this.limpiarCompositor();
   }
 
   /** Inicia una solicitud sugerida desde el estado de bienvenida. */
@@ -148,7 +156,7 @@ export class PanelAsistenteIA {
     if (this.operacionBloqueada()) return;
 
     this.mensajeEnviado.emit(mensaje);
-    this.formulario.reset();
+    this.limpiarCompositor();
   }
 
   /** Envía con Enter y conserva Shift + Enter para redactar en varias líneas. */
@@ -157,5 +165,16 @@ export class PanelAsistenteIA {
 
     evento.preventDefault();
     this.enviar();
+  }
+
+  /** Limpia el valor y evita conservar el formulario como enviado. */
+  private limpiarCompositor(): void {
+    const directiva = this.directivaFormulario();
+    if (directiva) {
+      directiva.resetForm({ mensaje: '' });
+      return;
+    }
+
+    this.formulario.reset();
   }
 }

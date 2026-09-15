@@ -1,4 +1,4 @@
-import { mapearUsuario } from './usuario.mapper';
+import { mapearPaginaUsuarios, mapearUsuario } from './usuario.mapper';
 
 describe('Mapeo de usuario', () => {
   it('conserva identidades, perfil, límite y fechas entregadas por el backend', () => {
@@ -35,5 +35,35 @@ describe('Mapeo de usuario', () => {
     };
 
     expect(mapearUsuario(dto)).toEqual(dto);
+  });
+
+  it('adapta registros y metadatos del paginado remoto', () => {
+    const pagina = mapearPaginaUsuarios({
+      registros: [],
+      paginaActual: 2,
+      paginaTamano: 10,
+      totalRegistros: 13,
+      paginas: 2,
+    });
+
+    expect(pagina).toEqual({
+      usuarios: [],
+      paginaActual: 2,
+      paginaTamano: 10,
+      totalRegistros: 13,
+      totalPaginas: 2,
+    });
+  });
+
+  it('interpreta una colección remota nula como una página vacía', () => {
+    expect(
+      mapearPaginaUsuarios({
+        registros: null,
+        paginaActual: 1,
+        paginaTamano: 10,
+        totalRegistros: 0,
+        paginas: 0,
+      }).usuarios,
+    ).toEqual([]);
   });
 });

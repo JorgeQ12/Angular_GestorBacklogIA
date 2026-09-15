@@ -21,12 +21,12 @@ import type {
   MensajeAsistenteIA,
   ResultadoResolucionPropuestaIA,
 } from '../models/asistente-ia.model';
+import { EstadoPropuestaAsistenteIA } from '../models/asistente-ia.model';
 import { AsistenteIAApiService } from './asistente-ia-api.service';
 
 /** Conserva una única conversación de IA durante la vida de la ruta del proyecto. */
 @Injectable()
 export class EstadoAsistenteIAService {
-
   /** Proporciona acceso al servicio remoto requerido por esta responsabilidad. */
   private readonly api = inject(AsistenteIAApiService);
 
@@ -171,8 +171,16 @@ export class EstadoAsistenteIAService {
     mensajeId: number,
   ): Observable<ResultadoResolucionPropuestaIA> {
     if (!this.puedeOperar(contexto.proyectoId) || this.hayOperacionEnCurso()) return EMPTY;
+
+    const propuesta = this.estadoMensajes().find((mensaje) => mensaje.id === mensajeId)?.propuesta;
+    if (!propuesta || propuesta.estado !== EstadoPropuestaAsistenteIA.Pendiente) return EMPTY;
+
+    const contenidoSeccionActualJson =
+      propuesta.seccion.toLowerCase() === contexto.seccionActiva.toLowerCase()
+        ? contexto.contenidoSeccionTemporalJson
+        : null;
     this.estadoPropuestaProcesando.set(mensajeId);
-    return this.api.aplicarPropuesta(contexto, mensajeId).pipe(
+    return this.api.aplicarPropuesta(contexto, mensajeId, contenidoSeccionActualJson).pipe(
       takeUntil(this.cambioProyecto),
       takeUntilDestroyed(this.destroyRef),
       tap((resultado) => {
@@ -215,9 +223,7 @@ export class EstadoAsistenteIAService {
 
   /** Determina si operar. */
   private puedeOperar(proyectoId: number): boolean {
-    return (
-      this.proyectoActivo === proyectoId && !this.estadoCargando() && !this.estadoErrorCarga()
-    );
+    return this.proyectoActivo === proyectoId && !this.estadoCargando() && !this.estadoErrorCarga();
   }
 
   /** Determina si operación en curso. */

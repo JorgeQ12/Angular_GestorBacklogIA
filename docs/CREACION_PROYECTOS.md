@@ -8,7 +8,8 @@ especificar proyectos.
 El recorrido integra un único **Asistente IA** por proyecto desde Necesidad de negocio. Se presenta
 como botón flotante y conserva la misma conversación al cambiar de paso; no existe un asistente por
 sección. Su implementación pertenece a `features/inteligencia-artificial/asistente-ia`
-y la página comparte únicamente proyecto, revisión y sección activa.
+y la página comparte proyecto, revisión, sección activa y una fotografía canónica del formulario
+visible. Esta última incluye cambios todavía no guardados en Necesidad, Objetivos, Alcance y Roles.
 
 La visibilidad depende del paso que se está viendo: al retroceder a Contexto o Tipo de solución,
 el asistente se oculta; al volver a Necesidad o un paso posterior reaparece con la misma conversación.
@@ -16,6 +17,11 @@ el asistente se oculta; al volver a Necesidad o un paso posterior reaparece con 
 Las propuestas no modifican formularios localmente ni se aplican al recibir la respuesta. El
 usuario confirma Aplicar o Rechazar. Una aplicación correcta incrementa la revisión en el backend
 y la página solicita una nueva fotografía mediante `EstadoCreacionProyectoService.recargar`.
+La ayuda por campo se solicita escribiéndola en la misma conversación, sin acciones adicionales
+junto a cada control. La sugerencia conserva los campos hermanos y reutiliza la aplicación de la
+sección completa para guardar de forma atómica el campo propuesto y el contenido temporal vigente.
+La página obtiene esa fotografía con el mapper común de actualizaciones; no mantiene un `switch`
+propio del asistente ni conoce qué campos admite cada capacidad de IA.
 Consultar [Asistente IA](ASISTENTE_IA.md) para contratos, seguridad y organización.
 
 ## Punto de partida

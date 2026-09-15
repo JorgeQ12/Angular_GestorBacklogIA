@@ -7,6 +7,7 @@ import { of, Subject, throwError } from 'rxjs';
 import { SEGMENTOS_RUTA, URL_INICIO_PANEL } from '../../../../../core/navegacion/rutas';
 import { PasoEquipoProyecto } from '../../../components/pasos/paso-equipo-proyecto/paso-equipo-proyecto';
 import { PasoFlujoProyecto } from '../../../components/pasos/paso-flujo-proyecto/paso-flujo-proyecto';
+import { PasoObjetivosProyecto } from '../../../components/pasos/paso-objetivos-proyecto/paso-objetivos-proyecto';
 import { ClaveSeccionProyecto } from '../../../config/secciones-proyecto.config';
 import { BorradorProyecto } from '../../models/borrador-proyecto.model';
 import type { DatosVinculacionAzure } from '../../../models/vinculacion-azure-proyecto.model';
@@ -92,10 +93,25 @@ describe('PaginaCreacionProyecto', () => {
     expect(elemento.querySelector('app-asistente-ia-flotante')).not.toBeNull();
   });
 
-  it('mantiene oculto el Asistente IA antes de alcanzar necesidad de negocio', async () => {
-    creacionProyecto.obtenerBorrador.and.returnValue(
-      of({ ...BORRADOR_AVANZADO, pasoActual: 2 }),
+  it('entrega al asistente la fotografía temporal del formulario sin guardarla primero', async () => {
+    const harness = await RouterTestingHarness.create('/proyectos/creacion?proyectoId=42');
+    const paso = harness.routeDebugElement?.query(By.directive(PasoObjetivosProyecto));
+
+    paso?.componentInstance.datosCambiados.emit({
+      objetivoGeneral: 'Reducir tiempos sin guardar',
+      objetivosEspecificos: ['Automatizar validaciones'],
+    });
+    harness.detectChanges();
+
+    const asistente = harness.routeDebugElement?.query(By.directive(AsistenteIAFlotante));
+    expect(asistente?.componentInstance.contexto().contenidoSeccionTemporalJson).toBe(
+      '{"objetivoGeneral":"Reducir tiempos sin guardar","objetivosEspecificos":["Automatizar validaciones"]}',
     );
+    expect(creacionProyecto.actualizarBorrador).not.toHaveBeenCalled();
+  });
+
+  it('mantiene oculto el Asistente IA antes de alcanzar necesidad de negocio', async () => {
+    creacionProyecto.obtenerBorrador.and.returnValue(of({ ...BORRADOR_AVANZADO, pasoActual: 2 }));
     const harness = await RouterTestingHarness.create('/proyectos/creacion?proyectoId=42');
 
     expect(
@@ -130,7 +146,9 @@ describe('PaginaCreacionProyecto', () => {
 
       const asistente = harness.routeDebugElement!.query(By.directive(AsistenteIAFlotante));
       expect(asistente).not.toBeNull();
-      expect(asistente.componentInstance.contexto().seccionActiva).toBe(ClaveSeccionProyecto.Necesidad);
+      expect(asistente.componentInstance.contexto().seccionActiva).toBe(
+        ClaveSeccionProyecto.Necesidad,
+      );
       expect(asistente.injector.get(EstadoAsistenteIAService)).toBe(estadoIA);
       expect(creacionProyecto.obtenerBorrador).toHaveBeenCalledTimes(1);
     });
@@ -155,9 +173,7 @@ describe('PaginaCreacionProyecto', () => {
   });
 
   it('oculta el encabezado y el recorrido cuando falla la carga del borrador', async () => {
-    creacionProyecto.obtenerBorrador.and.returnValue(
-      throwError(() => new Error('Error de carga')),
-    );
+    creacionProyecto.obtenerBorrador.and.returnValue(throwError(() => new Error('Error de carga')));
 
     const harness = await RouterTestingHarness.create('/proyectos/creacion?proyectoId=42');
     const elemento = harness.routeNativeElement as HTMLElement;
@@ -202,8 +218,9 @@ describe('PaginaCreacionProyecto', () => {
     const router = TestBed.inject(Router);
     const navegar = spyOn(router, 'navigate');
 
-    (componente as unknown as { datosVinculacion: { set: (datos: DatosVinculacionAzure) => void } })
-      .datosVinculacion.set(DATOS_VINCULACION);
+    (
+      componente as unknown as { datosVinculacion: { set: (datos: DatosVinculacionAzure) => void } }
+    ).datosVinculacion.set(DATOS_VINCULACION);
     (componente as unknown as { crearBorrador: () => void }).crearBorrador();
 
     expect(creacionProyecto.crearBorrador).toHaveBeenCalledWith(DATOS_VINCULACION);

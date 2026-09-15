@@ -1,8 +1,17 @@
+/** Representa un detalle de presentación preparado por el API. */
+export interface DetallePropuestaAsistenteIADto {
+  readonly etiqueta: string;
+  readonly valores: readonly string[];
+}
+
 /** Representa la propuesta estructurada recibida desde el API. */
 export interface PropuestaAsistenteIADto {
   readonly seccion: string;
+  readonly etiquetaSeccion: string;
+  readonly campoObjetivo: string | null;
+  readonly etiquetaObjetivo: string | null;
   readonly resumen: string;
-  readonly contenidoJson: string;
+  readonly detalles: readonly DetallePropuestaAsistenteIADto[];
   readonly estado: string;
 }
 
@@ -45,7 +54,9 @@ export interface EnviarMensajeAsistenteIASolicitudDto {
   readonly proyectoId: number;
   readonly revisionContexto: number;
   readonly seccionContexto: string;
+  readonly etiquetaSeccionContexto: string;
   readonly mensaje: string;
+  readonly contenidoSeccionTemporalJson: string | null;
 }
 
 /** Identifica la propuesta y la revisión esperada antes de aplicarla. */
@@ -53,6 +64,7 @@ export interface AplicarPropuestaAsistenteIASolicitudDto {
   readonly proyectoId: number;
   readonly mensajeId: number;
   readonly revisionEsperada: number;
+  readonly contenidoSeccionActualJson: string | null;
 }
 
 /** Identifica la propuesta que el usuario decidió rechazar. */

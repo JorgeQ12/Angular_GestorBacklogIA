@@ -34,6 +34,8 @@ export class PasoAlcanceProyecto {
   public readonly cancelar = output<void>();
   /** Entrega el alcance validado para persistirlo. */
   public readonly guardar = output<AlcanceProyecto>();
+  /** Comunica el contenido temporal utilizado como contexto por consumidores externos. */
+  public readonly datosCambiados = output<AlcanceProyecto>();
   /** Comunica la versión seleccionada por el usuario. */
   public readonly versionCambiada = output<number>();
 

@@ -105,8 +105,55 @@ describe('EstadoAsistenteIAService', () => {
     const resultado = await firstValueFrom(servicio.aplicar(CONTEXTO, 9));
 
     expect(resultado.proyectoId).toBe(42);
+    expect(api.aplicarPropuesta).toHaveBeenCalledOnceWith(CONTEXTO, 9, null);
     expect(servicio.mensajes()[0]?.propuesta?.estado).toBe(EstadoPropuestaAsistenteIA.Aplicada);
     expect(servicio.propuestaProcesando()).toBeNull();
+  });
+
+  it('envía la fotografía viva al aplicar una propuesta de la sección visible', () => {
+    const contenidoActual =
+      '{"objetivoGeneral":"Reducir tiempos","objetivosEspecificos":["Automatizar"]}';
+    const contexto = { ...CONTEXTO, contenidoSeccionTemporalJson: contenidoActual };
+    api.obtenerConversacion.and.returnValue(
+      of({ proyectoId: 42, conversacionId: 7, mensajes: [crearMensaje(9, undefined, true)] }),
+    );
+    api.aplicarPropuesta.and.returnValue(
+      of({
+        proyectoId: 42,
+        mensajeId: 9,
+        estado: EstadoPropuestaAsistenteIA.Aplicada,
+        revision: 5,
+      }),
+    );
+    servicio.cargar(42);
+
+    servicio.aplicar(contexto, 9).subscribe();
+
+    expect(api.aplicarPropuesta).toHaveBeenCalledOnceWith(contexto, 9, contenidoActual);
+  });
+
+  it('no mezcla la fotografía visible con una propuesta de otra sección', () => {
+    const contexto = {
+      ...CONTEXTO,
+      seccionActiva: 'alcance',
+      contenidoSeccionTemporalJson: '{"incluido":"Portal","excluido":"Móvil"}',
+    };
+    api.obtenerConversacion.and.returnValue(
+      of({ proyectoId: 42, conversacionId: 7, mensajes: [crearMensaje(9, undefined, true)] }),
+    );
+    api.aplicarPropuesta.and.returnValue(
+      of({
+        proyectoId: 42,
+        mensajeId: 9,
+        estado: EstadoPropuestaAsistenteIA.Aplicada,
+        revision: 5,
+      }),
+    );
+    servicio.cargar(42);
+
+    servicio.aplicar(contexto, 9).subscribe();
+
+    expect(api.aplicarPropuesta).toHaveBeenCalledOnceWith(contexto, 9, null);
   });
 
   it('bloquea operaciones superpuestas mientras existe un envío pendiente', () => {
@@ -308,6 +355,7 @@ const CONTEXTO: ContextoAsistenteIA = {
   revisionContexto: 4,
   seccionActiva: 'objetivos',
   nombreSeccion: 'Objetivos',
+  contenidoSeccionTemporalJson: null,
 };
 
 function crearMensaje(
@@ -326,8 +374,10 @@ function crearMensaje(
     propuesta: conPropuesta
       ? {
           seccion: 'objetivos',
+          etiquetaSeccion: 'Objetivos',
+          campoObjetivo: null,
+          etiquetaObjetivo: null,
           resumen: 'Mejora los objetivos.',
-          contenidoJson: '{}',
           estado: EstadoPropuestaAsistenteIA.Pendiente,
           detalles: [],
         }

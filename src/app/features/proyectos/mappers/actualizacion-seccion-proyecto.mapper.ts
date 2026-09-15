@@ -42,3 +42,11 @@ export function mapearCambioSeccionProyecto(
       return { diagramFlujoJson: serializarFlujoProyecto(actualizacion.datos) };
   }
 }
+
+/** Obtiene el JSON canónico producido por una actualización de sección serializable. */
+export function obtenerContenidoJsonSeccionProyecto(
+  actualizacion: ActualizacionSeccionProyecto,
+): string | null {
+  const valores = Object.values(mapearCambioSeccionProyecto(actualizacion));
+  return valores.length === 1 && typeof valores[0] === 'string' ? valores[0] : null;
+}
