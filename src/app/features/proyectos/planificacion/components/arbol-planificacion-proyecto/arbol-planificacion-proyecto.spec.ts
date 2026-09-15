@@ -35,6 +35,8 @@ describe('ArbolPlanificacionProyecto', () => {
     expect(elemento.textContent).toContain('Épica principal');
     expect(elemento.textContent).toContain('Registro de órdenes');
     expect(elemento.textContent).not.toContain('Crear orden');
+    expect(elemento.querySelector('.arbol-planificacion__rama--epica')).not.toBeNull();
+    expect(elemento.querySelector('.arbol-planificacion__rama--caracteristica')).not.toBeNull();
   });
 
   it('muestra el tooltip Nueva épica en la acción de creación del proyecto', () => {

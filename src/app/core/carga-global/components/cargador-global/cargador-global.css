@@ -43,6 +43,22 @@
   contain: layout paint;
 }
 
+.cargador-global__carretera {
+  position: absolute;
+  right: 0;
+  bottom: 0.35rem;
+  left: 0;
+  height: calc(var(--border-width) * 2);
+  background: repeating-linear-gradient(
+    90deg,
+    var(--border-strong) 0,
+    var(--border-strong) var(--space-8),
+    transparent var(--space-8),
+    transparent var(--space-12)
+  );
+  opacity: 0.65;
+}
+
 .cargador-global__vehiculo {
   position: absolute;
   bottom: 0;

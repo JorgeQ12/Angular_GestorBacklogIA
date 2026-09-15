@@ -44,7 +44,7 @@
   >
     @for (elemento of elementos; track elemento.clave) {
       <li
-        class='arbol-planificacion__rama'
+        class='arbol-planificacion__rama arbol-planificacion__rama--{{ elemento.tipo }}'
         [class.arbol-planificacion__rama--terminal]='esRamaTerminal(elemento)'
         [class.arbol-planificacion__rama--menu-abierto]='estaAbiertoMenuAcciones(elemento.clave)'
         role='treeitem'

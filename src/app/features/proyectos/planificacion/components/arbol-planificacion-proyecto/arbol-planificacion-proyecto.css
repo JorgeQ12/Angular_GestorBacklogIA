@@ -109,6 +109,8 @@
 }
 
 .arbol-planificacion__lista--raiz {
+  --arbol-acento: var(--color-category-orange);
+
   margin-left: var(--space-1);
   --arbol-tronco-x: calc(var(--space-2) * -1);
   --arbol-ramal-control-ancho: var(--space-3);
@@ -123,7 +125,12 @@
   left: var(--space-8);
   z-index: 0;
   width: var(--border-width);
-  background: var(--border-strong);
+  background: repeating-linear-gradient(
+    180deg,
+    var(--text-muted) 0 4px,
+    transparent 4px 9px
+  );
+  opacity: 0.78;
   content: '';
 }
 
@@ -133,8 +140,35 @@
 }
 
 .arbol-planificacion__rama {
+  --arbol-acento: var(--text-muted);
+
   position: relative;
   padding-top: var(--space-1);
+}
+
+.arbol-planificacion__rama--epica {
+  --arbol-acento: var(--color-category-orange);
+}
+
+.arbol-planificacion__rama--caracteristica {
+  --arbol-acento: var(--color-category-violet);
+}
+
+.arbol-planificacion__rama--historia {
+  --arbol-acento: var(--color-category-blue);
+}
+
+.arbol-planificacion__rama--tarea {
+  --arbol-acento: var(--color-category-magenta);
+}
+
+.arbol-planificacion__rama--actividad-requisito,
+.arbol-planificacion__rama--tarea-requisito {
+  --arbol-acento: var(--color-category-green);
+}
+
+.arbol-planificacion__rama--lista-requisitos {
+  --arbol-acento: var(--text-primary);
 }
 
 .arbol-planificacion__rama--menu-abierto {
@@ -153,9 +187,41 @@
       var(--border-width)
   );
   height: var(--border-width);
-  background: var(--border-strong);
+  background: repeating-linear-gradient(
+    90deg,
+    var(--text-muted) 0 4px,
+    transparent 4px 9px
+  );
+  opacity: 0.78;
+  transition: opacity var(--transition-fast);
   content: '';
   pointer-events: none;
+}
+
+.arbol-planificacion__rama:is(:hover, :has(:focus-visible))::before {
+  height: calc(var(--border-width) * 2);
+  background: repeating-linear-gradient(
+    90deg,
+    var(--arbol-acento) 0 8px,
+    transparent 8px 13px
+  );
+  opacity: 1;
+  animation: arbol-relacion-flujo 720ms linear infinite;
+}
+
+.arbol-planificacion__rama:is(:hover, :has(:focus-visible))
+  > .arbol-planificacion__lista::before,
+.arbol-planificacion__lista--raiz:has(
+    > .arbol-planificacion__rama:is(:hover, :has(:focus-visible))
+  )::before {
+  width: calc(var(--border-width) * 2);
+  background: repeating-linear-gradient(
+    180deg,
+    var(--arbol-acento) 0 8px,
+    transparent 8px 13px
+  );
+  opacity: 1;
+  animation: arbol-relacion-flujo 720ms linear infinite;
 }
 
 .arbol-planificacion__rama--terminal::before {
@@ -192,6 +258,12 @@
   z-index: calc(var(--z-dropdown) + 1);
 }
 
+@keyframes arbol-relacion-flujo {
+  to {
+    background-position: -26px -26px;
+  }
+}
+
 @media (max-width: 640px) {
   .arbol-planificacion {
     padding-inline: var(--space-3);
@@ -220,5 +292,16 @@
 
   .arbol-planificacion__lista--raiz::before {
     left: var(--space-1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arbol-planificacion__rama:is(:hover, :has(:focus-visible))::before,
+  .arbol-planificacion__rama:is(:hover, :has(:focus-visible))
+    > .arbol-planificacion__lista::before,
+  .arbol-planificacion__lista--raiz:has(
+      > .arbol-planificacion__rama:is(:hover, :has(:focus-visible))
+    )::before {
+    animation: none;
   }
 }
